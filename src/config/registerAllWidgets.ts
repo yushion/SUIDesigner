@@ -62,6 +62,7 @@ import ListBoxWidget            from '@/components/widgets/ListBoxWidget.vue'
 import TreeViewWidget           from '@/components/widgets/TreeViewWidget.vue'
 import DataGridWidget           from '@/components/widgets/DataGridWidget.vue'
 import ContextMenuWidget        from '@/components/widgets/ContextMenuWidget.vue'
+import TooltipWidget            from '@/components/widgets/TooltipWidget.vue'
 
 interface RegistryEntry {
   type: string
@@ -91,9 +92,8 @@ const BUILTIN_WIDGETS: RegistryEntry[] = [
   { type: 'listBox',          config: listBoxConfig as WidgetJSONConfig,          component: ListBoxWidget },
   { type: 'treeView',         config: treeViewConfig as WidgetJSONConfig,         component: TreeViewWidget },
   { type: 'dataGrid',         config: dataGridConfig as WidgetJSONConfig,         component: DataGridWidget },
-  // 以下为纯逻辑控件（无画布渲染组件）
-  { type: 'contextMenu',      config: contextMenuConfig as WidgetJSONConfig },
-  { type: 'tooltip',          config: tooltipConfig as WidgetJSONConfig },
+  { type: 'contextMenu',      config: contextMenuConfig as WidgetJSONConfig,       component: ContextMenuWidget },
+  { type: 'tooltip',          config: tooltipConfig as WidgetJSONConfig,           component: TooltipWidget },
   { type: 'messageBox',       config: messageBoxConfig as WidgetJSONConfig },
   { type: 'inputBox',         config: inputBoxConfig as WidgetJSONConfig },
 ]

@@ -184,7 +184,7 @@
       </div>
     </template>
     <template v-else-if="widget.type === 'treeView'">
-      <div v-for="(node, ni) in (widget.treeNodes || [{ id: 'node1', label: '节点1', icon: '　' }])" :key="ni">
+      <div v-for="(node, ni) in (widget.treeNodes || [])" :key="ni">
         <div class="tree-node" :data-node-id="node.id" :style="{ paddingLeft: ((node.level || 0) * 16) + 'px' }">
           <div class="tree-node-content">
             <span class="tree-toggle" :class="(node.children && node.children.length > 0) ? (node.isExpanded ? 'expanded' : 'collapsed') : 'empty'">{{ (node.children && node.children.length > 0) ? (node.isExpanded ? '▼' : '▶') : '' }}</span>
