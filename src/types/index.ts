@@ -192,8 +192,6 @@ export interface Widget {
   progressValue?: number
   /** 进度条专有：是否显示进度文本（默认 true） */
   showProgressText?: boolean
-  /** 进度条/列表框专有：是否可编辑/可交互 */
-  editable?: boolean
   /** 进度条专有：是否可拖拽修改进度 */
   draggable?: boolean
   /** 日志输出专有：日志行数组 */
