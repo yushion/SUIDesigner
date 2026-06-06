@@ -57,6 +57,11 @@ export interface TreeNode {
   expanded?: boolean
   checked?: boolean
   children?: TreeNode[]
+  /** 运行时使用的别名 */
+  label?: string
+  name?: string
+  level?: number
+  isExpanded?: boolean
 }
 
 /** 多项表格列定义 */
