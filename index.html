@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <script>self["MonacoEnvironment"] = (function (paths) {
+          return {
+            globalAPI: false,
+            getWorkerUrl : function (moduleId, label) {
+              var result =  paths[label];
+              if (/^((http:)|(https:)|(file:)|(\/\/))/.test(result)) {
+                var currentUrl = String(window.location);
+                var currentOrigin = currentUrl.substr(0, currentUrl.length - window.location.hash.length - window.location.search.length - window.location.pathname.length);
+                if (result.substring(0, currentOrigin.length) !== currentOrigin) {
+                  var js = '/*' + label + '*/importScripts("' + result + '");';
+                  var blob = new Blob([js], { type: 'application/javascript' });
+                  return URL.createObjectURL(blob);
+                }
+              }
+              return result;
+            }
+          };
+        })({
+  "editorWorkerService": "/SUIDesigner/monacoeditorwork/editor.worker.bundle.js",
+  "css": "/SUIDesigner/monacoeditorwork/css.worker.bundle.js",
+  "less": "/SUIDesigner/monacoeditorwork/css.worker.bundle.js",
+  "scss": "/SUIDesigner/monacoeditorwork/css.worker.bundle.js"
+});</script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SUIDesigner</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <script type="module" crossorigin src="/SUIDesigner/assets/index-BBhlhSjW.js"></script>
+  <link rel="stylesheet" crossorigin href="/SUIDesigner/assets/index-VehmFHZJ.css">
+</head>
+<body>
+  <div id="app"></div>
+</body>
+</html>
