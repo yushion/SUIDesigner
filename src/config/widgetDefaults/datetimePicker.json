@@ -1,0 +1,66 @@
+{
+  "label": "时间框",
+  "icon": "📅",
+  "defaultStyleData": {
+    "base": {
+      "width": 140,
+      "height": 32,
+      "backgroundColor": "#ffffff",
+      "color": "#333333",
+      "fontSize": 13,
+      "borderRadius": 4,
+      "borderColor": "#dddddd",
+      "borderWidth": 1,
+      "borderStyle": "solid",
+      "padding": 4,
+      "outline": "none",
+      "boxShadow": "0 2px 4px rgba(0,0,0,0.05)",
+      "fontFamily": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+    },
+    "pseudo": {
+      ":focus": {
+        "border-color": "#0078d4",
+        "box-shadow": "0 0 0 2px rgba(0,120,212,0.2)"
+      },
+      ":disabled": {
+        "opacity": "0.6",
+        "background-color": "#f5f5f5",
+        "cursor": "not-allowed"
+      }
+    },
+    "sub": {}
+  },
+  "defaultStyleLight": {
+    "base": {
+      "backgroundColor": "#ffffff",
+      "color": "#333333",
+      "borderRadius": 4,
+      "borderColor": "#dddddd",
+      "borderWidth": 1,
+      "borderStyle": "solid",
+      "padding": 4
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "defaultStyleDark": {
+    "base": {
+      "backgroundColor": "#2d2d2d",
+      "color": "#e0e0e0",
+      "borderRadius": 4,
+      "borderColor": "#555555",
+      "borderWidth": 1,
+      "borderStyle": "solid",
+      "padding": 4
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "mappedProps": [],
+  "computedProps": [],
+  "defaultProps": {
+    "value": "",
+    "disabled": false,
+    "visible": true
+  }
+}

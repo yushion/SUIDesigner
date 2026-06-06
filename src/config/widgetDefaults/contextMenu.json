@@ -1,0 +1,123 @@
+{
+  "label": "右键菜单",
+  "icon": "📋",
+  "defaultStyleData": {
+    "base": {
+      "width": 125,
+      "height": 65,
+      "backgroundColor": "#FFEEE9",
+      "borderColor": "#E58080",
+      "borderWidth": 2,
+      "borderStyle": "dashed"
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "defaultStyleLight": {
+    "base": {
+      "backgroundColor": "#FFEEE9",
+      "borderColor": "#E58080",
+      "borderWidth": 2,
+      "borderStyle": "solid"
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "defaultStyleDark": {
+    "base": {
+      "backgroundColor": "#2d2d2d",
+      "borderColor": "#444",
+      "borderWidth": 1,
+      "borderStyle": "solid"
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "structuralCSS": {
+    ".ctx-menu": [
+      "position: fixed",
+      "z-index: 99999",
+      "background: #ffffff",
+      "border: 1px solid #d9d9d9",
+      "border-radius: 6px",
+      "box-shadow: 0 3px 12px rgba(0,0,0,0.15)",
+      "padding: 4px 0",
+      "min-width: 160px",
+      "font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+      "font-size: 13px",
+      "color: #333333"
+    ],
+    ".ctx-menu-item": [
+      "display: flex",
+      "align-items: center",
+      "gap: 8px",
+      "padding: 7px 16px",
+      "cursor: pointer",
+      "white-space: nowrap",
+      "position: relative"
+    ],
+    ".ctx-menu-item:hover": [
+      "background: #e8f4ff"
+    ],
+    ".ctx-menu-separator": [
+      "height: 1px",
+      "background: #e8e8e8",
+      "margin: 4px 12px"
+    ],
+    ".ctx-menu-item-icon": [
+      "font-size: 14px",
+      "width: 18px",
+      "text-align: center",
+      "flex-shrink: 0"
+    ],
+    ".ctx-menu-item-text": [
+      "flex: 1"
+    ],
+    ".ctx-menu-item-arrow": [
+      "font-size: 10px",
+      "color: #999",
+      "margin-left: 24px",
+      "flex-shrink: 0"
+    ],
+    ".ctx-sub-menu": [
+      "position: absolute",
+      "left: 100%",
+      "top: -4px",
+      "z-index: 100000",
+      "background: #ffffff",
+      "border: 1px solid #d9d9d9",
+      "border-radius: 6px",
+      "box-shadow: 0 3px 12px rgba(0,0,0,0.15)",
+      "padding: 4px 0",
+      "min-width: 160px",
+      "display: none"
+    ],
+    ".ctx-sub-menu.left": [
+      "left: auto",
+      "right: 100%"
+    ]
+  },
+  "mappedProps": [],
+  "computedProps": [],
+  "defaultProps": {
+    "contextMenuTargetId": "",
+    "contextMenuTrigger": "contextmenu",
+    "contextMenuItems": [
+      {
+        "id": "item1",
+        "text": "菜单项1"
+      },
+      {
+        "id": "item2",
+        "text": "菜单项2",
+        "type": "separator"
+      },
+      {
+        "id": "item3",
+        "text": "菜单项3"
+      }
+    ],
+    "disabled": false,
+    "visible": true
+  }
+}

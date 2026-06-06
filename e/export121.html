@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    :root {
+        /* 亮色主题 - 模拟 Win11 Mica 云母 */
+        --titlebar-bg: rgba(255, 255, 255, 0.6);
+        --titlebar-blur: blur(20px) saturate(180%);
+        --titlebar-border: rgba(0, 0, 0, 0.08);
+        --content-bg: rgba(255, 255, 255, 0.85);
+        --text-color: #1a1a1a;
+        --text-muted: #666;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        :root {
+            /* 暗色主题 - 模拟 Win11 暗色 Mica */
+            --titlebar-bg: rgba(32, 32, 32, 0.6);
+            --titlebar-blur: blur(20px) saturate(150%);
+            --titlebar-border: rgba(255, 255, 255, 0.08);
+            --content-bg: rgba(32, 32, 32, 0.8);
+            --text-color: #e8e8e8;
+            --text-muted: #999;
+        }
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+        height: 100%;
+        background: transparent;
+        font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+        color: var(--text-color);
+        user-select: none;
+        overflow: hidden;
+    }
+
+    /* 标题栏区域 - 亚克力毛玻璃 */
+    .titlebar {
+        height: 40px;
+        display: flex;
+        align-items: center;
+        padding: 0 12px;
+        background: var(--titlebar-bg);
+        backdrop-filter: var(--titlebar-blur);
+        -webkit-backdrop-filter: var(--titlebar-blur);
+        border-bottom: 1px solid var(--titlebar-border);
+        -webkit-app-region: drag;
+    }
+    .titlebar-title { font-size: 13px; color: var(--text-muted); }
+    .titlebar-spacer { flex: 1; }
+
+    .titlebar-btn {
+        width: 46px; height: 32px;
+        border: none; background: transparent;
+        cursor: pointer; font-size: 14px;
+        color: var(--text-color);
+        -webkit-app-region: no-drag;
+        border-radius: 4px;
+    }
+    .titlebar-btn:hover { background: rgba(128,128,128,0.15); }
+    .titlebar-btn.close:hover { background: #e81123; color: #fff; }
+
+    /* 内容区 - 微透明 */
+    .content {
+        height: calc(100% - 40px);
+        padding: 20px;
+        background: var(--content-bg);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        overflow-y: auto;
+    }
+
+    /* 卡片区域 - 亚克力卡片 */
+    .acrylic-card {
+        background: rgba(255,255,255,0.4);
+        backdrop-filter: blur(12px) saturate(180%);
+        -webkit-backdrop-filter: blur(12px) saturate(180%);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 16px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+
+    /* 暗色卡片 */
+    @media (prefers-color-scheme: dark) {
+        .acrylic-card {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.06);
+        }
+    }
+
+    .card-title { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+    .card-text  { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+</style>
+</head>
+<body>
+
+    <!-- 标题栏 -->
+    <div class="titlebar">
+        <span class="titlebar-title">我的应用</span>
+        <span class="titlebar-spacer"></span>
+        <button class="titlebar-btn" onclick="window.external.minimize && window.external.minimize()">&#x2014;</button>
+        <button class="titlebar-btn" onclick="window.external.maximize && window.external.maximize()">&#x25A1;</button>
+        <button class="titlebar-btn close" onclick="window.external.close && window.external.close()">&#x2715;</button>
+    </div>
+
+    <!-- 内容区 -->
+    <div class="content">
+        <div class="acrylic-card">
+            <div class="card-title">亚克力卡片</div>
+            <div class="card-text">这个卡片使用 backdrop-filter 模拟亚克力模糊效果。背景透过的内容被模糊，文字保持清晰。</div>
+        </div>
+        <div class="acrylic-card">
+            <div class="card-title">第二张卡片</div>
+            <div class="card-text">配合 prefers-color-scheme 媒体查询，亮色/暗色主题自动切换。</div>
+        </div>
+    </div>
+
+</body>
+</html>

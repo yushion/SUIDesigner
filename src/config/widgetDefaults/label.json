@@ -1,0 +1,43 @@
+{
+  "label": "文本标签",
+  "icon": "T",
+  "defaultStyleData": {
+    "base": {
+      "width": 30,
+      "height": 20,
+      "color": "#1E1F22",
+      "fontSize": 13,
+      "fontWeight": "normal",
+      "textAlign": "left",
+      "fontFamily": "Segoe UI, Tahoma, Geneva, Verdana, sans-serif",
+      "cursor": "default"
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "defaultStyleLight": {
+    "base": {
+      "color": "#1E1F22",
+      "fontWeight": "normal",
+      "textAlign": "left"
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "defaultStyleDark": {
+    "base": {
+      "color": "#e0e0e0",
+      "fontWeight": "normal",
+      "textAlign": "left"
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "mappedProps": [],
+  "computedProps": [],
+  "defaultProps": {
+    "text": "标签",
+    "disabled": false,
+    "visible": true
+  }
+}

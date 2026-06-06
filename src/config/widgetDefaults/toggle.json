@@ -1,0 +1,118 @@
+{
+  "label": "开关按钮",
+  "icon": "⊘",
+  "defaultStyleData": {
+    "base": {
+      "width": 50,
+      "height": 24,
+      "trackColor": "#cccccc",
+      "knobColor": "#ffffff",
+      "activeTrackColor": "#0078d4",
+      "backgroundColor": "#cccccc",
+      "display": "inline-block",
+      "cursor": "pointer",
+      "userSelect": "none"
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "defaultStyleLight": {
+    "base": {
+      "trackColor": "#cccccc",
+      "knobColor": "#ffffff",
+      "activeTrackColor": "#0078d4",
+      "backgroundColor": "#cccccc"
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "defaultStyleDark": {
+    "base": {
+      "trackColor": "#555555",
+      "knobColor": "#e0e0e0",
+      "activeTrackColor": "#1a6fc4",
+      "backgroundColor": "#555555"
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "structuralCSS": {
+    "input": [
+      "position: absolute",
+      "opacity: 0",
+      "width: 100%",
+      "height: 100%",
+      "margin: 0",
+      "z-index: 1",
+      "cursor: pointer"
+    ],
+    ".slider": [
+      "display: block",
+      "position: absolute",
+      "top: 0",
+      "left: 0",
+      "right: 0",
+      "bottom: 0",
+      "transition: 0.3s"
+    ],
+    ".slider::before": [
+      "content: ''",
+      "position: absolute",
+      "height: calc(100% - 4px)",
+      "width: calc(50% - 4px)",
+      "left: 2px",
+      "bottom: 2px",
+      "transition: 0.3s",
+      "border-radius: 50%",
+      "box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2)"
+    ],
+    "input:checked + .slider::before": [
+      "transform: translateX(100%)"
+    ],
+    "input:checked + .slider": [],
+    "input:disabled + .slider": [
+      "opacity: 0.5",
+      "cursor: not-allowed"
+    ]
+  },
+  "mappedProps": [
+    {
+      "selector": ".slider",
+      "base": {
+        "backgroundColor": "inherit"
+      },
+      "pseudo": {}
+    },
+    {
+      "selector": ".slider::before",
+      "base": {
+        "backgroundColor": "#ffffff"
+      },
+      "pseudo": {}
+    },
+    {
+      "selector": "input:checked + .slider",
+      "base": {
+        "backgroundColor": "#0078d4"
+      },
+      "pseudo": {}
+    }
+  ],
+  "computedProps": [
+    {
+      "selector": "#id",
+      "cssProp": "border-radius",
+      "template": "{{halfH}}px"
+    },
+    {
+      "selector": ".slider",
+      "cssProp": "border-radius",
+      "template": "{{halfH}}px"
+    }
+  ],
+  "defaultProps": {
+    "checked": false,
+    "disabled": false,
+    "visible": true
+  }
+}

@@ -1,0 +1,2189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>标题</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+<style data-preview-id="main">
+/* === 全局基础样式 === */
+
+* { margin:0;padding:0;box-sizing:border-box }
+html,body { width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:transparent }
+body { display:flex }
+
+.page-container {
+  position:relative;
+  overflow:hidden;
+}
+.page-container::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background-color: var(--canvas-bg-color);
+  opacity: var(--canvas-opacity);
+  border-radius: inherit;
+}
+.page-container.show-shadow {
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+
+/* 排除所有控件和弹出框的拖拽区域，确保控件可交互 */
+.page-container [data-ctrl-type] {
+  app-region: no-drag;
+}
+
+/* 画布标题栏 */
+.canvas-titlebar {
+  position:absolute;top:0;left:0;right:0;
+  display:flex;align-items:center;height:40px;user-select:none;z-index:10;
+}
+.canvas-titlebar .tb-left {
+  width:48px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.canvas-titlebar .tb-center {
+  flex:1;display:flex;align-items:center;min-width:0;
+}
+.canvas-titlebar .tb-right {
+  display:flex;align-items:center;justify-content:flex-end;gap:2px;padding-right:4px;flex-shrink:0;
+}
+.canvas-titlebar .tb-icon {
+  width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:16px;
+}
+.canvas-titlebar .tb-title {
+  font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.canvas-titlebar .tb-btn {
+  width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:default;border-radius:4px;flex-shrink:0;
+}
+.canvas-titlebar .tb-btn:hover { background:rgba(0,0,0,0.06) }
+.canvas-titlebar .tb-btn-min:hover,.tb-btn-max:hover { filter: brightness(1.2)}
+.canvas-titlebar .tb-btn-close:hover { background:#e81123;color:#fff }
+.canvas-titlebar .tb-btn-min:active,.tb-btn-max:active,.tb-btn-close:active {filter: brightness(0.7);}
+
+/* 毛玻璃效果 */
+.page-container.glass-effect {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  --shadow-blur: 10px;
+}
+
+/* 所有控件的基础定位（具体 left/top/width/height 在各 #id 块中） */
+[data-type] {
+  position:absolute;
+  box-sizing:border-box;
+}
+
+/* 右键菜单默认样式 */
+.ctx-menu-overlay {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 99998;
+}
+.ctx-menu {
+  position: fixed;
+  z-index: 99999;
+  background: #ffffff;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+  padding: 4px 0;
+  min-width: 160px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 13px;
+  color: #333333;
+}
+.ctx-menu-item {
+  padding: 7px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  position: relative;
+}
+.ctx-menu-item:hover {
+  background: #e8f4ff;
+}
+.ctx-menu-item.disabled {
+  color: #ccc;
+  cursor: not-allowed;
+}
+.ctx-menu-item.disabled:hover {
+  background: transparent;
+}
+.ctx-menu-separator {
+  height: 1px;
+  background: #e8e8e8;
+  margin: 4px 12px;
+}
+.ctx-menu-item-icon {
+  font-size: 14px;
+  width: 18px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.ctx-menu-item-text {
+  flex: 1;
+}
+.ctx-menu-item-arrow {
+  font-size: 10px;
+  color: #999;
+  margin-left: 24px;
+  flex-shrink: 0;
+}
+.ctx-sub-menu {
+  position: absolute;
+  left: 100%;
+  top: -4px;
+  z-index: 100000;
+  background: #ffffff;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+  padding: 4px 0;
+  min-width: 160px;
+  display: none;
+}
+.ctx-sub-menu.left {
+  left: auto;
+  right: 100%;
+}
+.ctx-menu-item:hover > .ctx-sub-menu {
+  display: block;
+}
+
+
+/* === 页面容器 === */
+.page-container {
+  width: 1040px;
+  height: 690px;
+  background-color: transparent;
+  border: 1px solid #e5e5e5;
+  border-radius: 0px;
+  app-region: drag;
+  
+}
+
+/* === 画布自定义样式 === */
+/* ===== 画布自定义样式 ===== */
+/* 页面容器 - 使用 .page-container 选择器 */
+.page-container {
+  /* 自定义样式 */
+}
+
+
+/* === 页面容器 CSS 变量（放在 customCSS 之后，确保不被覆盖） === */
+.page-container {
+  --canvas-bg-color: #ffffff;
+  --canvas-opacity: 1;
+}
+
+/* === 控件独立样式（每控件完整 #id { ... }，互不干扰） === */
+#button_1 {
+  position: absolute;
+  left: 12px;
+  top: 54px;
+  width: 80px;
+  height: 30px;
+  z-index: 2;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background-color: #0078d4;
+  color: #ffffff;
+  font-size: 13px;
+  font-style: normal;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  border-color: #d9d9d9;
+  border-width: 0px;
+  border-style: solid;
+}
+#button_1:hover { filter: brightness(1.1); }
+#button_1:active { filter: brightness(0.9); }
+#button_1:disabled { opacity: 0.6;
+  cursor: not-allowed;
+  filter: grayscale(1); }
+
+#input_1 {
+  position: absolute;
+  left: 119px;
+  top: 52px;
+  width: 150px;
+  height: 30px;
+  z-index: 3;
+  box-sizing: border-box;
+  border: 1px solid #dddddd;
+  border-radius: 4px;
+  background: #fff;
+  color: #333333;
+  font-size: 13px;
+  font-style: normal;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  outline: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  background-color: #ffffff;
+  border-color: #dddddd;
+  border-width: 1px;
+  border-style: solid;
+  padding: 4px 8px;
+}
+#input_1:focus { border-color: #0078d4;
+  box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.2); }
+#input_1:disabled { opacity: 0.6;
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  filter: grayscale(1); }
+#input_1::placeholder { color: #999; }
+
+#checkbox_1 {
+  position: absolute;
+  left: 696px;
+  top: 57px;
+  width: 60px;
+  height: 30px;
+  z-index: 4;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-style: normal;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333333;
+  cursor: pointer;
+}
+#checkbox_1 input[type="checkbox"] { accent-color: #0078d4; width: 16px; height: 16px; margin: 0; cursor: pointer; }
+#checkbox_1 span { font-size: inherit; color: inherit; font-style: normal; }
+#checkbox_1 input[type="checkbox"] { margin-right: 6px;
+  cursor: pointer; }
+#checkbox_1 span { font-size: 14px;
+  color: #333333; }
+#checkbox_1 input[type="checkbox"]:disabled { opacity: 0.5;
+  cursor: not-allowed; }
+
+#toggle_1 {
+  position: absolute;
+  left: 306px;
+  top: 57px;
+  width: 50px;
+  height: 24px;
+  z-index: 5;
+  box-sizing: border-box;
+  display: inline-block;
+  cursor: pointer;
+  user-select: none;
+}
+#toggle_1 input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; z-index: 1; cursor: pointer; }
+#toggle_1 .toggle-slider { display: block; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: 0.3s; border-radius: 12px; }
+#toggle_1 .toggle-slider::before { content: ''; position: absolute; height: calc(100% - 4px); width: calc(50% - 4px); left: 2px; bottom: 2px; background-color: white; transition: 0.3s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+#toggle_1 input:checked+.toggle-slider { background-color: #0078d4; }
+#toggle_1 input:checked+.toggle-slider::before { transform: translateX(100%); }
+#toggle_1 input:disabled+.toggle-slider { opacity: 0.5; cursor: not-allowed; }
+#toggle_1 input { position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  z-index: 1;
+  cursor: pointer; }
+#toggle_1 .toggle-slider { display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #cccccc;
+  transition: 0.3s;
+  border-radius: 12px; }
+#toggle_1 .toggle-slider::before { content: '';
+  position: absolute;
+  height: calc(100% - 4px);
+  width: calc(50% - 4px);
+  left: 2px;
+  bottom: 2px;
+  background-color: #ffffff;
+  transition: 0.3s;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); }
+#toggle_1 input:checked + .toggle-slider { background-color: #0078d4; }
+#toggle_1 input:checked + .toggle-slider::before { transform: translateX(100%); }
+#toggle_1 input:disabled + .toggle-slider { opacity: 0.5;
+  cursor: not-allowed; }
+
+#comboBox_1 {
+  position: absolute;
+  left: 388px;
+  top: 55px;
+  width: 120px;
+  height: 28px;
+  z-index: 6;
+  box-sizing: border-box;
+  font-size: 13px;
+  font-style: normal;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border: 1px solid #dddddd;
+  border-radius: 3px;
+  background-color: #ffffff;
+  color: #1E1F22;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%235F6876' d='M1 3.5l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 10px;
+  padding-right: 24px;
+  border-color: #dddddd;
+  border-width: 1px;
+  border-style: solid;
+  padding: 4px;
+}
+#comboBox_1:focus { border-color: #0078d4;
+  box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.2); }
+#comboBox_1:disabled { opacity: 0.6;
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  filter: grayscale(1); }
+
+#label_1 {
+  position: absolute;
+  left: 788px;
+  top: 62px;
+  width: 50px;
+  height: 24px;
+  z-index: 7;
+  box-sizing: border-box;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: normal;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #1E1F22;
+  overflow: hidden;
+  white-space: nowrap;
+  text-align: left;
+}
+
+#hyperlink_1 {
+  position: absolute;
+  left: 529px;
+  top: 59px;
+  width: 80px;
+  height: 24px;
+  z-index: 8;
+  box-sizing: border-box;
+  color: #0078d4;
+  font-size: 13px;
+  font-style: normal;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  cursor: pointer;
+  text-decoration: underline;
+}
+#hyperlink_1[disabled] { pointer-events: none; cursor: default; opacity: 0.6; }
+#hyperlink_1:hover { filter: brightness(1.1); }
+#hyperlink_1:active { filter: brightness(0.8); }
+#hyperlink_1:visited { color: #800080; }
+
+#radioGroup_1 {
+  position: absolute;
+  left: 613px;
+  top: 52px;
+  width: 60px;
+  height: 60px;
+  z-index: 9;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-style: normal;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333333;
+  font-size: 13px;
+}
+#radioGroup_1 .radiogroup-item { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; font-size: 13px; color: #333333; font-style: normal; }
+#radioGroup_1 .radiogroup-item input[type="radio"] { accent-color: #0078d4; width: 16px; height: 16px; margin: 0; cursor: pointer; }
+#radioGroup_1 .radiogroup-item input:disabled { opacity: 0.5; cursor: not-allowed; }
+#radioGroup_1 .radiogroup-item { display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #333333; }
+#radioGroup_1 .radiogroup-item input[type="radio"] { cursor: pointer; }
+#radioGroup_1 .radiogroup-item input:disabled { opacity: 0.5;
+  cursor: not-allowed; }
+
+#progressBar_1 {
+  position: absolute;
+  left: 50px;
+  top: 124px;
+  width: 250px;
+  height: 12px;
+  z-index: 10;
+  box-sizing: border-box;
+  background: #E0E0E0;
+  border-radius: 12px;
+  overflow: hidden;
+  font-size: 12px;
+  background-color: #E0E0E0;
+}
+#progressBar_1 .progress-fill { position: absolute; left: 0; top: 0; height: 100%; background: #0078D4; width: 60%; transition: width 0.2s; }
+#progressBar_1 .progress-text { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: inherit; color: #fff; text-shadow: 0 0 2px rgba(0, 0, 0, 0.5); pointer-events: none; }
+#progressBar_1 .progress-fill { position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: #0078D4;
+  width: 60%;
+  transition: width 0.2s; }
+#progressBar_1 .progress-text { position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: inherit;
+  color: #fff;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+  pointer-events: none; }
+
+#datetimePicker_1 {
+  position: absolute;
+  left: 863px;
+  top: 57px;
+  width: 140px;
+  height: 32px;
+  z-index: 11;
+  box-sizing: border-box;
+  border: 1px solid #dddddd;
+  border-radius: 4px;
+  background: #fff;
+  color: #333333;
+  font-size: 13px;
+  font-style: normal;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  outline: none;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  background-color: #ffffff;
+  border-color: #dddddd;
+  border-width: 1px;
+  border-style: solid;
+  padding: 4px;
+}
+#datetimePicker_1:disabled { opacity: 0.6; background: #f5f5f5; cursor: not-allowed; }
+#datetimePicker_1:focus { border-color: #0078d4;
+  box-shadow: 0 0 0 2px rgba(0,120,212,0.2); }
+
+#iconButton_1 {
+  position: absolute;
+  left: 350px;
+  top: 127px;
+  width: 80px;
+  height: 32px;
+  z-index: 12;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  background-color: #0078d4;
+  color: #ffffff;
+  font-size: 13px;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  outline: none;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border-color: #d9d9d9;
+  border-width: 0px;
+  border-style: solid;
+  padding: 6px 12px;
+}
+#iconButton_1 i { font-size: inherit; line-height: 1; }
+#iconButton_1 img, #iconButton_1 svg { max-width: 20px; height: auto; vertical-align: middle; }
+#iconButton_1 span { pointer-events: none; }
+#iconButton_1:hover { filter: brightness(1.1); }
+#iconButton_1:active { filter: brightness(0.9); }
+#iconButton_1:disabled { cursor: not-allowed;
+  opacity: 0.6; }
+#iconButton_1 i { font-size: inherit;
+  line-height: 1; }
+#iconButton_1 img,
+#iconButton_1 svg { max-width: 20px;
+  height: auto;
+  vertical-align: middle; }
+
+#imageBox_1 {
+  position: absolute;
+  left: 550px;
+  top: 248px;
+  width: 150px;
+  height: 150px;
+  z-index: 13;
+  box-sizing: border-box;
+  overflow: hidden;
+  background-color: #f0f0f0;
+}
+#imageBox_1 img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
+#imageBox_1.disabled { cursor: not-allowed; opacity: 0.6; }
+#imageBox_1 .disabled-overlay { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.5); pointer-events: none; }
+#imageBox_1 img { width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block; }
+#imageBox_1.disabled { cursor: not-allowed;
+  opacity: 0.6; }
+#imageBox_1 .disabled-overlay { position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.5);
+  pointer-events: none; }
+
+#textarea_1 {
+  position: absolute;
+  left: 475px;
+  top: 119px;
+  width: 200px;
+  height: 80px;
+  z-index: 14;
+  box-sizing: border-box;
+  font-size: 13px;
+  font-style: normal;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border: 1px solid #dddddd;
+  border-radius: 4px;
+  background: #fff;
+  color: #333333;
+  outline: none;
+  resize: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  background-color: #ffffff;
+  border-color: #dddddd;
+  border-width: 1px;
+  border-style: solid;
+  padding: 4px;
+}
+#textarea_1:focus { border-color: #0078d4;
+  box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.2); }
+#textarea_1:disabled { opacity: 0.6;
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  filter: grayscale(1); }
+#textarea_1::placeholder { color: #999; }
+
+#logOutput_1 {
+  position: absolute;
+  left: 16px;
+  top: 166px;
+  width: 300px;
+  height: 150px;
+  z-index: 15;
+  box-sizing: border-box;
+  background: #f8f8f8;
+  border: 1px solid #dddddd;
+  padding: 2px;
+  overflow-x: auto;
+  overflow-y: auto;
+  white-space: nowrap;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 13px;
+  color: #333;
+  border-color: #dddddd;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 4px;
+  background-color: #f8f8f8;
+}
+#logOutput_1 .log-line { line-height: 1.5; padding: 2px 5px; }
+#logOutput_1 .log-line { line-height: 1.5;
+  padding: 2px 5px; }
+
+#listBox_1 {
+  position: absolute;
+  left: 329px;
+  top: 216px;
+  width: 200px;
+  height: 160px;
+  z-index: 2;
+  box-sizing: border-box;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #ffffff;
+  border-color: #d9d9d9;
+  border-width: 1px;
+  border-style: solid;
+}
+#listBox_1 .list-box-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; }
+#listBox_1 .list-item { display: flex; align-items: center; height: 32px; padding: 0 10px; cursor: pointer; user-select: none; font-size: 13px; color: #333; border-bottom: 1px solid #f0f0f0; gap: 8px; }
+#listBox_1 .list-item:last-child { border-bottom: none; }
+#listBox_1 .list-item:hover { background-color: #f5f5f5; }
+#listBox_1 .list-item.item-selected { background-color: #e6f4ff; }
+#listBox_1 .list-item-checkbox { margin: 0; flex-shrink: 0; accent-color: #1890ff; }
+#listBox_1 .list-item-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: inherit; color: inherit; }
+#listBox_1 .list-item-edit-input { flex: 1; height: 24px; border: 1px solid #1890ff; border-radius: 3px; padding: 0 6px; font-size: 13px; font-family: inherit; outline: none; box-shadow: 0 0 0 2px rgba(24,144,255,0.2); }
+#listBox_1 .list-empty { display: flex; align-items: center; justify-content: center; height: 100%; color: #ccc; font-size: 13px; }
+#listBox_1.disabled { cursor: not-allowed; opacity: 0.6; }
+#listBox_1 .disabled-overlay { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.5); pointer-events: none; }
+#listBox_1 .list-box-scroll { flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden; }
+#listBox_1 .list-item { display: flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 10px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 13px;
+  color: #333333;
+  border-bottom: 1px solid #f0f0f0;
+  gap: 8px; }
+#listBox_1 .list-item:last-child { border-bottom: none; }
+#listBox_1 .list-item:hover { background-color: #f5f5f5; }
+#listBox_1 .list-item.item-selected { background-color: #e6f4ff; }
+#listBox_1 .list-item-checkbox { margin: 0;
+  flex-shrink: 0;
+  accent-color: #1890ff; }
+#listBox_1 .list-item-text { flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap; }
+#listBox_1 .list-item-edit-input { flex: 1;
+  height: 24px;
+  border: 1px solid #1890ff;
+  border-radius: 3px;
+  padding: 0 6px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2); }
+#listBox_1 .list-empty { display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #ccc;
+  font-size: 13px; }
+#listBox_1.disabled { cursor: not-allowed;
+  opacity: 0.6; }
+#listBox_1 .disabled-overlay { position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.5);
+  pointer-events: none; }
+
+#treeView_1 {
+  position: absolute;
+  left: 774px;
+  top: 364px;
+  width: 220px;
+  height: 280px;
+  z-index: 3;
+  box-sizing: border-box;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  overflow: auto;
+  background: #ffffff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #ffffff;
+  border-color: #d9d9d9;
+  border-width: 1px;
+  border-style: solid;
+  display: flex;
+  flex-direction: column;
+}
+#treeView_1 .tree-node { position: relative; user-select: none; }
+#treeView_1 .tree-node-content { display: flex; align-items: center; padding: 3px 6px; cursor: pointer; border-radius: 4px; gap: 4px; font-size: 13px; }
+#treeView_1 .tree-node-content:hover { background: #f3f3f3; }
+#treeView_1 .tree-node.selected > .tree-node-content { background: #e0edff; color: #005499; }
+#treeView_1 .tree-toggle { width: 16px; height: 16px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 10px; color: #666; transition: transform 0.15s; }
+#treeView_1 .tree-toggle.expanded { transform: rotate(90deg); }
+#treeView_1 .tree-toggle.empty { visibility: hidden; }
+#treeView_1 .tree-icon { width: 16px; height: 16px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px; }
+#treeView_1 .tree-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#treeView_1 .tree-children { padding-left: 20px; }
+#treeView_1.collapsed { height: auto; }
+#treeView_1.disabled { cursor: not-allowed; opacity: 0.6; }
+#treeView_1 .tree-node-content { display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 4px;
+  gap: 4px; }
+#treeView_1 .tree-node-content:hover { background-color: #f5f5f5; }
+#treeView_1 .tree-node-content.selected { background: #e0edff; }
+#treeView_1 .tree-toggle { width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 10px;
+  color: #666666;
+  transition: transform 0.2s; }
+#treeView_1 .tree-toggle.expanded { transform: rotate(90deg); }
+#treeView_1 .tree-toggle.empty { visibility: hidden; }
+#treeView_1 .tree-checkbox { display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0; }
+#treeView_1 .tree-node-check { width: 14px;
+  height: 14px;
+  margin: 0;
+  cursor: pointer;
+  accent-color: #0078D4; }
+#treeView_1 .tree-icon { width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center; }
+#treeView_1 .tree-label { flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap; }
+#treeView_1 .tree-children { padding-left: 20px; }
+#treeView_1.disabled { cursor: not-allowed;
+  opacity: 0.6; }
+#treeView_1 .tree-edit-input { flex: 1;
+  height: 24px;
+  border: 1px solid #1890ff;
+  border-radius: 3px;
+  padding: 0 6px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2); }
+
+#dataGrid_1 {
+  position: absolute;
+  left: 16px;
+  top: 404px;
+  width: 400px;
+  height: 250px;
+  z-index: 4;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #fff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #ffffff;
+  color: #333333;
+  border-color: #d9d9d9;
+  border-width: 1px;
+  border-style: solid;
+  font-size: 13px;
+}
+#dataGrid_1 .data-grid-header { display: flex; background: #f0f0f0; border-bottom: 1px solid #d9d9d9; flex-shrink: 0; }
+#dataGrid_1 .data-grid-header-cell { padding: 6px 10px; font-weight: 600; border-right: 1px solid #d9d9d9; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
+#dataGrid_1 .data-grid-body { flex: 1; overflow-y: auto; }
+#dataGrid_1 .data-grid-row { display: flex; border-bottom: 1px solid #e8e8e8; }
+#dataGrid_1 .data-grid-row:nth-child(even) { background: #fafafa; }
+#dataGrid_1 .data-grid-row:hover { background: #e6f7ff; }
+#dataGrid_1 .data-grid-row-focused { background: #d6e4ff !important; }
+#dataGrid_1 .data-grid-cell { padding: 5px 10px; border-right: 1px solid #e8e8e8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; cursor: default; }
+#dataGrid_1 .data-grid-checkbox { display: flex; align-items: center; justify-content: center; }
+#dataGrid_1 .data-grid-checkbox input[type="checkbox"] { margin: 0; width: 14px; height: 14px; cursor: pointer; }
+#dataGrid_1 .data-grid-header { display: flex;
+  background: #f0f0f0;
+  border-bottom: 1px solid #d9d9d9; }
+#dataGrid_1 .data-grid-header-cell { padding: 6px 10px;
+  font-weight: 600;
+  border-right: 1px solid #d9d9d9;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-sizing: border-box; }
+#dataGrid_1 .data-grid-body { flex: 1;
+  overflow-y: auto; }
+#dataGrid_1 .data-grid-row { display: flex;
+  border-bottom: 1px solid #e8e8e8; }
+#dataGrid_1 .data-grid-row:nth-child(even) { background: #fafafa; }
+#dataGrid_1 .data-grid-row:hover { background: #e6f7ff; }
+#dataGrid_1 .data-grid-row-focused { background: #d6e4ff !important; }
+#dataGrid_1 .data-grid-cell { padding: 5px 10px;
+  border-right: 1px solid #e8e8e8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-sizing: border-box;
+  cursor: default; }
+#dataGrid_1 .data-grid-checkbox { display: flex;
+  align-items: center;
+  justify-content: center; }
+#dataGrid_1 .data-grid-checkbox input[type="checkbox"] { margin: 0;
+  width: 14px;
+  height: 14px;
+  cursor: pointer; }
+
+#tabsContainer_1 {
+  position: absolute;
+  left: 440px;
+  top: 444px;
+  width: 300px;
+  height: 200px;
+  z-index: 5;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  overflow: hidden;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #fff;
+  background-color: #ffffff;
+  border-color: #d9d9d9;
+  border-width: 1px;
+  border-style: solid;
+  font-size: 13px;
+}
+#tabsContainer_1 .tab-header-bar { display: flex; flex-shrink: 0; background: #f5f5f5; border-bottom: 1px solid #d9d9d9; }
+#tabsContainer_1 .tab-header-btn { padding: 0 12px; height: 34px; line-height: 34px; border: none; border-right: 1px solid #d9d9d9; cursor: pointer; font-size: inherit; font-family: inherit; background: #f5f5f5; color: inherit; font-style: normal; }
+#tabsContainer_1 .tab-header-btn.active { background: #fff; color: inherit; border-bottom: 2px solid #1890ff; }
+#tabsContainer_1 .tab-header-btn:hover { background: #e8e8e8; }
+#tabsContainer_1 .tab-content-wrapper { flex: 1; position: relative; overflow: hidden; }
+#tabsContainer_1 .tab-pane { display: none; position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: hidden; }
+#tabsContainer_1 .tab-pane.active { display: block; }
+#tabsContainer_1 .tab-header-bar { display: flex;
+  flex-shrink: 0;
+  background: #f5f5f5;
+  border-bottom: 1px solid #d9d9d9; }
+#tabsContainer_1 .tab-header-btn { padding: 0 12px;
+  height: 34px;
+  line-height: 34px;
+  border: none;
+  border-right: 1px solid #d9d9d9;
+  cursor: pointer;
+  font-size: inherit;
+  font-family: inherit;
+  background: #f5f5f5;
+  color: inherit; }
+#tabsContainer_1 .tab-header-btn.active { background: #ffffff;
+  color: inherit;
+  border-bottom: 2px solid #1890ff; }
+#tabsContainer_1 .tab-header-btn:hover { background: #e8e8e8; }
+#tabsContainer_1 .tab-content-wrapper { flex: 1;
+  position: relative;
+  overflow: hidden; }
+#tabsContainer_1 .tab-pane { display: none;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden; }
+#tabsContainer_1 .tab-pane.active { display: block; }
+
+#cardBox_1 {
+  position: absolute;
+  left: 715px;
+  top: 110px;
+  width: 300px;
+  height: 200px;
+  z-index: 6;
+  box-sizing: border-box;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #ffffff;
+  border-color: #d9d9d9;
+  border-width: 1px;
+  border-style: solid;
+}
+#cardBox_1 .card-header { display: flex; align-items: center; padding: 0 12px; height: 32px; background-color: #f5f5f5; border-bottom: 1px solid #e8e8e8; flex-shrink: 0; }
+#cardBox_1 .card-header-title { flex: 1; min-width: 0; font-size: 13px; font-weight: 600; color: #333; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#cardBox_1 .card-body { position: relative; width: 100%; height: calc(100% - 32px); overflow: hidden; }
+#cardBox_1.disabled { opacity: 0.6; }
+#cardBox_1 .card-header { display: flex;
+  align-items: center;
+  padding: 0 12px;
+  height: 32px;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #e8e8e8;
+  flex-shrink: 0; }
+#cardBox_1 .card-header-title { font-size: 13px;
+  font-weight: 600;
+  color: #333333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; }
+#cardBox_1 .card-body { position: relative;
+  width: 100%;
+  height: calc(100% - 32px);
+  overflow: hidden; }
+#cardBox_1.disabled { opacity: 0.6; }
+
+#divider_1 {
+  position: absolute;
+  left: 72px;
+  top: 354px;
+  width: 200px;
+  height: 2px;
+  z-index: 2;
+  box-sizing: border-box;
+  border: none;
+  background: none;
+  border-color: #D0D0D0;
+  border-top: 2px solid #D0D0D0;
+}
+
+
+</style>
+</head>
+<body style="align-items:center;justify-content:center">
+<div class="page-container" id="page_container" data-ctrl-type="page" data-name="canvas" data-original-width="1040" data-original-height="690">
+
+<div class="canvas-titlebar" id="titlebar" data-name="标题栏" style="
+  position:absolute;top:0;left:0;right:0;height:40px;
+  background-color:#f5f5f5;
+  opacity:1;
+  border-bottom:1px solid rgba(0,0,0,0.08);
+  app-region: drag;
+">
+  <div class="tb-left">
+    <span class="tb-icon" id="titlebar_icon" data-ctrl-type="titlebar_icon" data-name="图标" style="color:#333333;"><i class="fas fa-home"></i></span>
+  </div>
+  <div class="tb-center" style="justify-content:flex-start;">
+    <span class="tb-title" id="titlebar_title" data-ctrl-type="titlebar_title" data-name="标题" style="color:#333333">我的应用</span>
+  </div>
+  <div class="tb-right">
+    <button class="tb-btn tb-btn-min" id="titlebar_min" data-ctrl-type="titlebar_min" data-name="最小化" style="color:#333333;" title="最小化">
+      <svg width="10" height="1" viewBox="0 0 10 1"><rect width="10" height="1" fill="currentColor"/></svg>
+    </button>
+    <button class="tb-btn tb-btn-max" id="titlebar_max" data-ctrl-type="titlebar_max" data-name="最大化" style="color:#333333;" title="最大化">
+      <svg width="10" height="10" viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
+    </button>
+    <button class="tb-btn tb-btn-close" id="titlebar_close" data-ctrl-type="titlebar_close" data-name="关闭" style="color:#333333;" title="关闭">
+      <svg width="10" height="10" viewBox="0 0 10 10"><line x1="1" y1="1" x2="9" y2="9" stroke="currentColor" stroke-width="1.2"/><line x1="9" y1="1" x2="1" y2="9" stroke="currentColor" stroke-width="1.2"/></svg>
+    </button>
+  </div>
+</div>
+<button id="button_1" data-type="button" data-ctrl-type="button" data-name="按钮_1">按钮</button>
+<input type="text" id="input_1" data-type="input" data-ctrl-type="input_text" data-name="编辑框_1" placeholder="请输入..." value="" />
+<label id="checkbox_1" data-type="checkbox" data-ctrl-type="checkbox" data-name="选择框_1"><input type="checkbox" /><span>选项</span></label>
+<label id="toggle_1" data-type="toggle" data-ctrl-type="switch_toggle" data-name="开关按钮_1"><input type="checkbox" /><span class="toggle-slider"></span></label>
+<select id="comboBox_1" data-type="comboBox" data-ctrl-type="combobox" data-name="组合框_1"><option value="选项1" selected>选项1</option><option value="选项2">选项2</option><option value="选项3">选项3</option></select>
+<span id="label_1" data-type="label" data-ctrl-type="label" data-name="文本标签_1">标签</span>
+<a id="hyperlink_1" data-type="hyperlink" data-ctrl-type="hyperlink" data-name="超链接_1" href="javascript:void(0)" data-href="#">超链接</a>
+<div id="radioGroup_1" data-type="radioGroup" data-ctrl-type="radio_group" data-name="单选框_1" class="radiogroup-container"><label class="radiogroup-item"><input type="radio" data-ctrl-type="radio" name="单选框_1" value="选项1" checked />选项1</label><label class="radiogroup-item"><input type="radio" data-ctrl-type="radio" name="单选框_1" value="选项2" />选项2</label></div>
+<div id="progressBar_1" data-type="progressBar" data-ctrl-type="progress_bar" data-name="进度条_1" class="progress-bar-container"><div class="progress-track"></div><div class="progress-fill" style="width:60%"></div><span class="progress-text">60%</span></div>
+<input type="datetime-local" id="datetimePicker_1" data-type="datetimePicker" data-ctrl-type="datetime_picker" data-name="时间框_1" value="2026-05-22T00:00" />
+<button id="iconButton_1" data-type="iconButton" data-ctrl-type="icon_button" data-name="图标按钮_1"><i class="fas fa-star"></i><span>按钮</span></button>
+<div id="imageBox_1" data-type="imageBox" data-ctrl-type="image_box" data-name="图片框_1" class="image-box"></div>
+<textarea id="textarea_1" data-type="textarea" data-ctrl-type="textarea" data-name="文本域_1" data-rows='4' placeholder="请输入..." rows="4"></textarea>
+<div id="logOutput_1" data-type="logOutput" data-ctrl-type="logbox" data-name="日志框_1" class="log-output-container"><div class="log-line" data-ctrl-type="log_item" style="color:#333333">日志输出已就绪。</div></div>
+<div id="listBox_1" data-type="listBox" data-ctrl-type="listbox" data-name="列表框_1" data-editable="false" data-always-show-selection="true" data-listbox-items='[{"id":"","text":"列表项一","selected":false},{"id":"","text":"列表项二","selected":false},{"id":"","text":"列表项三","selected":false}]' data-always-show-selection="true"><div class="list-box-scroll"><div class="list-item" data-ctrl-type="listbox_item" data-item-index="0"><span class="list-item-text">列表项一</span></div>
+<div class="list-item" data-ctrl-type="listbox_item" data-item-index="1"><span class="list-item-text">列表项二</span></div>
+<div class="list-item" data-ctrl-type="listbox_item" data-item-index="2"><span class="list-item-text">列表项三</span></div></div></div>
+<div id="treeView_1" data-type="treeView" data-ctrl-type="treeview" data-name="树形框_1" data-type="treeView" data-tree-id="treeView_1" data-editable="false" data-show-icon="true" data-always-show-selection="true"><div class="tree-node" data-node-id="node_1" data-level="0">
+      <div class="tree-node-content">
+        
+        <span class="tree-toggle expanded" data-ctrl-type="treeview_node_toggle">▶</span>
+        <span class="tree-icon folder">📁</span>
+        <span class="tree-label" data-ctrl-type="treeview_node_text">根节点</span>
+        <span class="tree-edit-input" style="display:none"></span>
+      </div>
+      <div class="tree-children"><div class="tree-node" data-node-id="node_2" data-level="1">
+      <div class="tree-node-content">
+        
+        <span class="tree-toggle empty" data-ctrl-type="treeview_node_toggle">▶</span>
+        <span class="tree-icon file">📄</span>
+        <span class="tree-label" data-ctrl-type="treeview_node_text">子节点1</span>
+        <span class="tree-edit-input" style="display:none"></span>
+      </div>
+      
+    </div><div class="tree-node" data-node-id="node_3" data-level="1">
+      <div class="tree-node-content">
+        
+        <span class="tree-toggle collapsed" data-ctrl-type="treeview_node_toggle">▶</span>
+        <span class="tree-icon folder">📁</span>
+        <span class="tree-label" data-ctrl-type="treeview_node_text">子节点2</span>
+        <span class="tree-edit-input" style="display:none"></span>
+      </div>
+      <div class="tree-children"><div class="tree-node" data-node-id="node_4" data-level="2">
+      <div class="tree-node-content">
+        
+        <span class="tree-toggle empty" data-ctrl-type="treeview_node_toggle">▶</span>
+        <span class="tree-icon file">📄</span>
+        <span class="tree-label" data-ctrl-type="treeview_node_text">子节点2-1</span>
+        <span class="tree-edit-input" style="display:none"></span>
+      </div>
+      
+    </div></div>
+    </div></div>
+    </div></div>
+<div id="dataGrid_1" data-type="dataGrid" data-ctrl-type="datagrid" data-name="多项表格_1" data-columns='[{"field":"col1","header":"列A","editable":false},{"field":"col2","header":"列B","editable":false},{"field":"col3","header":"列C","editable":false}]' data-rows='[{"id":"dataGrid_1_row_1","cells":{"col1":"数据A1","col2":"数据B1","col3":"数据C1"},"selected":false},{"id":"dataGrid_1_row_2","cells":{"col1":"数据A2","col2":"数据B2","col3":"数据C2"},"selected":false},{"id":"dataGrid_1_row_3","cells":{"col1":"数据A3","col2":"数据B3","col3":"数据C3"},"selected":false}]' data-show-checkbox="true" data-allow-add="false" data-allow-delete="false" data-editable="false" data-always-show-selection="false" class="data-grid-container"><div class="data-grid-header"><div class="data-grid-header-cell data-grid-checkbox" style="width:36px;min-width:36px;flex-shrink:0"><input type="checkbox" class="data-grid-select-all"></div><div class="data-grid-header-cell" data-col-key="col1" data-ctrl-type="datagrid_cell" style="width:100px;min-width:100px;flex-shrink:0">列A</div><div class="data-grid-header-cell" data-col-key="col2" data-ctrl-type="datagrid_cell" style="width:100px;min-width:100px;flex-shrink:0">列B</div><div class="data-grid-header-cell" data-col-key="col3" data-ctrl-type="datagrid_cell" style="width:100px;min-width:100px;flex-shrink:0">列C</div></div><div class="data-grid-body"><div class="data-grid-row" data-row-index="0" data-row-id="dataGrid_1_row_1"><div class="data-grid-cell data-grid-checkbox" style="width:36px;min-width:36px;flex-shrink:0"><input type="checkbox" class="data-grid-row-check" data-ctrl-type="datagrid_row_checkbox"></div><div class="data-grid-cell" data-ctrl-type="datagrid_cell" data-col-key="col1" style="width:100px;min-width:100px;flex-shrink:0" title="数据A1">数据A1</div><div class="data-grid-cell" data-ctrl-type="datagrid_cell" data-col-key="col2" style="width:100px;min-width:100px;flex-shrink:0" title="数据B1">数据B1</div><div class="data-grid-cell" data-ctrl-type="datagrid_cell" data-col-key="col3" style="width:100px;min-width:100px;flex-shrink:0" title="数据C1">数据C1</div></div><div class="data-grid-row" data-row-index="1" data-row-id="dataGrid_1_row_2"><div class="data-grid-cell data-grid-checkbox" style="width:36px;min-width:36px;flex-shrink:0"><input type="checkbox" class="data-grid-row-check" data-ctrl-type="datagrid_row_checkbox"></div><div class="data-grid-cell" data-ctrl-type="datagrid_cell" data-col-key="col1" style="width:100px;min-width:100px;flex-shrink:0" title="数据A2">数据A2</div><div class="data-grid-cell" data-ctrl-type="datagrid_cell" data-col-key="col2" style="width:100px;min-width:100px;flex-shrink:0" title="数据B2">数据B2</div><div class="data-grid-cell" data-ctrl-type="datagrid_cell" data-col-key="col3" style="width:100px;min-width:100px;flex-shrink:0" title="数据C2">数据C2</div></div><div class="data-grid-row" data-row-index="2" data-row-id="dataGrid_1_row_3"><div class="data-grid-cell data-grid-checkbox" style="width:36px;min-width:36px;flex-shrink:0"><input type="checkbox" class="data-grid-row-check" data-ctrl-type="datagrid_row_checkbox"></div><div class="data-grid-cell" data-ctrl-type="datagrid_cell" data-col-key="col1" style="width:100px;min-width:100px;flex-shrink:0" title="数据A3">数据A3</div><div class="data-grid-cell" data-ctrl-type="datagrid_cell" data-col-key="col2" style="width:100px;min-width:100px;flex-shrink:0" title="数据B3">数据B3</div><div class="data-grid-cell" data-ctrl-type="datagrid_cell" data-col-key="col3" style="width:100px;min-width:100px;flex-shrink:0" title="数据C3">数据C3</div></div></div></div>
+<div id="tabsContainer_1" data-type="tabsContainer" data-ctrl-type="tab_container" data-name="标签页_1" class="tabs-container"><div class="tab-header-bar"><button class="tab-header-btn active" data-ctrl-type="tab_btn" data-tab-name="tab1">标签页1</button><button class="tab-header-btn" data-ctrl-type="tab_btn" data-tab-name="tab2">标签页2</button></div><div class="tab-content-wrapper"><div class="tab-pane active" data-tab-name="tab1" data-parent="tabsContainer_1" data-tab="0"></div>
+<div class="tab-pane" data-tab-name="tab2" data-parent="tabsContainer_1" data-tab="1"></div></div></div>
+<div id="cardBox_1" data-type="cardBox" data-ctrl-type="cardbox" data-name="卡片框_1" class="card-box"><div class="card-header"><span class="card-header-title">卡片标题</span></div><div class="card-body" data-ctrl-type="cardbox_body"></div></div>
+<div id="divider_1" data-type="divider" data-ctrl-type="divider" data-name="分割线_1"></div>
+</div>
+
+<script>
+
+(function() {
+  'use strict';
+
+  document.addEventListener('click', function(e) {
+    var tabBtn = e.target.closest('.tab-header-btn');
+    if (tabBtn) {
+      var container = tabBtn.closest('.tabs-container');
+      if (!container) return;
+
+      if (container.getAttribute('data-disabled') === 'true') return;
+
+      var tabName = tabBtn.getAttribute('data-tab-name');
+      var allBtns = container.querySelectorAll('.tab-header-btn');
+      allBtns.forEach(function(b) { b.classList.remove('active'); });
+      tabBtn.classList.add('active');
+
+      var allPanes = container.querySelectorAll('.tab-pane');
+      allPanes.forEach(function(p) { p.classList.remove('active'); });
+      var activePane = container.querySelector('.tab-pane[data-tab-name="' + tabName + '"]');
+      if (activePane) activePane.classList.add('active');
+      return;
+    }
+
+    var collapseBtn = e.target.closest('.card-collapse-btn');
+    if (collapseBtn) {
+      var card = collapseBtn.closest('.card-box');
+      if (!card) return;
+      var isCollapsed = card.getAttribute('data-collapsed') === 'true';
+      var downArrow = '<svg width="12" height="12" viewBox="0 0 12 12"><path d="M3 4.5L6 7.5L9 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      var rightArrow = '<svg width="12" height="12" viewBox="0 0 12 12"><path d="M4.5 3L7.5 6L4.5 9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      if (isCollapsed) {
+        card.setAttribute('data-collapsed', 'false');
+        card.classList.remove('collapsed');
+        collapseBtn.innerHTML = downArrow;
+      } else {
+        card.setAttribute('data-collapsed', 'true');
+        card.classList.add('collapsed');
+        collapseBtn.innerHTML = rightArrow;
+      }
+      return;
+    }
+  });
+})();
+
+
+(function() {
+  var ListBoxManager = {
+    itemsCache: {},
+
+    init: function() {
+      var listBoxes = document.querySelectorAll('[data-listbox-items]');
+      for (var i = 0; i < listBoxes.length; i++) {
+        var el = listBoxes[i];
+        var id = el.id;
+        if (!id) continue;
+        try {
+          var items = JSON.parse(el.getAttribute('data-listbox-items') || '[]');
+          ListBoxManager.itemsCache[id] = items;
+        } catch(e) { ListBoxManager.itemsCache[id] = []; }
+        ListBoxManager._bindEvents(el);
+        ListBoxManager._bindBlur(el);
+      }
+    },
+
+    _bindBlur: function(el) {
+      document.addEventListener('mousedown', function(e) {
+        if (el.getAttribute('data-always-show-selection') === 'true') return;
+        if (!el.contains(e.target)) {
+          var allItems = el.querySelectorAll('.list-item');
+          for (var ai = 0; ai < allItems.length; ai++) {
+            allItems[ai].classList.remove('item-selected');
+          }
+        }
+      });
+    },
+
+    _render: function(listBoxEl) {
+      var id = listBoxEl.id;
+      var items = ListBoxManager.itemsCache[id] || [];
+      var showCheckbox = listBoxEl.getAttribute('data-show-checkbox') === 'true';
+      var scroll = listBoxEl.querySelector('.list-box-scroll');
+      if (!scroll) return;
+      if (items.length === 0) {
+        scroll.innerHTML = '<div class="list-empty">暂无数据</div>';
+        return;
+      }
+      var html = '';
+      for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+        var cb = showCheckbox ? '<input type="checkbox" class="list-item-checkbox" data-ctrl-type="listbox_item_checkbox"' + (item.selected ? ' checked' : '') + ' data-item-index="' + i + '" />' : '';
+        html += '<div class="list-item" data-ctrl-type="listbox_item" data-item-index="' + i + '">' + cb + '<span class="list-item-text">' + ListBoxManager._escHtml(item.text) + '</span></div>';
+      }
+      scroll.innerHTML = html;
+      ListBoxManager._bindEvents(listBoxEl);
+    },
+
+    _escHtml: function(str) {
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    },
+
+    _bindEvents: function(el) {
+      var items = el.querySelectorAll('.list-item');
+      for (var i = 0; i < items.length; i++) {
+        (function(itemEl) {
+          itemEl.onclick = function(e) {
+            if (e.target.tagName === 'INPUT') return;
+            var listBox = itemEl.closest('[data-listbox-items]');
+            if (!listBox || listBox.getAttribute('data-disabled') === 'true') return;
+            var allItems = listBox.querySelectorAll('.list-item');
+            for (var ai = 0; ai < allItems.length; ai++) {
+              allItems[ai].classList.remove('item-selected');
+            }
+            itemEl.classList.add('item-selected');
+          };
+          itemEl.ondblclick = function(e) {
+            var listBox = itemEl.closest('[data-listbox-items]');
+            if (!listBox || listBox.getAttribute('data-editable') !== 'true') return;
+            if (listBox.getAttribute('data-disabled') === 'true') return;
+            ListBoxManager._startEdit(listBox, itemEl);
+          };
+          var cb = itemEl.querySelector('.list-item-checkbox');
+          if (cb) {
+            cb.onchange = function(e) {
+              var listBox = cb.closest('[data-listbox-items]');
+              if (!listBox) return;
+              var idx = parseInt(cb.getAttribute('data-item-index') || '0');
+              var cache = ListBoxManager.itemsCache[listBox.id];
+              if (cache && cache[idx]) cache[idx].selected = cb.checked;
+            };
+          }
+        })(items[i]);
+      }
+    },
+
+    _startEdit: function(listBox, itemEl) {
+      var idx = parseInt(itemEl.getAttribute('data-item-index') || '0');
+      var cache = ListBoxManager.itemsCache[listBox.id];
+      if (!cache || !cache[idx]) return;
+      var textSpan = itemEl.querySelector('.list-item-text');
+      if (!textSpan) return;
+      var oldText = cache[idx].text;
+      var input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'list-item-edit-input';
+      input.value = oldText;
+      textSpan.replaceWith(input);
+      input.focus();
+      input.select();
+      var save = function() {
+        var newText = input.value.trim();
+        if (newText && newText !== oldText) {
+          cache[idx].text = newText;
+          ListBoxManager._updateDataAttr(listBox);
+        }
+        var span = document.createElement('span');
+        span.className = 'list-item-text';
+        span.textContent = cache[idx].text;
+        input.replaceWith(span);
+      };
+      input.onblur = save;
+      input.onkeydown = function(e) {
+        if (e.key === 'Enter') { input.blur(); }
+        if (e.key === 'Escape') { input.value = oldText; input.blur(); }
+      };
+    },
+
+    _updateDataAttr: function(listBox) {
+      var id = listBox.id;
+      var cache = ListBoxManager.itemsCache[id];
+      if (!cache) return;
+      listBox.setAttribute('data-listbox-items', JSON.stringify(cache));
+    },
+
+    add: function(listBoxId, text) {
+      var el = document.getElementById(listBoxId);
+      var cache = ListBoxManager.itemsCache[listBoxId];
+      if (!el || !cache) return false;
+      cache.push({ id: '', text: String(text) });
+      ListBoxManager._updateDataAttr(el);
+      ListBoxManager._render(el);
+      return true;
+    },
+
+    remove: function(listBoxId, index) {
+      var el = document.getElementById(listBoxId);
+      var cache = ListBoxManager.itemsCache[listBoxId];
+      if (!el || !cache || index < 0 || index >= cache.length) return false;
+      cache.splice(index, 1);
+      ListBoxManager._updateDataAttr(el);
+      ListBoxManager._render(el);
+      return true;
+    },
+
+    setItemText: function(listBoxId, index, text) {
+      var el = document.getElementById(listBoxId);
+      var cache = ListBoxManager.itemsCache[listBoxId];
+      if (!el || !cache || index < 0 || index >= cache.length) return false;
+      cache[index].text = String(text);
+      ListBoxManager._updateDataAttr(el);
+      ListBoxManager._render(el);
+      return true;
+    },
+
+    setCheckbox: function(listBoxId, index, checked) {
+      var el = document.getElementById(listBoxId);
+      var cache = ListBoxManager.itemsCache[listBoxId];
+      if (!el || !cache || index < 0 || index >= cache.length) return false;
+      cache[index].selected = !!checked;
+      var itemEl = el.querySelector('[data-item-index="' + index + '"]');
+      if (itemEl) {
+        var cb = itemEl.querySelector('.list-item-checkbox');
+        if (cb) cb.checked = !!checked;
+      }
+      ListBoxManager._updateDataAttr(el);
+      return true;
+    },
+
+    getChecked: function(listBoxId, index) {
+      var cache = ListBoxManager.itemsCache[listBoxId];
+      if (!cache || index < 0 || index >= cache.length) return false;
+      return !!cache[index].selected;
+    },
+
+    getItems: function(listBoxId) {
+      return ListBoxManager.itemsCache[listBoxId] || [];
+    }
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() { ListBoxManager.init(); });
+  } else {
+    ListBoxManager.init();
+  }
+
+  window.ListBoxManager = ListBoxManager;
+})();
+
+
+(function() {
+  'use strict';
+
+  if (window.__TREE_RUNTIME_INITIALIZED__) return;
+  window.__TREE_RUNTIME_INITIALIZED__ = true;
+
+  var TreeManager = {
+    configs: {},
+    selectedNodes: {},
+
+    /**
+     * 初始化树形控件
+     * @param {Object} config - { id: string, data: TreeNode[], editable: boolean, showIcon: boolean }
+     */
+    init: function(config) {
+      var treeId = config.id;
+      var data = config.data || [];
+      var editable = !!config.editable;
+      var showIcon = !!config.showIcon;
+      var showCheckbox = !!config.showCheckbox;
+
+      TreeManager.configs[treeId] = {
+        id: treeId,
+        data: data,
+        editable: editable,
+        showIcon: showIcon,
+        showCheckbox: showCheckbox
+      };
+
+      var container = document.getElementById(treeId);
+      if (!container) return;
+
+      container.innerHTML = '';
+
+      for (var i = 0; i < data.length; i++) {
+        var nodeEl = TreeManager.createNodeElement(treeId, data[i], 0);
+        if (nodeEl) container.appendChild(nodeEl);
+      }
+
+      TreeManager._bindGlobalEvents(container, treeId);
+    },
+
+    /**
+     * 递归创建节点 DOM 元素
+     * @param {string} treeId - 树控件 ID
+     * @param {Object} node - 节点数据 { id, text, expanded, children }
+     * @param {number} level - 层级深度
+     * @returns {HTMLElement}
+     */
+    createNodeElement: function(treeId, node, level) {
+      var config = TreeManager.configs[treeId];
+      if (!config || !node) return null;
+
+      var nodeDiv = document.createElement('div');
+      nodeDiv.className = 'tree-node';
+      nodeDiv.setAttribute('data-tree-id', treeId);
+      nodeDiv.setAttribute('data-node-id', node.id);
+      nodeDiv.setAttribute('data-level', level);
+
+      if (config.editable) {
+        nodeDiv.setAttribute('data-editable', 'true');
+        nodeDiv.classList.add('editable');
+      }
+
+      var contentDiv = document.createElement('div');
+      contentDiv.className = 'tree-node-content';
+
+      if (config.showCheckbox) {
+        var checkboxSpan = document.createElement('span');
+        checkboxSpan.className = 'tree-checkbox';
+        var cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.className = 'tree-node-check';
+        cb.checked = !!node.checked;
+        cb.setAttribute('data-ctrl-type', 'treeview_node_checkbox');
+        checkboxSpan.appendChild(cb);
+        contentDiv.appendChild(checkboxSpan);
+      }
+
+      var toggle = document.createElement('span');
+      toggle.className = 'tree-toggle';
+      toggle.textContent = '▶';
+      if (node.children && node.children.length > 0) {
+        if (node.expanded === true) {
+          toggle.classList.add('expanded');
+        } else {
+          toggle.classList.add('collapsed');
+        }
+      } else {
+        toggle.classList.add('empty');
+      }
+      contentDiv.appendChild(toggle);
+
+      var icon = document.createElement('span');
+      icon.className = 'tree-icon';
+      var showIcon = config.showIcon !== false;
+      if (showIcon) {
+        var nodeIcon = node.icon || '';
+        if (!nodeIcon) {
+          nodeIcon = (node.children && node.children.length > 0) ? '📁' : '📄';
+        }
+        icon.textContent = nodeIcon;
+      }
+
+      var label = document.createElement('span');
+      label.className = 'tree-label';
+      label.textContent = node.text || '';
+
+      contentDiv.appendChild(icon);
+      contentDiv.appendChild(label);
+      nodeDiv.appendChild(contentDiv);
+
+      if (node.children && node.children.length > 0) {
+        var childrenDiv = document.createElement('div');
+        childrenDiv.className = 'tree-children';
+        if (node.expanded === false) {
+          childrenDiv.style.display = 'none';
+        }
+        for (var i = 0; i < node.children.length; i++) {
+          var childEl = TreeManager.createNodeElement(treeId, node.children[i], level + 1);
+          if (childEl) childrenDiv.appendChild(childEl);
+        }
+        nodeDiv.appendChild(childrenDiv);
+      }
+
+      return nodeDiv;
+    },
+
+    /**
+     * 展开/折叠节点
+     * @param {string} treeId - 树控件 ID
+     * @param {string} nodeId - 节点 ID
+     */
+    toggleNode: function(treeId, nodeId) {
+      var container = document.getElementById(treeId);
+      if (!container) return;
+
+      var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
+      if (!nodeEl) return;
+
+      var toggle = nodeEl.querySelector(':scope > .tree-node-content > .tree-toggle');
+      var children = nodeEl.querySelector(':scope > .tree-children');
+      if (!toggle || !children) return;
+
+      var node = TreeManager.findNodeData(TreeManager.configs[treeId] ? TreeManager.configs[treeId].data : null, nodeId);
+      if (!node) return;
+
+      if (toggle.classList.contains('expanded')) {
+        toggle.classList.remove('expanded');
+        toggle.classList.add('collapsed');
+        children.style.display = 'none';
+        node.expanded = false;
+      } else {
+        toggle.classList.remove('collapsed');
+        toggle.classList.add('expanded');
+        children.style.display = '';
+        node.expanded = true;
+      }
+    },
+
+    /**
+     * 选中节点（高亮选中，取消之前的选中）
+     * @param {string} treeId - 树控件 ID
+     * @param {string} nodeId - 节点 ID
+     */
+    selectNode: function(treeId, nodeId) {
+      var container = document.getElementById(treeId);
+      if (!container) return;
+
+      var prevSelected = container.querySelector('.tree-node-content.selected');
+      if (prevSelected) {
+        prevSelected.classList.remove('selected');
+      }
+
+      var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
+      if (!nodeEl) return;
+
+      var content = nodeEl.querySelector(':scope > .tree-node-content');
+      if (content) {
+        content.classList.add('selected');
+      }
+
+      TreeManager.selectedNodes[treeId] = nodeId;
+    },
+
+    /**
+     * 获取当前选中的节点数据
+     * @param {string} treeId - 树控件 ID
+     * @returns {Object|null}
+     */
+    getSelectedNode: function(treeId) {
+      var nodeId = TreeManager.selectedNodes[treeId];
+      if (!nodeId) return null;
+      var config = TreeManager.configs[treeId];
+      if (!config) return null;
+      return TreeManager.findNodeData(config.data, nodeId);
+    },
+
+    /**
+     * 递归查找节点数据
+     * @param {Object[]} nodes - 节点数组
+     * @param {string} nodeId - 节点 ID
+     * @returns {Object|null}
+     */
+    findNodeData: function(nodes, nodeId) {
+      if (!nodes) return null;
+      for (var i = 0; i < nodes.length; i++) {
+        if (nodes[i].id === nodeId) return nodes[i];
+        if (nodes[i].children && nodes[i].children.length > 0) {
+          var found = TreeManager.findNodeData(nodes[i].children, nodeId);
+          if (found) return found;
+        }
+      }
+      return null;
+    },
+
+    /**
+     * 添加子节点并重新渲染
+     * @param {string} treeId - 树控件 ID
+     * @param {string} parentNodeId - 父节点 ID（父节点必须存在 children）
+     * @param {Object} newNodeData - 新节点数据 { id, text, children }
+     */
+    addNode: function(treeId, parentNodeId, newNodeData) {
+      var config = TreeManager.configs[treeId];
+      if (!config || !newNodeData) return false;
+
+      var parent = TreeManager.findNodeData(config.data, parentNodeId);
+      if (!parent) return false;
+
+      if (!parent.children) {
+        parent.children = [];
+      }
+
+      parent.children.push({
+        id: newNodeData.id || ('node_' + Date.now()),
+        text: newNodeData.text || '新节点',
+        expanded: newNodeData.expanded !== undefined ? newNodeData.expanded : false,
+        children: newNodeData.children || undefined
+      });
+
+      TreeManager.init(config);
+      return true;
+    },
+
+    /**
+     * 删除节点并重新渲染
+     * @param {string} treeId - 树控件 ID
+     * @param {string} nodeId - 节点 ID
+     */
+    removeNode: function(treeId, nodeId) {
+      var config = TreeManager.configs[treeId];
+      if (!config) return false;
+
+      var removed = TreeManager._removeNodeFromData(config.data, nodeId);
+      if (removed) {
+        TreeManager.init(config);
+        return true;
+      }
+      return false;
+    },
+
+    /**
+     * 从数据中递归删除节点
+     * @param {Object[]} nodes - 节点数组
+     * @param {string} nodeId - 节点 ID
+     * @returns {boolean}
+     */
+    _removeNodeFromData: function(nodes, nodeId) {
+      if (!nodes) return false;
+      for (var i = nodes.length - 1; i >= 0; i--) {
+        if (nodes[i].id === nodeId) {
+          nodes.splice(i, 1);
+          return true;
+        }
+        if (nodes[i].children && nodes[i].children.length > 0) {
+          if (TreeManager._removeNodeFromData(nodes[i].children, nodeId)) {
+            return true;
+          }
+        }
+      }
+      return false;
+    },
+
+    /**
+     * 更新节点文本并重新渲染
+     * @param {string} treeId - 树控件 ID
+     * @param {string} nodeId - 节点 ID
+     * @param {string} text - 新文本
+     */
+    updateNode: function(treeId, nodeId, text) {
+      var config = TreeManager.configs[treeId];
+      if (!config) return false;
+
+      var node = TreeManager.findNodeData(config.data, nodeId);
+      if (!node) return false;
+
+      node.text = text;
+      TreeManager.init(config);
+      return true;
+    },
+
+    /**
+     * 展开节点
+     * @param {string} treeId - 树控件 ID
+     * @param {string} nodeId - 节点 ID
+     */
+    expandNode: function(treeId, nodeId) {
+      var node = TreeManager.findNodeData(
+        TreeManager.configs[treeId] ? TreeManager.configs[treeId].data : null,
+        nodeId
+      );
+      if (node) {
+        node.expanded = true;
+      }
+      var container = document.getElementById(treeId);
+      if (!container) return;
+      var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
+      if (!nodeEl) return;
+      var toggle = nodeEl.querySelector(':scope > .tree-node-content > .tree-toggle');
+      var children = nodeEl.querySelector(':scope > .tree-children');
+      if (toggle) {
+        toggle.classList.remove('collapsed');
+        toggle.classList.add('expanded');
+      }
+      if (children) {
+        children.style.display = '';
+      }
+    },
+
+    /**
+     * 折叠节点
+     * @param {string} treeId - 树控件 ID
+     * @param {string} nodeId - 节点 ID
+     */
+    collapseNode: function(treeId, nodeId) {
+      var node = TreeManager.findNodeData(
+        TreeManager.configs[treeId] ? TreeManager.configs[treeId].data : null,
+        nodeId
+      );
+      if (node) {
+        node.expanded = false;
+      }
+      var container = document.getElementById(treeId);
+      if (!container) return;
+      var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
+      if (!nodeEl) return;
+      var toggle = nodeEl.querySelector(':scope > .tree-node-content > .tree-toggle');
+      var children = nodeEl.querySelector(':scope > .tree-children');
+      if (toggle) {
+        toggle.classList.remove('expanded');
+        toggle.classList.add('collapsed');
+      }
+      if (children) {
+        children.style.display = 'none';
+      }
+    },
+
+    /**
+     * 动态设置树控件的编辑状态
+     * @param {string} treeId - 树控件 ID
+     * @param {boolean} enabled - 是否允许编辑
+     */
+    setEditable: function(treeId, enabled) {
+      var config = TreeManager.configs[treeId];
+      if (!config) return;
+      config.editable = !!enabled;
+      var el = document.getElementById(treeId);
+      if (el) {
+        el.setAttribute('data-editable', enabled ? 'true' : 'false');
+      }
+    },
+
+    /**
+     * 动态设置树控件的复选框显示状态
+     * @param {string} treeId - 树控件 ID
+     * @param {boolean} show - 是否显示复选框
+     */
+    showCheckbox: function(treeId, show) {
+      var config = TreeManager.configs[treeId];
+      if (!config) return false;
+      config.showCheckbox = !!show;
+      var el = document.getElementById(treeId);
+      if (el) {
+        el.setAttribute('data-show-checkbox', show ? 'true' : 'false');
+      }
+      return true;
+    },
+
+    /**
+     * 设置指定节点的勾选状态
+     * @param {string} treeId - 树控件 ID
+     * @param {string} nodeId - 节点 ID
+     * @param {boolean} checked - 是否勾选
+     */
+    setNodeChecked: function(treeId, nodeId, checked) {
+      var container = document.getElementById(treeId);
+      if (!container) return false;
+      var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
+      if (!nodeEl) return false;
+      var cbs = nodeEl.querySelectorAll('.tree-node-check');
+      for (var i = 0; i < cbs.length; i++) {
+        cbs[i].checked = !!checked;
+      }
+      return true;
+    },
+
+    /**
+     * 获取指定节点的勾选状态
+     * @param {string} treeId - 树控件 ID
+     * @param {string} nodeId - 节点 ID
+     * @returns {boolean} 是否勾选
+     */
+    isNodeChecked: function(treeId, nodeId) {
+      var container = document.getElementById(treeId);
+      if (!container) return false;
+      var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
+      if (!nodeEl) return false;
+      var cb = nodeEl.querySelector('.tree-node-check');
+      return cb ? cb.checked : false;
+    },
+
+    /**
+     * 获取所有已勾选的节点 ID 数组
+     * @param {string} treeId - 树控件 ID
+     * @returns {string[]} 已勾选节点 ID 数组
+     */
+    getCheckedNodes: function(treeId) {
+      var container = document.getElementById(treeId);
+      if (!container) return [];
+      var checkboxes = container.querySelectorAll('.tree-node-check:checked');
+      var ids = [];
+      for (var i = 0; i < checkboxes.length; i++) {
+        var nodeEl = checkboxes[i].closest('.tree-node');
+        if (nodeEl) {
+          ids.push(nodeEl.getAttribute('data-node-id'));
+        }
+      }
+      return ids;
+    },
+
+    /**
+     * 全选所有节点的复选框
+     * @param {string} treeId - 树控件 ID
+     */
+    checkAll: function(treeId) {
+      var container = document.getElementById(treeId);
+      if (!container) return false;
+      var checkboxes = container.querySelectorAll('.tree-node-check');
+      for (var i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = true;
+      }
+      return true;
+    },
+
+    /**
+     * 取消全选所有节点的复选框
+     * @param {string} treeId - 树控件 ID
+     */
+    uncheckAll: function(treeId) {
+      var container = document.getElementById(treeId);
+      if (!container) return false;
+      var checkboxes = container.querySelectorAll('.tree-node-check');
+      for (var i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = false;
+      }
+      return true;
+    },
+
+    /**
+     * 编辑节点标签（内联编辑）
+     * @param {string} treeId - 树控件 ID
+     * @param {string} nodeId - 节点 ID
+     */
+    editNodeLabel: function(treeId, nodeId) {
+      var config = TreeManager.configs[treeId];
+      if (!config || !config.editable) return;
+
+      var container = document.getElementById(treeId);
+      if (!container) return;
+
+      var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
+      if (!nodeEl) return;
+
+      var label = nodeEl.querySelector(':scope > .tree-node-content > .tree-label');
+      if (!label) return;
+
+      var node = TreeManager.findNodeData(config.data, nodeId);
+      if (!node) return;
+
+      var oldText = node.text;
+      var input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'tree-edit-input';
+      input.value = oldText;
+
+      label.replaceWith(input);
+      input.focus();
+      input.select();
+
+      var save = function() {
+        var newText = input.value.trim();
+        if (newText && newText !== oldText) {
+          node.text = newText;
+        }
+        var newLabel = document.createElement('span');
+        newLabel.className = 'tree-label';
+        newLabel.textContent = node.text;
+        input.replaceWith(newLabel);
+      };
+
+      var cancel = function() {
+        var newLabel = document.createElement('span');
+        newLabel.className = 'tree-label';
+        newLabel.textContent = oldText;
+        input.replaceWith(newLabel);
+      };
+
+      input.addEventListener('blur', save);
+      input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          save();
+        }
+        if (e.key === 'Escape') {
+          cancel();
+        }
+      });
+    },
+
+    /**
+     * 绑定全局事件委托到树容器
+     * @param {HTMLElement} container - 树容器元素
+     * @param {string} treeId - 树控件 ID
+     */
+    _bindGlobalEvents: function(container, treeId) {
+      var config = TreeManager.configs[treeId];
+      if (!config) return;
+
+      container.onclick = function(e) {
+        if (e.target.closest('.tree-node-check')) {
+          return;
+        }
+
+        var content = e.target.closest('.tree-node-content');
+        if (!content) return;
+
+        var nodeEl = content.closest('.tree-node');
+        if (!nodeEl) return;
+
+        var nodeId = nodeEl.getAttribute('data-node-id');
+        if (!nodeId) return;
+
+        var targetTreeId = nodeEl.getAttribute('data-tree-id');
+        if (targetTreeId !== treeId) return;
+
+        if (e.target.closest('.tree-toggle')) {
+          TreeManager.toggleNode(treeId, nodeId);
+          return;
+        }
+
+        TreeManager.selectNode(treeId, nodeId);
+      };
+
+      container.ondblclick = function(e) {
+        var content = e.target.closest('.tree-node-content');
+        if (!content) return;
+
+        var nodeEl = content.closest('.tree-node');
+        if (!nodeEl) return;
+
+        var nodeId = nodeEl.getAttribute('data-node-id');
+        if (!nodeId) return;
+
+        var targetTreeId = nodeEl.getAttribute('data-tree-id');
+        if (targetTreeId !== treeId) return;
+
+        if (config.editable) {
+          TreeManager.editNodeLabel(treeId, nodeId);
+        }
+      };
+
+      container.addEventListener('change', function(e) {
+        var target = e.target;
+        if (!target || !target.classList.contains('tree-node-check')) return;
+        var nodeEl = target.closest('.tree-node');
+        if (!nodeEl) return;
+        var targetTreeId = nodeEl.getAttribute('data-tree-id');
+        if (targetTreeId !== treeId) return;
+        var checked = target.checked;
+        var descendants = nodeEl.querySelectorAll('.tree-node-check');
+        for (var i = 0; i < descendants.length; i++) {
+          descendants[i].checked = checked;
+        }
+      });
+    }
+  };
+
+  window.TreeManager = TreeManager;
+})();
+
+
+(function(){
+  var DataTableManager = {
+    tables: {},
+
+    /**
+     * 初始化表格
+     */
+    init: function(tableId, config) {
+      var container = document.getElementById(tableId);
+      if (!container) return;
+
+      var store = {
+        id: tableId,
+        container: container,
+        columns: config.columns || [],
+        rows: config.rows || [],
+        showCheckbox: config.showCheckbox !== false,
+        allowAdd: config.allowAdd === true,
+        allowDelete: config.allowDelete === true,
+        editable: config.editable === true,
+        alwaysShowSelection: config.alwaysShowSelection === true,
+        selectedRowIndex: -1
+      };
+
+      this.tables[tableId] = store;
+      this.bindEvents(store);
+    },
+
+    /**
+     * 绑定表格事件
+     */
+    bindEvents: function(store) {
+      var self = this;
+      var container = store.container;
+
+      // 表头全选复选框
+      var selectAll = container.querySelector('.data-grid-select-all');
+      if (selectAll) {
+        selectAll.addEventListener('change', function(e) {
+          self.selectAllRows(store.id, e.target.checked);
+        });
+      }
+
+      // 行复选框
+      container.querySelectorAll('.data-grid-row-check').forEach(function(cb) {
+        cb.addEventListener('change', function(e) {
+          var row = e.target.closest('.data-grid-row');
+          if (row) {
+            var idx = parseInt(row.getAttribute('data-row-index'), 10);
+            var rowData = self.getRowData(store.id, idx);
+            if (rowData) {
+              rowData.selected = e.target.checked;
+              self.updateSelectAllState(store);
+            }
+          }
+        });
+      });
+
+      // 行点击高亮处理
+      container.querySelectorAll('.data-grid-row').forEach(function(row) {
+        row.addEventListener('click', function(e) {
+          if (e.target.tagName === 'INPUT') return;
+          // 移除其他行的高亮
+          container.querySelectorAll('.data-grid-row.data-grid-row-focused').forEach(function(r) {
+            r.classList.remove('data-grid-row-focused');
+          });
+          // 高亮当前行
+          row.classList.add('data-grid-row-focused');
+          store.selectedRowIndex = parseInt(row.getAttribute('data-row-index'), 10);
+        });
+      });
+
+      // 单元格双击编辑
+      if (store.editable) {
+        container.querySelectorAll('.data-grid-cell[data-col-key]').forEach(function(cell) {
+          if (cell.closest('.data-grid-checkbox')) return;
+          cell.addEventListener('dblclick', function() {
+            var row = cell.closest('.data-grid-row');
+            if (!row) return;
+            var ri = parseInt(row.getAttribute('data-row-index'), 10);
+            var field = cell.getAttribute('data-col-key');
+            if (ri === undefined || !field) return;
+            self.startEditCell(store, cell, ri, field);
+          });
+        });
+      }
+    },
+
+    /** 更新全选复选框状态 */
+    updateSelectAllState: function(store) {
+      var selectAll = store.container.querySelector('.data-grid-select-all');
+      if (!selectAll) return;
+      var total = store.rows.length;
+      var selected = store.rows.filter(function(r) { return r.selected; }).length;
+      selectAll.checked = (total > 0 && selected === total);
+      selectAll.indeterminate = (selected > 0 && selected < total);
+    },
+
+    /** 全选/取消全选 */
+    selectAllRows: function(tableId, checked) {
+      var store = this.tables[tableId];
+      if (!store) return;
+      store.rows.forEach(function(r) {
+        r.selected = checked;
+      });
+      store.container.querySelectorAll('.data-grid-row-check').forEach(function(cb) {
+        cb.checked = checked;
+      });
+    },
+
+    /** 开始编辑单元格 */
+    startEditCell: function(store, cell, ri, field) {
+      var self = this;
+      if (!store.editable) return;
+      if (cell.hasAttribute('data-editable')) return;
+      if (cell.querySelector('input')) return;
+      var oldVal = cell.textContent || '';
+      var input = document.createElement('input');
+      input.type = 'text';
+      input.value = oldVal;
+      input.style.cssText = 'width:100%;height:100%;border:2px solid #1890ff;outline:none;padding:2px 4px;font-size:12px;font-family:inherit;background:#fff;box-sizing:border-box;margin:-2px -4px;';
+      cell.textContent = '';
+      cell.appendChild(input);
+      input.focus();
+      input.select();
+
+      var commit = function() {
+        var val = input.value;
+        cell.textContent = val;
+        self.setCellValue(store.id, ri, field, val);
+      };
+      input.addEventListener('blur', commit);
+      input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          commit();
+        } else if (e.key === 'Escape') {
+          cell.textContent = oldVal;
+        }
+      });
+    },
+
+    /** 设置单元格值 */
+    setCellValue: function(tableId, rowIndex, field, value) {
+      var store = this.tables[tableId];
+      if (!store || !store.rows[rowIndex]) return;
+      store.rows[rowIndex].cells[field] = value;
+    },
+
+    /** 获取行数据 */
+    getRowData: function(tableId, rowIndex) {
+      var store = this.tables[tableId];
+      if (!store || !store.rows[rowIndex]) return null;
+      return store.rows[rowIndex];
+    },
+
+    /** 添加行 */
+    addRow: function(tableId, rowData) {
+      var store = this.tables[tableId];
+      if (!store) return;
+      var newRow = {
+        id: tableId + '_row_' + (store.rows.length + 1),
+        cells: {},
+        selected: false
+      };
+      store.columns.forEach(function(col) {
+        newRow.cells[col.field] = (rowData && rowData[col.field] !== undefined) ? rowData[col.field] : '';
+      });
+      store.rows.push(newRow);
+      this.refreshDOM(store);
+    },
+
+    /** 删除行 */
+    removeRow: function(tableId, rowIndex) {
+      var store = this.tables[tableId];
+      if (!store || !store.rows[rowIndex]) return;
+      store.rows.splice(rowIndex, 1);
+      this.refreshDOM(store);
+    },
+
+    /** 动态设置表格的编辑状态 */
+    setEditable: function(tableId, enabled) {
+      var store = this.tables[tableId];
+      if (!store) return;
+      store.editable = !!enabled;
+      store.container.setAttribute('data-editable', enabled ? 'true' : 'false');
+      if (!enabled) return;
+      var self = this;
+      store.container.querySelectorAll('.data-grid-cell[data-col-key]').forEach(function(cell) {
+        if (cell.closest('.data-grid-checkbox')) return;
+        if (cell._dgEditBound) return;
+        cell._dgEditBound = true;
+        cell.addEventListener('dblclick', function() {
+          var row = cell.closest('.data-grid-row');
+          if (!row) return;
+          var ri = parseInt(row.getAttribute('data-row-index'), 10);
+          var field = cell.getAttribute('data-col-key');
+          if (ri === undefined || !field) return;
+          self.startEditCell(store, cell, ri, field);
+        });
+      });
+    },
+
+    /** 刷新 DOM */
+    refreshDOM: function(store) {
+      var self = this;
+      var body = store.container.querySelector('.data-grid-body');
+      if (!body) return;
+
+      var html = '';
+      store.rows.forEach(function(row, ri) {
+        var rowClass = (store.selectedRowIndex === ri) ? 'data-grid-row data-grid-row-focused' : 'data-grid-row';
+        html += '<div class="' + rowClass + '" data-row-index="' + ri + '" data-row-id="' + row.id + '">';
+        if (store.showCheckbox) {
+          var checked = row.selected ? ' checked' : '';
+          html += '<div class="data-grid-cell data-grid-checkbox" style="width:36px;min-width:36px;flex-shrink:0"><input type="checkbox" class="data-grid-row-check"' + checked + '></div>';
+        }
+        store.columns.forEach(function(col) {
+          var w = col.width || 100;
+          var val = row.cells && row.cells[col.field] !== undefined && row.cells[col.field] !== null ? String(row.cells[col.field]) : '';
+          html += '<div class="data-grid-cell" data-col-key="' + col.field + '" style="width:' + w + 'px;min-width:' + w + 'px;flex-shrink:0" title="' + val + '">' + val + '</div>';
+        });
+        html += '</div>';
+      });
+      body.innerHTML = html;
+      this.bindEvents(store);
+    }
+  };
+
+  window.DataTableManager = DataTableManager;
+})();
+
+
+(function() {
+  var treeViewEls = document.querySelectorAll('[data-type="treeView"]');
+  treeViewEls.forEach(function(el) {
+    var treeId = el.getAttribute('data-tree-id');
+    if (treeId && typeof TreeManager !== 'undefined') {
+      function buildNodesFromDOM(parentEl) {
+        var nodes = [];
+        var childNodes = parentEl.querySelectorAll(':scope > .tree-node');
+        childNodes.forEach(function(nodeEl) {
+          var contentEl = nodeEl.querySelector(':scope > .tree-node-content');
+          var labelEl = contentEl ? contentEl.querySelector('.tree-label') : null;
+          var childrenEl = nodeEl.querySelector(':scope > .tree-children');
+          var toggleEl = contentEl ? contentEl.querySelector('.tree-toggle') : null;
+          var checkboxEl = contentEl ? contentEl.querySelector('.tree-node-check') : null;
+          var isExpanded = toggleEl && toggleEl.classList.contains('expanded');
+          var node = {
+            id: nodeEl.getAttribute('data-node-id'),
+            text: labelEl ? labelEl.textContent : '',
+            expanded: isExpanded,
+            checked: checkboxEl ? checkboxEl.checked : false,
+            children: []
+          };
+          if (childrenEl) {
+            var childNodesData = buildNodesFromDOM(childrenEl);
+            if (childNodesData.length > 0) {
+              node.children = childNodesData;
+            }
+          }
+          nodes.push(node);
+        });
+        return nodes;
+      }
+      var data = buildNodesFromDOM(el);
+      var editable = el.getAttribute('data-editable') === 'true';
+      var showIcon = el.getAttribute('data-show-icon') !== 'false';
+      var showCheckbox = el.getAttribute('data-show-checkbox') === 'true';
+      TreeManager.init({ id: treeId, data: data, editable: editable, showIcon: showIcon, showCheckbox: showCheckbox });
+    }
+  });
+})();
+
+
+(function(){
+  document.querySelectorAll('.data-grid-container').forEach(function(container){
+    var id = container.getAttribute('data-id') || container.id;
+    var columns = JSON.parse(container.getAttribute('data-columns') || '[]');
+    var rows = JSON.parse(container.getAttribute('data-rows') || '[]');
+    var showCheckbox = container.getAttribute('data-show-checkbox') !== 'false';
+    var allowAdd = container.getAttribute('data-allow-add') === 'true';
+    var allowDelete = container.getAttribute('data-allow-delete') === 'true';
+    var editable = container.getAttribute('data-editable') === 'true';
+    var alwaysShowSelection = container.getAttribute('data-always-show-selection') === 'true';
+    if (window.DataTableManager && typeof window.DataTableManager.init === 'function'){
+      window.DataTableManager.init(id, { columns: columns, rows: rows, showCheckbox: showCheckbox, allowAdd: allowAdd, allowDelete: allowDelete, editable: editable, alwaysShowSelection: alwaysShowSelection });
+    }
+  });
+})();
+
+</script>
+
+
+<script>
+window.__messageBoxConfig = {"title":"提示","message":"这是一条消息","icon":"error","customIcon":"","buttons":"okcancel","defaultButton":0,"width":432,"height":"200","showOverlay":false,"closeOnOverlayClick":false,"draggable":true,"opacity":0.56,"customCSS":"/* ===== 信息提示框自定义样式 ===== */\n/* 蒙版层 - 半透明黑色背景覆盖全屏 */\n.mb-overlay {\n  background: rgba(0, 0, 0, 0.4);\n}\n/* 对话框容器 - 白色圆角卡片 */\n.mb-dialog {\n  background: #491b1b;\n  border-radius: 8px;\n  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);\n}\n/* 标题栏 */\n.mb-header {\n  padding: 16px 20px 8px;\n  font-size: 16px;\n  font-weight: 600;\n  color: #ffffff;\n}\n/* 关闭按钮 (✕) */\n.mb-header-close {\n  color: #ff0000;\n}\n.mb-header-close:hover {\n  background: #f0f0f0;\n  color: #333;\n}\n/* 内容区域（图标+消息） */\n.mb-body {\n  padding: 8px 20px 16px;\n}\n/* 图标 */\n.mb-icon {\n  font-size: 28px;\n}\n/* 消息文字 */\n.mb-message {\n  font-size: 14px;\n  color: #555;\n  line-height: 1.6;\n}\n/* 底部按钮栏 */\n.mb-footer {\n  padding: 12px 20px 16px;\n}\n/* 普通按钮 */\n.mb-btn {\n  padding: 7px 20px;\n  border: 1px solid #d9d9d9;\n  border-radius: 4px;\n  background: #fff;\n  font-size: 13px;\n}\n.mb-btn:hover {\n  border-color: #409eff;\n  color: #409eff;\n}\n/* 主按钮（确定/是/重试） */\n.mb-btn.mb-btn-primary {\n  background: #409eff;\n  color: #fff;\n  border-color: #409eff;\n}\n.mb-btn.mb-btn-primary:hover {\n  background: #66b1ff;\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n/* [auto:opacity] */\n.mb-dialog { opacity: 0.73; }\n"};
+</script>
+<script>
+window.__inputBoxConfig = {"title":"输入","prompt":"请输入内容","defaultValue":"","inputType":"number","buttons":"okcancel","defaultButton":0,"width":400,"height":0,"showOverlay":true,"closeOnOverlayClick":false,"draggable":true,"opacity":0.56,"customCSS":"/* ===== 输入框自定义样式 ===== */\n/* 蒙版层 - 半透明黑色背景覆盖全屏 */\n.ib-overlay {\n  background: rgba(0, 0, 0, 0.4);\n}\n/* 对话框容器 - 白色圆角卡片 */\n.ib-dialog {\n  background: #4e4848;\n  border-radius: 8px;\n  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);\n}\n/* 标题栏 */\n.ib-header {\n  padding: 16px 20px 8px;\n  font-size: 16px;\n  font-weight: 600;\n  color: #333;\n}\n/* 关闭按钮 (✕) */\n.ib-header-close {\n  color: #eb0000;\n}\n.ib-header-close:hover {\n  background: #f0f0f0;\n  color: #333;\n}\n/* 内容区域（提示文字+输入框） */\n.ib-body {\n  padding: 8px 20px 16px;\n}\n/* 提示文字 */\n.ib-prompt {\n  font-size: 14px;\n  color: #555;\n  line-height: 1.6;\n  margin-bottom: 10px;\n}\n/* 输入框 */\n.ib-input {\n  width: 100%;\n  padding: 7px 10px;\n  border: 1px solid #d9d9d9;\n  border-radius: 4px;\n  font-size: 13px;\n  color: #333;\n  outline: none;\n  box-sizing: border-box;\n}\n.ib-input:focus {\n  border-color: #409eff;\n  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);\n}\n/* 底部按钮栏 */\n.ib-footer {\n  padding: 12px 20px 16px;\n  display: flex;\n  justify-content: flex-end;\n  gap: 8px;\n}\n/* 普通按钮 */\n.ib-btn {\n  padding: 7px 20px;\n  border: 1px solid #d9d9d9;\n  border-radius: 4px;\n  background: #fff;\n  font-size: 13px;\n  cursor: pointer;\n}\n.ib-btn:hover {\n  border-color: #409eff;\n  color: #409eff;\n}\n/* 主按钮（确定） */\n.ib-btn.ib-btn-primary {\n  background: #409eff;\n  color: #fff;\n  border-color: #409eff;\n}\n.ib-btn.ib-btn-primary:hover {\n  background: #66b1ff;\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n/* [auto:opacity] */\n.ib-dialog { opacity: 0.32; }\n"};
+</script>
+<script src="./webviewBridge.js"></script>
+</body>
+</html>

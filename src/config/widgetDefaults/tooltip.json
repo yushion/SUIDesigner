@@ -1,0 +1,93 @@
+{
+  "label": "气泡提示框",
+  "icon": "💬",
+  "defaultStyleData": {
+    "base": {
+      "width": 125,
+      "height": 65,
+      "backgroundColor": "#E9F9FF",
+      "borderColor": "#809EE5",
+      "borderWidth": 2,
+      "borderStyle": "dashed"
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "defaultStyleLight": {
+    "base": {
+      "backgroundColor": "#E9F9FF",
+      "borderColor": "#809EE5",
+      "borderWidth": 2,
+      "borderStyle": "dashed"
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "defaultStyleDark": {
+    "base": {
+      "backgroundColor": "#555",
+      "color": "#eee",
+      "borderColor": "rgba(255,255,255,0.15)",
+      "borderWidth": 1,
+      "borderStyle": "solid",
+      "borderRadius": 6
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "structuralCSS": {
+    ".tt-content": [
+      "background: #333",
+      "color: #fff",
+      "padding: 8px 12px",
+      "border-radius: 6px",
+      "font-size: 13px",
+      "font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+      "line-height: 1.5",
+      "max-width: 300px",
+      "word-wrap: break-word",
+      "box-shadow: 0 4px 12px rgba(0,0,0,0.25)"
+    ],
+    ".tt-arrow": [
+      "position: absolute",
+      "width: 0",
+      "height: 0",
+      "border: 6px solid transparent"
+    ],
+    ".tt-arrow.bottom": [
+      "bottom: -12px",
+      "left: 50%",
+      "transform: translateX(-50%)",
+      "border-top-color: #333"
+    ],
+    ".tt-arrow.top": [
+      "top: -12px",
+      "left: 50%",
+      "transform: translateX(-50%)",
+      "border-bottom-color: #333"
+    ],
+    ".tt-arrow.right": [
+      "right: -12px",
+      "top: 50%",
+      "transform: translateY(-50%)",
+      "border-left-color: #333"
+    ],
+    ".tt-arrow.left": [
+      "left: -12px",
+      "top: 50%",
+      "transform: translateY(-50%)",
+      "border-right-color: #333"
+    ]
+  },
+  "mappedProps": [],
+  "computedProps": [],
+  "defaultProps": {
+    "tooltipTargetId": "",
+    "tooltipTrigger": "hover",
+    "tooltipContent": "气泡提示内容",
+    "tooltipAllowHTML": false,
+    "tooltipPosition": "top",
+    "disabled": false,
+    "visible": true
+  }
+}

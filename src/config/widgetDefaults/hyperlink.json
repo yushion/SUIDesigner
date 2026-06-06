@@ -1,0 +1,52 @@
+{
+  "label": "超链接",
+  "icon": "🔗",
+  "defaultStyleData": {
+    "base": {
+      "width": 45,
+      "height": 20,
+      "color": "#0078d4",
+      "fontSize": 13,
+      "textDecoration": "underline",
+      "fontFamily": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+      "cursor": "pointer"
+    },
+    "pseudo": {
+      ":hover": {
+        "filter": "brightness(1.1)"
+      },
+      ":active": {
+        "filter": "brightness(0.8)"
+      },
+      ":visited": {
+        "color": "#800080"
+      }
+    },
+    "sub": {}
+  },
+  "defaultStyleLight": {
+    "base": {
+      "color": "#0078d4",
+      "textDecoration": "underline"
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "defaultStyleDark": {
+    "base": {
+      "color": "#4da3e0",
+      "textDecoration": "underline"
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "mappedProps": [],
+  "computedProps": [],
+  "defaultProps": {
+    "text": "超链接",
+    "href": "#",
+    "showUnderline": true,
+    "disabled": false,
+    "visible": true
+  }
+}

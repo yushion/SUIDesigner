@@ -1,0 +1,233 @@
+{
+  "label": "列表框",
+  "icon": "☰",
+  "defaultStyleData": {
+    "base": {
+      "width": 200,
+      "height": 200,
+      "backgroundColor": "#ffffff",
+      "borderColor": "#d9d9d9",
+      "borderWidth": 1,
+      "borderStyle": "solid",
+      "borderRadius": 6,
+      "fontSize": 13,
+      "color": "#333333",
+      "display": "flex",
+      "flexDirection": "column",
+      "overflow": "hidden",
+      "fontFamily": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+    },
+    "pseudo": {},
+    "sub": {
+      ".list-box-scroll": {
+        "flex": "1",
+        "overflow-y": "auto",
+        "overflow-x": "hidden"
+      },
+      ".list-item": {
+        "display": "flex",
+        "align-items": "center",
+        "height": "32px",
+        "padding": "0 10px",
+        "cursor": "pointer",
+        "user-select": "none",
+        "border-bottom": "1px solid #f0f0f0",
+        "gap": "8px"
+      },
+      ".list-item:last-child": {
+        "border-bottom": "none"
+      },
+      ".list-item:hover": {
+        "background-color": "#f5f5f5"
+      },
+      ".list-item.item-selected": {
+        "background-color": "var(--list-item-selected-bg, #e6f4ff)"
+      },
+      ".list-item.item-selected:hover": {
+        "background-color": "#d0e3ff"
+      },
+      ".list-item-checkbox": {
+        "margin": "0",
+        "flex-shrink": "0"
+      },
+      ".list-item-text": {
+        "flex": "1",
+        "overflow": "hidden",
+        "text-overflow": "ellipsis",
+        "white-space": "nowrap"
+      },
+      ".list-item-edit-input": {
+        "flex": "1",
+        "height": "24px",
+        "border": "1px solid #1890ff",
+        "border-radius": "3px",
+        "padding": "0 6px",
+        "font-size": "13px",
+        "font-family": "inherit",
+        "outline": "none",
+        "box-shadow": "0 0 0 2px rgba(24, 144, 255, 0.2)"
+      },
+      ".list-empty": {
+        "display": "flex",
+        "align-items": "center",
+        "justify-content": "center",
+        "height": "100%",
+        "font-size": "13px"
+      },
+      ".disabled": {
+        "opacity": "0.6",
+        "cursor": "not-allowed"
+      },
+      ".disabled-overlay": {
+        "position": "absolute",
+        "left": "0",
+        "top": "0",
+        "width": "100%",
+        "height": "100%",
+        "pointer-events": "none"
+      }
+    }
+  },
+  "defaultStyleLight": {
+    "base": {
+      "backgroundColor": "#ffffff",
+      "borderColor": "#d9d9d9",
+      "borderWidth": 1,
+      "borderStyle": "solid",
+      "borderRadius": 6,
+      "color": "#333333",
+      "itemColor": "#333333",
+      "itemSelectedBg": "#e0edff"
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "defaultStyleDark": {
+    "base": {
+      "backgroundColor": "#2d2d2d",
+      "borderColor": "#555555",
+      "borderWidth": 1,
+      "borderStyle": "solid",
+      "borderRadius": 6,
+      "color": "#e0e0e0",
+      "itemColor": "#e0e0e0",
+      "itemSelectedBg": "#1a3a5c"
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "structuralCSS": {
+    ".list-box-scroll": [
+      "flex: 1",
+      "overflow-y: auto",
+      "overflow-x: hidden"
+    ],
+    ".list-item": [
+      "display: flex",
+      "align-items: center",
+      "height: 32px",
+      "padding: 0 10px",
+      "cursor: pointer",
+      "user-select: none",
+      "border-bottom: 1px solid #f0f0f0",
+      "gap: 8px"
+    ],
+    ".list-item:last-child": [
+      "border-bottom: none"
+    ],
+    ".list-item:hover": [
+      "background-color: #f5f5f5"
+    ],
+    ".list-item.item-selected": [
+      "background-color: var(--list-item-selected-bg, #e6f4ff)"
+    ],
+    ".list-item.item-selected:hover": [
+      "background-color: #d0e3ff"
+    ],
+    ".list-item-checkbox": [
+      "margin: 0",
+      "flex-shrink: 0"
+    ],
+    ".list-item-text": [
+      "flex: 1",
+      "overflow: hidden",
+      "text-overflow: ellipsis",
+      "white-space: nowrap"
+    ],
+    ".list-item-edit-input": [
+      "flex: 1",
+      "height: 24px",
+      "border: 1px solid #1890ff",
+      "border-radius: 3px",
+      "padding: 0 6px",
+      "font-size: 13px",
+      "font-family: inherit",
+      "outline: none",
+      "box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2)"
+    ],
+    ".list-empty": [
+      "display: flex",
+      "align-items: center",
+      "justify-content: center",
+      "height: 100%",
+      "font-size: 13px"
+    ],
+    ".disabled": [
+      "opacity: 0.6",
+      "cursor: not-allowed"
+    ],
+    ".disabled-overlay": [
+      "position: absolute",
+      "left: 0",
+      "top: 0",
+      "width: 100%",
+      "height: 100%",
+      "pointer-events: none"
+    ]
+  },
+  "mappedProps": [
+    {
+      "selector": ".list-item",
+      "base": {
+      },
+      "pseudo": {
+        ":hover": {
+          "backgroundColor": "#f5f5f5"
+        }
+      }
+    },
+    {
+      "selector": ".list-item.item-selected",
+      "base": {
+        "backgroundColor": "#e0edff"
+      },
+      "pseudo": {}
+    }
+  ],
+  "computedProps": [],
+  "defaultProps": {
+    "items": [
+      {
+        "id": "1",
+        "text": "列表项1",
+        "selected": false
+      },
+      {
+        "id": "2",
+        "text": "列表项2",
+        "selected": false
+      },
+      {
+        "id": "3",
+        "text": "列表项3",
+        "selected": false
+      }
+    ],
+    "showCheckbox": false,
+    "multiSelect": false,
+    "editable": false,
+    "alwaysShowSelection": false,
+    "disabled": false,
+    "visible": true
+  }
+}

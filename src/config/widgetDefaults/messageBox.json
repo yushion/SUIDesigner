@@ -1,0 +1,121 @@
+{
+  "label": "信息提示框",
+  "icon": "💬",
+  "defaultStyleData": {
+    "base": {},
+    "pseudo": {},
+    "sub": {}
+  },
+  "defaultStyleLight": {
+    "base": {},
+    "pseudo": {},
+    "sub": {}
+  },
+  "defaultStyleDark": {
+    "base": {},
+    "pseudo": {},
+    "sub": {}
+  },
+  "structuralCSS": {
+    ".mb-overlay": [
+      "position: fixed",
+      "inset: 0",
+      "background: rgba(0,0,0,0.3)",
+      "display: flex",
+      "align-items: center",
+      "justify-content: center",
+      "z-index: 9999"
+    ],
+    ".mb-dialog": [
+      "background: #ffffff",
+      "border-radius: 8px",
+      "box-shadow: 0 8px 32px rgba(0,0,0,0.2)",
+      "overflow: hidden",
+      "display: flex",
+      "flex-direction: column"
+    ],
+    ".mb-header": [
+      "display: flex",
+      "align-items: center",
+      "padding: 12px 16px",
+      "background: #f5f5f5",
+      "border-bottom: 1px solid #e5e5e5",
+      "user-select: none",
+      "cursor: default"
+    ],
+    ".mb-header-close": [
+      "color: #999",
+      "margin-left: auto",
+      "width: 24px",
+      "height: 24px",
+      "display: flex",
+      "align-items: center",
+      "justify-content: center",
+      "cursor: pointer",
+      "border: none",
+      "background: transparent",
+      "font-size: 16px",
+      "border-radius: 4px"
+    ],
+    ".mb-header-close:hover": [
+      "background: #f0f0f0",
+      "color: #333"
+    ],
+    ".mb-body": [
+      "padding: 16px",
+      "flex: 1",
+      "display: flex",
+      "align-items: flex-start",
+      "gap: 12px",
+      "font-size: 14px",
+      "color: #333"
+    ],
+    ".mb-icon": [
+      "font-size: 28px",
+      "flex-shrink: 0"
+    ],
+    ".mb-message": [
+      "font-size: 14px",
+      "color: #555",
+      "line-height: 1.6"
+    ],
+    ".mb-footer": [
+      "padding: 12px 16px",
+      "display: flex",
+      "justify-content: flex-end",
+      "gap: 8px",
+      "border-top: 1px solid #e5e5e5"
+    ],
+    ".mb-btn": [
+      "padding: 6px 18px",
+      "border: 1px solid #d9d9d9",
+      "border-radius: 4px",
+      "background: #ffffff",
+      "color: #333",
+      "font-size: 13px",
+      "cursor: pointer",
+      "min-width: 72px",
+      "text-align: center"
+    ],
+    ".mb-btn:hover": [
+      "background: #f0f0f0"
+    ],
+    ".mb-btn:active": [
+      "background: #e0e0e0"
+    ],
+    ".mb-btn-primary": [
+      "background: #0078d4",
+      "color: #fff",
+      "border-color: #0078d4"
+    ],
+    ".mb-btn-primary:hover": [
+      "background: #106ebe"
+    ],
+    ".mb-btn-primary:active": [
+      "background: #005a9e"
+    ]
+  },
+  "mappedProps": [],
+  "computedProps": [],
+  "defaultProps": {}
+}

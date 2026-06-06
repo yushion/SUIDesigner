@@ -1,0 +1,83 @@
+{
+  "label": "单选框组",
+  "icon": "○",
+  "defaultStyleData": {
+    "base": {
+      "width": 120,
+      "height": 40,
+      "color": "#333333",
+      "fontSize": 14,
+      "display": "flex",
+      "gap": "4px",
+      "fontFamily": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+    },
+    "pseudo": {
+      ":hover": {
+        "opacity": "0.85"
+      },
+      "label input:disabled": {
+        "opacity": "0.5",
+        "cursor": "not-allowed"
+      },
+      "input[type=checkbox]:disabled": {
+        "opacity": "0.5",
+        "cursor": "not-allowed"
+      }
+    },
+    "sub": {}
+  },
+  "defaultStyleLight": {
+    "base": {
+      "color": "#333333"
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "defaultStyleDark": {
+    "base": {
+      "color": "#e0e0e0"
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "structuralCSS": {
+    "label": [
+      "display: inline-flex",
+      "align-items: center",
+      "gap: 4px",
+      "cursor: pointer"
+    ],
+    "label:hover": [
+      "background-color: rgba(0, 0, 0, 0)",
+      "border-radius: 3px"
+    ],
+    "label input[type=radio]": [
+      "cursor: pointer"
+    ]
+  },
+  "mappedProps": [
+    {
+      "selector": "label",
+      "base": {
+      },
+      "pseudo": {}
+    }
+  ],
+  "computedProps": [
+    {
+      "selector": "#id",
+      "cssProp": "flex-direction",
+      "template": "{{flexDirection}}"
+    }
+  ],
+  "defaultProps": {
+    "options": [
+      "选项1",
+      "选项2"
+    ],
+    "selectedIndex": 0,
+    "layout": "vertical",
+    "disabled": false,
+    "visible": true
+  }
+}

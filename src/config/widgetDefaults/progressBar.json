@@ -1,0 +1,104 @@
+{
+  "label": "进度条",
+  "icon": "▬",
+  "defaultStyleData": {
+    "base": {
+      "width": 250,
+      "height": 10,
+      "fontSize": 10,
+      "borderRadius": 12,
+      "barColor": "#0078D4",
+      "color": "#ffffff",
+      "backgroundColor": "#E0E0E0",
+      "overflow": "visible"
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "defaultStyleLight": {
+    "base": {
+      "backgroundColor": "#E0E0E0",
+      "barColor": "#0078D4",
+      "color": "#ffffff",
+      "borderRadius": 12
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "defaultStyleDark": {
+    "base": {
+      "backgroundColor": "#3d3d3d",
+      "barColor": "#1a6fc4",
+      "color": "#e0e0e0",
+      "borderRadius": 12
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "structuralCSS": {
+    ".progress-fill": [
+      "position: absolute",
+      "left: 0",
+      "top: 0",
+      "height: 100%",
+      "transition: width 0.15s",
+      "border-radius: inherit",
+      "overflow: visible"
+    ],
+    ".progress-thumb": [
+      "position: absolute",
+      "top: 50%",
+      "transform: translateY(-50%)",
+      "width: 22px",
+      "height: 22px",
+      "border-radius: 50%",
+      "background: #fff",
+      "border: 2px solid #0078D4",
+      "box-shadow: 0 1px 6px rgba(0,0,0,0.3)",
+      "z-index: 3"
+    ],
+    ".progress-text": [
+      "position: absolute",
+      "left: 50%",
+      "top: 50%",
+      "transform: translate(-50%, -50%)",
+      "font-size: inherit",
+      "text-shadow: 0 0 2px rgba(0, 0, 0, 0.5)",
+      "pointer-events: none"
+    ]
+  },
+  "mappedProps": [
+    {
+      "selector": ".progress-fill",
+      "base": {
+        "background": "#0078D4"
+      },
+      "pseudo": {
+        ":hover": {
+          "filter": "brightness(1.1)"
+        }
+      }
+    },
+    {
+      "selector": ".progress-text",
+      "base": {
+      },
+      "pseudo": {}
+    }
+  ],
+  "computedProps": [
+    {
+      "selector": ".progress-fill",
+      "cssProp": "width",
+      "template": "{{progressValue}}%"
+    }
+  ],
+  "defaultProps": {
+    "progressValue": 60,
+    "showProgressText": true,
+    "editable": false,
+    "draggable": false,
+    "disabled": false,
+    "visible": true
+  }
+}

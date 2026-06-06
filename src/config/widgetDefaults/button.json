@@ -1,0 +1,70 @@
+{
+  "label": "按钮",
+  "icon": "⊙",
+  "defaultStyleData": {
+    "base": {
+      "width": 80,
+      "height": 30,
+      "backgroundColor": "#0078d4",
+      "color": "#ffffff",
+      "fontSize": 13,
+      "borderColor": "#d9d9d9",
+      "borderStyle": "solid",
+      "borderWidth": 0,
+      "borderRadius": 4,
+      "fontFamily": "Segoe UI, Tahoma, Geneva, Verdana, sans-serif",
+      "display": "inline-flex",
+      "alignItems": "center",
+      "justifyContent": "center",
+      "border": "none",
+      "cursor": "pointer",
+      "whiteSpace": "nowrap",
+      "userSelect": "none"
+    },
+    "pseudo": {
+      ":hover": {
+        "filter": "brightness(1.1)"
+      },
+      ":active": {
+        "filter": "brightness(0.9)"
+      },
+      ":disabled": {
+        "opacity": "0.6",
+        "cursor": "not-allowed",
+        "filter": "grayscale(1)"
+      }
+    },
+    "sub": {}
+  },
+  "defaultStyleLight": {
+    "base": {
+      "backgroundColor": "#0078d4",
+      "color": "#ffffff",
+      "borderColor": "#d9d9d9",
+      "borderStyle": "solid",
+      "borderWidth": 0,
+      "borderRadius": 4
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "defaultStyleDark": {
+    "base": {
+      "backgroundColor": "#1a6fc4",
+      "color": "#e0e0e0",
+      "borderColor": "#444",
+      "borderStyle": "solid",
+      "borderWidth": 0,
+      "borderRadius": 4
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "mappedProps": [],
+  "computedProps": [],
+  "defaultProps": {
+    "text": "按钮",
+    "disabled": false,
+    "visible": true
+  }
+}

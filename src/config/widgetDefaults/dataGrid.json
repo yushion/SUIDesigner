@@ -1,0 +1,247 @@
+{
+  "label": "多项表格",
+  "icon": "⊞",
+  "defaultStyleData": {
+    "base": {
+      "width": 400,
+      "height": 250,
+      "backgroundColor": "#ffffff",
+      "color": "#333333",
+      "fontSize": 13,
+      "borderColor": "#d9d9d9",
+      "borderWidth": 1,
+      "borderStyle": "solid",
+      "borderRadius": 6,
+      "gridHeaderBg": "#f0f0f0",
+      "gridEvenRowBg": "#fafafa",
+      "gridHoverBg": "#e6f7ff",
+      "gridFocusedBg": "#d6e4ff",
+      "display": "flex",
+      "flexDirection": "column",
+      "overflow": "hidden",
+      "fontFamily": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+    },
+    "pseudo": {},
+    "sub": {
+      ".data-grid-header": {
+        "display": "flex",
+        "border-bottom": "1px solid #d9d9d9",
+        "background": "#f0f0f0"
+      },
+      ".data-grid-header-cell": {
+        "padding": "6px 10px",
+        "font-weight": "600",
+        "border-right": "1px solid #d9d9d9",
+        "overflow": "hidden",
+        "text-overflow": "ellipsis",
+        "white-space": "nowrap",
+        "box-sizing": "border-box"
+      },
+      ".data-grid-body": {
+        "flex": "1",
+        "overflow-y": "auto"
+      },
+      ".data-grid-row": {
+        "display": "flex",
+        "border-bottom": "1px solid #e8e8e8"
+      },
+      ".data-grid-row:nth-child(even)": {
+        "background": "#fafafa"
+      },
+      ".data-grid-row:hover": {
+        "background": "#e6f7ff"
+      },
+      ".data-grid-row:last-child": {
+        "border-bottom": "none"
+      },
+      ".data-grid-cell": {
+        "padding": "6px 10px",
+        "border-right": "1px solid #e8e8e8",
+        "overflow": "hidden",
+        "text-overflow": "ellipsis",
+        "white-space": "nowrap",
+        "box-sizing": "border-box"
+      },
+      ".data-grid-cell:hover": {
+        "background-color": "rgba(0, 120, 212, 0.05)"
+      },
+      ".data-grid-checkbox": {
+        "display": "flex",
+        "align-items": "center",
+        "justify-content": "center",
+        "width": "40px",
+        "flex-shrink": "0"
+      },
+      ".data-grid-checkbox input": {
+        "margin": "0",
+        "cursor": "pointer"
+      },
+      ".data-grid-row-focused": {
+        "background": "#d6e4ff"
+      }
+    }
+  },
+  "defaultStyleLight": {
+    "base": {
+      "backgroundColor": "#ffffff",
+      "color": "#333333",
+      "borderColor": "#d9d9d9",
+      "borderWidth": 1,
+      "borderStyle": "solid",
+      "borderRadius": 6,
+      "gridHeaderBg": "#f0f0f0",
+      "gridEvenRowBg": "#fafafa",
+      "gridHoverBg": "#e6f7ff",
+      "gridFocusedBg": "#d6e4ff"
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "defaultStyleDark": {
+    "base": {
+      "backgroundColor": "#2d2d2d",
+      "color": "#e0e0e0",
+      "borderColor": "#555555",
+      "borderWidth": 1,
+      "borderStyle": "solid",
+      "borderRadius": 6,
+      "gridHeaderBg": "#3a3a3a",
+      "gridEvenRowBg": "#333333",
+      "gridHoverBg": "#1a3a5c",
+      "gridFocusedBg": "#1a4a6c"
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "structuralCSS": {
+    ".data-grid-header": [
+      "display: flex",
+      "border-bottom: 1px solid #d9d9d9"
+    ],
+    ".data-grid-header-cell": [
+      "padding: 6px 10px",
+      "font-weight: 600",
+      "border-right: 1px solid #d9d9d9",
+      "overflow: hidden",
+      "text-overflow: ellipsis",
+      "white-space: nowrap",
+      "box-sizing: border-box"
+    ],
+    ".data-grid-body": [
+      "flex: 1",
+      "overflow-y: auto"
+    ],
+    ".data-grid-row": [
+      "display: flex",
+      "border-bottom: 1px solid #e8e8e8"
+    ],
+    ".data-grid-row:nth-child(even)": [
+      "background: #fafafa"
+    ],
+    ".data-grid-row:hover": [
+      "background: #e6f7ff"
+    ],
+    ".data-grid-row:last-child": [
+      "border-bottom: none"
+    ],
+    ".data-grid-cell": [
+      "padding: 6px 10px",
+      "border-right: 1px solid #e8e8e8",
+      "overflow: hidden",
+      "text-overflow: ellipsis",
+      "white-space: nowrap",
+      "box-sizing: border-box"
+    ],
+    ".data-grid-cell:hover": [
+      "background-color: rgba(0, 120, 212, 0.05)",
+      "cursor: pointer"
+    ],
+    ".data-grid-checkbox": [
+      "display: flex",
+      "align-items: center",
+      "justify-content: center",
+      "width: 40px",
+      "flex-shrink: 0"
+    ],
+    ".data-grid-checkbox input": [
+      "margin: 0",
+      "cursor: pointer"
+    ],
+    ".data-grid-row-focused": [
+      "background: #d6e4ff"
+    ]
+  },
+  "mappedProps": [
+    {
+      "selector": ".data-grid-header",
+      "base": {
+        "background": "#f0f0f0"
+      },
+      "pseudo": {}
+    },
+    {
+      "selector": ".data-grid-row:hover",
+      "base": {
+        "background": "#e6f7ff"
+      },
+      "pseudo": {}
+    },
+    {
+      "selector": ".data-grid-row:nth-child(even)",
+      "base": {
+        "background": "#fafafa"
+      },
+      "pseudo": {}
+    }
+  ],
+  "computedProps": [],
+  "defaultProps": {
+    "columns": [
+      {
+        "field": "col1",
+        "header": "列A"
+      },
+      {
+        "field": "col2",
+        "header": "列B"
+      },
+      {
+        "field": "col3",
+        "header": "列C"
+      }
+    ],
+    "rows": [
+      {
+        "id": "__r1__",
+        "cells": {
+          "col1": "数据A1",
+          "col2": "数据B1",
+          "col3": "数据C1"
+        }
+      },
+      {
+        "id": "__r2__",
+        "cells": {
+          "col1": "数据A2",
+          "col2": "数据B2",
+          "col3": "数据C2"
+        }
+      },
+      {
+        "id": "__r3__",
+        "cells": {
+          "col1": "数据A3",
+          "col2": "数据B3",
+          "col3": "数据C3"
+        }
+      }
+    ],
+    "showRowCheckbox": true,
+    "alwaysShowSelection": false,
+    "allowAddRow": false,
+    "allowDeleteRow": false,
+    "editable": false,
+    "disabled": false,
+    "visible": true
+  }
+}

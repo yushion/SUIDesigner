@@ -1,0 +1,52 @@
+{
+  "label": "分割线",
+  "icon": "━",
+  "defaultStyleData": {
+    "base": {
+      "width": 200,
+      "height": 1,
+      "lineStyle": "solid",
+      "borderColor": "#D0D0D0",
+      "backgroundColor": "#fff"
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "defaultStyleLight": {
+    "base": {
+      "lineStyle": "solid"
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "defaultStyleDark": {
+    "base": {
+      "lineStyle": "solid"
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "mappedProps": [],
+  "computedProps": [
+    {
+      "selector": "#id",
+      "cssProp": "border-top-width",
+      "template": "{{height}}px"
+    },
+    {
+      "selector": "#id",
+      "cssProp": "border-top-style",
+      "template": "{{lineStyle}}"
+    },
+    {
+      "selector": "#id",
+      "cssProp": "border-top-color",
+      "template": "{{borderColor}}"
+    }
+  ],
+  "defaultProps": {
+    "text": "",
+    "disabled": false,
+    "visible": true
+  }
+}

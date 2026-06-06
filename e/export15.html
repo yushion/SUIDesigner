@@ -1,0 +1,3220 @@
+<html lang="zh-CN"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>标题</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style data-preview-id="main">
+/* === 全局基础样式 === */
+
+* { margin:0;padding:0;box-sizing:border-box }
+html,body { width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:transparent }
+body { display:flex }
+
+.page-container {
+  position:relative;
+  overflow:hidden;
+  backdrop-filter: blur(24px) !important;
+}
+.page-container::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background-color: var(--canvas-bg-color);
+  opacity: var(--canvas-opacity);
+  border-radius: inherit;
+}
+.page-container.show-shadow {
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+
+/* 排除所有控件和弹出框的拖拽区域，确保控件可交互 */
+.page-container [data-ctrl-type] {
+  app-region: no-drag;
+}
+
+/* 画布标题栏 */
+.canvas-titlebar {
+  position:absolute;top:0;left:0;right:0;
+  display:flex;align-items:center;height:40px;user-select:none;z-index:10;
+}
+.canvas-titlebar .tb-left {
+  width:48px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.canvas-titlebar .tb-center {
+  flex:1;display:flex;align-items:center;min-width:0;
+}
+.canvas-titlebar .tb-right {
+  display:flex;align-items:center;justify-content:flex-end;gap:2px;padding-right:4px;flex-shrink:0;
+}
+.canvas-titlebar .tb-icon {
+  width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:16px;
+}
+.canvas-titlebar .tb-title {
+  font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.canvas-titlebar .tb-btn {
+  width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:default;border-radius:4px;flex-shrink:0;
+}
+.canvas-titlebar .tb-btn:hover { background:rgba(0,0,0,0.06) }
+.canvas-titlebar .tb-btn-min:hover,.tb-btn-max:hover { filter: brightness(1.2)}
+.canvas-titlebar .tb-btn-close:hover { background:#e81123;color:#fff }
+.canvas-titlebar .tb-btn-min:active,.tb-btn-max:active,.tb-btn-close:active {filter: brightness(0.7);}
+.canvas-titlebar .tb-btn-disabled { opacity:0.4;cursor:not-allowed;pointer-events:none; }
+.canvas-titlebar .tb-btn-disabled:hover { background:transparent }
+
+/* 毛玻璃效果 */
+.page-container.glass-effect {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  --shadow-blur: 10px;
+}
+
+/* 所有控件的基础定位（具体 left/top/width/height 在各 #id 块中） */
+[data-type] {
+  position:absolute;
+  box-sizing:border-box;
+}
+
+/* 树形框箭头方向（由CSS控制，避免JS覆盖） */
+.tree-toggle.expanded::before { content: '▼'; }
+.tree-toggle.collapsed::before { content: '▶'; }
+.tree-toggle.empty { visibility: hidden; }
+
+/* 右键菜单默认样式 */
+.ctx-menu-overlay {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 99998;
+}
+.ctx-menu {
+  position: fixed;
+  z-index: 99999;
+  background: #ffffff;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+  padding: 4px 0;
+  min-width: 160px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 13px;
+  color: #333333;
+}
+.ctx-menu-item {
+  padding: 7px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  position: relative;
+}
+.ctx-menu-item:hover {
+  background: #e8f4ff;
+}
+.ctx-menu-item.disabled {
+  color: #ccc;
+  cursor: not-allowed;
+}
+.ctx-menu-item.disabled:hover {
+  background: transparent;
+}
+.ctx-menu-separator {
+  height: 1px;
+  background: #e8e8e8;
+  margin: 4px 12px;
+}
+.ctx-menu-item-icon {
+  font-size: 14px;
+  width: 18px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.ctx-menu-item-text {
+  flex: 1;
+}
+.ctx-menu-item-arrow {
+  font-size: 10px;
+  color: #999;
+  margin-left: 24px;
+  flex-shrink: 0;
+}
+.ctx-sub-menu {
+  position: absolute;
+  left: 100%;
+  top: -4px;
+  z-index: 100000;
+  background: #ffffff;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+  padding: 4px 0;
+  min-width: 160px;
+  display: none;
+}
+.ctx-sub-menu.left {
+  left: auto;
+  right: 100%;
+}
+.ctx-menu-item:hover > .ctx-sub-menu {
+  display: block;
+}
+
+/* 气泡框默认样式 */
+.tt-content {
+  background: #333;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.5;
+  max-width: 300px;
+  word-wrap: break-word;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+.tt-arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+}
+.tt-arrow.bottom { border-top-color: #333; }
+.tt-arrow.top { border-bottom-color: #333; }
+.tt-arrow.right { border-left-color: #333; }
+.tt-arrow.left { border-right-color: #333; }
+/* 当箭头指向下方时（即 tooltip 在目标上方），箭头应位于 wrapper 底部中央 */
+.tt-arrow.bottom {
+  bottom: -12px;        /* 6px 边框高度 + 6px 留白，使箭头完全外露 */
+  left: 50%;
+  transform: translateX(-50%);
+  border-top-color: #333;
+}
+
+/* 当箭头指向上方时（即 tooltip 在目标下方），箭头应位于 wrapper 顶部中央 */
+.tt-arrow.top {
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-bottom-color: #333;
+}
+
+/* 当箭头指向右侧时（即 tooltip 在目标左侧），箭头应位于 wrapper 右侧中央 */
+.tt-arrow.right {
+  right: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-left-color: #333;
+}
+
+/* 当箭头指向左侧时（即 tooltip 在目标右侧），箭头应位于 wrapper 左侧中央 */
+.tt-arrow.left {
+  left: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-right-color: #333;
+}
+
+
+/* === 弹出菜单/气泡框自定义样式（覆盖 BASE_STYLES 默认值） === */
+/* 无自定义弹出样式 */
+
+/* === Body 背景 === */
+
+
+/* === 页面容器 === */
+.page-container {
+  width: 980px;
+  height: 625px;
+  background-color: transparent;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  app-region: drag;
+  
+  box-shadow: 3px 5px 10px rgba(0, 0, 0, 0.1)
+}
+
+/* === 画布自定义样式 === */
+.page-container {
+  position: relative;
+  overflow: hidden;
+  --canvas-bg-color: #ffffff;
+  --canvas-opacity: 1;
+  border-width: 1px;
+}
+
+.page-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-color: var(--canvas-bg-color);
+  opacity: var(--canvas-opacity);
+  border-radius: inherit;
+}
+
+.page-container.glass-effect {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.canvas-titlebar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  background-color: #f5f5f5;
+  opacity: 1;
+  user-select: none;
+  z-index: 10;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.canvas-titlebar .tb-left {
+  width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.canvas-titlebar .tb-center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.canvas-titlebar .tb-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+  padding-right: 4px;
+  flex-shrink: 0;
+}
+
+.canvas-titlebar .tb-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.canvas-titlebar .tb-title {
+  font-size: 13px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.canvas-titlebar .tb-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: default;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.canvas-titlebar .tb-btn:hover { background: rgba(0, 0, 0, 0.06); }
+
+.canvas-titlebar .tb-btn:active { background: rgba(0, 0, 0, 0.1); }
+
+.canvas-titlebar .tb-btn-close:hover { background: #e81123; color: #fff; }
+
+.canvas-titlebar .tb-btn-close:active { background: #bf0a1a; color: #fff; }
+
+/* === 页面容器 CSS 变量（放在 customCSS 之后，确保不被覆盖） === */
+.page-container {
+  --canvas-bg-color: #ffffff;
+  --canvas-opacity: 1;
+}
+
+/* === 控件独立样式（每控件完整 #id { ... }，互不干扰） === */
+/* 按钮_1 - 基础样式 */
+#button_1 {
+  position: absolute;
+  left: 13px;
+  top: 49px;
+  width: 80px;
+  height: 30px;
+  box-sizing: border-box;
+  background-color: #0078d4;
+  color: #ffffff;
+  font-size: 13px;
+  border-color: #d9d9d9;
+  border-style: solid;
+  border-width: 0px;
+  border-radius: 4px;
+  font-family: Segoe UI, Tahoma, Geneva, Verdana, sans-serif;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* 按钮_1 - :hover */
+#button_1:hover {
+  filter: brightness(1.1);
+}
+
+/* 按钮_1 - :active */
+#button_1:active {
+  filter: brightness(0.9);
+}
+
+/* 按钮_1 - :disabled */
+#button_1:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
+/* 编辑框_1 - 基础样式 */
+#input_1 {
+  position: absolute;
+  left: 110px;
+  top: 49px;
+  width: 150px;
+  height: 30px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  color: #333333;
+  border-color: #dddddd;
+  border-width: 1px;
+  border-style: solid;
+  font-size: 13px;
+  border-radius: 4px;
+  padding: 4px;
+  outline: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* 编辑框_1 - :focus */
+#input_1:focus {
+  border-color: #2081f7;
+  box-shadow: 0 0 0 1px rgba(0, 120, 212, 0.2);
+}
+
+/* 编辑框_1 - ::placeholder */
+#input_1::placeholder {
+  color: #999999;
+}
+
+/* 编辑框_1 - :disabled */
+#input_1:disabled {
+  opacity: 0.6;
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
+/* 编辑框_1 - :hover */
+#input_1:hover {
+  border-color: #4096ff;
+}
+
+/* 选择框_1 - 基础样式 */
+#checkbox_1 {
+  position: absolute;
+  left: 274px;
+  top: 56px;
+  width: 50px;
+  height: 20px;
+  box-sizing: border-box;
+  color: #333333;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  cursor: pointer;
+  line-height: 14px;
+  user-select: none;
+}
+
+/* 选择框_1 - input[type=checkbox] */
+#checkbox_1 input[type=checkbox] {
+  margin-right: 6px;
+  cursor: pointer;
+}
+
+/* 选择框_1 - span:hover */
+#checkbox_1 span:hover {
+  opacity: 0.85;
+}
+
+/* 选择框_1 - label input:disabled */
+#checkbox_1label input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 选择框_1 - :hover */
+#checkbox_1:hover {
+  opacity: 0.85;
+}
+
+/* 选择框_1 - input[type=checkbox]:disabled */
+#checkbox_1input[type=checkbox]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 开关按钮_1 - 基础样式 */
+#toggle_1 {
+  position: absolute;
+  left: 338px;
+  top: 55px;
+  width: 50px;
+  height: 24px;
+  box-sizing: border-box;
+  background-color: #cccccc;
+  display: inline-block;
+  cursor: pointer;
+  user-select: none;
+  border-radius: 12px;
+}
+
+/* 开关按钮_1 - input */
+#toggle_1 input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  z-index: 1;
+  cursor: pointer;
+}
+
+/* 开关按钮_1 - .slider */
+#toggle_1 .slider {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transition: 0.3s;
+}
+
+/* 开关按钮_1 - .slider::before */
+#toggle_1 .slider::before {
+  content: '';
+  position: absolute;
+  height: calc(100% - 4px);
+  width: calc(50% - 4px);
+  left: 2px;
+  bottom: 2px;
+  transition: 0.3s;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* 开关按钮_1 - input:checked + .slider::before */
+#toggle_1 input:checked + .slider::before {
+  transform: translateX(100%);
+}
+
+/* 开关按钮_1 - input:checked + .slider */
+
+
+/* 开关按钮_1 - input:disabled + .slider */
+#toggle_1 input:disabled + .slider {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 开关按钮_1 - .slider */
+#toggle_1 .slider {
+  background-color: inherit;
+  border-radius: 12px;
+}
+
+/* 开关按钮_1 - .slider::before */
+#toggle_1 .slider::before {
+  background-color: #ffffff;
+}
+
+/* 开关按钮_1 - input:checked + .slider */
+#toggle_1 input:checked + .slider {
+  background-color: #0078d4;
+}
+
+/* 组合框_1 - 基础样式 */
+#comboBox_1 {
+  position: absolute;
+  left: 398px;
+  top: 53px;
+  width: 120px;
+  height: 28px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  color: #1E1F22;
+  border-color: #dddddd;
+  border-width: 1px;
+  border-style: solid;
+  font-size: 13px;
+  border-radius: 3px;
+  padding: 4px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  outline: none;
+  appearance: none;
+  webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%235F6876' d='M1 3.5l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 10px;
+  padding-right: 20px;
+}
+
+/* 组合框_1 - :focus */
+#comboBox_1:focus {
+  border-color: #0078d4;
+  box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.2);
+}
+
+/* 组合框_1 - :disabled */
+#comboBox_1:disabled {
+  opacity: 0.6;
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
+/* 文本标签_1 - 基础样式 */
+#label_1 {
+  position: absolute;
+  left: 534px;
+  top: 57px;
+  width: 30px;
+  height: 20px;
+  box-sizing: border-box;
+  color: #1E1F22;
+  font-size: 13px;
+  font-weight: normal;
+  text-align: left;
+  font-family: Segoe UI, Tahoma, Geneva, Verdana, sans-serif;
+  cursor: default;
+}
+
+/* 分割线_1 - 基础样式 */
+#divider_1 {
+  position: absolute;
+  left: 22px;
+  top: 93px;
+  width: 200px;
+  height: 1px;
+  box-sizing: border-box;
+  border-color: #D0D0D0;
+  background-color: #fff;
+  border-top-width: 1px;
+  border-top-style: solid;
+  border-top-color: #D0D0D0;
+}
+
+/* 超链接_1 - 基础样式 */
+#hyperlink_1 {
+  position: absolute;
+  left: 574px;
+  top: 56px;
+  width: 45px;
+  height: 20px;
+  box-sizing: border-box;
+  color: #0078d4;
+  font-size: 13px;
+  text-decoration: underline;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  cursor: pointer;
+}
+
+/* 超链接_1 - :hover */
+#hyperlink_1:hover {
+  filter: brightness(1.1);
+}
+
+/* 超链接_1 - :active */
+#hyperlink_1:active {
+  filter: brightness(0.8);
+}
+
+/* 超链接_1 - :visited */
+#hyperlink_1:visited {
+  color: #800080;
+}
+
+/* 单选框组_1 - 基础样式 */
+#radioGroup_1 {
+  position: absolute;
+  left: 632px;
+  top: 43px;
+  width: 120px;
+  height: 40px;
+  box-sizing: border-box;
+  color: #333333;
+  font-size: 14px;
+  display: flex;
+  gap: 4px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  flex-direction: column;
+}
+
+/* 单选框组_1 - label */
+#radioGroup_1 label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+/* 单选框组_1 - label:hover */
+#radioGroup_1 label:hover {
+  background-color: rgba(0, 0, 0, 0);
+  border-radius: 3px;
+}
+
+/* 单选框组_1 - label input[type=radio] */
+#radioGroup_1 label input[type=radio] {
+  cursor: pointer;
+}
+
+/* 单选框组_1 - :hover */
+#radioGroup_1:hover {
+  opacity: 0.85;
+}
+
+/* 单选框组_1 - label input:disabled */
+#radioGroup_1label input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 单选框组_1 - input[type=checkbox]:disabled */
+#radioGroup_1input[type=checkbox]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 进度条_1 - 基础样式 */
+#progressBar_1 {
+  position: absolute;
+  left: 251px;
+  top: 92px;
+  width: 250px;
+  height: 10px;
+  box-sizing: border-box;
+  font-size: 10px;
+  border-radius: 12px;
+  color: #ffffff;
+  background-color: #E0E0E0;
+  overflow: hidden;
+}
+
+/* 进度条_1 - .progress-fill */
+#progressBar_1 .progress-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  transition: width 0.2s;
+  border-radius: inherit;
+}
+
+/* 进度条_1 - .progress-text */
+#progressBar_1 .progress-text {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: inherit;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+
+/* 进度条_1 - .progress-fill */
+#progressBar_1 .progress-fill {
+  background: #0078D4;
+  width: 60%;
+}
+
+/* 进度条_1 - .progress-fill:hover */
+#progressBar_1 .progress-fill:hover {
+  filter: brightness(1.1);
+}
+
+/* 时间框_1 - 基础样式 */
+#datetimePicker_1 {
+  position: absolute;
+  left: 715px;
+  top: 49px;
+  width: 140px;
+  height: 32px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  color: #333333;
+  font-size: 13px;
+  border-radius: 4px;
+  border-color: #dddddd;
+  border-width: 1px;
+  border-style: solid;
+  padding: 4px;
+  outline: none;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* 时间框_1 - :focus */
+#datetimePicker_1:focus {
+  border-color: #0078d4;
+  box-shadow: 0 0 0 2px rgba(0,120,212,0.2);
+}
+
+/* 时间框_1 - :disabled */
+#datetimePicker_1:disabled {
+  opacity: 0.6;
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+/* 图标按钮_1 - 基础样式 */
+#iconButton_1 {
+  position: absolute;
+  left: 881px;
+  top: 49px;
+  width: 80px;
+  height: 32px;
+  box-sizing: border-box;
+  background-color: #0078d4;
+  color: #ffffff;
+  font-size: 13px;
+  border-color: #d9d9d9;
+  border-style: solid;
+  border-width: 0px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  outline: none;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 6px 12px;
+}
+
+/* 图标按钮_1 - i */
+#iconButton_1 i {
+  font-size: inherit;
+  line-height: 1;
+}
+
+/* 图标按钮_1 - img, svg */
+#iconButton_1 img, svg {
+  max-width: 20px;
+  height: auto;
+  vertical-align: middle;
+}
+
+/* 图标按钮_1 - :hover */
+#iconButton_1:hover {
+  filter: brightness(1.1);
+}
+
+/* 图标按钮_1 - :active */
+#iconButton_1:active {
+  filter: brightness(0.9);
+}
+
+/* 图标按钮_1 - :disabled */
+#iconButton_1:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* 图片框_1 - 基础样式 */
+#imageBox_1 {
+  position: absolute;
+  left: 15px;
+  top: 105px;
+  width: 110px;
+  height: 110px;
+  box-sizing: border-box;
+  background-color: #f0f0f0;
+  overflow: hidden;
+}
+
+/* 图片框_1 - img */
+#imageBox_1 img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* 图片框_1 - .disabled-overlay */
+#imageBox_1 .disabled-overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.5);
+  pointer-events: none;
+}
+
+/* 图片框_1 - img (computed) */
+#imageBox_1 img {
+  object-fit: cover;
+}
+
+/* 图片框_1 - img (computed) */
+#imageBox_1 img {
+  object-position: center;
+}
+
+/* 图片框_1 - img:hover */
+#imageBox_1img:hover {
+  opacity: 0.9;
+}
+
+/* 图片框_1 - .disabled */
+#imageBox_1.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* 文本域_1 - 基础样式 */
+#textarea_1 {
+  position: absolute;
+  left: 146px;
+  top: 128px;
+  width: 200px;
+  height: 80px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  color: #333333;
+  border-color: #dddddd;
+  border-width: 1px;
+  border-style: solid;
+  font-size: 13px;
+  border-radius: 4px;
+  padding: 4px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  outline: none;
+  resize: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* 文本域_1 - :focus */
+#textarea_1:focus {
+  border-color: #0078d4;
+  box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.2);
+}
+
+/* 文本域_1 - :disabled */
+#textarea_1:disabled {
+  opacity: 0.6;
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
+/* 文本域_1 - ::placeholder */
+#textarea_1::placeholder {
+  color: #999;
+}
+
+/* 日志框_1 - 基础样式 */
+#logOutput_1 {
+  position: absolute;
+  left: 21px;
+  top: 234px;
+  width: 300px;
+  height: 150px;
+  box-sizing: border-box;
+  border-color: #dddddd;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 4px;
+  background-color: #fbfbfb;
+  color: #333333;
+  font-size: 13px;
+  padding: 8px;
+  overflow-x: auto;
+  overflow-y: auto;
+  white-space: nowrap;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* 日志框_1 - .log-line */
+#logOutput_1 .log-line {
+  line-height: 1.5;
+  padding: 2px 5px;
+}
+
+/* 日志框_1 - .log-line:hover */
+#logOutput_1.log-line:hover {
+  background-color: rgba(0,120,212,0.08);
+}
+
+/* 日志框_1 - .log-line:nth-child(even) */
+#logOutput_1.log-line:nth-child(even) {
+  background-color: rgba(0,0,0,0.02);
+}
+
+/* 列表框_1 - 基础样式 */
+#listBox_1 {
+  position: absolute;
+  left: 359px;
+  top: 117px;
+  width: 200px;
+  height: 200px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  border-color: #d9d9d9;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #333333;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* 列表框_1 - .list-box-scroll */
+#listBox_1 .list-box-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* 列表框_1 - .list-item */
+#listBox_1 .list-item {
+  display: flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 10px;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid #f0f0f0;
+  gap: 8px;
+}
+
+/* 列表框_1 - .list-item:last-child */
+#listBox_1 .list-item:last-child {
+  border-bottom: none;
+}
+
+/* 列表框_1 - .list-item:hover */
+#listBox_1 .list-item:hover {
+  background-color: #f5f5f5;
+}
+
+/* 列表框_1 - .list-item.item-selected */
+#listBox_1 .list-item.item-selected {
+  background-color: var(--list-item-selected-bg, #e6f4ff);
+}
+
+/* 列表框_1 - .list-item.item-selected:hover */
+#listBox_1 .list-item.item-selected:hover {
+  background-color: #d0e3ff;
+}
+
+/* 列表框_1 - .list-item-checkbox */
+#listBox_1 .list-item-checkbox {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+/* 列表框_1 - .list-item-text */
+#listBox_1 .list-item-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 列表框_1 - .list-item-edit-input */
+#listBox_1 .list-item-edit-input {
+  flex: 1;
+  height: 24px;
+  border: 1px solid #1890ff;
+  border-radius: 3px;
+  padding: 0 6px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+/* 列表框_1 - .list-empty */
+#listBox_1 .list-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: 13px;
+}
+
+/* 列表框_1 - .disabled */
+#listBox_1 .disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 列表框_1 - .disabled-overlay */
+#listBox_1 .disabled-overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* 列表框_1 - .list-box-scroll */
+#listBox_1 .list-box-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* 列表框_1 - .list-item */
+#listBox_1 .list-item {
+  display: flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 10px;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid #f0f0f0;
+  gap: 8px;
+}
+
+/* 列表框_1 - .list-item:last-child */
+#listBox_1 .list-item:last-child {
+  border-bottom: none;
+}
+
+/* 列表框_1 - .list-item:hover */
+#listBox_1 .list-item:hover {
+  background-color: #f5f5f5;
+}
+
+/* 列表框_1 - .list-item.item-selected */
+#listBox_1 .list-item.item-selected {
+  background-color: var(--list-item-selected-bg, #e6f4ff);
+}
+
+/* 列表框_1 - .list-item.item-selected:hover */
+#listBox_1 .list-item.item-selected:hover {
+  background-color: #d0e3ff;
+}
+
+/* 列表框_1 - .list-item-checkbox */
+#listBox_1 .list-item-checkbox {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+/* 列表框_1 - .list-item-text */
+#listBox_1 .list-item-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 列表框_1 - .list-item-edit-input */
+#listBox_1 .list-item-edit-input {
+  flex: 1;
+  height: 24px;
+  border: 1px solid #1890ff;
+  border-radius: 3px;
+  padding: 0 6px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+/* 列表框_1 - .list-empty */
+#listBox_1 .list-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: 13px;
+}
+
+/* 列表框_1 - .disabled */
+#listBox_1 .disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 列表框_1 - .disabled-overlay */
+#listBox_1 .disabled-overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* 列表框_1 - .list-item:hover */
+#listBox_1 .list-item:hover {
+  background-color: #f5f5f5;
+}
+
+/* 列表框_1 - .list-item.item-selected */
+#listBox_1 .list-item.item-selected {
+  background-color: #e0edff;
+}
+
+/* 树形框_1 - 基础样式 */
+#treeView_1 {
+  position: absolute;
+  left: 335px;
+  top: 327px;
+  width: 220px;
+  height: 280px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  border-color: #d9d9d9;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #333333;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* 树形框_1 - .tree-node-content */
+#treeView_1 .tree-node-content {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 4px;
+  gap: 4px;
+}
+
+/* 树形框_1 - .tree-node-content:hover */
+#treeView_1 .tree-node-content:hover {
+  background-color: #f5f5f5;
+}
+
+/* 树形框_1 - .tree-node.selected > .tree-node-content */
+#treeView_1 .tree-node.selected > .tree-node-content {
+  background: #e0edff;
+}
+
+/* 树形框_1 - .tree-toggle */
+#treeView_1 .tree-toggle {
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 10px;
+  transition: transform 0.2s;
+}
+
+/* 树形框_1 - .tree-toggle.expanded */
+#treeView_1 .tree-toggle.expanded {
+  transform: rotate(90deg);
+}
+
+/* 树形框_1 - .tree-toggle.empty */
+#treeView_1 .tree-toggle.empty {
+  visibility: hidden;
+}
+
+/* 树形框_1 - .tree-checkbox */
+#treeView_1 .tree-checkbox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* 树形框_1 - .tree-node-check */
+#treeView_1 .tree-node-check {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  cursor: pointer;
+  accent-color: #0078D4;
+}
+
+/* 树形框_1 - .tree-icon */
+#treeView_1 .tree-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 树形框_1 - .tree-label */
+#treeView_1 .tree-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 树形框_1 - .tree-children */
+#treeView_1 .tree-children {
+  padding-left: 20px;
+}
+
+/* 树形框_1 - .disabled */
+#treeView_1 .disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* 树形框_1 - .tree-edit-input */
+#treeView_1 .tree-edit-input {
+  flex: 1;
+  height: 24px;
+  border: 1px solid #1890ff;
+  border-radius: 3px;
+  padding: 0 6px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+/* 树形框_1 - .tree-node-content */
+#treeView_1 .tree-node-content {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 4px;
+  gap: 4px;
+}
+
+/* 树形框_1 - .tree-node-content:hover */
+#treeView_1 .tree-node-content:hover {
+  background-color: #f5f5f5;
+}
+
+/* 树形框_1 - .tree-node.selected > .tree-node-content */
+#treeView_1 .tree-node.selected > .tree-node-content {
+  background: #e0edff;
+}
+
+/* 树形框_1 - .tree-toggle */
+#treeView_1 .tree-toggle {
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 10px;
+  transition: transform 0.2s;
+  color: #666666;
+}
+
+/* 树形框_1 - .tree-toggle.expanded */
+#treeView_1 .tree-toggle.expanded {
+  transform: rotate(0deg);
+}
+
+/* 树形框_1 - .tree-toggle.empty */
+#treeView_1 .tree-toggle.empty {
+  visibility: hidden;
+}
+
+/* 树形框_1 - .tree-checkbox */
+#treeView_1 .tree-checkbox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* 树形框_1 - .tree-node-check */
+#treeView_1 .tree-node-check {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  cursor: pointer;
+  accent-color: #0078D4;
+}
+
+/* 树形框_1 - .tree-icon */
+#treeView_1 .tree-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 树形框_1 - .tree-label */
+#treeView_1 .tree-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 树形框_1 - .tree-children */
+#treeView_1 .tree-children {
+  padding-left: 20px;
+}
+
+/* 树形框_1 - .disabled */
+#treeView_1 .disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* 树形框_1 - .tree-edit-input */
+#treeView_1 .tree-edit-input {
+  flex: 1;
+  height: 24px;
+  border: 1px solid #1890ff;
+  border-radius: 3px;
+  padding: 0 6px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+/* 树形框_1 - .tree-node.selected > .tree-node-content */
+#treeView_1 .tree-node.selected > .tree-node-content {
+  background: #e0edff;
+}
+
+/* 树形框_1 - .tree-toggle */
+#treeView_1 .tree-toggle {
+  color: #666666;
+}
+
+/* 树形框_1 - .tree-toggle:hover */
+#treeView_1 .tree-toggle:hover {
+  color: #333333;
+}
+
+/* 多项表格_1 - 基础样式 */
+#dataGrid_1 {
+  position: absolute;
+  left: 571px;
+  top: 103px;
+  width: 400px;
+  height: 250px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  color: #333333;
+  font-size: 13px;
+  border-color: #d9d9d9;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* 多项表格_1 - .data-grid-header */
+#dataGrid_1 .data-grid-header {
+  display: flex;
+  border-bottom: 1px solid #d9d9d9;
+}
+
+/* 多项表格_1 - .data-grid-header-cell */
+#dataGrid_1 .data-grid-header-cell {
+  padding: 6px 10px;
+  font-weight: 600;
+  border-right: 1px solid #d9d9d9;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+/* 多项表格_1 - .data-grid-body */
+#dataGrid_1 .data-grid-body {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* 多项表格_1 - .data-grid-row */
+#dataGrid_1 .data-grid-row {
+  display: flex;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+/* 多项表格_1 - .data-grid-row:nth-child(even) */
+#dataGrid_1 .data-grid-row:nth-child(even) {
+  background: #fafafa;
+}
+
+/* 多项表格_1 - .data-grid-row:hover */
+#dataGrid_1 .data-grid-row:hover {
+  background: #e6f7ff;
+}
+
+/* 多项表格_1 - .data-grid-row:last-child */
+#dataGrid_1 .data-grid-row:last-child {
+  border-bottom: none;
+}
+
+/* 多项表格_1 - .data-grid-cell */
+#dataGrid_1 .data-grid-cell {
+  padding: 6px 10px;
+  border-right: 1px solid #e8e8e8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+/* 多项表格_1 - .data-grid-cell:hover */
+#dataGrid_1 .data-grid-cell:hover {
+  background-color: rgba(0, 120, 212, 0.05);
+  cursor: pointer;
+}
+
+/* 多项表格_1 - .data-grid-checkbox */
+#dataGrid_1 .data-grid-checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  flex-shrink: 0;
+}
+
+/* 多项表格_1 - .data-grid-checkbox input */
+#dataGrid_1 .data-grid-checkbox input {
+  margin: 0;
+  cursor: pointer;
+}
+
+/* 多项表格_1 - .data-grid-row-focused */
+#dataGrid_1 .data-grid-row-focused {
+  background: #d6e4ff;
+}
+
+/* 多项表格_1 - .data-grid-header */
+#dataGrid_1 .data-grid-header {
+  display: flex;
+  border-bottom: 1px solid #d9d9d9;
+  background: #f0f0f0;
+}
+
+/* 多项表格_1 - .data-grid-header-cell */
+#dataGrid_1 .data-grid-header-cell {
+  padding: 6px 10px;
+  font-weight: 600;
+  border-right: 1px solid #d9d9d9;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+/* 多项表格_1 - .data-grid-body */
+#dataGrid_1 .data-grid-body {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* 多项表格_1 - .data-grid-row */
+#dataGrid_1 .data-grid-row {
+  display: flex;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+/* 多项表格_1 - .data-grid-row:nth-child(even) */
+#dataGrid_1 .data-grid-row:nth-child(even) {
+  background: #fafafa;
+}
+
+/* 多项表格_1 - .data-grid-row:hover */
+#dataGrid_1 .data-grid-row:hover {
+  background: #e6f7ff;
+}
+
+/* 多项表格_1 - .data-grid-row:last-child */
+#dataGrid_1 .data-grid-row:last-child {
+  border-bottom: none;
+}
+
+/* 多项表格_1 - .data-grid-cell */
+#dataGrid_1 .data-grid-cell {
+  padding: 6px 10px;
+  border-right: 1px solid #e8e8e8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+/* 多项表格_1 - .data-grid-cell:hover */
+#dataGrid_1 .data-grid-cell:hover {
+  background-color: rgba(0, 120, 212, 0.05);
+}
+
+/* 多项表格_1 - .data-grid-checkbox */
+#dataGrid_1 .data-grid-checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  flex-shrink: 0;
+}
+
+/* 多项表格_1 - .data-grid-checkbox input */
+#dataGrid_1 .data-grid-checkbox input {
+  margin: 0;
+  cursor: pointer;
+}
+
+/* 多项表格_1 - .data-grid-row-focused */
+#dataGrid_1 .data-grid-row-focused {
+  background: #d6e4ff;
+}
+
+/* 多项表格_1 - .data-grid-header */
+#dataGrid_1 .data-grid-header {
+  background: #f0f0f0;
+}
+
+/* 多项表格_1 - .data-grid-row:hover */
+#dataGrid_1 .data-grid-row:hover {
+  background: #e6f7ff;
+}
+
+/* 多项表格_1 - .data-grid-row:nth-child(even) */
+#dataGrid_1 .data-grid-row:nth-child(even) {
+  background: #fafafa;
+}
+
+/* 卡片框_1 - 基础样式 */
+#cardBox_1 {
+  position: absolute;
+  left: 40px;
+  top: 411px;
+  width: 260px;
+  height: 180px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  border-color: #e0e0e0;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #333333;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* 卡片框_1 - .card-header */
+#cardBox_1 .card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s;
+}
+
+/* 卡片框_1 - .card-header:hover */
+#cardBox_1 .card-header:hover {
+  filter: brightness(0.95);
+}
+
+/* 卡片框_1 - .card-header-title */
+#cardBox_1 .card-header-title {
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1;
+}
+
+/* 卡片框_1 - .card-collapse-btn */
+#cardBox_1 .card-collapse-btn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: transform 0.2s;
+  font-size: 12px;
+  line-height: 1;
+  padding: 0;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+/* 卡片框_1 - .card-collapse-btn.collapsed */
+#cardBox_1 .card-collapse-btn.collapsed {
+  transform: rotate(-90deg);
+}
+
+/* 卡片框_1 - .card-body */
+#cardBox_1 .card-body {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 卡片框_1 - #id.collapsed .card-body */
+#cardBox_1.collapsed .card-body {
+  display: none;
+}
+
+/* 卡片框_1 - #id.collapsed */
+#cardBox_1.collapsed {
+  height: 32px;
+}
+
+/* 卡片框_1 - .card-collapse-btn:hover */
+#cardBox_1 .card-collapse-btn:hover {
+  color: #333;
+}
+
+/* 卡片框_1 - .card-drop-hint */
+#cardBox_1 .card-drop-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ccc;
+  font-size: 12px;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* 卡片框_1 - .card-header */
+#cardBox_1 .card-header {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s;
+  background-color: #f5f5f5;
+  color: #1E1F22;
+  padding: 0 12px;
+}
+
+/* 卡片框_1 - .card-header:hover */
+#cardBox_1 .card-header:hover {
+  filter: brightness(1);
+}
+
+/* 卡片框_1 - .card-header-title */
+#cardBox_1 .card-header-title {
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 32px;
+}
+
+/* 卡片框_1 - .card-collapse-btn */
+#cardBox_1 .card-collapse-btn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 12px;
+  line-height: 1;
+  padding: 0;
+  flex-shrink: 0;
+  color: #666666;
+  margin-left: auto;
+}
+
+/* 卡片框_1 - .card-collapse-btn.collapsed */
+#cardBox_1 .card-collapse-btn.collapsed {
+  transform: rotate(-90deg);
+}
+
+/* 卡片框_1 - .card-body */
+#cardBox_1 .card-body {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 卡片框_1 - #id.collapsed .card-body */
+#cardBox_1 #id.collapsed .card-body {
+  display: none;
+}
+
+/* 卡片框_1 - .card-collapse-btn:hover */
+#cardBox_1 .card-collapse-btn:hover {
+  color: #333;
+}
+
+/* 卡片框_1 - .card-drop-hint */
+#cardBox_1 .card-drop-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ccc;
+  font-size: 12px;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* 卡片框_1 - .card-header */
+#cardBox_1 .card-header {
+  background-color: #f5f5f5;
+  color: #1E1F22;
+  height: 32px;
+  padding: 0 12px;
+  background-color: #f5f5f5;
+}
+
+/* 卡片框_1 - .card-header:hover */
+#cardBox_1 .card-header:hover {
+  filter: brightness(0.95);
+}
+
+/* 卡片框_1 - .card-header-title */
+#cardBox_1 .card-header-title {
+  font-size: 13;
+  color: #1E1F22;
+}
+
+/* 卡片框_1 - .card-collapse-btn */
+#cardBox_1 .card-collapse-btn {
+  color: #666666;
+}
+
+/* 标签页容器_1 - 基础样式 */
+#tabsContainer_1 {
+  position: absolute;
+  left: 631px;
+  top: 382px;
+  width: 300px;
+  height: 200px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  border-color: #d9d9d9;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 6px;
+  color: #333333;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-weight: 500;
+}
+
+/* 标签页容器_1 - .tab-header-bar */
+#tabsContainer_1 .tab-header-bar {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  height: 32px;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* 标签页容器_1 - .tab-header-btn */
+#tabsContainer_1 .tab-header-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: 0 12px;
+  cursor: pointer;
+  border: none;
+  position: relative;
+  white-space: nowrap;
+  font-size: inherit;
+  flex-shrink: 0;
+  border-right: none;
+}
+
+/* 标签页容器_1 - .tab-header-btn.active */
+#tabsContainer_1 .tab-header-btn.active {
+  border-bottom-width: 3px;
+  border-bottom-style: solid;
+  background-color: #ffffff;
+  border-bottom-color: #1890ff;
+}
+
+/* 标签页容器_1 - .tab-header-btn:hover */
+
+
+/* 标签页容器_1 - .tab-content-wrapper */
+#tabsContainer_1 .tab-content-wrapper {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 标签页容器_1 - .tab-content-panel */
+#tabsContainer_1 .tab-content-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+}
+
+/* 标签页容器_1 - .tab-content-panel.active */
+#tabsContainer_1 .tab-content-panel.active {
+  display: block;
+}
+
+/* 标签页容器_1 - .tab-header-bar */
+#tabsContainer_1 .tab-header-bar {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  height: 32px;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: #d9d9d9;
+  overflow-x: auto;
+  overflow-y: hidden;
+  background-color: #f5f5f5;
+}
+
+/* 标签页容器_1 - .tab-header-btn */
+#tabsContainer_1 .tab-header-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: 0 12px;
+  cursor: pointer;
+  border: none;
+  position: relative;
+  white-space: nowrap;
+  font-size: 13px;
+  flex-shrink: 0;
+  border-right: 1px solid #d9d9d9;
+  background-color: #f5f5f5;
+  color: #333333;
+  font-weight: 500;
+}
+
+/* 标签页容器_1 - .tab-header-btn.active */
+#tabsContainer_1 .tab-header-btn.active {
+  border-bottom-width: 3px;
+  border-bottom-style: solid;
+  background-color: #ffffff;
+  border-bottom-color: #1890ff;
+}
+
+/* 标签页容器_1 - .tab-content-wrapper */
+#tabsContainer_1 .tab-content-wrapper {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 标签页容器_1 - .tab-content-panel */
+#tabsContainer_1 .tab-content-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+}
+
+/* 标签页容器_1 - .tab-content-panel.active */
+#tabsContainer_1 .tab-content-panel.active {
+  display: block;
+}
+
+/* 标签页容器_1 - .tab-header-bar */
+#tabsContainer_1 .tab-header-bar {
+  border-bottom-color: #d9d9d9;
+  background-color: #f5f5f5;
+}
+
+/* 标签页容器_1 - .tab-header-btn */
+#tabsContainer_1 .tab-header-btn {
+  background-color: #f5f5f5;
+  color: #333333;
+  font-size: 13;
+}
+
+/* 标签页容器_1 - .tab-header-btn.active */
+#tabsContainer_1 .tab-header-btn.active {
+  background-color: #ffffff;
+  border-bottom-color: #1890ff;
+}
+
+
+</style>
+<style>.item-selected { background-color: #0078d4 !important; color: #ffffff !important; }.tree-node-content.selected { background-color: #0078d4 !important; color: #ffffff !important; }.tree-node-content.selected .tree-label { color: #ffffff !important; }.data-grid-row-focused { background-color: #0078d4 !important; color: #ffffff !important; }.data-grid-row-focused .data-grid-cell { color: #ffffff !important; }</style><style data-messagebox-base-style="1">.mb-overlay{position:fixed;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:99999;display:flex;align-items:center;justify-content:center;}.mb-dialog{background:#fff;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.2);max-width:90vw;overflow:hidden;display:flex;flex-direction:column;}.mb-header{padding:16px 20px 8px;font-size:16px;font-weight:600;color:#333;cursor:default;display:flex;align-items:center;justify-content:space-between;}.mb-header-title{flex:1;}.mb-header-close{width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;background:transparent;color:#999;font-size:16px;border-radius:4px;}.mb-header-close:hover{background:#f0f0f0;color:#333;}.mb-body{padding:8px 20px 16px;display:flex;align-items:flex-start;gap:12px;}.mb-icon{font-size:28px;flex-shrink:0;}.mb-message{font-size:14px;color:#555;line-height:1.6;word-wrap:break-word;flex:1;}.mb-footer{padding:12px 20px 16px;display:flex;justify-content:flex-end;gap:8px;}.mb-btn{padding:7px 20px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;font-size:13px;cursor:pointer;}.mb-btn:hover{border-color:#409eff;color:#409eff;}.mb-btn.mb-btn-primary{background:#409eff;color:#fff;border-color:#409eff;}.mb-btn.mb-btn-primary:hover{background:#66b1ff;}</style><style data-inputbox-base-style="1">.ib-overlay{position:fixed;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:99999;display:flex;align-items:center;justify-content:center;}.ib-dialog{background:#fff;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.2);max-width:90vw;overflow:hidden;display:flex;flex-direction:column;}.ib-header{padding:16px 20px 8px;font-size:16px;font-weight:600;color:#333;display:flex;align-items:center;justify-content:space-between;}.ib-header-title{flex:1;}.ib-header-close{width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;background:transparent;color:#999;font-size:16px;border-radius:4px;}.ib-header-close:hover{background:#f0f0f0;color:#333;}.ib-body{padding:8px 20px 16px;}.ib-prompt{font-size:14px;color:#555;line-height:1.6;margin-bottom:10px;}.ib-input{width:100%;padding:7px 10px;border:1px solid #d9d9d9;border-radius:4px;font-size:13px;color:#333;outline:none;box-sizing:border-box;}.ib-input:focus{border-color:#409eff;box-shadow:0 0 0 2px rgba(64,158,255,0.2);}.ib-footer{padding:12px 20px 16px;display:flex;justify-content:flex-end;gap:8px;}.ib-btn{padding:7px 20px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;font-size:13px;cursor:pointer;}.ib-btn:hover{border-color:#409eff;color:#409eff;}.ib-btn.ib-btn-primary{background:#409eff;color:#fff;border-color:#409eff;}.ib-btn.ib-btn-primary:hover{background:#66b1ff;}</style><style class="automa-element-selector">@font-face { font-family: "Inter var"; font-weight: 100 900; font-display: swap; font-style: normal; font-named-instance: "Regular"; src: url("chrome-extension://infppggnoaenmfagbfknfkancpbljcca/Inter-roman-latin.var.woff2") format("woff2") }
+.automa-element-selector { direction: ltr } 
+ [automa-isDragging] { user-select: none } 
+ [automa-el-list] {outline: 2px dashed #6366f1;}</style></head>
+<body style="align-items:center;justify-content:center">
+<div class="page-container glass-effect" id="page_container" data-ctrl-type="page" data-name="canvas" data-original-width="980" data-original-height="625">
+
+<div class="canvas-titlebar" id="titlebar" data-name="标题栏" style="
+  position:absolute;top:0;left:0;right:0;height:40px;
+  background-color:#f5f5f5;
+  opacity:1;
+  border-bottom:1px solid rgba(0,0,0,0.08);
+  app-region: drag;
+">
+  <div class="tb-left" data-ctrl-type="titlebar_icon">
+    <span class="tb-icon" id="titlebar_icon" data-name="图标" style="color:#333333;"><i class="fas fa-star"></i></span>
+  </div>
+  <div class="tb-center" style="justify-content:flex-end;">
+    <span class="tb-title" id="titlebar_title" data-name="标题" data-ctrl-type="titlebar_title" style="color:#333333">我的应用</span>
+  </div>
+  <div class="tb-right">
+    <button class="tb-btn tb-btn-min" id="titlebar_min" data-ctrl-type="titlebar_min" data-name="最小化" style="color:#333333;" title="最小化">
+      <svg width="10" height="1" viewBox="0 0 10 1"><rect width="10" height="1" fill="currentColor"></rect></svg>
+    </button>
+    <button class="tb-btn tb-btn-max tb-btn-disabled" id="titlebar_max" data-ctrl-type="titlebar_max" data-name="最大化" style="color:#333333;opacity:0.4;cursor:not-allowed;pointer-events:none;" title="最大化" disabled="">
+      <svg width="10" height="10" viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.2"></rect></svg>
+    </button>
+    <button class="tb-btn tb-btn-close" id="titlebar_close" data-ctrl-type="titlebar_close" data-name="关闭" style="color:#333333;" title="关闭">
+      <svg width="10" height="10" viewBox="0 0 10 10"><line x1="1" y1="1" x2="9" y2="9" stroke="currentColor" stroke-width="1.2"></line><line x1="9" y1="1" x2="1" y2="9" stroke="currentColor" stroke-width="1.2"></line></svg>
+    </button>
+  </div>
+</div>
+<button id="button_1" data-type="button" data-ctrl-type="button" data-ctrl-id="button_1" data-name="按钮_1">按钮</button>
+<input type="text" id="input_1" data-type="input" data-ctrl-type="input_text" data-ctrl-id="input_1" data-name="编辑框_1" placeholder="请输入..." value="">
+<label id="checkbox_1" data-type="checkbox" data-ctrl-type="checkbox" data-ctrl-id="checkbox_1" data-name="选择框_1"><input type="checkbox"><span>选项</span></label>
+<label id="toggle_1" data-type="toggle" data-ctrl-type="switch_toggle" data-ctrl-id="toggle_1" data-name="开关按钮_1" style="display:inline-flex;align-items:center;"><input type="checkbox"><span class="slider"></span></label>
+<select id="comboBox_1" data-type="comboBox" data-ctrl-type="combobox" data-ctrl-id="comboBox_1" data-name="组合框_1"><option value="选项1" selected="">选项1</option><option value="选项2">选项2</option><option value="选项3">选项3</option></select>
+<span id="label_1" data-type="label" data-ctrl-type="label" data-ctrl-id="label_1" data-name="文本标签_1">标签</span>
+<div id="divider_1" data-type="divider" data-ctrl-type="divider" data-ctrl-id="divider_1" data-name="分割线_1"></div>
+<a id="hyperlink_1" data-type="hyperlink" data-ctrl-type="hyperlink" data-ctrl-id="hyperlink_1" data-name="超链接_1" href="javascript:void(0)" data-href="#">超链接</a>
+<div id="radioGroup_1" data-type="radioGroup" data-ctrl-type="radio_group" data-ctrl-id="radioGroup_1" data-name="单选框组_1" class="radiogroup-container"><label class="radiogroup-item"><input type="radio" data-ctrl-type="radio" name="单选框组_1" value="选项1" checked="">选项1</label><label class="radiogroup-item"><input type="radio" data-ctrl-type="radio" name="单选框组_1" value="选项2">选项2</label></div>
+<div id="progressBar_1" data-type="progressBar" data-ctrl-type="progress_bar" data-ctrl-id="progressBar_1" data-name="进度条_1" class="progress-bar-container"><div class="progress-track"></div><div class="progress-fill" style="width:60%"></div><span class="progress-text">60%</span></div>
+<input type="datetime-local" id="datetimePicker_1" data-type="datetimePicker" data-ctrl-type="datetime_picker" data-ctrl-id="datetimePicker_1" data-name="时间框_1" value="2026-06-05T00:00">
+<button id="iconButton_1" data-type="iconButton" data-ctrl-type="icon_button" data-ctrl-id="iconButton_1" data-name="图标按钮_1"><i class="fas fa-star"></i><span>按钮</span></button>
+<div id="imageBox_1" data-type="imageBox" data-ctrl-type="image_box" data-ctrl-id="imageBox_1" data-name="图片框_1" class="image-box"></div>
+<textarea id="textarea_1" data-type="textarea" data-ctrl-type="textarea" data-ctrl-id="textarea_1" data-name="文本域_1" data-rows="4" placeholder="请输入..." rows="4"></textarea>
+<div id="logOutput_1" data-type="logOutput" data-ctrl-type="logbox" data-ctrl-id="logOutput_1" data-name="日志框_1" class="log-output-container"><div class="log-line" data-ctrl-type="log_item" style="color:#333333">日志输出已就绪。</div></div>
+<div id="listBox_1" data-type="listBox" data-ctrl-type="listbox" data-ctrl-id="listBox_1" data-name="列表框_1" data-editable="false" data-always-show-selection="false" data-listbox-items="[{&quot;id&quot;:&quot;1&quot;,&quot;text&quot;:&quot;列表项1&quot;,&quot;selected&quot;:false},{&quot;id&quot;:&quot;2&quot;,&quot;text&quot;:&quot;列表项2&quot;,&quot;selected&quot;:false},{&quot;id&quot;:&quot;3&quot;,&quot;text&quot;:&quot;列表项3&quot;,&quot;selected&quot;:false}]"><div class="list-box-scroll"><div class="list-item" data-ctrl-type="listbox_item" data-item-index="0"><span class="list-item-text">列表项1</span></div>
+<div class="list-item" data-ctrl-type="listbox_item" data-item-index="1"><span class="list-item-text">列表项2</span></div>
+<div class="list-item" data-ctrl-type="listbox_item" data-item-index="2"><span class="list-item-text">列表项3</span></div></div></div>
+<div id="treeView_1" data-type="treeView" data-ctrl-type="treeview" data-ctrl-id="treeView_1" data-name="树形框_1" data-tree-id="treeView_1" data-editable="false" data-show-icon="true" data-always-show-selection="true"><div class="tree-node" data-tree-id="treeView_1" data-node-id="node_1" data-level="0"><div class="tree-node-content"><span class="tree-toggle expanded"></span><span class="tree-icon">📁</span><span class="tree-label">根节点</span></div><div class="tree-children"><div class="tree-node" data-tree-id="treeView_1" data-node-id="node_2" data-level="1"><div class="tree-node-content"><span class="tree-toggle empty"></span><span class="tree-icon">📄</span><span class="tree-label">子节点1</span></div></div><div class="tree-node" data-tree-id="treeView_1" data-node-id="node_3" data-level="1"><div class="tree-node-content"><span class="tree-toggle collapsed"></span><span class="tree-icon">📁</span><span class="tree-label">子节点2</span></div><div class="tree-children" style="display: none;"><div class="tree-node" data-tree-id="treeView_1" data-node-id="node_4" data-level="2"><div class="tree-node-content"><span class="tree-toggle empty"></span><span class="tree-icon">📄</span><span class="tree-label">子节点2-1</span></div></div></div></div></div></div></div>
+<div id="dataGrid_1" data-type="dataGrid" data-ctrl-type="datagrid" data-ctrl-id="dataGrid_1" data-name="多项表格_1" data-columns="[{&quot;field&quot;:&quot;col1&quot;,&quot;header&quot;:&quot;列A&quot;},{&quot;field&quot;:&quot;col2&quot;,&quot;header&quot;:&quot;列B&quot;},{&quot;field&quot;:&quot;col3&quot;,&quot;header&quot;:&quot;列C&quot;}]" data-rows="[{&quot;id&quot;:&quot;dataGrid_1_row_1&quot;,&quot;cells&quot;:{&quot;col1&quot;:&quot;数据A1&quot;,&quot;col2&quot;:&quot;数据B1&quot;,&quot;col3&quot;:&quot;数据C1&quot;}},{&quot;id&quot;:&quot;dataGrid_1_row_2&quot;,&quot;cells&quot;:{&quot;col1&quot;:&quot;数据A2&quot;,&quot;col2&quot;:&quot;数据B2&quot;,&quot;col3&quot;:&quot;数据C2&quot;}},{&quot;id&quot;:&quot;dataGrid_1_row_3&quot;,&quot;cells&quot;:{&quot;col1&quot;:&quot;数据A3&quot;,&quot;col2&quot;:&quot;数据B3&quot;,&quot;col3&quot;:&quot;数据C3&quot;}}]" data-show-checkbox="true" data-allow-add="false" data-allow-delete="false" data-editable="false" data-always-show-selection="false" class="data-grid-container"><div class="data-grid-header"><div class="data-grid-header-cell data-grid-checkbox" style="width:36px;min-width:36px;flex-shrink:0"><input type="checkbox" class="data-grid-select-all"></div><div class="data-grid-header-cell" data-col-key="col1" data-ctrl-type="datagrid_cell" data-col-name="列A" style="width:100px;min-width:100px;flex-shrink:0">列A</div><div class="data-grid-header-cell" data-col-key="col2" data-ctrl-type="datagrid_cell" data-col-name="列B" style="width:100px;min-width:100px;flex-shrink:0">列B</div><div class="data-grid-header-cell" data-col-key="col3" data-ctrl-type="datagrid_cell" data-col-name="列C" style="width:100px;min-width:100px;flex-shrink:0">列C</div></div><div class="data-grid-body"><div class="data-grid-row" data-row-index="0" data-row-id="dataGrid_1_row_1"><div class="data-grid-cell data-grid-checkbox" style="width:36px;min-width:36px;flex-shrink:0"><input type="checkbox" class="data-grid-row-check" data-ctrl-type="datagrid_row_checkbox"></div><div class="data-grid-cell" data-ctrl-type="datagrid_cell" data-col-key="col1" data-col-name="列A" style="width:100px;min-width:100px;flex-shrink:0" title="数据A1">数据A1</div><div class="data-grid-cell" data-ctrl-type="datagrid_cell" data-col-key="col2" data-col-name="列B" style="width:100px;min-width:100px;flex-shrink:0" title="数据B1">数据B1</div><div class="data-grid-cell" data-ctrl-type="datagrid_cell" data-col-key="col3" data-col-name="列C" style="width:100px;min-width:100px;flex-shrink:0" title="数据C1">数据C1</div></div><div class="data-grid-row" data-row-index="1" data-row-id="dataGrid_1_row_2"><div class="data-grid-cell data-grid-checkbox" style="width:36px;min-width:36px;flex-shrink:0"><input type="checkbox" class="data-grid-row-check" data-ctrl-type="datagrid_row_checkbox"></div><div class="data-grid-cell" data-ctrl-type="datagrid_cell" data-col-key="col1" data-col-name="列A" style="width:100px;min-width:100px;flex-shrink:0" title="数据A2">数据A2</div><div class="data-grid-cell" data-ctrl-type="datagrid_cell" data-col-key="col2" data-col-name="列B" style="width:100px;min-width:100px;flex-shrink:0" title="数据B2">数据B2</div><div class="data-grid-cell" data-ctrl-type="datagrid_cell" data-col-key="col3" data-col-name="列C" style="width:100px;min-width:100px;flex-shrink:0" title="数据C2">数据C2</div></div><div class="data-grid-row" data-row-index="2" data-row-id="dataGrid_1_row_3"><div class="data-grid-cell data-grid-checkbox" style="width:36px;min-width:36px;flex-shrink:0"><input type="checkbox" class="data-grid-row-check" data-ctrl-type="datagrid_row_checkbox"></div><div class="data-grid-cell" data-ctrl-type="datagrid_cell" data-col-key="col1" data-col-name="列A" style="width:100px;min-width:100px;flex-shrink:0" title="数据A3">数据A3</div><div class="data-grid-cell" data-ctrl-type="datagrid_cell" data-col-key="col2" data-col-name="列B" style="width:100px;min-width:100px;flex-shrink:0" title="数据B3">数据B3</div><div class="data-grid-cell" data-ctrl-type="datagrid_cell" data-col-key="col3" data-col-name="列C" style="width:100px;min-width:100px;flex-shrink:0" title="数据C3">数据C3</div></div></div></div>
+<div id="cardBox_1" data-type="cardBox" data-ctrl-type="cardbox" data-ctrl-id="cardBox_1" data-name="卡片框_1" data-collapsible="true" data-collapsed="false" class="card-box"><div class="card-header"><span class="card-header-title">卡片标题</span><span class="card-collapse-btn"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M3 4.5L6 7.5L9 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></div><div class="card-body" data-ctrl-type="cardbox_body"></div></div>
+<div id="tabsContainer_1" data-type="tabsContainer" data-ctrl-type="tab_container" data-ctrl-id="tabsContainer_1" data-name="标签页容器_1" class="tabs-container"><div class="tab-header-bar"><button class="tab-header-btn active" data-ctrl-type="tab_btn" data-tab-name="tab1">标签1</button><button class="tab-header-btn" data-ctrl-type="tab_btn" data-tab-name="tab2">标签2</button><button class="tab-header-btn" data-ctrl-type="tab_btn" data-tab-name="tab3">标签3</button></div><div class="tab-content-wrapper"><div class="tab-content-panel active" data-tab-name="tab1" data-parent="tabsContainer_1" data-tab="0"></div>
+<div class="tab-content-panel" data-tab-name="tab2" data-parent="tabsContainer_1" data-tab="1"></div>
+<div class="tab-content-panel" data-tab-name="tab3" data-parent="tabsContainer_1" data-tab="2"></div></div></div>
+</div>
+
+<script>
+
+(function() {
+  'use strict';
+
+  document.addEventListener('click', function(e) {
+    var tabBtn = e.target.closest('.tab-header-btn');
+    if (tabBtn) {
+      var container = tabBtn.closest('.tabs-container');
+      if (!container) return;
+
+      if (container.getAttribute('data-disabled') === 'true') return;
+
+      var tabName = tabBtn.getAttribute('data-tab-name');
+      var allBtns = container.querySelectorAll('.tab-header-btn');
+      allBtns.forEach(function(b) { b.classList.remove('active'); });
+      tabBtn.classList.add('active');
+
+      var allPanes = container.querySelectorAll('.tab-content-panel');
+      allPanes.forEach(function(p) { p.classList.remove('active'); });
+      var activePane = container.querySelector('.tab-content-panel[data-tab-name="' + tabName + '"]');
+      if (activePane) activePane.classList.add('active');
+      return;
+    }
+
+    var collapseBtn = e.target.closest('.card-collapse-btn');
+    if (collapseBtn) {
+      var card = collapseBtn.closest('.card-box');
+      if (!card) return;
+      var isCollapsed = card.getAttribute('data-collapsed') === 'true';
+      var downArrow = '<svg width="12" height="12" viewBox="0 0 12 12"><path d="M3 4.5L6 7.5L9 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      var rightArrow = '<svg width="12" height="12" viewBox="0 0 12 12"><path d="M4.5 3L7.5 6L4.5 9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      if (isCollapsed) {
+        card.setAttribute('data-collapsed', 'false');
+        card.classList.remove('collapsed');
+        collapseBtn.innerHTML = downArrow;
+      } else {
+        card.setAttribute('data-collapsed', 'true');
+        card.classList.add('collapsed');
+        collapseBtn.innerHTML = rightArrow;
+      }
+      return;
+    }
+  });
+})();
+
+
+(function() {
+  var ListBoxManager = {
+    itemsCache: {},
+
+    init: function() {
+      var listBoxes = document.querySelectorAll('[data-listbox-items]');
+      for (var i = 0; i < listBoxes.length; i++) {
+        var el = listBoxes[i];
+        var id = el.id;
+        if (!id) continue;
+        try {
+          var items = JSON.parse(el.getAttribute('data-listbox-items') || '[]');
+          ListBoxManager.itemsCache[id] = items;
+        } catch(e) { ListBoxManager.itemsCache[id] = []; }
+        ListBoxManager._bindEvents(el);
+        ListBoxManager._bindBlur(el);
+      }
+    },
+
+    _bindBlur: function(el) {
+      document.addEventListener('mousedown', function(e) {
+        if (el.getAttribute('data-always-show-selection') === 'true') return;
+        if (!el.contains(e.target)) {
+          var allItems = el.querySelectorAll('.list-item');
+          for (var ai = 0; ai < allItems.length; ai++) {
+            allItems[ai].classList.remove('item-selected');
+          }
+        }
+      });
+    },
+
+    _render: function(listBoxEl) {
+      var id = listBoxEl.id;
+      var items = ListBoxManager.itemsCache[id] || [];
+      var showCheckbox = listBoxEl.getAttribute('data-show-checkbox') === 'true';
+      var scroll = listBoxEl.querySelector('.list-box-scroll');
+      if (!scroll) return;
+      if (items.length === 0) {
+        scroll.innerHTML = '<div class="list-empty">暂无数据</div>';
+        return;
+      }
+      var html = '';
+      for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+        var cb = showCheckbox ? '<input type="checkbox" class="list-item-checkbox" data-ctrl-type="listbox_item_checkbox"' + (item.selected ? ' checked' : '') + ' data-item-index="' + i + '" />' : '';
+        html += '<div class="list-item" data-ctrl-type="listbox_item" data-item-index="' + i + '">' + cb + '<span class="list-item-text">' + ListBoxManager._escHtml(item.text) + '</span></div>';
+      }
+      scroll.innerHTML = html;
+      ListBoxManager._bindEvents(listBoxEl);
+    },
+
+    _escHtml: function(str) {
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    },
+
+    _bindEvents: function(el) {
+      var items = el.querySelectorAll('.list-item');
+      for (var i = 0; i < items.length; i++) {
+        (function(itemEl) {
+          itemEl.onclick = function(e) {
+            if (e.target.tagName === 'INPUT') return;
+            var listBox = itemEl.closest('[data-listbox-items]');
+            if (!listBox || listBox.getAttribute('data-disabled') === 'true') return;
+            var allItems = listBox.querySelectorAll('.list-item');
+            for (var ai = 0; ai < allItems.length; ai++) {
+              allItems[ai].classList.remove('item-selected');
+            }
+            itemEl.classList.add('item-selected');
+          };
+          itemEl.ondblclick = function(e) {
+            var listBox = itemEl.closest('[data-listbox-items]');
+            if (!listBox || listBox.getAttribute('data-editable') !== 'true') return;
+            if (listBox.getAttribute('data-disabled') === 'true') return;
+            ListBoxManager._startEdit(listBox, itemEl);
+          };
+          var cb = itemEl.querySelector('.list-item-checkbox');
+          if (cb) {
+            cb.onchange = function(e) {
+              var listBox = cb.closest('[data-listbox-items]');
+              if (!listBox) return;
+              var idx = parseInt(cb.getAttribute('data-item-index') || '0');
+              var cache = ListBoxManager.itemsCache[listBox.id];
+              if (cache && cache[idx]) cache[idx].selected = cb.checked;
+            };
+          }
+        })(items[i]);
+      }
+    },
+
+    _startEdit: function(listBox, itemEl) {
+      var idx = parseInt(itemEl.getAttribute('data-item-index') || '0');
+      var cache = ListBoxManager.itemsCache[listBox.id];
+      if (!cache || !cache[idx]) return;
+      var textSpan = itemEl.querySelector('.list-item-text');
+      if (!textSpan) return;
+      var oldText = cache[idx].text;
+      var input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'list-item-edit-input';
+      input.value = oldText;
+      // 逐项设置样式，确保生效
+      input.style.border = '1px solid #1890ff';
+      input.style.borderRadius = '3px';
+      input.style.background = '#fff';
+      input.style.outline = 'none';
+      input.style.boxShadow = 'none';
+      input.style.flex = '1';
+      input.style.height = '100%';
+      input.style.padding = '0 6px';
+      input.style.fontSize = 'inherit';
+      input.style.fontFamily = 'inherit';
+      textSpan.replaceWith(input);
+      input.focus();
+      input.select();
+      var save = function() {
+        var newText = input.value.trim();
+        if (newText && newText !== oldText) {
+          cache[idx].text = newText;
+          ListBoxManager._updateDataAttr(listBox);
+        }
+        var span = document.createElement('span');
+        span.className = 'list-item-text';
+        span.textContent = cache[idx].text;
+        input.replaceWith(span);
+      };
+      input.onblur = save;
+      input.onkeydown = function(e) {
+        if (e.key === 'Enter') { input.blur(); }
+        if (e.key === 'Escape') { input.value = oldText; input.blur(); }
+      };
+    },
+
+    _updateDataAttr: function(listBox) {
+      var id = listBox.id;
+      var cache = ListBoxManager.itemsCache[id];
+      if (!cache) return;
+      listBox.setAttribute('data-listbox-items', JSON.stringify(cache));
+    },
+
+    add: function(listBoxId, text) {
+      var el = document.getElementById(listBoxId);
+      var cache = ListBoxManager.itemsCache[listBoxId];
+      if (!el || !cache) return false;
+      cache.push({ id: '', text: String(text) });
+      ListBoxManager._updateDataAttr(el);
+      ListBoxManager._render(el);
+      return true;
+    },
+
+    remove: function(listBoxId, index) {
+      var el = document.getElementById(listBoxId);
+      var cache = ListBoxManager.itemsCache[listBoxId];
+      if (!el || !cache || index < 0 || index >= cache.length) return false;
+      cache.splice(index, 1);
+      ListBoxManager._updateDataAttr(el);
+      ListBoxManager._render(el);
+      return true;
+    },
+
+    setItemText: function(listBoxId, index, text) {
+      var el = document.getElementById(listBoxId);
+      var cache = ListBoxManager.itemsCache[listBoxId];
+      if (!el || !cache || index < 0 || index >= cache.length) return false;
+      cache[index].text = String(text);
+      ListBoxManager._updateDataAttr(el);
+      ListBoxManager._render(el);
+      return true;
+    },
+
+    setCheckbox: function(listBoxId, index, checked) {
+      var el = document.getElementById(listBoxId);
+      var cache = ListBoxManager.itemsCache[listBoxId];
+      if (!el || !cache || index < 0 || index >= cache.length) return false;
+      cache[index].selected = !!checked;
+      var itemEl = el.querySelector('[data-item-index="' + index + '"]');
+      if (itemEl) {
+        var cb = itemEl.querySelector('.list-item-checkbox');
+        if (cb) cb.checked = !!checked;
+      }
+      ListBoxManager._updateDataAttr(el);
+      return true;
+    },
+
+    getChecked: function(listBoxId, index) {
+      var cache = ListBoxManager.itemsCache[listBoxId];
+      if (!cache || index < 0 || index >= cache.length) return false;
+      return !!cache[index].selected;
+    },
+
+    getItems: function(listBoxId) {
+      return ListBoxManager.itemsCache[listBoxId] || [];
+    }
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() { ListBoxManager.init(); });
+  } else {
+    ListBoxManager.init();
+  }
+
+  window.ListBoxManager = ListBoxManager;
+})();
+
+
+(function() {
+  'use strict';
+
+  if (window.__TREE_RUNTIME_INITIALIZED__) return;
+  window.__TREE_RUNTIME_INITIALIZED__ = true;
+
+  var TreeManager = {
+    configs: {},
+    selectedNodes: {},
+
+    /**
+     * 初始化树形控件
+     * @param {Object} config - { id: string, data: TreeNode[], editable: boolean, showIcon: boolean }
+     */
+    init: function(config) {
+      var treeId = config.id;
+      var data = config.data || [];
+      var editable = !!config.editable;
+      var showIcon = !!config.showIcon;
+      var showCheckbox = !!config.showCheckbox;
+
+      TreeManager.configs[treeId] = {
+        id: treeId,
+        data: data,
+        editable: editable,
+        showIcon: showIcon,
+        showCheckbox: showCheckbox
+      };
+
+      var container = document.getElementById(treeId);
+      if (!container) return;
+
+      container.innerHTML = '';
+
+      for (var i = 0; i < data.length; i++) {
+        var nodeEl = TreeManager.createNodeElement(treeId, data[i], 0);
+        if (nodeEl) container.appendChild(nodeEl);
+      }
+
+      TreeManager._bindGlobalEvents(container, treeId);
+    },
+
+    /**
+     * 递归创建节点 DOM 元素
+     * @param {string} treeId - 树控件 ID
+     * @param {Object} node - 节点数据 { id, text, expanded, children }
+     * @param {number} level - 层级深度
+     * @returns {HTMLElement}
+     */
+    createNodeElement: function(treeId, node, level) {
+      var config = TreeManager.configs[treeId];
+      if (!config || !node) return null;
+
+      var nodeDiv = document.createElement('div');
+      nodeDiv.className = 'tree-node';
+      nodeDiv.setAttribute('data-tree-id', treeId);
+      nodeDiv.setAttribute('data-node-id', node.id);
+      nodeDiv.setAttribute('data-level', level);
+
+      if (config.editable) {
+        nodeDiv.setAttribute('data-editable', 'true');
+        nodeDiv.classList.add('editable');
+      }
+
+      var contentDiv = document.createElement('div');
+      contentDiv.className = 'tree-node-content';
+
+      if (config.showCheckbox) {
+        var checkboxSpan = document.createElement('span');
+        checkboxSpan.className = 'tree-checkbox';
+        var cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.className = 'tree-node-check';
+        cb.checked = !!node.checked;
+        cb.setAttribute('data-ctrl-type', 'treeview_node_checkbox');
+        checkboxSpan.appendChild(cb);
+        contentDiv.appendChild(checkboxSpan);
+      }
+
+      var toggle = document.createElement('span');
+      toggle.className = 'tree-toggle';
+      toggle.textContent = '';
+      if (node.children && node.children.length > 0) {
+        if (node.expanded === true) {
+          toggle.classList.add('expanded');
+        } else {
+          toggle.classList.add('collapsed');
+        }
+      } else {
+        toggle.classList.add('empty');
+      }
+      contentDiv.appendChild(toggle);
+
+      var icon = document.createElement('span');
+      icon.className = 'tree-icon';
+      var showIcon = config.showIcon !== false;
+      if (showIcon) {
+        var nodeIcon = node.icon || '';
+        if (!nodeIcon) {
+          nodeIcon = (node.children && node.children.length > 0) ? '📁' : '📄';
+        }
+        icon.textContent = nodeIcon;
+      }
+
+      var label = document.createElement('span');
+      label.className = 'tree-label';
+      label.textContent = node.text || '';
+
+      contentDiv.appendChild(icon);
+      contentDiv.appendChild(label);
+      nodeDiv.appendChild(contentDiv);
+
+      if (node.children && node.children.length > 0) {
+        var childrenDiv = document.createElement('div');
+        childrenDiv.className = 'tree-children';
+        if (node.expanded === false) {
+          childrenDiv.style.display = 'none';
+        }
+        for (var i = 0; i < node.children.length; i++) {
+          var childEl = TreeManager.createNodeElement(treeId, node.children[i], level + 1);
+          if (childEl) childrenDiv.appendChild(childEl);
+        }
+        nodeDiv.appendChild(childrenDiv);
+      }
+
+      return nodeDiv;
+    },
+
+    /**
+     * 展开/折叠节点
+     * @param {string} treeId - 树控件 ID
+     * @param {string} nodeId - 节点 ID
+     */
+    toggleNode: function(treeId, nodeId) {
+      var container = document.getElementById(treeId);
+      if (!container) return;
+
+      var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
+      if (!nodeEl) return;
+
+      var toggle = nodeEl.querySelector(':scope > .tree-node-content > .tree-toggle');
+      var children = nodeEl.querySelector(':scope > .tree-children');
+      if (!toggle || !children) return;
+
+      var node = TreeManager.findNodeData(TreeManager.configs[treeId] ? TreeManager.configs[treeId].data : null, nodeId);
+      if (!node) return;
+
+      if (toggle.classList.contains('expanded')) {
+        toggle.classList.remove('expanded');
+        toggle.classList.add('collapsed');
+        children.style.display = 'none';
+        node.expanded = false;
+      } else {
+        toggle.classList.remove('collapsed');
+        toggle.classList.add('expanded');
+        children.style.display = '';
+        node.expanded = true;
+      }
+    },
+
+    /**
+     * 选中节点（高亮选中，取消之前的选中）
+     * @param {string} treeId - 树控件 ID
+     * @param {string} nodeId - 节点 ID
+     */
+    selectNode: function(treeId, nodeId) {
+      var container = document.getElementById(treeId);
+      if (!container) return;
+
+      var prevSelected = container.querySelector('.tree-node-content.selected');
+      if (prevSelected) {
+        prevSelected.classList.remove('selected');
+      }
+
+      var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
+      if (!nodeEl) return;
+
+      var content = nodeEl.querySelector(':scope > .tree-node-content');
+      if (content) {
+        content.classList.add('selected');
+      }
+
+      TreeManager.selectedNodes[treeId] = nodeId;
+    },
+
+    /**
+     * 获取当前选中的节点数据
+     * @param {string} treeId - 树控件 ID
+     * @returns {Object|null}
+     */
+    getSelectedNode: function(treeId) {
+      var nodeId = TreeManager.selectedNodes[treeId];
+      if (!nodeId) return null;
+      var config = TreeManager.configs[treeId];
+      if (!config) return null;
+      return TreeManager.findNodeData(config.data, nodeId);
+    },
+
+    /**
+     * 递归查找节点数据
+     * @param {Object[]} nodes - 节点数组
+     * @param {string} nodeId - 节点 ID
+     * @returns {Object|null}
+     */
+    findNodeData: function(nodes, nodeId) {
+      if (!nodes) return null;
+      for (var i = 0; i < nodes.length; i++) {
+        if (nodes[i].id === nodeId) return nodes[i];
+        if (nodes[i].children && nodes[i].children.length > 0) {
+          var found = TreeManager.findNodeData(nodes[i].children, nodeId);
+          if (found) return found;
+        }
+      }
+      return null;
+    },
+
+    /**
+     * 添加子节点并重新渲染
+     * @param {string} treeId - 树控件 ID
+     * @param {string} parentNodeId - 父节点 ID（父节点必须存在 children）
+     * @param {Object} newNodeData - 新节点数据 { id, text, children }
+     */
+    addNode: function(treeId, parentNodeId, newNodeData) {
+      var config = TreeManager.configs[treeId];
+      if (!config || !newNodeData) return false;
+
+      var parent = TreeManager.findNodeData(config.data, parentNodeId);
+      if (!parent) return false;
+
+      if (!parent.children) {
+        parent.children = [];
+      }
+
+      parent.children.push({
+        id: newNodeData.id || ('node_' + Date.now()),
+        text: newNodeData.text || '新节点',
+        expanded: newNodeData.expanded !== undefined ? newNodeData.expanded : false,
+        children: newNodeData.children || undefined
+      });
+
+      TreeManager.init(config);
+      return true;
+    },
+
+    /**
+     * 删除节点并重新渲染
+     * @param {string} treeId - 树控件 ID
+     * @param {string} nodeId - 节点 ID
+     */
+    removeNode: function(treeId, nodeId) {
+      var config = TreeManager.configs[treeId];
+      if (!config) return false;
+
+      var removed = TreeManager._removeNodeFromData(config.data, nodeId);
+      if (removed) {
+        TreeManager.init(config);
+        return true;
+      }
+      return false;
+    },
+
+    /**
+     * 从数据中递归删除节点
+     * @param {Object[]} nodes - 节点数组
+     * @param {string} nodeId - 节点 ID
+     * @returns {boolean}
+     */
+    _removeNodeFromData: function(nodes, nodeId) {
+      if (!nodes) return false;
+      for (var i = nodes.length - 1; i >= 0; i--) {
+        if (nodes[i].id === nodeId) {
+          nodes.splice(i, 1);
+          return true;
+        }
+        if (nodes[i].children && nodes[i].children.length > 0) {
+          if (TreeManager._removeNodeFromData(nodes[i].children, nodeId)) {
+            return true;
+          }
+        }
+      }
+      return false;
+    },
+
+    /**
+     * 更新节点文本并重新渲染
+     * @param {string} treeId - 树控件 ID
+     * @param {string} nodeId - 节点 ID
+     * @param {string} text - 新文本
+     */
+    updateNode: function(treeId, nodeId, text) {
+      var config = TreeManager.configs[treeId];
+      if (!config) return false;
+
+      var node = TreeManager.findNodeData(config.data, nodeId);
+      if (!node) return false;
+
+      node.text = text;
+      TreeManager.init(config);
+      return true;
+    },
+
+    /**
+     * 展开节点
+     * @param {string} treeId - 树控件 ID
+     * @param {string} nodeId - 节点 ID
+     */
+    expandNode: function(treeId, nodeId) {
+      var node = TreeManager.findNodeData(
+        TreeManager.configs[treeId] ? TreeManager.configs[treeId].data : null,
+        nodeId
+      );
+      if (node) {
+        node.expanded = true;
+      }
+      var container = document.getElementById(treeId);
+      if (!container) return;
+      var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
+      if (!nodeEl) return;
+      var toggle = nodeEl.querySelector(':scope > .tree-node-content > .tree-toggle');
+      var children = nodeEl.querySelector(':scope > .tree-children');
+      if (toggle) {
+        toggle.classList.remove('collapsed');
+        toggle.classList.add('expanded');
+      }
+      if (children) {
+        children.style.display = '';
+      }
+    },
+
+    /**
+     * 折叠节点
+     * @param {string} treeId - 树控件 ID
+     * @param {string} nodeId - 节点 ID
+     */
+    collapseNode: function(treeId, nodeId) {
+      var node = TreeManager.findNodeData(
+        TreeManager.configs[treeId] ? TreeManager.configs[treeId].data : null,
+        nodeId
+      );
+      if (node) {
+        node.expanded = false;
+      }
+      var container = document.getElementById(treeId);
+      if (!container) return;
+      var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
+      if (!nodeEl) return;
+      var toggle = nodeEl.querySelector(':scope > .tree-node-content > .tree-toggle');
+      var children = nodeEl.querySelector(':scope > .tree-children');
+      if (toggle) {
+        toggle.classList.remove('expanded');
+        toggle.classList.add('collapsed');
+      }
+      if (children) {
+        children.style.display = 'none';
+      }
+    },
+
+    /**
+     * 动态设置树控件的编辑状态
+     * @param {string} treeId - 树控件 ID
+     * @param {boolean} enabled - 是否允许编辑
+     */
+    setEditable: function(treeId, enabled) {
+      var config = TreeManager.configs[treeId];
+      if (!config) return;
+      config.editable = !!enabled;
+      var el = document.getElementById(treeId);
+      if (el) {
+        el.setAttribute('data-editable', enabled ? 'true' : 'false');
+      }
+    },
+
+    /**
+     * 动态设置树控件的复选框显示状态
+     * @param {string} treeId - 树控件 ID
+     * @param {boolean} show - 是否显示复选框
+     */
+    showCheckbox: function(treeId, show) {
+      var config = TreeManager.configs[treeId];
+      if (!config) return false;
+      config.showCheckbox = !!show;
+      var el = document.getElementById(treeId);
+      if (el) {
+        el.setAttribute('data-show-checkbox', show ? 'true' : 'false');
+      }
+      return true;
+    },
+
+    /**
+     * 设置指定节点的勾选状态
+     * @param {string} treeId - 树控件 ID
+     * @param {string} nodeId - 节点 ID
+     * @param {boolean} checked - 是否勾选
+     */
+    setNodeChecked: function(treeId, nodeId, checked) {
+      var container = document.getElementById(treeId);
+      if (!container) return false;
+      var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
+      if (!nodeEl) return false;
+      var cbs = nodeEl.querySelectorAll('.tree-node-check');
+      for (var i = 0; i < cbs.length; i++) {
+        cbs[i].checked = !!checked;
+      }
+      return true;
+    },
+
+    /**
+     * 获取指定节点的勾选状态
+     * @param {string} treeId - 树控件 ID
+     * @param {string} nodeId - 节点 ID
+     * @returns {boolean} 是否勾选
+     */
+    isNodeChecked: function(treeId, nodeId) {
+      var container = document.getElementById(treeId);
+      if (!container) return false;
+      var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
+      if (!nodeEl) return false;
+      var cb = nodeEl.querySelector('.tree-node-check');
+      return cb ? cb.checked : false;
+    },
+
+    /**
+     * 获取所有已勾选的节点 ID 数组
+     * @param {string} treeId - 树控件 ID
+     * @returns {string[]} 已勾选节点 ID 数组
+     */
+    getCheckedNodes: function(treeId) {
+      var container = document.getElementById(treeId);
+      if (!container) return [];
+      var checkboxes = container.querySelectorAll('.tree-node-check:checked');
+      var ids = [];
+      for (var i = 0; i < checkboxes.length; i++) {
+        var nodeEl = checkboxes[i].closest('.tree-node');
+        if (nodeEl) {
+          ids.push(nodeEl.getAttribute('data-node-id'));
+        }
+      }
+      return ids;
+    },
+
+    /**
+     * 全选所有节点的复选框
+     * @param {string} treeId - 树控件 ID
+     */
+    checkAll: function(treeId) {
+      var container = document.getElementById(treeId);
+      if (!container) return false;
+      var checkboxes = container.querySelectorAll('.tree-node-check');
+      for (var i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = true;
+      }
+      return true;
+    },
+
+    /**
+     * 取消全选所有节点的复选框
+     * @param {string} treeId - 树控件 ID
+     */
+    uncheckAll: function(treeId) {
+      var container = document.getElementById(treeId);
+      if (!container) return false;
+      var checkboxes = container.querySelectorAll('.tree-node-check');
+      for (var i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = false;
+      }
+      return true;
+    },
+
+    /**
+     * 编辑节点标签（内联编辑）
+     * @param {string} treeId - 树控件 ID
+     * @param {string} nodeId - 节点 ID
+     */
+    editNodeLabel: function(treeId, nodeId) {
+      var config = TreeManager.configs[treeId];
+      if (!config || !config.editable) return;
+
+      var container = document.getElementById(treeId);
+      if (!container) return;
+
+      var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
+      if (!nodeEl) return;
+
+      var label = nodeEl.querySelector(':scope > .tree-node-content > .tree-label');
+      if (!label) return;
+
+      var node = TreeManager.findNodeData(config.data, nodeId);
+      if (!node) return;
+
+      var oldText = node.text;
+      var input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'tree-edit-input';
+      input.value = oldText;
+
+      label.replaceWith(input);
+      input.focus();
+      input.select();
+
+      var save = function() {
+        var newText = input.value.trim();
+        if (newText && newText !== oldText) {
+          node.text = newText;
+        }
+        var newLabel = document.createElement('span');
+        newLabel.className = 'tree-label';
+        newLabel.textContent = node.text;
+        input.replaceWith(newLabel);
+      };
+
+      var cancel = function() {
+        var newLabel = document.createElement('span');
+        newLabel.className = 'tree-label';
+        newLabel.textContent = oldText;
+        input.replaceWith(newLabel);
+      };
+
+      input.addEventListener('blur', save);
+      input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          save();
+        }
+        if (e.key === 'Escape') {
+          cancel();
+        }
+      });
+    },
+
+    /**
+     * 绑定全局事件委托到树容器
+     * @param {HTMLElement} container - 树容器元素
+     * @param {string} treeId - 树控件 ID
+     */
+    _bindGlobalEvents: function(container, treeId) {
+      var config = TreeManager.configs[treeId];
+      if (!config) return;
+
+      container.onclick = function(e) {
+        if (e.target.closest('.tree-node-check')) {
+          return;
+        }
+
+        var content = e.target.closest('.tree-node-content');
+        if (!content) return;
+
+        var nodeEl = content.closest('.tree-node');
+        if (!nodeEl) return;
+
+        var nodeId = nodeEl.getAttribute('data-node-id');
+        if (!nodeId) return;
+
+        var targetTreeId = nodeEl.getAttribute('data-tree-id');
+        if (targetTreeId !== treeId) return;
+
+        if (e.target.closest('.tree-toggle')) {
+          TreeManager.toggleNode(treeId, nodeId);
+          return;
+        }
+
+        TreeManager.selectNode(treeId, nodeId);
+      };
+
+      container.ondblclick = function(e) {
+        var content = e.target.closest('.tree-node-content');
+        if (!content) return;
+
+        var nodeEl = content.closest('.tree-node');
+        if (!nodeEl) return;
+
+        var nodeId = nodeEl.getAttribute('data-node-id');
+        if (!nodeId) return;
+
+        var targetTreeId = nodeEl.getAttribute('data-tree-id');
+        if (targetTreeId !== treeId) return;
+
+        if (config.editable) {
+          TreeManager.editNodeLabel(treeId, nodeId);
+        }
+      };
+
+      container.addEventListener('change', function(e) {
+        var target = e.target;
+        if (!target || !target.classList.contains('tree-node-check')) return;
+        var nodeEl = target.closest('.tree-node');
+        if (!nodeEl) return;
+        var targetTreeId = nodeEl.getAttribute('data-tree-id');
+        if (targetTreeId !== treeId) return;
+        var checked = target.checked;
+        var descendants = nodeEl.querySelectorAll('.tree-node-check');
+        for (var i = 0; i < descendants.length; i++) {
+          descendants[i].checked = checked;
+        }
+      });
+    }
+  };
+
+  window.TreeManager = TreeManager;
+})();
+
+
+(function(){
+  var DataTableManager = {
+    tables: {},
+
+    /**
+     * 初始化表格
+     */
+    init: function(tableId, config) {
+      var container = document.getElementById(tableId);
+      if (!container) return;
+
+      var store = {
+        id: tableId,
+        container: container,
+        columns: config.columns || [],
+        rows: config.rows || [],
+        showCheckbox: config.showCheckbox !== false,
+        allowAdd: config.allowAdd === true,
+        allowDelete: config.allowDelete === true,
+        editable: config.editable === true,
+        alwaysShowSelection: config.alwaysShowSelection === true,
+        selectedRowIndex: -1
+      };
+
+      this.tables[tableId] = store;
+      this.bindEvents(store);
+    },
+
+    /**
+     * 绑定表格事件
+     */
+    bindEvents: function(store) {
+      var self = this;
+      var container = store.container;
+
+      // 表头全选复选框
+      var selectAll = container.querySelector('.data-grid-select-all');
+      if (selectAll) {
+        selectAll.addEventListener('change', function(e) {
+          self.selectAllRows(store.id, e.target.checked);
+        });
+      }
+
+      // 行复选框
+      container.querySelectorAll('.data-grid-row-check').forEach(function(cb) {
+        cb.addEventListener('change', function(e) {
+          var row = e.target.closest('.data-grid-row');
+          if (row) {
+            var idx = parseInt(row.getAttribute('data-row-index'), 10);
+            var rowData = self.getRowData(store.id, idx);
+            if (rowData) {
+              rowData.selected = e.target.checked;
+              self.updateSelectAllState(store);
+            }
+          }
+        });
+      });
+
+      // 行点击高亮处理
+      container.querySelectorAll('.data-grid-row').forEach(function(row) {
+        row.addEventListener('click', function(e) {
+          if (e.target.tagName === 'INPUT') return;
+          // 移除其他行的高亮
+          container.querySelectorAll('.data-grid-row.data-grid-row-focused').forEach(function(r) {
+            r.classList.remove('data-grid-row-focused');
+          });
+          // 高亮当前行
+          row.classList.add('data-grid-row-focused');
+          store.selectedRowIndex = parseInt(row.getAttribute('data-row-index'), 10);
+        });
+      });
+
+      // 单元格双击编辑
+      if (store.editable) {
+        container.querySelectorAll('.data-grid-cell[data-col-key]').forEach(function(cell) {
+          if (cell.closest('.data-grid-checkbox')) return;
+          cell.addEventListener('dblclick', function() {
+            var row = cell.closest('.data-grid-row');
+            if (!row) return;
+            var ri = parseInt(row.getAttribute('data-row-index'), 10);
+            var field = cell.getAttribute('data-col-key');
+            if (ri === undefined || !field) return;
+            self.startEditCell(store, cell, ri, field);
+          });
+        });
+      }
+    },
+
+    /** 更新全选复选框状态 */
+    updateSelectAllState: function(store) {
+      var selectAll = store.container.querySelector('.data-grid-select-all');
+      if (!selectAll) return;
+      var total = store.rows.length;
+      var selected = store.rows.filter(function(r) { return r.selected; }).length;
+      selectAll.checked = (total > 0 && selected === total);
+      selectAll.indeterminate = (selected > 0 && selected < total);
+    },
+
+    /** 全选/取消全选 */
+    selectAllRows: function(tableId, checked) {
+      var store = this.tables[tableId];
+      if (!store) return;
+      store.rows.forEach(function(r) {
+        r.selected = checked;
+      });
+      store.container.querySelectorAll('.data-grid-row-check').forEach(function(cb) {
+        cb.checked = checked;
+      });
+    },
+
+    /** 开始编辑单元格 */
+    startEditCell: function(store, cell, ri, field) {
+      var self = this;
+      if (!store.editable) return;
+      if (cell.hasAttribute('data-editable')) return;
+      if (cell.querySelector('input')) return;
+      var oldVal = cell.textContent || '';
+      var input = document.createElement('input');
+      input.type = 'text';
+      input.value = oldVal;
+      input.style.cssText = 'width:100%;height:100%;border:1px solid #1890ff;outline:none;padding:2px 4px;font-size:12px;font-family:inherit;background:#fff;box-sizing:border-box;margin:-2px -4px;';
+      cell.textContent = '';
+      cell.appendChild(input);
+      input.focus();
+      input.select();
+
+      var commit = function() {
+        var val = input.value;
+        cell.textContent = val;
+        self.setCellValue(store.id, ri, field, val);
+      };
+      input.addEventListener('blur', commit);
+      input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          commit();
+        } else if (e.key === 'Escape') {
+          cell.textContent = oldVal;
+        }
+      });
+    },
+
+    /** 设置单元格值 */
+    setCellValue: function(tableId, rowIndex, field, value) {
+      var store = this.tables[tableId];
+      if (!store || !store.rows[rowIndex]) return;
+      store.rows[rowIndex].cells[field] = value;
+    },
+
+    /** 获取行数据 */
+    getRowData: function(tableId, rowIndex) {
+      var store = this.tables[tableId];
+      if (!store || !store.rows[rowIndex]) return null;
+      return store.rows[rowIndex];
+    },
+
+    /** 添加行 */
+    addRow: function(tableId, rowData) {
+      var store = this.tables[tableId];
+      if (!store) return;
+      var newRow = {
+        id: tableId + '_row_' + (store.rows.length + 1),
+        cells: {},
+        selected: false
+      };
+      store.columns.forEach(function(col) {
+        newRow.cells[col.field] = (rowData && rowData[col.field] !== undefined) ? rowData[col.field] : '';
+      });
+      store.rows.push(newRow);
+      this.refreshDOM(store);
+    },
+
+    /** 删除行 */
+    removeRow: function(tableId, rowIndex) {
+      var store = this.tables[tableId];
+      if (!store || !store.rows[rowIndex]) return;
+      store.rows.splice(rowIndex, 1);
+      this.refreshDOM(store);
+    },
+
+    /** 动态设置表格的编辑状态 */
+    setEditable: function(tableId, enabled) {
+      var store = this.tables[tableId];
+      if (!store) return;
+      store.editable = !!enabled;
+      store.container.setAttribute('data-editable', enabled ? 'true' : 'false');
+      if (!enabled) return;
+      var self = this;
+      store.container.querySelectorAll('.data-grid-cell[data-col-key]').forEach(function(cell) {
+        if (cell.closest('.data-grid-checkbox')) return;
+        if (cell._dgEditBound) return;
+        cell._dgEditBound = true;
+        cell.addEventListener('dblclick', function() {
+          var row = cell.closest('.data-grid-row');
+          if (!row) return;
+          var ri = parseInt(row.getAttribute('data-row-index'), 10);
+          var field = cell.getAttribute('data-col-key');
+          if (ri === undefined || !field) return;
+          self.startEditCell(store, cell, ri, field);
+        });
+      });
+    },
+
+    /** 刷新 DOM */
+    refreshDOM: function(store) {
+      var self = this;
+      var body = store.container.querySelector('.data-grid-body');
+      if (!body) return;
+
+      var html = '';
+      store.rows.forEach(function(row, ri) {
+        var rowClass = (store.selectedRowIndex === ri) ? 'data-grid-row data-grid-row-focused' : 'data-grid-row';
+        html += '<div class="' + rowClass + '" data-row-index="' + ri + '" data-row-id="' + row.id + '">';
+        if (store.showCheckbox) {
+          var checked = row.selected ? ' checked' : '';
+          html += '<div class="data-grid-cell data-grid-checkbox" style="width:36px;min-width:36px;flex-shrink:0"><input type="checkbox" class="data-grid-row-check"' + checked + '></div>';
+        }
+        store.columns.forEach(function(col) {
+          var w = col.width || 100;
+          var val = row.cells && row.cells[col.field] !== undefined && row.cells[col.field] !== null ? String(row.cells[col.field]) : '';
+          html += '<div class="data-grid-cell" data-col-key="' + col.field + '" style="width:' + w + 'px;min-width:' + w + 'px;flex-shrink:0" title="' + val + '">' + val + '</div>';
+        });
+        html += '</div>';
+      });
+      body.innerHTML = html;
+      this.bindEvents(store);
+    }
+  };
+
+  window.DataTableManager = DataTableManager;
+})();
+
+
+(function() {
+  var treeViewEls = document.querySelectorAll('[data-type="treeView"]');
+  treeViewEls.forEach(function(el) {
+    var treeId = el.getAttribute('data-tree-id');
+    if (treeId && typeof TreeManager !== 'undefined') {
+      function buildNodesFromDOM(parentEl) {
+        var nodes = [];
+        var childNodes = parentEl.querySelectorAll(':scope > .tree-node');
+        childNodes.forEach(function(nodeEl) {
+          var contentEl = nodeEl.querySelector(':scope > .tree-node-content');
+          var labelEl = contentEl ? contentEl.querySelector('.tree-label') : null;
+          var childrenEl = nodeEl.querySelector(':scope > .tree-children');
+          var toggleEl = contentEl ? contentEl.querySelector('.tree-toggle') : null;
+          var checkboxEl = contentEl ? contentEl.querySelector('.tree-node-check') : null;
+          var isExpanded = toggleEl && toggleEl.classList.contains('expanded');
+          var node = {
+            id: nodeEl.getAttribute('data-node-id'),
+            text: labelEl ? labelEl.textContent : '',
+            expanded: isExpanded,
+            checked: checkboxEl ? checkboxEl.checked : false,
+            children: []
+          };
+          if (childrenEl) {
+            var childNodesData = buildNodesFromDOM(childrenEl);
+            if (childNodesData.length > 0) {
+              node.children = childNodesData;
+            }
+          }
+          nodes.push(node);
+        });
+        return nodes;
+      }
+      var data = buildNodesFromDOM(el);
+      var editable = el.getAttribute('data-editable') === 'true';
+      var showIcon = el.getAttribute('data-show-icon') !== 'false';
+      var showCheckbox = el.getAttribute('data-show-checkbox') === 'true';
+      TreeManager.init({ id: treeId, data: data, editable: editable, showIcon: showIcon, showCheckbox: showCheckbox });
+    }
+  });
+})();
+
+
+(function(){
+  document.querySelectorAll('.data-grid-container').forEach(function(container){
+    var id = container.getAttribute('data-id') || container.id;
+    var columns = JSON.parse(container.getAttribute('data-columns') || '[]');
+    var rows = JSON.parse(container.getAttribute('data-rows') || '[]');
+    var showCheckbox = container.getAttribute('data-show-checkbox') !== 'false';
+    var allowAdd = container.getAttribute('data-allow-add') === 'true';
+    var allowDelete = container.getAttribute('data-allow-delete') === 'true';
+    var editable = container.getAttribute('data-editable') === 'true';
+    var alwaysShowSelection = container.getAttribute('data-always-show-selection') === 'true';
+    if (window.DataTableManager && typeof window.DataTableManager.init === 'function'){
+      window.DataTableManager.init(id, { columns: columns, rows: rows, showCheckbox: showCheckbox, allowAdd: allowAdd, allowDelete: allowDelete, editable: editable, alwaysShowSelection: alwaysShowSelection });
+    }
+  });
+})();
+
+</script>
+
+
+<script>
+window.__messageBoxConfig = {"title":"提示","message":"这是一条消息","icon":"warning","customIcon":"","buttons":"ok","defaultButton":0,"width":350,"height":"180","showOverlay":true,"closeOnOverlayClick":false,"draggable":false,"opacity":1,"customCSS":"/* ===== 信息提示框自定义样式 ===== */\n/* 蒙版层 - 半透明黑色背景覆盖全屏 */\n.mb-overlay {\n  background: rgba(0, 0, 0, 0.4);\n}\n/* 对话框容器 - 白色圆角卡片 */\n.mb-dialog {\n  background: #361111;\n  border-radius: 8px;\n  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);\n}\n/* 标题栏 */\n.mb-header {\n  padding: 16px 20px 8px;\n  font-size: 16px;\n  font-weight: 600;\n  color: #ffffff;\n}\n/* 关闭按钮 (✕) */\n.mb-header-close {\n  color: #ff0000;\n}\n.mb-header-close:hover {\n  background: #f0f0f0;\n  color: #333;\n}\n/* 内容区域（图标+消息） */\n.mb-body {\n  padding: 8px 20px 16px;\n}\n/* 图标 */\n.mb-icon {\n  font-size: 28px;\n}\n/* 消息文字 */\n.mb-message {\n  font-size: 14px;\n  color: #555;\n  line-height: 1.6;\n}\n/* 底部按钮栏 */\n.mb-footer {\n  padding: 12px 20px 16px;\n}\n/* 普通按钮 */\n.mb-btn {\n  padding: 7px 20px;\n  border: 1px solid #d9d9d9;\n  border-radius: 4px;\n  background: #fff;\n  font-size: 13px;\n}\n.mb-btn:hover {\n  border-color: #409eff;\n  color: #409eff;\n}\n/* 主按钮（确定/是/重试） */\n.mb-btn.mb-btn-primary {\n  background: #409eff;\n  color: #fff;\n  border-color: #409eff;\n}\n.mb-btn.mb-btn-primary:hover {\n  background: #66b1ff;\n}\n"};
+</script>
+<script>
+window.__inputBoxConfig = {"title":"输入","prompt":"请输入内容","defaultValue":"","inputType":"number","buttons":"okcancel","defaultButton":0,"width":400,"height":0,"showOverlay":false,"closeOnOverlayClick":false,"draggable":false,"opacity":1,"customCSS":"/* ===== 输入框自定义样式 ===== */\n/* 蒙版层 - 半透明黑色背景覆盖全屏 */\n.ib-overlay {\n  background: rgba(0, 0, 0, 0.4);\n}\n/* 对话框容器 - 白色圆角卡片 */\n.ib-dialog {\n  background: #0a0909;\n  border-radius: 8px;\n  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);\n}\n/* 标题栏 */\n.ib-header {\n  padding: 16px 20px 8px;\n  font-size: 16px;\n  font-weight: 600;\n  color: #333;\n}\n/* 关闭按钮 (✕) */\n.ib-header-close {\n  color: #eb0000;\n}\n.ib-header-close:hover {\n  background: #f0f0f0;\n  color: #333;\n}\n/* 内容区域（提示文字+输入框） */\n.ib-body {\n  padding: 8px 20px 16px;\n}\n/* 提示文字 */\n.ib-prompt {\n  font-size: 14px;\n  color: #555;\n  line-height: 1.6;\n  margin-bottom: 10px;\n}\n/* 输入框 */\n.ib-input {\n  width: 100%;\n  padding: 7px 10px;\n  border: 1px solid #d9d9d9;\n  border-radius: 4px;\n  font-size: 13px;\n  color: #333;\n  outline: none;\n  box-sizing: border-box;\n}\n.ib-input:focus {\n  border-color: #409eff;\n  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);\n}\n/* 底部按钮栏 */\n.ib-footer {\n  padding: 12px 20px 16px;\n  display: flex;\n  justify-content: flex-end;\n  gap: 8px;\n}\n/* 普通按钮 */\n.ib-btn {\n  padding: 7px 20px;\n  border: 1px solid #d9d9d9;\n  border-radius: 4px;\n  background: #fff;\n  font-size: 13px;\n  cursor: pointer;\n}\n.ib-btn:hover {\n  border-color: #409eff;\n  color: #409eff;\n}\n/* 主按钮（确定） */\n.ib-btn.ib-btn-primary {\n  background: #409eff;\n  color: #fff;\n  border-color: #409eff;\n}\n.ib-btn.ib-btn-primary:hover {\n  background: #66b1ff;\n}\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n"};
+</script>
+<script src="./webviewBridge.js"></script>
+
+<div id="automa-palette"></div></body></html>

@@ -1,0 +1,2433 @@
+.版本 2
+.支持库 spec
+
+.程序集 集_页面操作函数
+
+.子程序 Page_Public_setValue, 逻辑型, 公开, 设置控件值
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 目标控件ID
+.参数 value, 文本型, , 要设置的值
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.public.setValue('%s','%s');”, targetId, _替换换行符 (value))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_Public_getValue, 文本型, 公开, 获取控件值
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 目标控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.public.getValue('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+ret ＝ _删除前后引号 (ret)
+返回 (ret)
+
+.子程序 Page_Public_setChecked, 逻辑型, 公开, 设置复选框/单选框选中状态
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 目标控件ID
+.参数 checked, 逻辑型, , true=选中 false=取消
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.public.setChecked('%s',%s);”, targetId, 选择 (checked, “true”, “false”))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_Public_getChecked, 逻辑型, 公开, 获取控件选中状态
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 目标控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.public.getChecked('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_Public_setEnabled, 逻辑型, 公开, 启用或禁用控件
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 目标控件ID
+.参数 enabled, 逻辑型, , true=启用 false=禁用
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.public.setEnabled('%s',%s);”, targetId, 选择 (enabled, “true”, “false”))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_Public_isEnabled, 逻辑型, 公开, 检查控件是否启用
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 目标控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.public.isEnabled('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_Public_show, 逻辑型, 公开, 显示控件
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 目标控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.public.show('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_Public_hide, 逻辑型, 公开, 隐藏控件
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 目标控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.public.hide('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_Public_toggle, 逻辑型, 公开, 切换控件可见性
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 目标控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.public.toggle('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_Public_isVisible, 逻辑型, 公开, 检查控件是否可见
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 目标控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.public.isVisible('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_Public_focus, 逻辑型, 公开, 使控件获得焦点
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 目标控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.public.focus('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_Public_setStyle, 逻辑型, 公开, 批量设置控件CSS样式
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 目标控件ID
+.参数 styleObj, 文本型, , CSS样式JSON对象，如 {"color":"red","fontSize":"16px"}
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.public.setStyle('%s',%s);”, targetId, _替换换行符 (styleObj))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_Public_setBlockContextMenu, 逻辑型, 公开, 设置是否阻止右键菜单
+.参数 webView2, _WebView2_浏览器
+.参数 block, 逻辑型, , true=阻止 false=允许
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.public.setBlockContextMenu(%s);”, 选择 (block, “true”, “false”))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_Public_getBlockContextMenu, 逻辑型, 公开, 获取右键菜单阻止状态
+.参数 webView2, _WebView2_浏览器
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ “webviewBridge.api.public.getBlockContextMenu();”
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_Public_getWindowSize, 文本型, 公开, 获取画布尺寸(返回JSON)
+.参数 webView2, _WebView2_浏览器
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ “webviewBridge.api.public.getWindowSize();”
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (ret)
+
+.子程序 Page_Public_testReturn, 文本型, 公开, 测试API通信
+.参数 webView2, _WebView2_浏览器
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ “webviewBridge.api.public.testReturn();”
+ret ＝ webView2.执行脚本 (jsCode)
+ret ＝ _删除前后引号 (ret)
+返回 (ret)
+
+.子程序 Page_Public_move, 逻辑型, 公开, 移动控件到指定坐标
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 目标控件ID
+.参数 x, 整数型, , X坐标(px)
+.参数 y, 整数型, , Y坐标(px)
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.public.move('%s',%d,%d);”, targetId, x, y)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_Public_setSize, 逻辑型, 公开, 设置控件尺寸
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 目标控件ID
+.参数 width, 整数型, , 宽度(px)
+.参数 height, 整数型, , 高度(px)
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.public.setSize('%s',%d,%d);”, targetId, width, height)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_Public_getPosition, 文本型, 公开, 获取控件坐标(返回JSON)
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 目标控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.public.getPosition('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (ret)
+
+.子程序 Page_Public_getSize, 文本型, 公开, 获取控件尺寸(返回JSON)
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 目标控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.public.getSize('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (ret)
+
+.子程序 Page_Public_bringToFront, 逻辑型, 公开, 将控件置顶
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 目标控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.public.bringToFront('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_Public_sendToBack, 逻辑型, 公开, 将控件置底
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 目标控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.public.sendToBack('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_Public_setZIndex, 逻辑型, 公开, 设置控件z-index层级
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 目标控件ID
+.参数 zIndex, 整数型, , z-index值
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.public.setZIndex('%s',%d);”, targetId, zIndex)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_Public_getIdByName, 文本型, 公开, 通过data-name查找控件ID
+.参数 webView2, _WebView2_浏览器
+.参数 dataName, 文本型, , 元素的data-name属性值，如"按钮_1"
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.public.getIdByName('%s');”, _替换换行符 (dataName))
+ret ＝ webView2.执行脚本 (jsCode)
+ret ＝ _删除前后引号 (ret)
+返回 (ret)
+
+.子程序 Page_Public_getInfoById, 文本型, 公开, 通过ID获取控件元信息(返回JSON)
+.参数 webView2, _WebView2_浏览器
+.参数 id, 文本型, , 元素的id值，如"button_1"
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.public.getInfoById('%s');”, id)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (ret)
+
+.子程序 Page_Public_sendMessage, , 公开, 向宿主发送消息
+.参数 webView2, _WebView2_浏览器
+.参数 action, 文本型, , 动作名称
+.参数 tagName, 文本型, , 标签名
+.参数 type, 文本型, , 类型
+.参数 id, 文本型, , 控件ID
+.参数 data, 文本型, 可空, 附加数据(JSON格式)
+.局部变量 jsCode, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.public.sendMessage('%s','%s','%s','%s',%s);”, action, tagName, type, id, 选择 (data ＝ “”, “null”, data))
+webView2.执行脚本 (jsCode)
+
+.子程序 Page_Public_showNotification, 逻辑型, 公开, 显示系统通知
+.参数 webView2, _WebView2_浏览器
+.参数 options, 文本型, , 通知配置JSON对象 {title,text,text2,image,button1,button2}
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.public.showNotification(%s);”, _替换换行符 (options))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_Public_addMessageListener, 逻辑型, 公开, 添加宿主消息监听器
+.参数 webView2, _WebView2_浏览器
+.参数 callbackName, 文本型, , JS中已定义的全局回调函数名
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.public.addMessageListener(%s);”, callbackName)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_Public_removeMessageListener, 逻辑型, 公开, 移除宿主消息监听器
+.参数 webView2, _WebView2_浏览器
+.参数 callbackName, 文本型, , 要移除的回调函数名
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.public.removeMessageListener(%s);”, callbackName)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+
+.子程序 Page_Canvas_setFixedCanvasSize, 逻辑型, 公开, 固定/取消固定画布宽高
+.参数 webView2, _WebView2_浏览器
+.参数 isFixed, 逻辑型, , true=固定画布宽高 false=继承body宽高
+.参数 width, 整数型, 可空, 固定时的画布宽度(px)
+.参数 height, 整数型, 可空, 固定时的画布高度(px)
+.局部变量 params, 文本型
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+.判断开始 (是否为空 (width) 且 是否为空 (height))
+    params ＝ 取文本 (“%s”, 选择 (isFixed, “true”, “false”))
+.判断 (是否为空 (width))
+    params ＝ 取文本 (“%s,,%d”, 选择 (isFixed, “true”, “false”), height)
+.判断 (是否为空 (height))
+    params ＝ 取文本 (“%s,%d”, 选择 (isFixed, “true”, “false”), width)
+.默认
+    params ＝ 取文本 (“%s,%d,%d”, 选择 (isFixed, “true”, “false”), width, height)
+.判断结束
+jsCode ＝ 取文本 (“webviewBridge.api.canvas.setFixedCanvasSize(%s);”, params)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_Canvas_getTitleBarTitle, 文本型, 公开, 获取画布标题栏文字
+.参数 webView2, _WebView2_浏览器
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ “webviewBridge.api.canvas.getTitleBarTitle();”
+ret ＝ webView2.执行脚本 (jsCode)
+ret ＝ _删除前后引号 (ret)
+返回 (ret)
+
+.子程序 Page_Canvas_setTitleBarTitle, 逻辑型, 公开, 设置画布标题栏文字
+.参数 webView2, _WebView2_浏览器
+.参数 title, 文本型, , 新的标题文字
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.canvas.setTitleBarTitle('%s');”, _替换换行符 (title))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+
+.子程序 Page_Icon_parse, 文本型, 公开, 图标占位符转emoji
+.参数 webView2, _WebView2_浏览器
+.参数 text, 文本型, , 包含占位符的文本，如"[OK] 操作成功"
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.icon.parse('%s');”, _替换换行符 (text))
+ret ＝ webView2.执行脚本 (jsCode)
+ret ＝ _删除前后引号 (ret)
+返回 (ret)
+
+.子程序 Page_Icon_toText, 文本型, 公开, emoji转图标占位符
+.参数 webView2, _WebView2_浏览器
+.参数 html, 文本型, , 包含emoji的HTML字符串
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.icon.toText('%s');”, _替换换行符 (html))
+ret ＝ webView2.执行脚本 (jsCode)
+ret ＝ _删除前后引号 (ret)
+返回 (ret)
+
+
+
+.子程序 Page_Button_getText, 文本型, 公开, 获取按钮文本
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 按钮控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.button.getText('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+ret ＝ _删除前后引号 (ret)
+返回 (ret)
+
+.子程序 Page_Button_setText, 逻辑型, 公开, 设置按钮文本
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 按钮控件ID
+.参数 text, 文本型, , 要设置的文本
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.button.setText('%s','%s');”, targetId, _替换换行符 (text))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_Button_onClick, 逻辑型, 公开, 为按钮绑定点击事件(需预定义JS回调函数)
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 按钮控件ID
+.参数 callbackName, 文本型, , JS中已定义的全局回调函数名
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.button.onClick('%s',%s);”, targetId, callbackName)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+
+
+.子程序 Page_Input_getValue, 文本型, 公开, 获取编辑框当前内容
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 编辑框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.input.getValue('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+ret ＝ _删除前后引号 (ret)
+返回 (ret)
+
+.子程序 Page_Input_setValue, 逻辑型, 公开, 设置编辑框的值
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 编辑框控件ID
+.参数 value, 文本型, , 要设置的值
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.input.setValue('%s','%s');”, targetId, _替换换行符 (value))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_Input_getPlaceholder, 文本型, 公开, 获取编辑框占位提示文本
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 编辑框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.input.getPlaceholder('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+ret ＝ _删除前后引号 (ret)
+返回 (ret)
+
+.子程序 Page_Input_setPlaceholder, 逻辑型, 公开, 设置编辑框占位提示文本
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 编辑框控件ID
+.参数 placeholder, 文本型, , 提示文本
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.input.setPlaceholder('%s','%s');”, targetId, _替换换行符 (placeholder))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_Input_setType, 逻辑型, 公开, 修改编辑框type属性
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 编辑框控件ID
+.参数 type, 文本型, , HTML input type值（text/password/email/number等）
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.input.setType('%s','%s');”, targetId, type)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+
+
+.子程序 Page_Textarea_getValue, 文本型, 公开, 获取多行文本框内容
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 文本域控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.textarea.getValue('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+ret ＝ _删除前后引号 (ret)
+返回 (ret)
+
+.子程序 Page_Textarea_setValue, 逻辑型, 公开, 设置多行文本框内容
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 文本域控件ID
+.参数 value, 文本型, , 要设置的内容
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.textarea.setValue('%s','%s');”, targetId, _替换换行符 (value))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_Textarea_getPlaceholder, 文本型, 公开, 获取文本域占位提示文本
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 文本域控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.textarea.getPlaceholder('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+ret ＝ _删除前后引号 (ret)
+返回 (ret)
+
+.子程序 Page_Textarea_setPlaceholder, 逻辑型, 公开, 设置文本域占位提示文本
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 文本域控件ID
+.参数 placeholder, 文本型, , 提示文本
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.textarea.setPlaceholder('%s','%s');”, targetId, _替换换行符 (placeholder))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_Textarea_setRows, 逻辑型, 公开, 设置文本域行数
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 文本域控件ID
+.参数 rows, 整数型, , 行数
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.textarea.setRows('%s',%d);”, targetId, rows)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+
+.子程序 Page_CheckBox_getChecked, 逻辑型, 公开, 获取复选框选中状态
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 复选框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.checkbox.getChecked('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_CheckBox_setChecked, 逻辑型, 公开, 设置复选框选中状态
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 复选框控件ID
+.参数 checked, 逻辑型, , true=选中
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.checkbox.setChecked('%s',%s);”, targetId, 选择 (checked, “true”, “false”))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_CheckBox_getLabel, 文本型, 公开, 获取复选框标签文本
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 复选框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.checkbox.getLabel('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+ret ＝ _删除前后引号 (ret)
+返回 (ret)
+
+.子程序 Page_CheckBox_setLabel, 逻辑型, 公开, 设置复选框标签文本
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 复选框控件ID
+.参数 text, 文本型, , 标签文本
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.checkbox.setLabel('%s','%s');”, targetId, _替换换行符 (text))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+
+.子程序 Page_Toggle_getChecked, 逻辑型, 公开, 获取开关状态
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 开关控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.switchToggle.getChecked('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_Toggle_setChecked, 逻辑型, 公开, 设置开关状态
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 开关控件ID
+.参数 checked, 逻辑型, , true=开 false=关
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.switchToggle.setChecked('%s',%s);”, targetId, 选择 (checked, “true”, “false”))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+
+.子程序 Page_ComboBox_getValue, 文本型, 公开, 获取组合框选中值
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 组合框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.comboBox.getValue('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+ret ＝ _删除前后引号 (ret)
+返回 (ret)
+
+.子程序 Page_ComboBox_setValue, 逻辑型, 公开, 按值设置组合框选中项
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 组合框控件ID
+.参数 value, 文本型, , 要选中的value
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.comboBox.setValue('%s','%s');”, targetId, _替换换行符 (value))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_ComboBox_getText, 文本型, 公开, 获取组合框显示文本
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 组合框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.comboBox.getText('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+ret ＝ _删除前后引号 (ret)
+返回 (ret)
+
+.子程序 Page_ComboBox_getIndex, 整数型, 公开, 获取组合框选中索引
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 组合框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.comboBox.getIndex('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (到整数 (ret))
+
+.子程序 Page_ComboBox_setIndex, 逻辑型, 公开, 按索引设置组合框选中项
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 组合框控件ID
+.参数 index, 整数型, , 要选中的索引（从0开始）
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.comboBox.setIndex('%s',%d);”, targetId, index)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_ComboBox_addItem, 逻辑型, 公开, 添加组合框选项
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 组合框控件ID
+.参数 text, 文本型, , 显示文本
+.参数 value, 文本型, 可空, 选项值，默认等于text
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+.如果真 (value ＝ “”)
+    value ＝ text
+.如果真结束
+jsCode ＝ 取文本 (“webviewBridge.api.comboBox.addItem('%s','%s','%s');”, targetId, _替换换行符 (text), _替换换行符 (value))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_ComboBox_removeItem, 逻辑型, 公开, 删除组合框选项
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 组合框控件ID
+.参数 index, 整数型, , 要删除的索引
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.comboBox.removeItem('%s',%d);”, targetId, index)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_ComboBox_clearItems, 逻辑型, 公开, 清空组合框所有选项
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 组合框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.comboBox.clearItems('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_ComboBox_getItemCount, 整数型, 公开, 获取组合框选项总数
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 组合框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.comboBox.getItemCount('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (到整数 (ret))
+
+
+.子程序 Page_Label_getText, 文本型, 公开, 获取标签文本
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 标签控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.label.getText('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+ret ＝ _删除前后引号 (ret)
+返回 (ret)
+
+.子程序 Page_Label_setText, 逻辑型, 公开, 设置标签文本
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 标签控件ID
+.参数 text, 文本型, , 文本内容
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.label.setText('%s','%s');”, targetId, _替换换行符 (text))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+
+.子程序 Page_Hyperlink_getText, 文本型, 公开, 获取超链接文本
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 超链接控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.hyperlink.getText('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+ret ＝ _删除前后引号 (ret)
+返回 (ret)
+
+.子程序 Page_Hyperlink_setText, 逻辑型, 公开, 设置超链接文本
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 超链接控件ID
+.参数 text, 文本型, , 链接文本
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.hyperlink.setText('%s','%s');”, targetId, _替换换行符 (text))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_Hyperlink_getHref, 文本型, 公开, 获取超链接URL
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 超链接控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.hyperlink.getHref('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+ret ＝ _删除前后引号 (ret)
+返回 (ret)
+
+.子程序 Page_Hyperlink_setHref, 逻辑型, 公开, 设置超链接URL
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 超链接控件ID
+.参数 url, 文本型, , URL地址
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.hyperlink.setHref('%s','%s');”, targetId, _替换换行符 (url))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+
+.子程序 Page_RadioGroup_getValue, 文本型, 公开, 获取单选框选中值
+.参数 webView2, _WebView2_浏览器
+.参数 groupName, 文本型, , 单选组容器ID或data-name
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.radioGroup.getValue('%s');”, groupName)
+ret ＝ webView2.执行脚本 (jsCode)
+ret ＝ _删除前后引号 (ret)
+返回 (ret)
+
+.子程序 Page_RadioGroup_setValue, 逻辑型, 公开, 按值设置单选框选中项
+.参数 webView2, _WebView2_浏览器
+.参数 groupName, 文本型, , 单选组容器ID或data-name
+.参数 value, 文本型, , 要选中的value
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.radioGroup.setValue('%s','%s');”, groupName, _替换换行符 (value))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_RadioGroup_getIndex, 整数型, 公开, 获取单选框选中索引
+.参数 webView2, _WebView2_浏览器
+.参数 groupName, 文本型, , 单选组容器ID或data-name
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.radioGroup.getIndex('%s');”, groupName)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (到整数 (ret))
+
+.子程序 Page_RadioGroup_setIndex, 逻辑型, 公开, 按索引设置单选框选中项
+.参数 webView2, _WebView2_浏览器
+.参数 groupName, 文本型, , 单选组容器ID或data-name
+.参数 index, 整数型, , 索引（从0开始）
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.radioGroup.setIndex('%s',%d);”, groupName, index)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_RadioGroup_addOption, 逻辑型, 公开, 添加单选框选项
+.参数 webView2, _WebView2_浏览器
+.参数 groupName, 文本型, , 单选组容器ID或data-name
+.参数 text, 文本型, , 显示文本
+.参数 value, 文本型, 可空, 选项值，默认等于text
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+.如果真 (value ＝ “”)
+    value ＝ text
+.如果真结束
+jsCode ＝ 取文本 (“webviewBridge.api.radioGroup.addOption('%s','%s','%s');”, groupName, _替换换行符 (text), _替换换行符 (value))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_RadioGroup_removeOption, 逻辑型, 公开, 删除单选框选项
+.参数 webView2, _WebView2_浏览器
+.参数 groupName, 文本型, , 单选组容器ID或data-name
+.参数 valueOrIndex, 文本型, , 选项的value值或索引
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.radioGroup.removeOption('%s','%s');”, groupName, _替换换行符 (valueOrIndex))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+
+.子程序 Page_ProgressBar_getValue, 整数型, 公开, 获取进度条当前值
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 进度条控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.progressBar.getValue('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (到整数 (ret))
+
+.子程序 Page_ProgressBar_setValue, 逻辑型, 公开, 设置进度条的值
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 进度条控件ID
+.参数 value, 整数型, , 进度值(0-100)
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.progressBar.setValue('%s',%d);”, targetId, value)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_ProgressBar_increment, 逻辑型, 公开, 增加进度条的值
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 进度条控件ID
+.参数 delta, 整数型, 可空, 增加量，默认1
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+.如果真 (是否为空 (delta))
+    delta ＝ 1
+.如果真结束
+jsCode ＝ 取文本 (“webviewBridge.api.progressBar.increment('%s',%d);”, targetId, delta)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_ProgressBar_decrement, 逻辑型, 公开, 减少进度条的值
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 进度条控件ID
+.参数 delta, 整数型, 可空, 减少量，默认1
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+.如果真 (是否为空 (delta))
+    delta ＝ 1
+.如果真结束
+jsCode ＝ 取文本 (“webviewBridge.api.progressBar.decrement('%s',%d);”, targetId, delta)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_ProgressBar_enableClick, 逻辑型, 公开, 启用点击修改进度
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 进度条控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.progressBar.enableClick('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_ProgressBar_disableClick, 逻辑型, 公开, 禁用点击修改进度
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 进度条控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.progressBar.disableClick('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_ProgressBar_setRange, 逻辑型, 公开, 设置进度条的最小/最大值
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 进度条控件ID
+.参数 min, 整数型, , 最小值
+.参数 max, 整数型, , 最大值
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.progressBar.setRange('%s',%d,%d);”, targetId, min, max)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+
+.子程序 Page_DateTimePicker_getValue, 文本型, 公开, 获取时间选择器当前值
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 时间选择器控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dateTimePicker.getValue('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+ret ＝ _删除前后引号 (ret)
+返回 (ret)
+
+.子程序 Page_DateTimePicker_setValue, 逻辑型, 公开, 设置时间选择器的值
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 时间选择器控件ID
+.参数 datetime, 文本型, , 日期时间字符串，如"2025-01-15T10:30"
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dateTimePicker.setValue('%s','%s');”, targetId, _替换换行符 (datetime))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+
+.子程序 Page_IconButton_getText, 文本型, 公开, 获取图标按钮文本
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 图标按钮控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.iconButton.getText('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+ret ＝ _删除前后引号 (ret)
+返回 (ret)
+
+.子程序 Page_IconButton_setText, 逻辑型, 公开, 设置图标按钮文本
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 图标按钮控件ID
+.参数 text, 文本型, , 按钮文本
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.iconButton.setText('%s','%s');”, targetId, _替换换行符 (text))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_IconButton_getIconHtml, 文本型, 公开, 获取图标按钮图标HTML
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 图标按钮控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.iconButton.getIconHtml('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+ret ＝ _删除前后引号 (ret)
+返回 (ret)
+
+.子程序 Page_IconButton_setIconHtml, 逻辑型, 公开, 设置图标按钮图标HTML
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 图标按钮控件ID
+.参数 html, 文本型, , 图标HTML
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.iconButton.setIconHtml('%s','%s');”, targetId, _替换换行符 (html))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+
+.子程序 Page_ImageBox_getSrc, 文本型, 公开, 获取图片框图片源地址
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 图片框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.imageBox.getSrc('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+ret ＝ _删除前后引号 (ret)
+返回 (ret)
+
+.子程序 Page_ImageBox_setSrc, 逻辑型, 公开, 设置图片框图片源地址
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 图片框控件ID
+.参数 url, 文本型, , 图片URL
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.imageBox.setSrc('%s','%s');”, targetId, _替换换行符 (url))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_ImageBox_getFit, 文本型, 公开, 获取图片填充模式
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 图片框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.imageBox.getFit('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+ret ＝ _删除前后引号 (ret)
+返回 (ret)
+
+.子程序 Page_ImageBox_setFit, 逻辑型, 公开, 设置图片填充模式
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 图片框控件ID
+.参数 fitMode, 文本型, , fill|contain|cover|none-top-left|none-center
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.imageBox.setFit('%s','%s');”, targetId, fitMode)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+
+.子程序 Page_LogBox_addLog, 逻辑型, 公开, 成功返回 真，控件不存在返回 假：添加日志到 logBox
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 日志框控件 ID
+.参数 text, 文本型, , 日志文本。例如：'操作成功', '加载配置完成'
+.参数 color, 文本型, 可空, （可选）文本颜色，默认 #000000, 十六进制颜色表示法：FF0000，支持 # 前缀，例如：'#008000'(绿色), '#0000FF'(蓝色), '#FF0000'(红色), '#FFA500'(橙色)
+.参数 colorDefault, 整数型, 可空, 0=普通 1=成功 2=信息 3=警告 4=错误
+.参数 wrap, 逻辑型, 可空, （可选）是否换行，默认 true（每行独立）。false 时多条日志同行排列
+.局部变量 params, 文本型
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+text ＝ _替换换行符 (text)
+.判断开始 (colorDefault ＝ 1)  ' 成功
+    color ＝ “#008000”
+.判断 (colorDefault ＝ 2)  ' 信息
+    color ＝ “#0000FF”
+.判断 (colorDefault ＝ 3)  ' 警告
+    color ＝ “#FF8C00”
+.判断 (colorDefault ＝ 4)  ' 错误
+    color ＝ “#FF0000”
+.默认
+
+.判断结束
+.判断开始 (是否为空 (wrap))
+    .判断开始 (color ＝ “”)
+        params ＝ 取文本 (“'%s','%s'”, targetId, text)
+    .默认
+        params ＝ 取文本 (“'%s','%s','%s'”, targetId, text, color)
+    .判断结束
+
+.默认
+    .如果真 (color ＝ “”)
+        color ＝ “#000000”
+    .如果真结束
+    params ＝ 取文本 (“'%s','%s','%s',%s”, targetId, text, color, 选择 (wrap, “true”, “false”))
+.判断结束
+jsCode ＝ 取文本 (“webviewBridge.api.logBox.addLog(%s);”, params)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_LogBox_addHtmlLog, 逻辑型, 公开, 添加HTML日志到日志框
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 日志框控件ID
+.参数 html, 文本型, , HTML内容字符串，任意合法HTML
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.logBox.addHtmlLog('%s','%s');”, targetId, _替换换行符 (html))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_LogBox_clearLog, 逻辑型, 公开, 清空日志框所有日志
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 日志框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.logBox.clearLog('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_LogBox_getLogCount, 整数型, 公开, 获取日志框日志条数
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 日志框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.logBox.getLogCount('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (到整数 (ret))
+
+
+.子程序 Page_ListBox_addItem, 逻辑型, 公开, 添加列表项
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 列表框控件ID
+.参数 text, 文本型, , 列表项文本
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.listBox.addItem('%s','%s');”, targetId, _替换换行符 (text))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_ListBox_addItemWithHtml, 逻辑型, 公开, 添加HTML列表项
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 列表框控件ID
+.参数 html, 文本型, , 列表项HTML字符串
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.listBox.addItemWithHtml('%s','%s');”, targetId, _替换换行符 (html))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_ListBox_removeItem, 逻辑型, 公开, 删除列表项
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 列表框控件ID
+.参数 index, 整数型, , 要删除的项索引
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.listBox.removeItem('%s',%d);”, targetId, index)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_ListBox_clearItems, 逻辑型, 公开, 清空列表框所有项目
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 列表框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.listBox.clearItems('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_ListBox_getItemCount, 整数型, 公开, 获取列表框项目总数
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 列表框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.listBox.getItemCount('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (到整数 (ret))
+
+.子程序 Page_ListBox_setItemText, 逻辑型, 公开, 设置列表项文本
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 列表框控件ID
+.参数 index, 整数型, , 项索引
+.参数 text, 文本型, , 新文本
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.listBox.setItemText('%s',%d,'%s');”, targetId, index, _替换换行符 (text))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_ListBox_getItemText, 文本型, 公开, 获取列表项文本
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 列表框控件ID
+.参数 index, 整数型, , 项索引
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.listBox.getItemText('%s',%d);”, targetId, index)
+ret ＝ webView2.执行脚本 (jsCode)
+ret ＝ _删除前后引号 (ret)
+返回 (ret)
+
+.子程序 Page_ListBox_setItemChecked, 逻辑型, 公开, 设置列表项勾选状态
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 列表框控件ID
+.参数 index, 整数型, , 项索引
+.参数 checked, 逻辑型, , true=勾选
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.listBox.setItemChecked('%s',%d,%s);”, targetId, index, 选择 (checked, “true”, “false”))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_ListBox_getItemChecked, 逻辑型, 公开, 获取列表项勾选状态
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 列表框控件ID
+.参数 index, 整数型, , 项索引
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.listBox.getItemChecked('%s',%d);”, targetId, index)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_ListBox_selectAll, 逻辑型, 公开, 视觉全选列表项
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 列表框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.listBox.selectAll('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_ListBox_toggleAll, 逻辑型, 公开, 反选列表项
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 列表框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.listBox.toggleAll('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_ListBox_deleteSelected, 逻辑型, 公开, 删除已勾选列表项
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 列表框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.listBox.deleteSelected('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_ListBox_selectItem, 逻辑型, 公开, 高亮选中列表项
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 列表框控件ID
+.参数 index, 整数型, , 项索引
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.listBox.selectItem('%s',%d);”, targetId, index)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_ListBox_deselectItem, 逻辑型, 公开, 取消高亮列表项
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 列表框控件ID
+.参数 index, 整数型, , 项索引
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.listBox.deselectItem('%s',%d);”, targetId, index)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_ListBox_getSelectedItemId, 整数型, 公开, 获取选中项索引
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 列表框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.listBox.getSelectedItemId('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (到整数 (ret))
+
+.子程序 Page_ListBox_getHighlightedItem, 文本型, 公开, 获取高亮列表项(返回JSON)
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 列表框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.listBox.getHighlightedItem('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (ret)
+
+.子程序 Page_ListBox_setAlwaysShowSelection, 逻辑型, 公开, 设置始终显示选中高亮
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 列表框控件ID
+.参数 enabled, 逻辑型, , true=始终显示
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.listBox.setAlwaysShowSelection('%s',%s);”, targetId, 选择 (enabled, “true”, “false”))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_ListBox_getAlwaysShowSelection, 逻辑型, 公开, 获取始终显示选中高亮状态
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 列表框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.listBox.getAlwaysShowSelection('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_ListBox_showCheckbox, 逻辑型, 公开, 显示/隐藏列表复选框
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 列表框控件ID
+.参数 show, 逻辑型, , true=显示 false=隐藏
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.listBox.showCheckbox('%s',%s);”, targetId, 选择 (show, “true”, “false”))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_ListBox_enableDblClickEdit, 逻辑型, 公开, 启用双击编辑
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 列表框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.listBox.enableDblClickEdit('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_ListBox_disableDblClickEdit, 逻辑型, 公开, 禁用双击编辑
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 列表框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.listBox.disableDblClickEdit('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_ListBox_isItemChecked, 逻辑型, 公开, 检查列表项是否勾选
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 列表框控件ID
+.参数 index, 整数型, , 列表项索引
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.listBox.isItemChecked('%s',%d);”, targetId, index)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_ListBox_getCheckedItems, 文本型, 公开, 获取已勾选列表项索引(返回JSON数组)
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 列表框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.listBox.getCheckedItems('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (ret)
+
+.子程序 Page_ListBox_checkAll, 逻辑型, 公开, 全选所有复选框
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 列表框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.listBox.checkAll('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_ListBox_uncheckAll, 逻辑型, 公开, 取消全选所有复选框
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 列表框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.listBox.uncheckAll('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+
+.子程序 Page_TreeView_addNode, 逻辑型, 公开, 添加树节点
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 树形框控件ID
+.参数 parentNodeId, 文本型, , 父节点ID，null添加到根级
+.参数 newNode, 文本型, , 节点对象JSON，如{"text":"新节点","children":[]}
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.treeView.addNode('%s',%s,%s);”, targetId, parentNodeId, _替换换行符 (newNode))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_TreeView_removeNode, 逻辑型, 公开, 删除树节点
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 树形框控件ID
+.参数 nodeId, 文本型, , 要删除的节点ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.treeView.removeNode('%s','%s');”, targetId, nodeId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_TreeView_updateNode, 逻辑型, 公开, 更新树节点文本
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 树形框控件ID
+.参数 nodeId, 文本型, , 节点ID
+.参数 newText, 文本型, , 新文本
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.treeView.updateNode('%s','%s','%s');”, targetId, nodeId, _替换换行符 (newText))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_TreeView_getNodeText, 文本型, 公开, 获取树节点文本
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 树形框控件ID
+.参数 nodeId, 文本型, , 节点ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.treeView.getNodeText('%s','%s');”, targetId, nodeId)
+ret ＝ webView2.执行脚本 (jsCode)
+ret ＝ _删除前后引号 (ret)
+返回 (ret)
+
+.子程序 Page_TreeView_expandNode, 逻辑型, 公开, 展开树节点
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 树形框控件ID
+.参数 nodeId, 文本型, , 节点ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.treeView.expandNode('%s','%s');”, targetId, nodeId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_TreeView_collapseNode, 逻辑型, 公开, 折叠树节点
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 树形框控件ID
+.参数 nodeId, 文本型, , 节点ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.treeView.collapseNode('%s','%s');”, targetId, nodeId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_TreeView_expandAll, 逻辑型, 公开, 展开所有节点
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 树形框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.treeView.expandAll('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_TreeView_collapseAll, 逻辑型, 公开, 折叠所有节点
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 树形框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.treeView.collapseAll('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_TreeView_selectNode, 逻辑型, 公开, 选中树节点
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 树形框控件ID
+.参数 nodeId, 文本型, , 节点ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.treeView.selectNode('%s','%s');”, targetId, nodeId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_TreeView_getSelectedNode, 文本型, 公开, 获取选中节点ID
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 树形框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.treeView.getSelectedNode('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+ret ＝ _删除前后引号 (ret)
+返回 (ret)
+
+.子程序 Page_TreeView_getHighlightedNode, 文本型, 公开, 获取高亮树节点(返回JSON)
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 树形框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.treeView.getHighlightedNode('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (ret)
+
+.子程序 Page_TreeView_deselectNode, 逻辑型, 公开, 取消选中树节点
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 树形框控件ID
+.参数 nodeId, 文本型, , 节点ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.treeView.deselectNode('%s','%s');”, targetId, nodeId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_TreeView_clearSelection, 逻辑型, 公开, 清除选中高亮
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 树形框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.treeView.clearSelection('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_TreeView_setAlwaysShowSelection, 逻辑型, 公开, 设置始终显示选中高亮
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 树形框控件ID
+.参数 enabled, 逻辑型, , true=始终显示
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.treeView.setAlwaysShowSelection('%s',%s);”, targetId, 选择 (enabled, “true”, “false”))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_TreeView_getAlwaysShowSelection, 逻辑型, 公开, 获取始终显示选中高亮状态
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 树形框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.treeView.getAlwaysShowSelection('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_TreeView_enableNodeEdit, 逻辑型, 公开, 启用节点内联编辑
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 树形框控件ID
+.参数 nodeId, 文本型, , 节点ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.treeView.enableNodeEdit('%s','%s');”, targetId, nodeId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_TreeView_disableNodeEdit, 逻辑型, 公开, 禁用节点内联编辑
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 树形框控件ID
+.参数 nodeId, 文本型, , 节点ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.treeView.disableNodeEdit('%s','%s');”, targetId, nodeId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_TreeView_enableAllEdit, 逻辑型, 公开, 启用全局编辑
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 树形框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.treeView.enableAllEdit('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_TreeView_disableAllEdit, 逻辑型, 公开, 禁用全局编辑
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 树形框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.treeView.disableAllEdit('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_TreeView_isAllEditEnabled, 逻辑型, 公开, 获取全局编辑状态
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 树形框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.treeView.isAllEditEnabled('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_TreeView_getNodeLevel, 整数型, 公开, 获取节点层级深度
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 树形框控件ID
+.参数 nodeId, 文本型, , 节点ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.treeView.getNodeLevel('%s','%s');”, targetId, nodeId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (到整数 (ret))
+
+.子程序 Page_TreeView_clearTree, 逻辑型, 公开, 清空树形框
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 树形框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.treeView.clearTree('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_TreeView_showCheckbox, 逻辑型, 公开, 显示/隐藏树节点复选框
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 树形框控件ID
+.参数 show, 逻辑型, , true=显示 false=隐藏
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.treeView.showCheckbox('%s',%s);”, targetId, 选择 (show, “true”, “false”))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_TreeView_isCheckboxVisible, 逻辑型, 公开, 获取复选框显示状态
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 树形框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.treeView.isCheckboxVisible('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_TreeView_getCheckedNodes, 文本型, 公开, 获取已勾选节点ID(返回JSON数组)
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 树形框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.treeView.getCheckedNodes('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (ret)
+
+.子程序 Page_TreeView_setNodeChecked, 逻辑型, 公开, 设置节点勾选状态(级联)
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 树形框控件ID
+.参数 nodeId, 文本型, , 节点ID
+.参数 checked, 逻辑型, , true=勾选（级联子节点）
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.treeView.setNodeChecked('%s','%s',%s);”, targetId, nodeId, 选择 (checked, “true”, “false”))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_TreeView_isNodeChecked, 逻辑型, 公开, 获取节点勾选状态
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 树形框控件ID
+.参数 nodeId, 文本型, , 节点ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.treeView.isNodeChecked('%s','%s');”, targetId, nodeId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_TreeView_checkAll, 逻辑型, 公开, 全选所有节点复选框
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 树形框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.treeView.checkAll('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_TreeView_uncheckAll, 逻辑型, 公开, 取消全选所有节点复选框
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 树形框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.treeView.uncheckAll('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_TreeView_onNodeHover, 逻辑型, 公开, 为树节点绑定悬停事件(需预定义JS回调函数)
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 树形框控件ID
+.参数 callbackName, 文本型, , JS中已定义的全局回调函数名
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.treeView.onNodeHover('%s',%s);”, targetId, callbackName)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+
+.子程序 Page_DataGrid_addRow, 逻辑型, 公开, 添加数据行
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 表格控件ID
+.参数 rowData, 文本型, , 行数据JSON对象，{"cells":{"colKey":"value",...}}
+.参数 insertIndex, 整数型, 可空, 插入位置，默认末尾
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+.如果真 (是否为空 (insertIndex))
+    jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.addRow('%s',%s);”, targetId, _替换换行符 (rowData))
+.如果真结束
+.如果真 (取反 (是否为空 (insertIndex)))
+    jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.addRow('%s',%s,%d);”, targetId, _替换换行符 (rowData), insertIndex)
+.如果真结束
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_DataGrid_removeRow, 逻辑型, 公开, 删除数据行
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 表格控件ID
+.参数 rowIndex, 整数型, , 行索引
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.removeRow('%s',%d);”, targetId, rowIndex)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_DataGrid_getRowCount, 整数型, 公开, 获取表格行数
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 表格控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.getRowCount('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (到整数 (ret))
+
+.子程序 Page_DataGrid_setCellValue, 逻辑型, 公开, 设置单元格值(按列名)
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 表格控件ID
+.参数 rowIndex, 整数型, , 行索引
+.参数 columnKey, 文本型, , 列名(data-col-key)
+.参数 value, 文本型, , 单元格值
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.setCellValue('%s',%d,'%s','%s');”, targetId, rowIndex, columnKey, _替换换行符 (value))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_DataGrid_getCellValue, 文本型, 公开, 获取单元格值(按列名)
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 表格控件ID
+.参数 rowIndex, 整数型, , 行索引
+.参数 columnKey, 文本型, , 列名
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.getCellValue('%s',%d,'%s');”, targetId, rowIndex, columnKey)
+ret ＝ webView2.执行脚本 (jsCode)
+ret ＝ _删除前后引号 (ret)
+返回 (ret)
+
+.子程序 Page_DataGrid_setCellValueByIndex, 逻辑型, 公开, 设置单元格值(按列索引)
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 表格控件ID
+.参数 rowIndex, 整数型, , 行索引
+.参数 colIndex, 整数型, , 列索引（跳过复选框列）
+.参数 value, 文本型, , 单元格值
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.setCellValueByIndex('%s',%d,%d,'%s');”, targetId, rowIndex, colIndex, _替换换行符 (value))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_DataGrid_getCellValueByIndex, 文本型, 公开, 获取单元格值(按列索引)
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 表格控件ID
+.参数 rowIndex, 整数型, , 行索引
+.参数 colIndex, 整数型, , 列索引
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.getCellValueByIndex('%s',%d,%d);”, targetId, rowIndex, colIndex)
+ret ＝ webView2.执行脚本 (jsCode)
+ret ＝ _删除前后引号 (ret)
+返回 (ret)
+
+.子程序 Page_DataGrid_setRowData, 逻辑型, 公开, 批量设置行数据
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 表格控件ID
+.参数 rowIndex, 整数型, , 行索引
+.参数 rowData, 文本型, , 行数据JSON对象，{"cells":{"colKey":"value",...}}
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.setRowData('%s',%d,%s);”, targetId, rowIndex, _替换换行符 (rowData))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_DataGrid_getRowData, 文本型, 公开, 获取行数据(返回JSON)
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 表格控件ID
+.参数 rowIndex, 整数型, , 行索引
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.getRowData('%s',%d);”, targetId, rowIndex)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (ret)
+
+.子程序 Page_DataGrid_clearRows, 逻辑型, 公开, 清空表格所有行
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 表格控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.clearRows('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_DataGrid_setRowChecked, 逻辑型, 公开, 设置行勾选状态
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 表格控件ID
+.参数 rowIndex, 整数型, , 行索引
+.参数 checked, 逻辑型, , true=勾选
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.setRowChecked('%s',%d,%s);”, targetId, rowIndex, 选择 (checked, “true”, “false”))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_DataGrid_getRowChecked, 逻辑型, 公开, 获取行勾选状态
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 表格控件ID
+.参数 rowIndex, 整数型, , 行索引
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.getRowChecked('%s',%d);”, targetId, rowIndex)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_DataGrid_selectAllRows, 逻辑型, 公开, 全选所有行
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 表格控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.selectAllRows('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_DataGrid_toggleAllRows, 逻辑型, 公开, 反选所有行
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 表格控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.toggleAllRows('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_DataGrid_getSelectedRows, 文本型, 公开, 获取选中行索引(返回JSON数组)
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 表格控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.getSelectedRows('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (ret)
+
+.子程序 Page_DataGrid_getSelectedRowCount, 整数型, 公开, 获取选中行数量
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 表格控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.getSelectedRowCount('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (到整数 (ret))
+
+.子程序 Page_DataGrid_getHighlightedRow, 文本型, 公开, 获取高亮行(返回JSON)
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 表格控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.getHighlightedRow('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (ret)
+
+.子程序 Page_DataGrid_selectRow, 逻辑型, 公开, 高亮选中行
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 表格控件ID
+.参数 rowIndex, 整数型, , 行索引
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.selectRow('%s',%d);”, targetId, rowIndex)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_DataGrid_deselectRow, 逻辑型, 公开, 取消高亮行
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 表格控件ID
+.参数 rowIndex, 整数型, , 行索引
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.deselectRow('%s',%d);”, targetId, rowIndex)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_DataGrid_deleteSelectedRows, 逻辑型, 公开, 删除选中行
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 表格控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.deleteSelectedRows('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_DataGrid_enableCellEdit, 逻辑型, 公开, 启用列编辑
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 表格控件ID
+.参数 colIndex, 整数型, , 列索引（跳过复选框列）
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.enableCellEdit('%s',%d);”, targetId, colIndex)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_DataGrid_disableCellEdit, 逻辑型, 公开, 禁用列编辑
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 表格控件ID
+.参数 colIndex, 整数型, , 列索引（跳过复选框列）
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.disableCellEdit('%s',%d);”, targetId, colIndex)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_DataGrid_isCellEditable, 逻辑型, 公开, 检查列编辑状态
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 表格控件ID
+.参数 colIndex, 整数型, , 列索引（跳过复选框列）
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.isCellEditable('%s',%d);”, targetId, colIndex)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_DataGrid_enableGlobalEdit, 逻辑型, 公开, 启用全局编辑
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 表格控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.enableGlobalEdit('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_DataGrid_disableGlobalEdit, 逻辑型, 公开, 禁用全局编辑
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 表格控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.disableGlobalEdit('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_DataGrid_isGlobalEditEnabled, 逻辑型, 公开, 获取全局编辑状态
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 表格控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.isGlobalEditEnabled('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_DataGrid_setAlwaysShowSelection, 逻辑型, 公开, 设置始终显示选中高亮
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 表格控件ID
+.参数 enabled, 逻辑型, , true=始终显示
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.setAlwaysShowSelection('%s',%s);”, targetId, 选择 (enabled, “true”, “false”))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_DataGrid_getAlwaysShowSelection, 逻辑型, 公开, 获取始终显示选中高亮状态
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 表格控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.getAlwaysShowSelection('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_DataGrid_showRowCheckbox, 逻辑型, 公开, 显示/隐藏行复选框
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 表格控件ID
+.参数 show, 逻辑型, , true=显示 false=隐藏
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.showRowCheckbox('%s',%s);”, targetId, 选择 (show, “true”, “false”))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_DataGrid_getCheckedRows, 文本型, 公开, 获取勾选行索引(返回JSON数组)
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 表格控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.getCheckedRows('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (ret)
+
+.子程序 Page_DataGrid_isRowChecked, 逻辑型, 公开, 检查行勾选状态
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 表格控件ID
+.参数 rowIndex, 整数型, , 行索引
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.isRowChecked('%s',%d);”, targetId, rowIndex)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_DataGrid_checkAll, 逻辑型, 公开, 勾选所有行复选框
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 表格控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.checkAll('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_DataGrid_uncheckAll, 逻辑型, 公开, 取消勾选所有行复选框
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 表格控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.dataGrid.uncheckAll('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+
+.子程序 Page_CardBox_getCardTitle, 文本型, 公开, 获取卡片标题
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 卡片框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.cardBox.getCardTitle('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+ret ＝ _删除前后引号 (ret)
+返回 (ret)
+
+.子程序 Page_CardBox_setCardTitle, 逻辑型, 公开, 设置卡片标题
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 卡片框控件ID
+.参数 title, 文本型, , 新标题
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.cardBox.setCardTitle('%s','%s');”, targetId, _替换换行符 (title))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_CardBox_showCardHeader, 逻辑型, 公开, 显示卡片头部
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 卡片框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.cardBox.showCardHeader('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_CardBox_hideCardHeader, 逻辑型, 公开, 隐藏卡片头部
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 卡片框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.cardBox.hideCardHeader('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_CardBox_isCardHeaderVisible, 逻辑型, 公开, 检查卡片头部可见状态
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 卡片框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.cardBox.isCardHeaderVisible('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_CardBox_collapseCard, 逻辑型, 公开, 折叠卡片
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 卡片框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.cardBox.collapseCard('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_CardBox_expandCard, 逻辑型, 公开, 展开卡片
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 卡片框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.cardBox.expandCard('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_CardBox_isCardCollapsed, 逻辑型, 公开, 检查卡片折叠状态
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 卡片框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.cardBox.isCardCollapsed('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_CardBox_showCollapseButton, 逻辑型, 公开, 显示/隐藏折叠箭头按钮
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 卡片框控件ID
+.参数 show, 逻辑型, , true=显示 false=隐藏
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.cardBox.showCollapseButton('%s',%s);”, targetId, 选择 (show, “true”, “false”))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_CardBox_isCollapseButtonVisible, 逻辑型, 公开, 检查折叠箭头可见状态
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 卡片框控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.cardBox.isCollapseButtonVisible('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+
+.子程序 Page_TabContainer_selectTab, 逻辑型, 公开, 切换到指定标签页
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 标签页容器ID
+.参数 tabId, 文本型, , 标签名称(data-tab-name)
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.tabContainer.selectTab('%s','%s');”, targetId, tabId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_TabContainer_getActiveTab, 文本型, 公开, 获取当前激活标签
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 标签页容器ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.tabContainer.getActiveTab('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+ret ＝ _删除前后引号 (ret)
+返回 (ret)
+
+.子程序 Page_TabContainer_getActiveTabIndex, 整数型, 公开, 获取当前激活标签索引
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 标签页容器ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.tabContainer.getActiveTabIndex('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (到整数 (ret))
+
+.子程序 Page_TabContainer_addTab, 逻辑型, 公开, 添加标签页
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 标签页容器ID
+.参数 tabId, 文本型, 可空, 标签名称，默认自动生成
+.参数 tabTitle, 文本型, 可空, 标签标题，默认"标签N"
+.局部变量 params, 文本型
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+.判断开始 (tabId ＝ “” 且 tabTitle ＝ “”)
+    params ＝ “”
+.判断 (tabId ＝ “”)
+    params ＝ 取文本 (“'%s'”, _替换换行符 (tabTitle))
+.判断 (tabTitle ＝ “”)
+    params ＝ 取文本 (“'%s'”, tabId)
+.默认
+    params ＝ 取文本 (“'%s','%s'”, tabId, _替换换行符 (tabTitle))
+.判断结束
+jsCode ＝ 取文本 (“webviewBridge.api.tabContainer.addTab('%s',%s);”, targetId, params)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_TabContainer_removeTab, 逻辑型, 公开, 移除标签页
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 标签页容器ID
+.参数 tabId, 文本型, , 要移除的标签名称
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.tabContainer.removeTab('%s','%s');”, targetId, tabId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_TabContainer_renameTab, 逻辑型, 公开, 重命名标签页
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 标签页容器ID
+.参数 tabId, 文本型, , 标签名称
+.参数 newTitle, 文本型, , 新标题文本
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.tabContainer.renameTab('%s','%s','%s');”, targetId, tabId, _替换换行符 (newTitle))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_TabContainer_getTabCount, 整数型, 公开, 获取标签页数量
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 标签页容器ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.tabContainer.getTabCount('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (到整数 (ret))
+
+
+.子程序 Page_ContextMenu_show, , 公开, 显示右键菜单
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 右键菜单控件ID
+.参数 clientX, 整数型, 可空, 鼠标X坐标，默认100
+.参数 clientY, 整数型, 可空, 鼠标Y坐标，默认100
+.局部变量 jsCode, 文本型
+
+.如果真 (是否为空 (clientX))
+    clientX ＝ 100
+.如果真结束
+.如果真 (是否为空 (clientY))
+    clientY ＝ 100
+.如果真结束
+jsCode ＝ 取文本 (“webviewBridge.api.contextMenu.show('%s',{clientX:%d,clientY:%d});”, targetId, clientX, clientY)
+webView2.执行脚本 (jsCode)
+
+.子程序 Page_ContextMenu_hide, , 公开, 隐藏右键菜单
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 右键菜单控件ID
+.局部变量 jsCode, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.contextMenu.hide('%s');”, targetId)
+webView2.执行脚本 (jsCode)
+
+.子程序 Page_ContextMenu_getItems, 文本型, 公开, 获取右键菜单项列表(返回JSON数组)
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 右键菜单控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.contextMenu.getItems('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (ret)
+
+.子程序 Page_ContextMenu_isVisible, 逻辑型, 公开, 检查右键菜单是否正在显示
+.参数 webView2, _WebView2_浏览器
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ “webviewBridge.api.contextMenu.isVisible();”
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_ContextMenu_updateItems, 逻辑型, 公开, 更新右键菜单项
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 右键菜单控件ID
+.参数 items, 文本型, , 菜单项JSON数组
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.contextMenu.updateItems('%s',%s);”, targetId, _替换换行符 (items))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+
+.子程序 Page_Tooltip_show, , 公开, 显示气泡提示框
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 气泡提示控件ID
+.参数 clientX, 整数型, 可空, 鼠标X坐标，默认100
+.参数 clientY, 整数型, 可空, 鼠标Y坐标，默认100
+.局部变量 jsCode, 文本型
+
+.如果真 (是否为空 (clientX))
+    clientX ＝ 100
+.如果真结束
+.如果真 (是否为空 (clientY))
+    clientY ＝ 100
+.如果真结束
+jsCode ＝ 取文本 (“webviewBridge.api.tooltip.show('%s',{clientX:%d,clientY:%d});”, targetId, clientX, clientY)
+webView2.执行脚本 (jsCode)
+
+.子程序 Page_Tooltip_hide, , 公开, 隐藏气泡提示框
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 气泡提示控件ID
+.局部变量 jsCode, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.tooltip.hide('%s');”, targetId)
+webView2.执行脚本 (jsCode)
+
+.子程序 Page_Tooltip_getConfig, 文本型, 公开, 获取提示框运行时配置(返回JSON)
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 气泡提示控件ID
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.tooltip.getConfig('%s');”, targetId)
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (ret)
+
+.子程序 Page_Tooltip_updateConfig, 逻辑型, 公开, 动态更新提示框配置
+.参数 webView2, _WebView2_浏览器
+.参数 targetId, 文本型, , 气泡提示控件ID
+.参数 config, 文本型, , 配置JSON对象，如“{"content":"提示文本","position":"top"}”
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.tooltip.updateConfig('%s',%s);”, targetId, _替换换行符 (config))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+.子程序 Page_Tooltip_isVisible, 逻辑型, 公开, 检查气泡提示框是否正在显示
+.参数 webView2, _WebView2_浏览器
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ “webviewBridge.api.tooltip.isVisible();”
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+
+.子程序 Page_MessageBox_show, , 公开, 显示全局信息提示框
+.参数 webView2, _WebView2_浏览器
+.参数 overrides, 文本型, 可空, 临时覆盖配置JSON对象，如{"title":"保存确认","message":"文件已修改，是否保存？","buttons":"yesnocancel","icon":"question"}
+.参数 requestId, 文本型, 可空, 唯一标识，用于异步回调匹配
+.局部变量 params, 文本型
+.局部变量 jsCode, 文本型
+
+.如果真 (overrides ≠ “”)
+    params ＝ _替换换行符 (overrides)
+.如果真结束
+.如果真 (requestId ≠ “”)
+    params ＝ 选择 (params ≠ “”, params ＋ 取文本 (“,'%s'”, _替换换行符 (requestId)), 取文本 (“'%s'”, _替换换行符 (requestId)))
+.如果真结束
+jsCode ＝ 取文本 (“webviewBridge.api.messageBox.show(%s);”, params)
+webView2.执行脚本 (jsCode)
+
+.子程序 Page_MessageBox_hide, , 公开, 关闭信息提示框
+.参数 webView2, _WebView2_浏览器
+.局部变量 jsCode, 文本型
+
+jsCode ＝ “webviewBridge.api.messageBox.hide();”
+webView2.执行脚本 (jsCode)
+
+.子程序 Page_MessageBox_getConfig, 文本型, 公开, 获取信息提示框全局配置(返回JSON)
+.参数 webView2, _WebView2_浏览器
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ “webviewBridge.api.messageBox.getConfig();”
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (ret)
+
+.子程序 Page_MessageBox_updateConfig, 逻辑型, 公开, 动态更新信息提示框全局配置
+.参数 webView2, _WebView2_浏览器
+.参数 config, 文本型, , 配置JSON对象，如“{"title":"确认","message":"确定？"}”
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.messageBox.updateConfig(%s);”, _替换换行符 (config))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))
+
+
+.子程序 Page_InputBox_show, , 公开, 显示全局输入对话框
+.参数 webView2, _WebView2_浏览器
+.参数 overrides, 文本型, 可空, 配置JSON对象，如{"title":"请输入名称","placeholder":"在此输入...","defaultValue":""}
+.参数 requestId, 文本型, 可空, 唯一标识，用于异步回调匹配
+.局部变量 params, 文本型
+.局部变量 jsCode, 文本型
+
+.如果真 (overrides ≠ “”)
+    params ＝ _替换换行符 (overrides)
+.如果真结束
+.如果真 (requestId ≠ “”)
+    params ＝ 选择 (params ≠ “”, params ＋ 取文本 (“,'%s'”, _替换换行符 (requestId)), 取文本 (“'%s'”, _替换换行符 (requestId)))
+.如果真结束
+jsCode ＝ 取文本 (“webviewBridge.api.inputBox.show(%s);”, params)
+webView2.执行脚本 (jsCode)
+
+.子程序 Page_InputBox_hide, , 公开, 关闭输入对话框
+.参数 webView2, _WebView2_浏览器
+.局部变量 jsCode, 文本型
+
+jsCode ＝ “webviewBridge.api.inputBox.hide();”
+webView2.执行脚本 (jsCode)
+
+.子程序 Page_InputBox_getConfig, 文本型, 公开, 获取输入对话框全局配置(返回JSON)
+.参数 webView2, _WebView2_浏览器
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ “webviewBridge.api.inputBox.getConfig();”
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (ret)
+
+.子程序 Page_InputBox_updateConfig, 逻辑型, 公开, 动态更新输入对话框全局配置
+.参数 webView2, _WebView2_浏览器
+.参数 config, 文本型, , 配置JSON对象，如“{"title":"请输入","placeholder":"默认值"}”
+.局部变量 jsCode, 文本型
+.局部变量 ret, 文本型
+
+jsCode ＝ 取文本 (“webviewBridge.api.inputBox.updateConfig(%s);”, _替换换行符 (config))
+ret ＝ webView2.执行脚本 (jsCode)
+返回 (选择 (ret ＝ “true”, 真, 假))

@@ -1,0 +1,27 @@
+{
+  "name": "uid-signer",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@vue/server-renderer": "^3.5.34",
+    "echarts": "^6.1.0",
+    "element-plus": "^2.9.1",
+    "monaco-editor": "^0.55.1",
+    "pinia": "^2.2.6",
+    "vite-plugin-monaco-editor": "^1.1.0",
+    "vue": "^3.5.13",
+    "vuedraggable": "^4.1.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "typescript": "~5.6.3",
+    "vite": "^6.0.5",
+    "vue-tsc": "^2.2.0"
+  }
+}

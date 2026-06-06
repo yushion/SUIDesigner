@@ -1,0 +1,79 @@
+{
+  "label": "图标按钮",
+  "icon": "🔘",
+  "defaultStyleData": {
+    "base": {
+      "width": 80,
+      "height": 32,
+      "backgroundColor": "#0078d4",
+      "color": "#ffffff",
+      "fontSize": 13,
+      "borderColor": "#d9d9d9",
+      "borderStyle": "solid",
+      "borderWidth": 0,
+      "borderRadius": 4,
+      "display": "inline-flex",
+      "alignItems": "center",
+      "justifyContent": "center",
+      "gap": "6px",
+      "border": "none",
+      "cursor": "pointer",
+      "whiteSpace": "nowrap",
+      "outline": "none",
+      "fontFamily": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+      "padding": "6px 12px"
+    },
+    "pseudo": {
+      ":hover": {
+        "filter": "brightness(1.1)"
+      },
+      ":active": {
+        "filter": "brightness(0.9)"
+      },
+      ":disabled": {
+        "cursor": "not-allowed",
+        "opacity": "0.6"
+      }
+    },
+    "sub": {}
+  },
+  "defaultStyleLight": {
+    "base": {
+      "backgroundColor": "#0078d4",
+      "color": "#ffffff",
+      "borderRadius": 4
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "defaultStyleDark": {
+    "base": {
+      "backgroundColor": "#1a6fc4",
+      "color": "#e0e0e0",
+      "borderRadius": 4
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "structuralCSS": {
+    "i": [
+      "font-size: inherit",
+      "line-height: 1"
+    ],
+    "img, svg": [
+      "max-width: 20px",
+      "height: auto",
+      "vertical-align: middle"
+    ]
+  },
+  "mappedProps": [],
+  "computedProps": [],
+  "defaultProps": {
+    "iconName": "fa-star",
+    "iconPosition": "left",
+    "text": "按钮",
+    "iconHtml": "<i class=\"fas fa-star\"></i>",
+    "disabled": false,
+    "visible": true
+  }
+}

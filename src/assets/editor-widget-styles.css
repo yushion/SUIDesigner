@@ -1,0 +1,29 @@
+/**
+ * editor-widget-styles.css
+ * 编辑器画布交互样式 — 控件选中/悬停/禁用视觉反馈
+ *
+ * 所有 widget 组件共享此样式，避免在每个 .vue 文件中重复定义。
+ * 若某个 widget 需要特殊样式（如 DataGrid 的 outline-offset: -2px），
+ * 可在其 scoped CSS 中覆盖，scoped [data-v-xxx] 选择器优先级更高。
+ *
+ * 注意：这些是编辑器专属样式，不会出现在导出的 HTML 中。
+ */
+
+/* 悬停提示虚线边框 */
+.ui-widget:hover:not(.selected) {
+  outline: 1px dashed #0078D4;
+  outline-offset: 2px;
+  border-radius: 1px;
+}
+
+/* 选中高亮实线边框 */
+.ui-widget.selected {
+  outline: 2px solid #1890ff;
+  outline-offset: 1px;
+}
+
+/* 禁用状态 */
+.ui-widget.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}

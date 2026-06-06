@@ -1,0 +1,75 @@
+{
+  "label": "日志框",
+  "icon": "📋",
+  "defaultStyleData": {
+    "base": {
+      "width": 300,
+      "height": 150,
+      "borderColor": "#dddddd",
+      "borderWidth": 1,
+      "borderStyle": "solid",
+      "borderRadius": 4,
+      "backgroundColor": "#fbfbfb",
+      "color": "#333333",
+      "fontSize": 13,
+      "padding": 8,
+      "overflowX": "auto",
+      "overflowY": "auto",
+      "whiteSpace": "nowrap",
+      "fontFamily": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+    },
+    "pseudo": {
+      ".log-line:hover": {
+        "background-color": "rgba(0,120,212,0.08)"
+      },
+      ".log-line:nth-child(even)": {
+        "background-color": "rgba(0,0,0,0.02)"
+      }
+    },
+    "sub": {}
+  },
+  "defaultStyleLight": {
+    "base": {
+      "backgroundColor": "#ffffff",
+      "color": "#333333",
+      "borderColor": "#dddddd",
+      "borderWidth": 1,
+      "borderStyle": "solid",
+      "borderRadius": 4,
+      "padding": 8
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "defaultStyleDark": {
+    "base": {
+      "backgroundColor": "#1e1e1e",
+      "color": "#e0e0e0",
+      "borderColor": "#555555",
+      "borderWidth": 1,
+      "borderStyle": "solid",
+      "borderRadius": 4,
+      "padding": 8
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "structuralCSS": {
+    ".log-line": [
+      "line-height: 1.5",
+      "padding: 2px 5px"
+    ]
+  },
+  "mappedProps": [],
+  "computedProps": [],
+  "defaultProps": {
+    "logs": [
+      {
+        "text": "日志输出已就绪。",
+        "color": "#333333"
+      }
+    ],
+    "disabled": false,
+    "visible": true
+  }
+}

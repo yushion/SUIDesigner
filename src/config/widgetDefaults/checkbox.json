@@ -1,0 +1,71 @@
+{
+  "label": "选择框",
+  "icon": "☑",
+  "defaultStyleData": {
+    "base": {
+      "width": 50,
+      "height": 20,
+      "color": "#333333",
+      "fontSize": 14,
+      "display": "inline-flex",
+      "alignItems": "center",
+      "fontFamily": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+      "cursor": "pointer",
+      "lineHeight": "14px",
+      "userSelect": "none"
+    },
+    "pseudo": {
+      "label input:disabled": {
+        "opacity": "0.5",
+        "cursor": "not-allowed"
+      },
+      ":hover": {
+        "opacity": "0.85"
+      },
+      "input[type=checkbox]:disabled": {
+        "opacity": "0.5",
+        "cursor": "not-allowed"
+      }
+    },
+    "sub": {}
+  },
+  "defaultStyleLight": {
+    "base": {
+      "color": "#333333"
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "defaultStyleDark": {
+    "base": {
+      "color": "#e0e0e0"
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "structuralCSS": {
+    "input[type=checkbox]": [
+      "margin-right: 6px",
+      "cursor: pointer"
+    ]
+  },
+  "mappedProps": [
+    {
+      "selector": "span",
+      "base": {
+      },
+      "pseudo": {
+        ":hover": {
+          "opacity": "0.85"
+        }
+      }
+    }
+  ],
+  "computedProps": [],
+  "defaultProps": {
+    "labelText": "选项",
+    "checked": false,
+    "disabled": false,
+    "visible": true
+  }
+}

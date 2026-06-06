@@ -1,0 +1,71 @@
+{
+  "label": "文本域",
+  "icon": "▦",
+  "defaultStyleData": {
+    "base": {
+      "width": 200,
+      "height": 80,
+      "backgroundColor": "#ffffff",
+      "color": "#333333",
+      "borderColor": "#dddddd",
+      "borderWidth": 1,
+      "borderStyle": "solid",
+      "fontSize": 13,
+      "borderRadius": 4,
+      "padding": 4,
+      "fontFamily": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+      "outline": "none",
+      "resize": "none",
+      "boxShadow": "0 2px 4px rgba(0, 0, 0, 0.05)"
+    },
+    "pseudo": {
+      ":focus": {
+        "border-color": "#0078d4",
+        "box-shadow": "0 0 0 2px rgba(0, 120, 212, 0.2)"
+      },
+      ":disabled": {
+        "opacity": "0.6",
+        "background-color": "#f5f5f5",
+        "cursor": "not-allowed",
+        "filter": "grayscale(1)"
+      },
+      "::placeholder": {
+        "color": "#999"
+      }
+    },
+    "sub": {}
+  },
+  "defaultStyleLight": {
+    "base": {
+      "backgroundColor": "#ffffff",
+      "color": "#333333",
+      "borderColor": "#dddddd",
+      "borderWidth": 1,
+      "borderStyle": "solid",
+      "borderRadius": 4
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "defaultStyleDark": {
+    "base": {
+      "backgroundColor": "#2d2d2d",
+      "color": "#e0e0e0",
+      "borderColor": "#555",
+      "borderWidth": 1,
+      "borderStyle": "solid",
+      "borderRadius": 4
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "mappedProps": [],
+  "computedProps": [],
+  "defaultProps": {
+    "placeholder": "请输入...",
+    "value": "",
+    "rows": 4,
+    "disabled": false,
+    "visible": true
+  }
+}

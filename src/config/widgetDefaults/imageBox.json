@@ -1,0 +1,72 @@
+{
+  "label": "图片框",
+  "icon": "🖼",
+  "defaultStyleData": {
+    "base": {
+      "width": 150,
+      "height": 150,
+      "backgroundColor": "#f0f0f0",
+      "overflow": "hidden"
+    },
+    "pseudo": {
+      "img:hover": {
+        "opacity": "0.9"
+      },
+      ".disabled": {
+        "cursor": "not-allowed",
+        "opacity": "0.6"
+      }
+    },
+    "sub": {}
+  },
+  "defaultStyleLight": {
+    "base": {
+      "backgroundColor": "#f0f0f0"
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "defaultStyleDark": {
+    "base": {
+      "backgroundColor": "#3d3d3d"
+    },
+    "pseudo": {},
+    "sub": {}
+  },
+  "structuralCSS": {
+    "img": [
+      "width: 100%",
+      "height: 100%",
+      "display: block"
+    ],
+    ".disabled-overlay": [
+      "position: absolute",
+      "left: 0",
+      "top: 0",
+      "width: 100%",
+      "height: 100%",
+      "background: rgba(255, 255, 255, 0.5)",
+      "pointer-events: none"
+    ]
+  },
+  "mappedProps": [],
+  "computedProps": [
+    {
+      "selector": "img",
+      "cssProp": "object-fit",
+      "template": "{{fit}}"
+    },
+    {
+      "selector": "img",
+      "cssProp": "object-position",
+      "template": "{{objPos}}"
+    }
+  ],
+  "defaultProps": {
+    "src": "",
+    "fit": "cover",
+    "objectPosition": "center",
+    "disabled": false,
+    "visible": true
+  }
+}
