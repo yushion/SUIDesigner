@@ -8,6 +8,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;background:#f5f7fa;color:#333;line-height:1.6}
@@ -65,14 +67,15 @@ body{font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;background:#f5f
     cursor: pointer;
     font-size: 13px;
     background: none;
-    border: none;
+    border-radius: 6px 6px 0px 0px;
+    border: 1px solid #f9f9f9;
 	}
 .tab-bar .tab-btn.active{color:#007bff;font-weight:600;border-radius: 6px 6px 0px 0px;border: 1px solid #c7c6c6;border-bottom: solid 2px;background: #fbfbfb;}
 .tab-content{display:none;margin-top:0}
 .tab-content.active{display:block}
 .code-block{background:#1e1e1e;color:#d4d4d4;border-radius:0 6px 6px 6px;overflow:hidden;font-size:13px;line-height:1.5;margin:0;position:relative;border:1px solid #d5d2d2}
 .code-block-header{background:rgb(240, 240, 242);border-bottom:1px solid #d5d2d2;padding:4px 12px;display:flex;justify-content:space-between;align-items:center;min-height:28px}
-.code-block-header .lang-label{font-size:11px;color:#494949}
+.code-block-header .lang-label{font-size:11px;color:#494949;padding-left: 5px;}
 .code-block-header .copy-btn{background:#cfcbcb;border:1px solid #9f9f9f;color:#141414;padding:2px 10px;border-radius:3px;cursor:pointer;font-size:11px;transition:all .2s}
 .code-block-header .copy-btn:hover{background:#555;color:#fff}
 .code-block-header .copy-btn.copied{background:#28a745;border-color:#28a745;color:#fff}
@@ -726,16 +729,16 @@ function buildSections(){
           }
           html+='</tbody></table></div>';
         }
-        html+='<div class="api-returns"><strong style="user-select: none;">🔜返回值：</strong> <code>'+method.ret+'</code></div>';
+        html+='<div class="api-returns"><strong style="user-select: none;"><span style="color: #c53131;">↪</span> 返回值：</strong> <code>'+method.ret+'</code></div>';
         html+='<div class="tab-bar">';
         html+='<button class="tab-btn active" onclick="switchTab(this,\'api\')">API 调用示例</button>';
         html+='<button class="tab-btn" onclick="switchTab(this,\'cmd\')">命令分发示例</button>';
         html+='</div>';
         html+='<div class="tab-content active" data-tab="api">';
-        html+='<div class="code-block"><div class="code-block-header"><span class="lang-label">JavaScript</span><button class="copy-btn" onclick="copyCode(this,\''+method.exApi.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,"\\'").replace(/\n/g,'\\n')+'\')">复制</button></div><pre><code class="language-javascript">'+method.exApi.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</code></pre></div>';
+        html+='<div class="code-block"><div class="code-block-header"><span class="lang-label">&lt;/&gt;JavaScript</span><button class="copy-btn" onclick="copyCode(this,\''+method.exApi.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,"\\'").replace(/\n/g,'\\n')+'\')">复制</button></div><pre><code class="language-javascript">'+method.exApi.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</code></pre></div>';
         html+='</div>';
         html+='<div class="tab-content" data-tab="cmd">';
-        html+='<div class="code-block"><div class="code-block-header"><span class="lang-label">JSON (postMessage)</span><button class="copy-btn" onclick="copyCode(this,\''+method.exCmd.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,"\\'").replace(/\n/g,'\\n')+'\')">复制</button></div><pre><code class="language-json">'+method.exCmd.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</code></pre></div>';
+        html+='<div class="code-block"><div class="code-block-header"><span class="lang-label">JSON {postMessage}</span><button class="copy-btn" onclick="copyCode(this,\''+method.exCmd.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,"\\'").replace(/\n/g,'\\n')+'\')">复制</button></div><pre><code class="language-json">'+method.exCmd.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</code></pre></div>';
         html+='</div></div>';
         html+='</div>';
       }
