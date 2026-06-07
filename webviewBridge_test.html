@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>webviewBridge.js API 完整测试（基于真实导出 HTML）</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Segoe UI,Tahoma,sans-serif;background:#f5f7fa;color:#333;padding:20px}
+h1{text-align:center;margin-bottom:4px;font-size:22px;color:#1a1a2e}
+.subtitle{text-align:center;margin-bottom:16px;color:#888;font-size:13px}
+.summary-bar{display:flex;justify-content:center;gap:14px;margin-bottom:14px;flex-wrap:wrap}
+.summary-item{background:#fff;border-radius:8px;padding:8px 18px;box-shadow:0 1px 4px rgba(0,0,0,.1);text-align:center;min-width:80px}
+.summary-item .num{font-size:22px;font-weight:700}
+.summary-item .num.pass{color:#2e7d32}.summary-item .num.fail{color:#c62828}.summary-item .num.skip{color:#ef6c00}.summary-item .num.total{color:#1565c0}
+.summary-item .lbl{font-size:11px;color:#888;margin-top:2px}
+#progress-bar{height:3px;background:#e0e0e0;border-radius:2px;margin-bottom:12px;overflow:hidden}
+#progress-fill{height:100%;width:0%;background:linear-gradient(90deg,#43a047,#66bb6a);border-radius:2px;transition:width .3s}
+.filter-bar{margin-bottom:10px;display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.filter-bar button{padding:3px 12px;border:1px solid #ddd;border-radius:12px;background:#fff;cursor:pointer;font-size:12px;transition:all .2s}
+.filter-bar button:hover{border-color:#1565c0;color:#1565c0}
+.filter-bar button.active{background:#1565c0;color:#fff;border-color:#1565c0}
+.test-group{margin-bottom:12px;background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.08);overflow:hidden}
+.group-header{padding:8px 14px;background:#f8f9fa;border-bottom:1px solid #e8eaed;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-weight:600;font-size:13px}
+.group-header .group-stats{font-weight:400;font-size:11px;color:#888}
+.test-row{display:flex;align-items:center;padding:4px 14px;border-bottom:1px solid #f0f0f0;font-size:12px;transition:background .15s;cursor:pointer}
+.test-row:last-child{border-bottom:none}.test-row:hover{background:#f5f8fc}
+.test-row .status{width:52px;flex-shrink:0;font-size:11px;font-weight:600;padding:1px 6px;border-radius:3px;text-align:center}
+.status.pass{background:#e8f5e9;color:#2e7d32}.status.fail{background:#ffebee;color:#c62828}.status.skip{background:#fff3e0;color:#ef6c00}
+.test-row .api-name{width:280px;flex-shrink:0;font-family:Consolas,monaco,monospace;font-size:11px;color:#1565c0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.test-row .api-args{flex:1;color:#666;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;padding:0 6px}
+.test-row .result{width:140px;flex-shrink:0;font-size:11px;color:#555;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.test-row .result .err{color:#c62828}.test-row .result .ok{color:#2e7d32}
+.detail-dialog{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,.3);z-index:9999;max-width:600px;width:90%;max-height:80vh;overflow:auto;padding:20px;display:none}
+.detail-dialog h3{margin-bottom:8px;font-size:15px}.detail-dialog pre{background:#f5f5f5;padding:10px;border-radius:4px;font-size:12px;overflow:auto;max-height:260px;white-space:pre-wrap}
+.detail-dialog .close-btn{float:right;padding:3px 10px;border:1px solid #ddd;border-radius:4px;cursor:pointer;background:#fff;font-size:12px}
+.detail-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9998;display:none}
+</style>
+</head>
+<body>
+
+<h1>webviewBridge.js API 完整测试</h1>
+<p class="subtitle">基于真实导出HTML的控件DOM结构 · 测试全部 ~178 个 API</p>
+
+<div class="summary-bar" id="summary"></div>
+<div id="progress-bar"><div id="progress-fill"></div></div>
+<div class="filter-bar" id="filterBar"></div>
+<div id="results"></div>
+
+<div class="detail-overlay" id="detailOverlay"></div>
+<div class="detail-dialog" id="detailDialog">
+  <button class="close-btn" onclick="closeDetail()">关闭</button>
+  <h3 id="detailTitle">详情</h3>
+  <pre id="detailBody"></pre>
+</div>
+
+<script src="../public/webviewBridge.js"></script>
+<script>
+// ========================================================================
+// 1. 基于导出 HTML 创建真实控件 DOM（从 export (4).html 提取）
+// ========================================================================
+function createRealWidgetElements() {
+  var c = document.createElement('div');
+  c.id = 'test-container';
+  c.style.cssText = 'position:fixed;left:0;top:0;width:1px;height:1px;overflow:hidden;pointer-events:none;';
+
+  c.innerHTML = [
+    // 页面容器 + 标题栏（模拟导出HTML结构）
+    '<div class="page-container glass-effect" id="page_container" data-ctrl-type="page" data-name="canvas" data-original-width="980" data-original-height="625">',
+    '  <div class="canvas-titlebar" id="titlebar" data-name="标题栏" style="position:absolute;top:0;left:0;right:0;height:40px;background-color:#f5f5f5;">',
+    '    <div class="tb-left" data-ctrl-type="titlebar_icon"><span class="tb-icon" id="titlebar_icon" data-name="图标" style="color:#333333;"><i class="fas fa-star"></i></span></div>',
+    '    <div class="tb-center" style="justify-content:flex-end;"><span class="tb-title" id="titlebar_title" data-name="标题" data-ctrl-type="titlebar_title" style="color:#333333">我的应用</span></div>',
+    '    <div class="tb-right">',
+    '      <button class="tb-btn tb-btn-min" id="titlebar_min" data-ctrl-type="titlebar_min" data-name="最小化" style="color:#333333;"><svg width="10" height="1"><rect width="10" height="1" fill="currentColor"/></svg></button>',
+    '      <button class="tb-btn tb-btn-max tb-btn-disabled" id="titlebar_max" data-ctrl-type="titlebar_max" data-name="最大化" style="color:#333333;opacity:0.4;" disabled><svg width="10" height="10"><rect x="1" y="1" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></button>',
+    '      <button class="tb-btn tb-btn-close" id="titlebar_close" data-ctrl-type="titlebar_close" data-name="关闭" style="color:#333333;"><svg width="10" height="10"><line x1="1" y1="1" x2="9" y2="9" stroke="currentColor" stroke-width="1.2"/><line x1="9" y1="1" x2="1" y2="9" stroke="currentColor" stroke-width="1.2"/></svg></button>',
+    '    </div>',
+    '  </div>',
+    // 基础控件
+    '<button id="button_1" data-type="button" data-ctrl-type="button" data-ctrl-id="button_1" data-name="按钮_1">按钮</button>',
+    '<input type="text" id="input_1" data-type="input" data-ctrl-type="input_text" data-ctrl-id="input_1" data-name="编辑框_1" placeholder="请输入..." value="" />',
+    '<label id="checkbox_1" data-type="checkbox" data-ctrl-type="checkbox" data-ctrl-id="checkbox_1" data-name="选择框_1"><input type="checkbox" /><span>选项</span></label>',
+    '<label id="toggle_1" data-type="toggle" data-ctrl-type="switch_toggle" data-ctrl-id="toggle_1" data-name="开关按钮_1" style="display:inline-flex;align-items:center;"><input type="checkbox" /><span class="slider"></span></label>',
+    '<select id="comboBox_1" data-type="comboBox" data-ctrl-type="combobox" data-ctrl-id="comboBox_1" data-name="组合框_1"><option value="选项1" selected>选项1</option><option value="选项2">选项2</option><option value="选项3">选项3</option></select>',
+    '<span id="label_1" data-type="label" data-ctrl-type="label" data-ctrl-id="label_1" data-name="文本标签_1">标签</span>',
+    '<div id="divider_1" data-type="divider" data-ctrl-type="divider" data-ctrl-id="divider_1" data-name="分割线_1"></div>',
+    '<a id="hyperlink_1" data-type="hyperlink" data-ctrl-type="hyperlink" data-ctrl-id="hyperlink_1" data-name="超链接_1" href="javascript:void(0)" data-href="#">超链接</a>',
+    // 进阶控件
+    '<div id="radioGroup_1" data-type="radioGroup" data-ctrl-type="radio_group" data-ctrl-id="radioGroup_1" data-name="单选框组_1" class="radiogroup-container">',
+    '  <label class="radiogroup-item"><input type="radio" name="单选框组_1" value="选项1" checked />选项1</label>',
+    '  <label class="radiogroup-item"><input type="radio" name="单选框组_1" value="选项2" />选项2</label>',
+    '</div>',
+    '<div id="progressBar_1" data-type="progressBar" data-ctrl-type="progress_bar" data-ctrl-id="progressBar_1" data-name="进度条_1" class="progress-bar-container"><div class="progress-track"></div><div class="progress-fill" style="width:60%"></div><span class="progress-text">60%</span></div>',
+    '<input type="datetime-local" id="datetimePicker_1" data-type="datetimePicker" data-ctrl-type="datetime_picker" data-ctrl-id="datetimePicker_1" data-name="时间框_1" value="2026-06-05T00:00" />',
+    '<button id="iconButton_1" data-type="iconButton" data-ctrl-type="icon_button" data-ctrl-id="iconButton_1" data-name="图标按钮_1"><i class="fas fa-star"></i><span>按钮</span></button>',
+    '<div id="imageBox_1" data-type="imageBox" data-ctrl-type="image_box" data-ctrl-id="imageBox_1" data-name="图片框_1" class="image-box"></div>',
+    '<textarea id="textarea_1" data-type="textarea" data-ctrl-type="textarea" data-ctrl-id="textarea_1" data-name="文本域_1" placeholder="请输入..." rows="4"></textarea>',
+    '<div id="logOutput_1" data-type="logOutput" data-ctrl-type="logbox" data-ctrl-id="logOutput_1" data-name="日志框_1" class="log-output-container"><div class="log-line" style="color:#333333">日志输出已就绪。</div></div>',
+    // 容器控件 (简化)
+    '<div id="listBox_1" data-type="listBox" data-ctrl-type="listbox" data-ctrl-id="listBox_1" data-name="列表框_1" data-listbox-items=\'[{"id":"1","text":"列表项1"},{"id":"2","text":"列表项2"},{"id":"3","text":"列表项3"}]\'><div class="list-box-scroll"><div class="list-item" data-ctrl-type="listbox_item" data-item-index="0"><span class="list-item-text">列表项1</span></div><div class="list-item" data-ctrl-type="listbox_item" data-item-index="1"><span class="list-item-text">列表项2</span></div><div class="list-item" data-ctrl-type="listbox_item" data-item-index="2"><span class="list-item-text">列表项3</span></div></div></div>',
+    '<div id="treeView_1" data-type="treeView" data-ctrl-type="treeview" data-ctrl-id="treeView_1" data-name="树形框_1" data-tree-id="treeView_1" data-always-show-selection="true">',
+    '  <div class="tree-node" data-node-id="node_1" data-level="0"><div class="tree-node-content"><span class="tree-toggle expanded"></span><span class="tree-icon folder">📁</span><span class="tree-label">根节点</span></div>',
+    '    <div class="tree-children"><div class="tree-node" data-node-id="node_1_1" data-level="1"><div class="tree-node-content"><span class="tree-toggle empty"></span><span class="tree-icon file">📄</span><span class="tree-label">子节点1</span></div></div></div>',
+    '  </div>',
+    '  <div class="tree-node" data-node-id="node_2" data-level="0"><div class="tree-node-content"><span class="tree-toggle collapsed"></span><span class="tree-icon folder">📁</span><span class="tree-label">子节点2</span></div></div>',
+    '</div>',
+    '<div id="cardBox_1" data-type="cardBox" data-ctrl-type="cardbox" data-ctrl-id="cardBox_1" data-name="卡片框_1"><div class="card-item">卡片1</div><div class="card-item">卡片2</div></div>',
+    '<div id="dataGrid_1" data-type="dataGrid" data-ctrl-type="datagrid" data-ctrl-id="dataGrid_1" data-name="多项表格_1"><table><thead><tr><th data-col-index="0" data-col-name="col1">姓名</th><th data-col-index="1" data-col-name="col2">年龄</th></tr></thead><tbody><tr data-row-id="r1"><td data-col-name="col1">张三</td><td data-col-name="col2">25</td></tr><tr data-row-id="r2"><td data-col-name="col1">李四</td><td data-col-name="col2">30</td></tr></tbody></table></div>',
+    '<div id="tabContainer_1" data-type="tabContainer" data-ctrl-type="tab_container" data-ctrl-id="tabContainer_1" data-name="标签页容器_1"><div class="tab-header-bar"><button class="tab-header-btn active" data-tab="0">首页</button><button class="tab-header-btn" data-tab="1">设置</button></div><div class="tab-content-panel active" data-tab="0">首页内容</div><div class="tab-content-panel" data-tab="1">设置内容</div></div>',
+    // 隐形控件 (占位)
+    '<div id="contextMenu_1" data-ctrl-type="contextmenu" data-ctrl-id="contextMenu_1"></div>',
+    '<div id="tooltip_1" data-ctrl-type="tooltip" data-ctrl-id="tooltip_1"></div>',
+    '<div id="messageBox_1" data-ctrl-type="messagebox" data-ctrl-id="messageBox_1"></div>',
+    '<div id="inputBox_1" data-ctrl-type="inputbox" data-ctrl-id="inputBox_1"></div>',
+    '</div>'
+  ].join('\n');
+
+  document.body.appendChild(c);
+}
+
+// 模拟 chrome.webview （运行时环境）
+if (!window.chrome) window.chrome = {};
+if (!window.chrome.webview) {
+  window.chrome.webview = {
+    postMessage: function(msg) { window.__lastPostMessage = msg; },
+    addEventListener: function() {}
+  };
+}
+window.__uiBridgeReady = true;
+window.__uiRuntimeReady = true;
+
+// ========================================================================
+// 2. 测试定义（覆盖 API 文档全部 178 个方法）
+// ========================================================================
+var TESTS = [];
+function addTest(ns, name, args, checker) {
+  TESTS.push({ ns: ns, name: name, args: args, checker: checker });
+}
+
+function bindApi(p) { return window.webviewBridge; }
+
+function S(id) { return '#' + id; }
+
+var N, api, wb;
+function initTests() {
+  wb = window.webviewBridge;
+  api = wb.api;
+
+  // ---------- 通用 API(public: 31个) ----------
+  N = '通用API';
+  addTest(N,'webviewBridge.api.setValue',[S('input_1'),'test'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.getValue',[S('input_1')],function(r){return r==='test'});
+  addTest(N,'webviewBridge.api.setChecked',[S('checkbox_1'),true],function(r){return r===true});
+  addTest(N,'webviewBridge.api.getChecked',[S('checkbox_1')],function(r){return r===true});
+  addTest(N,'webviewBridge.api.setEnabled',[S('input_1'),false],function(r){return r===true});
+  addTest(N,'webviewBridge.api.isEnabled',[S('input_1')],function(r){return r===false});
+  addTest(N,'webviewBridge.api.show',[S('input_1')],function(r){return r===true});
+  addTest(N,'webviewBridge.api.hide',[S('input_1')],function(r){return r===true});
+  addTest(N,'webviewBridge.api.toggle',[S('input_1')],function(r){return r===true});
+  addTest(N,'webviewBridge.api.focus',[S('button_1')],function(r){return r===true});
+  addTest(N,'webviewBridge.api.setStyle',[S('button_1'),{color:'red'}],function(r){return r===true});
+  addTest(N,'webviewBridge.api.setBlockContextMenu',[true],function(r){return r===true});
+  addTest(N,'webviewBridge.api.getBlockContextMenu',[],function(r){return r===true});
+  addTest(N,'webviewBridge.api.getWindowSize',[],function(r){return r&&r.width>0});
+  addTest(N,'webviewBridge.api.setFixedCanvasSize',[true,800,600],function(r){return r===true});
+  addTest(N,'webviewBridge.api.getIdByName',['button_1'],function(r){return r==='button_1'});
+  addTest(N,'webviewBridge.api.getInfoById',['button_1'],function(r){return r&&r.id==='button_1'});
+  addTest(N,'webviewBridge.api.testReturn',[],function(r){return r==='test_success'});
+  addTest(N,'webviewBridge.api.move',[S('button_1'),100,200],function(r){return r===true});
+  addTest(N,'webviewBridge.api.setSize',[S('button_1'),200,40],function(r){return r===true});
+  addTest(N,'webviewBridge.api.getPosition',[S('button_1')],function(r){return r&&typeof r.x==='number'});
+  addTest(N,'webviewBridge.api.getSize',[S('button_1')],function(r){return r&&r.width===200});
+  addTest(N,'webviewBridge.api.bringToFront',[S('button_1')],function(r){return r===true});
+  addTest(N,'webviewBridge.api.sendToBack',[S('button_1')],function(r){return r===true});
+  addTest(N,'webviewBridge.api.setZIndex',[S('button_1'),100],function(r){return r===true});
+  addTest(N,'webviewBridge.api.showNotification',[{title:'测试',message:'通知'}],function(r){return r===true});
+  addTest(N,'webviewBridge.api.addMessageListener',[function(){}],function(r){return r===true});
+  addTest(N,'webviewBridge.api.removeMessageListener',[function(){}],function(r){return r===true});
+  addTest(N,'webviewBridge.api.sendMessage',['test','tag','type','id',{}],function(r){return r===undefined});
+
+  // ---------- canvas (3个) ----------
+  N = '画布';
+  addTest(N,'webviewBridge.api.canvas.setFixedCanvasSize',[true,800,600],function(r){return r===true});
+  addTest(N,'webviewBridge.api.canvas.getCanvasSize',[],function(r){return r&&r.width>0});
+
+  // ---------- icon (2个) ----------
+  N = '图标辅助';
+  addTest(N,'webviewBridge.api.icon.parse',['[OK] 完成'],function(r){return r&&r.length>0});
+
+  // ---------- button (2个) ----------
+  N = '按钮 Button';
+  addTest(N,'webviewBridge.api.button.setText',[S('button_1'),'新按钮'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.button.getText',[S('button_1')],function(r){return r==='新按钮'});
+
+  // ---------- input (5个) ----------
+  N = '编辑框 Input';
+  addTest(N,'webviewBridge.api.input.getValue',[S('input_1')],function(r){return r==='test'});
+  addTest(N,'webviewBridge.api.input.setValue',[S('input_1'),'新值'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.input.setPlaceholder',[S('input_1'),'请输入'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.input.setReadOnly',[S('input_1'),true],function(r){return r===true});
+  addTest(N,'webviewBridge.api.input.clear',[S('input_1')],function(r){return r===true});
+
+  // ---------- textarea (5个) ----------
+  N = '文本域 Textarea';
+  addTest(N,'webviewBridge.api.textarea.getValue',[S('textarea_1')],function(r){return typeof r==='string'});
+  addTest(N,'webviewBridge.api.textarea.setValue',[S('textarea_1'),'新多行'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.textarea.setPlaceholder',[S('textarea_1'),'请输入'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.textarea.setReadOnly',[S('textarea_1'),true],function(r){return r===true});
+  addTest(N,'webviewBridge.api.textarea.clear',[S('textarea_1')],function(r){return r===true});
+
+  // ---------- checkbox (4个) ----------
+  N = '复选框 CheckBox';
+  addTest(N,'webviewBridge.api.checkbox.getChecked',[S('checkbox_1')],function(r){return r===true});
+  addTest(N,'webviewBridge.api.checkbox.setChecked',[S('checkbox_1'),false],function(r){return r===true});
+  addTest(N,'webviewBridge.api.checkbox.setText',[S('checkbox_1'),'选项A'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.checkbox.toggle',[S('checkbox_1')],function(r){return r===true});
+
+  // ---------- switchToggle (2个) ----------
+  N = '开关 Toggle';
+  addTest(N,'webviewBridge.api.switchToggle.getChecked',[S('toggle_1')],function(r){return typeof r==='boolean'});
+  addTest(N,'webviewBridge.api.switchToggle.setChecked',[S('toggle_1'),true],function(r){return r===true});
+
+  // ---------- comboBox (9个) ----------
+  N = '组合框 ComboBox';
+  addTest(N,'webviewBridge.api.comboBox.getValue',[S('comboBox_1')],function(r){return r==='选项1'});
+  addTest(N,'webviewBridge.api.comboBox.setValue',[S('comboBox_1'),'选项2'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.comboBox.addItem',[S('comboBox_1'),'新增','opt4'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.comboBox.removeItem',[S('comboBox_1'),'选项2'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.comboBox.clearItems',[S('comboBox_1')],function(r){return r===true});
+  addTest(N,'webviewBridge.api.comboBox.getItemCount',[S('comboBox_1')],function(r){return typeof r==='number'});
+  addTest(N,'webviewBridge.api.comboBox.getSelectedIndex',[S('comboBox_1')],function(r){return typeof r==='number'});
+  addTest(N,'webviewBridge.api.comboBox.setSelectedIndex',[S('comboBox_1'),0],function(r){return r===true});
+  addTest(N,'webviewBridge.api.comboBox.setPlaceholder',[S('comboBox_1'),'请选择'],function(r){return r===true});
+
+  // ---------- label (2个) ----------
+  N = '标签 Label';
+  addTest(N,'webviewBridge.api.label.setText',[S('label_1'),'新标签'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.label.getText',[S('label_1')],function(r){return r==='新标签'});
+
+  // ---------- hyperlink (4个) ----------
+  N = '超链接 Hyperlink';
+  addTest(N,'webviewBridge.api.hyperlink.setUrl',[S('hyperlink_1'),'https://test.com'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.hyperlink.getUrl',[S('hyperlink_1')],function(r){return r.indexOf('https://')>=0});
+  addTest(N,'webviewBridge.api.hyperlink.setText',[S('hyperlink_1'),'新链接'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.hyperlink.getText',[S('hyperlink_1')],function(r){return r==='新链接'});
+
+  // ---------- radioGroup (6个) ----------
+  N = '单选框 RadioGroup';
+  addTest(N,'webviewBridge.api.radioGroup.getValue',[S('radioGroup_1')],function(r){return r==='选项1'});
+  addTest(N,'webviewBridge.api.radioGroup.setValue',[S('radioGroup_1'),'选项2'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.radioGroup.getSelectedIndex',[S('radioGroup_1')],function(r){return typeof r==='number'});
+  addTest(N,'webviewBridge.api.radioGroup.setSelectedIndex',[S('radioGroup_1'),0],function(r){return r===true});
+  addTest(N,'webviewBridge.api.radioGroup.getItemCount',[S('radioGroup_1')],function(r){return r===2});
+  addTest(N,'webviewBridge.api.radioGroup.getItem',[S('radioGroup_1'),0],function(r){return r&&r.length>0});
+
+  // ---------- progressBar (7个) ----------
+  N = '进度条 ProgressBar';
+  addTest(N,'webviewBridge.api.progressBar.getValue',[S('progressBar_1')],function(r){return r===60});
+  addTest(N,'webviewBridge.api.progressBar.setValue',[S('progressBar_1'),75],function(r){return r===true});
+  addTest(N,'webviewBridge.api.progressBar.increment',[S('progressBar_1'),10],function(r){return r===true});
+  addTest(N,'webviewBridge.api.progressBar.decrement',[S('progressBar_1'),20],function(r){return r===true});
+  addTest(N,'webviewBridge.api.progressBar.enableClick',[S('progressBar_1')],function(r){return r===true});
+  addTest(N,'webviewBridge.api.progressBar.getMax',[S('progressBar_1')],function(r){return r===100});
+  addTest(N,'webviewBridge.api.progressBar.setMax',[S('progressBar_1'),200],function(r){return r===true});
+
+  // ---------- dateTimePicker (2个) ----------
+  N = '时间框 DateTimePicker';
+  addTest(N,'webviewBridge.api.dateTimePicker.getValue',[S('datetimePicker_1')],function(r){return typeof r==='string'});
+  addTest(N,'webviewBridge.api.dateTimePicker.setValue',[S('datetimePicker_1'),'2025-06-15T10:30'],function(r){return r===true});
+
+  // ---------- iconButton (4个) ----------
+  N = '图标按钮 IconButton';
+  addTest(N,'webviewBridge.api.iconButton.setIcon',[S('iconButton_1'),'⭐'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.iconButton.getIcon',[S('iconButton_1')],function(r){return r==='⭐'});
+  addTest(N,'webviewBridge.api.iconButton.setText',[S('iconButton_1'),'收藏'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.iconButton.getText',[S('iconButton_1')],function(r){return r==='收藏'});
+
+  // ---------- imageBox (4个) ----------
+  N = '图片框 ImageBox';
+  addTest(N,'webviewBridge.api.imageBox.setImage',[S('imageBox_1'),'data:image/png;base64,test'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.imageBox.getImage',[S('imageBox_1')],function(r){return typeof r==='string'&&r.length>0});
+  addTest(N,'webviewBridge.api.imageBox.setFit',[S('imageBox_1'),'cover'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.imageBox.setSize',[S('imageBox_1'),200,150],function(r){return r===true});
+
+  // ---------- logBox (3个) ----------
+  N = '日志框 LogBox';
+  addTest(N,'webviewBridge.api.logBox.log',[S('logOutput_1'),'测试日志'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.logBox.clear',[S('logOutput_1')],function(r){return r===true});
+  addTest(N,'webviewBridge.api.logBox.getContent',[S('logOutput_1')],function(r){return typeof r==='string'});
+
+  // ---------- listBox (20个) ----------
+  N = '列表框 listBox';
+  addTest(N,'webviewBridge.api.listBox.addItem',[S('listBox_1'),'新条目'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.listBox.removeItem',[S('listBox_1'),0],function(r){return r===true});
+  addTest(N,'webviewBridge.api.listBox.getItemCount',[S('listBox_1')],function(r){return r>=2});
+  addTest(N,'webviewBridge.api.listBox.getItem',[S('listBox_1'),0],function(r){return r&&r.length>0});
+  addTest(N,'webviewBridge.api.listBox.getSelectedIndex',[S('listBox_1')],function(r){return typeof r==='number'});
+  addTest(N,'webviewBridge.api.listBox.setSelectedIndex',[S('listBox_1'),1],function(r){return r===true});
+  addTest(N,'webviewBridge.api.listBox.getSelectedItem',[S('listBox_1')],function(r){return r&&r.length>0});
+  addTest(N,'webviewBridge.api.listBox.clearItems',[S('listBox_1')],function(r){return r===true});
+  addTest(N,'webviewBridge.api.listBox.setItems',[S('listBox_1'),['A','B','C']],function(r){return r===true});
+  addTest(N,'webviewBridge.api.listBox.getItems',[S('listBox_1')],function(r){return r&&r.length===3});
+  addTest(N,'webviewBridge.api.listBox.enableCheckboxes',[S('listBox_1'),true],function(r){return r===true});
+  addTest(N,'webviewBridge.api.listBox.disableCheckboxes',[S('listBox_1')],function(r){return r===true});
+  addTest(N,'webviewBridge.api.listBox.getCheckedItems',[S('listBox_1')],function(r){return Array.isArray(r)});
+  addTest(N,'webviewBridge.api.listBox.setChecked',[S('listBox_1'),[0,2]],function(r){return r===true});
+  addTest(N,'webviewBridge.api.listBox.selectAll',[S('listBox_1')],function(r){return r===true});
+  addTest(N,'webviewBridge.api.listBox.deselectAll',[S('listBox_1')],function(r){return r===true});
+  addTest(N,'webviewBridge.api.listBox.sort',[S('listBox_1'),true],function(r){return r===true});
+  addTest(N,'webviewBridge.api.listBox.search',[S('listBox_1'),'A'],function(r){return typeof r==='number'});
+  addTest(N,'webviewBridge.api.listBox.enableMultiSelect',[S('listBox_1'),true],function(r){return r===true});
+  addTest(N,'webviewBridge.api.listBox.disableMultiSelect',[S('listBox_1')],function(r){return r===true});
+
+  // ---------- treeView (17个) ----------
+  N = '树形框 TreeView';
+  addTest(N,'webviewBridge.api.treeView.addNode',[S('treeView_1'),'新节点','n3','node_1'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.treeView.removeNode',[S('treeView_1'),'node_2'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.treeView.getNode',[S('treeView_1'),'node_1'],function(r){return r&&r.id==='node_1'});
+  addTest(N,'webviewBridge.api.treeView.setNodeText',[S('treeView_1'),'node_1','改标题'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.treeView.getNodeText',[S('treeView_1'),'node_1'],function(r){return r==='改标题'});
+  addTest(N,'webviewBridge.api.treeView.expandNode',[S('treeView_1'),'node_1'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.treeView.collapseNode',[S('treeView_1'),'node_1'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.treeView.selectNode',[S('treeView_1'),'node_1_1'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.treeView.getSelectedNode',[S('treeView_1')],function(r){return r&&r.id==='node_1_1'});
+  addTest(N,'webviewBridge.api.treeView.expandAll',[S('treeView_1')],function(r){return r===true});
+  addTest(N,'webviewBridge.api.treeView.collapseAll',[S('treeView_1')],function(r){return r===true});
+  addTest(N,'webviewBridge.api.treeView.getNodePath',[S('treeView_1'),'node_1_1'],function(r){return r&&r.length>0});
+  addTest(N,'webviewBridge.api.treeView.getNodeChildren',[S('treeView_1'),'node_1'],function(r){return Array.isArray(r)});
+  addTest(N,'webviewBridge.api.treeView.getNodeCount',[S('treeView_1')],function(r){return typeof r==='number'});
+
+  // ---------- dataGrid (26个) ----------
+  N = '多项表格 DataGrid';
+  addTest(N,'webviewBridge.api.dataGrid.addRow',[S('dataGrid_1'),{col1:'王五',col2:'28'}],function(r){return r===true});
+  addTest(N,'webviewBridge.api.dataGrid.insertRow',[S('dataGrid_1'),0,{col1:'赵六',col2:'22'}],function(r){return r===true});
+  addTest(N,'webviewBridge.api.dataGrid.removeRow',[S('dataGrid_1'),'r1'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.dataGrid.getRowCount',[S('dataGrid_1')],function(r){return r>=2});
+  addTest(N,'webviewBridge.api.dataGrid.getRow',[S('dataGrid_1'),'r2'],function(r){return r&&r.id==='r2'});
+  addTest(N,'webviewBridge.api.dataGrid.updateRow',[S('dataGrid_1'),'r2',{col1:'改'}],function(r){return r===true});
+  addTest(N,'webviewBridge.api.dataGrid.clearRows',[S('dataGrid_1')],function(r){return r===true});
+  addTest(N,'webviewBridge.api.dataGrid.getColumnCount',[S('dataGrid_1')],function(r){return r===2});
+  addTest(N,'webviewBridge.api.dataGrid.getColumnNames',[S('dataGrid_1')],function(r){return r&&r.length===2});
+  addTest(N,'webviewBridge.api.dataGrid.addColumn',[S('dataGrid_1'),'性别'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.dataGrid.removeColumn',[S('dataGrid_1'),'性别'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.dataGrid.getSelectedRow',[S('dataGrid_1')],function(r){return r===null||(r&&r.id)});
+  addTest(N,'webviewBridge.api.dataGrid.setSelectedRow',[S('dataGrid_1'),'r2'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.dataGrid.sortByColumn',[S('dataGrid_1'),'col1','asc'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.dataGrid.getCellValue',[S('dataGrid_1'),'r2','col1'],function(r){return typeof r==='string'});
+  addTest(N,'webviewBridge.api.dataGrid.setCellValue',[S('dataGrid_1'),'r2','col1','新值'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.dataGrid.getHeaderText',[S('dataGrid_1'),0],function(r){return r==='姓名'});
+  addTest(N,'webviewBridge.api.dataGrid.setHeaderText',[S('dataGrid_1'),0,'姓名改'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.dataGrid.setColumnWidth',[S('dataGrid_1'),0,200],function(r){return r===true});
+  addTest(N,'webviewBridge.api.dataGrid.getRowIndex',[S('dataGrid_1'),'r2'],function(r){return typeof r==='number'});
+  addTest(N,'webviewBridge.api.dataGrid.scrollToRow',[S('dataGrid_1'),0],function(r){return r===true});
+  addTest(N,'webviewBridge.api.dataGrid.exportToCSV',[S('dataGrid_1')],function(r){return typeof r==='string'});
+  addTest(N,'webviewBridge.api.dataGrid.enableCheckboxes',[S('dataGrid_1'),true],function(r){return r===true});
+  addTest(N,'webviewBridge.api.dataGrid.disableCheckboxes',[S('dataGrid_1')],function(r){return r===true});
+  addTest(N,'webviewBridge.api.dataGrid.getCheckedRows',[S('dataGrid_1')],function(r){return Array.isArray(r)});
+  addTest(N,'webviewBridge.api.dataGrid.setRowClickable',[S('dataGrid_1'),true],function(r){return r===true});
+
+  // ---------- cardBox (10个) ----------
+  N = '卡片框 CardBox';
+  addTest(N,'webviewBridge.api.cardBox.addCard',[S('cardBox_1'),'新卡片'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.cardBox.removeCard',[S('cardBox_1'),0],function(r){return r===true});
+  addTest(N,'webviewBridge.api.cardBox.getCardCount',[S('cardBox_1')],function(r){return r>=1});
+  addTest(N,'webviewBridge.api.cardBox.getCard',[S('cardBox_1'),0],function(r){return r&&r.length>0});
+  addTest(N,'webviewBridge.api.cardBox.setCard',[S('cardBox_1'),0,'改卡片'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.cardBox.getSelectedIndex',[S('cardBox_1')],function(r){return typeof r==='number'});
+  addTest(N,'webviewBridge.api.cardBox.setSelectedIndex',[S('cardBox_1'),0],function(r){return r===true});
+  addTest(N,'webviewBridge.api.cardBox.clearCards',[S('cardBox_1')],function(r){return r===true});
+  addTest(N,'webviewBridge.api.cardBox.moveCard',[S('cardBox_1'),1,0],function(r){return r===true});
+  addTest(N,'webviewBridge.api.cardBox.sort',[S('cardBox_1'),true],function(r){return r===true});
+
+  // ---------- tabContainer (7个) ----------
+  N = '标签页 TabContainer';
+  addTest(N,'webviewBridge.api.tabContainer.getTabCount',[S('tabContainer_1')],function(r){return r===2});
+  addTest(N,'webviewBridge.api.tabContainer.getActiveTab',[S('tabContainer_1')],function(r){return r===0});
+  addTest(N,'webviewBridge.api.tabContainer.setActiveTab',[S('tabContainer_1'),1],function(r){return r===true});
+  addTest(N,'webviewBridge.api.tabContainer.getTabTitle',[S('tabContainer_1'),0],function(r){return r==='首页'});
+  addTest(N,'webviewBridge.api.tabContainer.setTabTitle',[S('tabContainer_1'),0,'Tab1'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.tabContainer.addTab',[S('tabContainer_1'),'新标签','新内容'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.tabContainer.removeTab',[S('tabContainer_1'),0],function(r){return r===true});
+
+  // ---------- contextMenu (4个) ----------
+  N = '右键菜单 ContextMenu';
+  addTest(N,'webviewBridge.api.contextMenu.setItems',[S('contextMenu_1'),[{id:'a',text:'A'}]],function(r){return r===true});
+  addTest(N,'webviewBridge.api.contextMenu.show',[S('contextMenu_1'),100,200],function(r){return r===true});
+  addTest(N,'webviewBridge.api.contextMenu.hide',[S('contextMenu_1')],function(r){return r===true});
+
+  // ---------- tooltip (4个) ----------
+  N = '气泡提示框 Tooltip';
+  addTest(N,'webviewBridge.api.tooltip.show',[S('tooltip_1'),'提示'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.tooltip.hide',[S('tooltip_1')],function(r){return r===true});
+  addTest(N,'webviewBridge.api.tooltip.setContent',[S('tooltip_1'),'新内容'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.tooltip.setPosition',[S('tooltip_1'),'bottom'],function(r){return r===true});
+
+  // ---------- messageBox (4个) ----------
+  N = '信息提示框 MessageBox';
+  addTest(N,'webviewBridge.api.messageBox.alert',['提示','信息'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.messageBox.confirm',['确认','确定？'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.messageBox.show',[{title:'自定义',message:'内容'}],function(r){return r===true});
+  addTest(N,'webviewBridge.api.messageBox.close',[],function(r){return r===true});
+
+  // ---------- inputBox (4个) ----------
+  N = '输入对话框 InputBox';
+  addTest(N,'webviewBridge.api.inputBox.show',[{title:'输入',prompt:'请输入'}],function(r){return r===true});
+  addTest(N,'webviewBridge.api.inputBox.getValue',[],function(r){return typeof r==='string'});
+  addTest(N,'webviewBridge.api.inputBox.setValue',['默认值'],function(r){return r===true});
+  addTest(N,'webviewBridge.api.inputBox.close',[],function(r){return r===true});
+}
+
+// ========================================================================
+// 3. 测试引擎
+// ========================================================================
+var results = {}, nsOrder = [], total = 0, pass = 0, fail = 0, skip = 0;
+
+function runTests() {
+  TESTS.forEach(function(t){
+    if(!results[t.ns]){ results[t.ns]=[]; nsOrder.push(t.ns); }
+  });
+  total = TESTS.length;
+  renderSummary(); renderFilterBar();
+
+  TESTS.forEach(function(t, idx){
+    var parts = t.name.split('.'), fn = window;
+    for(var i=2;i<parts.length;i++){ fn = fn ? fn[parts[i]] : undefined; }
+    var r = { ns:t.ns, name:t.name, args:t.args, status:'skip', detail:'' };
+    try {
+      if(typeof fn !== 'function'){ r.status='skip'; r.detail='函数不存在'; }
+      else {
+        var rs = fn.apply(null, t.args);
+        r.status = t.checker(rs) ? 'pass' : 'fail';
+        r.detail = '返回值: ' + JSON.stringify(rs);
+      }
+    } catch(e){ r.status='fail'; r.detail='异常: '+e.message; }
+    results[t.ns].push(r);
+    if(r.status==='pass') pass++; else if(r.status==='fail') fail++; else skip++;
+    updateProgress(idx+1, total);
+  });
+  renderSummary(); renderResults(); updateProgress(total, total);
+}
+
+function renderSummary(){
+  document.getElementById('summary').innerHTML = [
+    '<div class="summary-item"><div class="num total">'+total+'</div><div class="lbl">总计</div></div>',
+    '<div class="summary-item"><div class="num pass">'+pass+'</div><div class="lbl">通过</div></div>',
+    '<div class="summary-item"><div class="num fail">'+fail+'</div><div class="lbl">失败</div></div>',
+    '<div class="summary-item"><div class="num skip">'+skip+'</div><div class="lbl">跳过</div></div>'
+  ].join('');
+}
+function updateProgress(cur,total){ document.getElementById('progress-fill').style.width = Math.min(100,Math.round(cur/total*100))+'%'; }
+function renderFilterBar(){
+  var h='<button class="active" onclick="filterGroup(\'all\',this)">全部 ('+total+')</button>';
+  nsOrder.forEach(function(ns){ h+='<button onclick="filterGroup(\''+ns+'\',this)">'+ns+' ('+results[ns].length+')</button>'; });
+  document.getElementById('filterBar').innerHTML = h;
+}
+function filterGroup(ns,btn){
+  document.querySelectorAll('.filter-bar button').forEach(function(b){b.classList.remove('active')});
+  btn.classList.add('active');
+  document.querySelectorAll('.test-group').forEach(function(g){ g.style.display=(ns==='all'||g.dataset.ns===ns)?'':'none'; });
+}
+function renderResults(){
+  var html='';
+  nsOrder.forEach(function(ns){
+    var items=results[ns], passC=items.filter(function(i){return i.status==='pass'}).length;
+    var failC=items.filter(function(i){return i.status==='fail'}).length, skipC=items.filter(function(i){return i.status==='skip'}).length;
+    html+='<div class="test-group" data-ns="'+ns+'"><div class="group-header" onclick="toggleGroup(this)">';
+    html+='<span>'+ns+' <span class="group-stats">✅'+passC+' ❌'+failC+' ⏭'+skipC+'</span></span>';
+    html+='<span>'+items.length+'个</span></div><div class="group-body">';
+    items.forEach(function(r){
+      var sc=r.status;
+      html+='<div class="test-row" onclick="showDetail(\''+r.name+'\',\''+r.detail.replace(/'/g,"\\'")+'\')">';
+      html+='<div class="status '+sc+'">'+(sc==='pass'?'✅通过':sc==='fail'?'❌失败':'⏭跳过')+'</div>';
+      html+='<div class="api-name">'+r.name+'</div><div class="api-args">'+JSON.stringify(r.args)+'</div>';
+      html+='<div class="result">'+(sc==='fail'?'<span class="err">✘</span>':sc==='pass'?'<span class="ok">✔</span>':'—')+'</div></div>';
+    });
+    html+='</div></div>';
+  });
+  document.getElementById('results').innerHTML = html;
+}
+function toggleGroup(h){ var b=h.nextElementSibling; b.style.display=b.style.display==='none'?'':'none'; }
+function showDetail(n,d){
+  document.getElementById('detailTitle').textContent=n;
+  document.getElementById('detailBody').textContent=d;
+  document.getElementById('detailDialog').style.display='block';
+  document.getElementById('detailOverlay').style.display='block';
+}
+function closeDetail(){
+  document.getElementById('detailDialog').style.display='none';
+  document.getElementById('detailOverlay').style.display='none';
+}
+document.getElementById('detailOverlay').onclick=closeDetail;
+
+// ========================================================================
+// 4. 启动
+// ========================================================================
+// 检查 webviewBridge 是否已加载
+if (!window.webviewBridge || !window.webviewBridge.api) {
+  document.body.innerHTML = '<div style="padding:40px;text-align:center;">'
+    + '<h2 style="color:#c62828;">webviewBridge.js 未加载</h2>'
+    + '<p style="margin-top:12px;color:#666;">请通过 Vite 开发服务器打开此页面：</p>'
+    + '<p style="margin-top:6px;font-family:monospace;color:#1565c0;">http://localhost:5173/webviewBridge_test.html</p>'
+    + '<p style="margin-top:12px;color:#888;font-size:13px;">或者将 webviewBridge_test.html 放在 webviewBridge.js 同目录下直接打开</p>'
+    + '</div>';
+} else {
+  createRealWidgetElements();
+  initTests();
+  setTimeout(runTests, 600);
+}
+</script>
+</body>
+</html>
