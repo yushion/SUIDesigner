@@ -98,6 +98,9 @@ const VALID_CSS_PROPS = new Set([
   /** zIndex计数器 */
   const zIndexCounter = ref<number>(1)
 
+  /** 控制点位置重算信号（方向键/属性面板移动控件后触发） */
+  const _handleTick = ref(0)
+
   /** 标签页容器头部高度缓存（widgetId → 实际测量的px高度） */
   const tabHeaderHeights = reactive<Record<string, number>>({})
 
@@ -239,6 +242,11 @@ const VALID_CSS_PROPS = new Set([
   /** 分配新zIndex */
   function nextZIndex(): number {
     return ++zIndexCounter.value
+  }
+
+  /** 触发控制点位置重算（方向键/属性面板移动控件后调用） */
+  function tickHandles() {
+    _handleTick.value++
   }
 
   /** 创建控件默认属性（从 JSON 配置统一初始化，widgetsDefaultConfig 仅作 label/icon 兜底） */
@@ -1342,6 +1350,8 @@ const VALID_CSS_PROPS = new Set([
     canUndo,
     canRedo,
     zIndexCounter,
+    _handleTick,
+    tickHandles,
     findWidgetById,
     findParentWidget,
     setTabHeaderHeight,

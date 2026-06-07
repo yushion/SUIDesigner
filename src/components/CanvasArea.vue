@@ -261,8 +261,9 @@ const showHandles = computed(() => {
 function getHandleTargetRect(): { left: number; top: number; width: number; height: number } {
   if (store.selectedWidget) {
     const s = store.selectedWidget.style
-    // 拖拽中通过 dragTick 触发重算，使用DOM实际位置跟随控件
+    // 拖拽中通过 dragTick 触发重算，方向键/属性面板通过 _handleTick 触发重算
     void dragTick.value
+    void store._handleTick
     // 优先使用DOM实际位置，避免在标签页容器等场景下计算错误
     var widgetEl = document.getElementById(store.selectedWidget.id)
     if (widgetEl && canvasRef.value) {

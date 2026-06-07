@@ -96,6 +96,8 @@ export function useKeyboard() {
           widget.style.top += dy
         }
       })
+      // 触发控制点重算（方向键修改后需要重新读取 DOM 位置）
+      store.tickHandles()
       store.saveState()
       return
     }
