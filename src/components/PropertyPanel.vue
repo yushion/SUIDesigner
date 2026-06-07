@@ -1341,13 +1341,13 @@
               <div class="props-section-title">控件属性</div>
               <div v-for="prop in customWidgetProps" :key="prop.key" class="form-group">
                 <template v-if="prop.type === 'boolean'">
-                  <label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin-top: 10px;">
+                  <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
                     <input type="checkbox" :checked="prop.value" @change="onCustomPropChange(prop.key, $event)" />
                     {{ prop.key }}
                   </label>
                 </template>
                 <template v-else>
-                <label>{{ prop.key }}:</label>
+                <label>{{ prop.key }}</label>
                 <template v-if="prop.type === 'number'">
                   <input type="number" :value="prop.value" @input="onCustomPropChange(prop.key, $event)" />
                 </template>

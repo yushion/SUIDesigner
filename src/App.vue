@@ -22,17 +22,17 @@
     </header>
 
     <!-- 导出选项对话框 -->
-    <el-dialog v-model="showExportDialog" title="导出 HTML" width="420px" :close-on-click-modal="false" append-to-body>
+    <el-dialog v-model="showExportDialog" style="width: 450px; border-radius: 10px;" title="导出 HTML" :close-on-click-modal="false" append-to-body>
       <div class="export-options">
         <div class="export-option-card" :class="{ active: exportMode === 'noBridge' }" @click="exportMode = 'noBridge'">
           <div class="option-radio">
             <el-radio v-model="exportMode" value="noBridge" size="large" />
           </div>
           <div class="option-content">
-            <div class="option-title">📄 独立导出（含外链，仅不下载 webviewBridge.js）</div>
+            <div class="option-title">📄 独立导出（含外链引用）</div>
             <div class="option-desc">
-              导出 HTML 页面，包含 <code>&lt;script src="./webviewBridge.js"&gt;</code> 外链引用。<br/>
-              适合已有 <code>webviewBridge.js</code> 的场景，仅需把 HTML 和 js 放在同一目录。
+              导出 HTML，包含 <code>&lt;script src="./webviewBridge.js"&gt;</code> 外链引用。<br/>
+              适合已有 <code>webviewBridge.js</code> 的场景，只需放在同一目录。
             </div>
           </div>
         </div>
@@ -43,8 +43,8 @@
           <div class="option-content">
             <div class="option-title">🔗 外链导出（同时下载 webviewBridge.js）</div>
             <div class="option-desc">
-              UI 交互脚本已内嵌。此选项控制 <code>webviewBridge.js</code> 是否外链。<br/>
-              导出时将同时下载 <code>export.html</code> 和 <code>webviewBridge.js</code>，请放在同一目录下。
+              同时下载 <code>.html</code> 和 <code>webviewBridge.js</code>，一起放在同目录使用。<br/>
+              <span style="color:#1677ff;">推荐用于需要与 WebView2 宿主通信的桌面应用场景。</span>
             </div>
           </div>
         </div>
@@ -53,14 +53,25 @@
             <el-radio v-model="exportMode" value="inline" size="large" />
           </div>
           <div class="option-content">
-            <div class="option-title">📦 内联导出（单文件含 webviewBridge.js 全代码）</div>
+            <div class="option-title">📦 内联导出（单文件完整包）</div>
             <div class="option-desc">
-              所有脚本内嵌在 HTML 中，包括 <code>webviewBridge.js</code> 的完整内容，<br/>
-              单个文件即可运行，兼容离线场景，支持与宿主通信。
+              所有脚本内嵌在 HTML 中，单个文件即可独立运行。<br/>
+              <span style="color:#52c41a;">推荐用于离线场景或直接浏览器打开预览。</span>
             </div>
           </div>
         </div>
       </div>
+
+      <!-- API 文档链接 -->
+      <div class="export-doc-link">
+        <el-divider />
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#666;">
+          <span>📚</span>
+          <span>与宿主通信API:</span>
+          <a href="/webviewBridge_api_doc.html" target="_blank" class="doc-link">WebviewBridge API 文档</a>
+        </div>
+      </div>
+
       <template #footer>
         <el-button @click="showExportDialog = false">取消</el-button>
         <el-button type="primary" @click="doExport">📄 导出</el-button>
@@ -924,38 +935,37 @@ body::before {
 .export-options {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .export-option-card {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  padding: 16px 18px;
-  border: 2px solid #e8e8e8;
-  border-radius: 12px;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 10px;
   cursor: pointer;
-  transition: all 0.25s ease;
-  background: #fafbfc;
+  transition: all 0.2s ease;
+  background: #ffffff;
+  position: relative;
 }
 
 .export-option-card:hover {
-  border-color: #1677ff;
-  background-color: #f0f7ff;
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(22, 119, 255, 0.08);
+  border-color: #4096ff;
+  background-color: #f6fbff;
+  box-shadow: 0 2px 8px rgba(64, 150, 255, 0.1);
 }
 
 .export-option-card.active {
   border-color: #1677ff;
-  background: linear-gradient(135deg, #e6f4ff, #f0f7ff);
-  box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.1);
-  transform: scale(1.05);
+  background: linear-gradient(135deg, #e6f4ff 0%, #f0f7ff 100%);
+  box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.12), 0 2px 8px rgba(22, 119, 255, 0.08);
 }
 
 .option-radio {
   flex-shrink: 0;
-  padding-top: 2px;
+  padding-top: 1px;
 }
 
 .option-content {
@@ -964,24 +974,45 @@ body::before {
 }
 
 .option-title {
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 600;
-  color: #333;
-  margin-bottom: 6px;
+  color: #1a1a2e;
+  margin-bottom: 5px;
 }
 
 .option-desc {
   font-size: 12px;
   color: #888;
-  line-height: 1.6;
+  line-height: 1.55;
 }
 
 .option-desc code {
-  background-color: #f5f5f5;
-  padding: 1px 6px;
+  background-color: #f0f0f0;
+  padding: 1px 5px;
   border-radius: 3px;
   font-size: 11px;
   color: #d63384;
+}
+
+/* API 文档链接区域 */
+.export-doc-link {
+  margin-top: 4px;
+}
+
+.export-doc-link .el-divider {
+  margin: 8px 0 10px 0;
+}
+
+.doc-link {
+  color: #1677ff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity 0.15s;
+}
+
+.doc-link:hover {
+  opacity: 0.75;
+  text-decoration: underline;
 }
 
 /* 加载缓存对话框 — 宽度自适应内容 */

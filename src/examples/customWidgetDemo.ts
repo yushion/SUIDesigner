@@ -59,11 +59,11 @@ registerCustomWidget({
       ],
     },
     defaultProps: {
-      showCount: true,                    // 复选框 → 控制是否显示 x/5 计数
       maxStars: 5,
       value: 3,
       starColor: '#ffa500',              // 颜色选择器 → 修改星星颜色
       starSize: ['14px', '20px', '28px'], // 下拉框 → 修改星星大小
+      showCount: true,                    // 复选框 → 控制是否显示 x/5 计数
       visible: true,
       disabled: false,
     },
@@ -142,12 +142,12 @@ registerCustomWidget({
       ],
     },
     defaultProps: {
-      showSubtitle: true,                    // 复选框 → 控制是否显示涨跌文字
       title: '总用户数',
       value: '12,846',
       subtitle: '较昨日 +12%',
       accentColor: '#1890ff',               // 颜色选择器 → 修改数值颜色
       trend: ['↑ 上涨', '↓ 下跌', '→ 持平'], // 下拉框 → 切换涨跌趋势
+      showSubtitle: true,                    // 复选框 → 控制是否显示涨跌文字
       visible: true,
       disabled: false,
     },

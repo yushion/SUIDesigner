@@ -86,6 +86,17 @@ src/
 | `docs/架构分析文档.md` | 完整架构分析（状态管理/样式数据流/渲染链路/性能优化） |
 | `docs/项目简介.txt` | 项目报告与后续建议 |
 | `docs/自定义控件开发指南.md` | 第三方自定义控件开发教程 |
+| `public/webviewBridge_api_doc.html` | webviewBridge 完整 API 参考（~178 个方法，26 个命名空间） |
+
+## 🔗 webviewBridge API 文档
+
+导出后的 HTML 通过 `webviewBridge.js` 与 WebView2 宿主双向通信，提供 ~178 个运行时 API。
+
+打开 `public/webviewBridge_api_doc.html` 即可查看完整 API 参考，包含：
+
+- **26 个命名空间**：`api.public`、`api.canvas`、`api.button` ~ `api.dataGrid` 等
+- **交互式搜索**：侧边栏导航 + 代码高亮
+- **每个 API 的方法签名、参数说明和使用示例**
 
 ## 🛠 技术栈
 
