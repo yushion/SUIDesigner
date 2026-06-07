@@ -114,6 +114,7 @@ import { useKeyboard } from '@/composables/useKeyboard'
 import { setCanvasFocused } from '@/composables/useKeyboard'
 import type { WidgetType, Widget } from '@/types/index'
 import { getWidgetComponent as getWidgetFromRegistry, isWidgetRegistered } from '@/config/widgetRegistry'
+import { getAllCustomWidgetCSS } from '@/config/customWidgetAPI'
 
 const store = useWidgetStore()
 const themeStore = useThemeStore()
@@ -1021,11 +1022,12 @@ function collectAllCustomCSS(list: Widget[]): string {
   return css
 }
 
-/** 汇总控件 + 画布 customCSS，注入到 DOM 中实现设计区实时效果 */
+/** 汇总控件 + 画布 + 自定义控件的 customCSS，注入到 DOM 中实现设计区实时效果 */
 const allWidgetCSS = computed(() => {
   const widgetCSS = collectAllCustomCSS(store.widgets)
   const canvasCSS = store.canvas.customCSS || ''
-  return widgetCSS + '\n' + canvasCSS
+  const customWidgetCSS = getAllCustomWidgetCSS()
+  return widgetCSS + '\n' + canvasCSS + '\n' + customWidgetCSS
 })
 
 watch(allWidgetCSS, (css) => {

@@ -1,0 +1,62 @@
+# SUIDesigner 项目总结与建议（2026-06-07）
+
+本报告基于 v9.2 架构层面的全面审查，覆盖已完成功能、近期修复和后续建议。
+
+## 一、项目核心定位
+
+SUIDesigner 是一个 WYSIWYG UI 设计器，用于可视化设计 UI 界面并导出为独立 HTML 文件。
+导出后的 HTML 由 `public/webviewBridge.js` 接管运行时交互（值变更/可见性/样式/消息框等 178 个 API），
+与 WebView2 宿主双向通信。
+
+## 二、v9.2 近期重大改进（2026-06-07）
+
+### 架构升级
+- **控件统一注册中心**：widgetRegistry.ts 用 5 个 Map 替代原 7 处分散的硬编码注册表
+- **内置控件统一注册**：registerAllWidgets.ts 一次性注册 24 个控件（JSON 配置 + Vue 组件 + HTML 导出 + CSS 映射）
+- **第三方自定义控件 API**：customWidgetAPI.ts 支持纯 JSON + HTML 模板注册，无需写 Vue 组件
+- **通用渲染器**：CustomWidget.vue 通过 v-html 渲染模板，支持 {{prop}} 变量替换
+
+### 功能增强
+- 自定义控件属性面板支持 **5 种表单控件**：文本框、数字框、复选框、下拉框、颜色选择器
+- 复选框隐藏联动：cssString + CSS 属性选择器 + !important 覆盖
+- 自定义控件 cssString 实时注入设计区 DOM
+
+### 关键修复（6 个修复）
+1. **自定义属性持久化**：序列化增加 _extraProps 机制，刷新后属性不丢失
+2. **下拉框初始值**：创建控件时数组属性自动取首项，避免模板渲染逗号拼接
+3. **复选框无效**：cssString 注入设计区 + CSS !important 覆盖结构样式
+4. **复选框同行显示**：boolean 类型改为 label 包裹 checkbox 的 flex 布局
+5. **TS 类型修复**：TreeNode 增加 level/label/name/isExpanded 字段，移除重复 editable
+6. **右键菜单/气泡框画布可见**：注册 Vue 组件到 registerAllWidgets
+
+### 云部署
+- GitHub Pages 部署工作流（.github/workflows/deploy.yml）
+- CloudFlare Pages 自动构建部署
+- Vercel 一键部署支持
+
+## 三、现有架构亮点
+
+- **纯 JSON 配置**：24 个控件的样式全在 JSON 中定义，修改默认外观无需改代码
+- **通用 CSS 生成器**：cssGenerator.ts 一个函数替代了 24 个硬编码 CSS 模板
+- **双速通道性能架构**：rAF 限流（每帧 1 次 DOM）+ 150ms 防抖（批量重建 CSS）+ saveState rAF 合并
+- **Vue SSR 预览导出**：预览和导出使用同一 ssrExporter 引擎，结果一致
+- **7 套主题**：默认/Mica 明暗/亚克力明暗/高透明暗，支持一键切换
+- **50 步撤销/重做**：完整设计快照，rAF 合并防高频
+
+## 四、后续建议
+
+### 高优先级
+1. **自定义控件文档完善**：编写完整的 customWidgetAPI 使用教程和最佳实践
+2. **控件参数校验**：自定义控件注册时校验 type 唯一性和必填字段
+3. **单元测试**：为核心模块（widgetStore、cssParser、cssGenerator）编写测试
+
+### 中优先级
+4. **图层管理面板**：树形显示控件层级，支持拖拽排序/重命名/锁定
+5. **响应式布局容器**：FlexRow/Grid 容器，子控件相对定位
+6. **多格式导出**：Vue SFC、React JSX 等
+7. **模板市场**：导入/导出设计 JSON，一键应用预设模板
+
+### 低优先级
+8. **AI 辅助**：属性面板集成 AI 样式优化
+9. **IndexedDB 存储**：突破 localStorage 5MB 限制
+10. **协作编辑**：多人在线编辑（类似 Figma，工程量大）

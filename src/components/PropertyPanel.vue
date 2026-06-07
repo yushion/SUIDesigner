@@ -1340,15 +1340,31 @@
             <div v-if="customWidgetProps.length > 0" class="props-section">
               <div class="props-section-title">控件属性</div>
               <div v-for="prop in customWidgetProps" :key="prop.key" class="form-group">
-                <label>{{ prop.key }}</label>
                 <template v-if="prop.type === 'boolean'">
-                  <input type="checkbox" :checked="prop.value" @change="onCustomPropChange(prop.key, $event)" />
+                  <label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin-top: 10px;">
+                    <input type="checkbox" :checked="prop.value" @change="onCustomPropChange(prop.key, $event)" />
+                    {{ prop.key }}
+                  </label>
                 </template>
-                <template v-else-if="prop.type === 'number'">
+                <template v-else>
+                <label>{{ prop.key }}:</label>
+                <template v-if="prop.type === 'number'">
                   <input type="number" :value="prop.value" @input="onCustomPropChange(prop.key, $event)" />
+                </template>
+                <template v-else-if="prop.type === 'select'">
+                  <select :value="prop.value" @change="onCustomPropChange(prop.key, $event)">
+                    <option v-for="opt in prop.options" :key="opt" :value="opt">{{ opt }}</option>
+                  </select>
+                </template>
+                <template v-else-if="prop.type === 'color'">
+                  <div style="display:flex;align-items:center;gap:6px;">
+                    <input type="color" :value="prop.value" @input="onCustomPropChange(prop.key, $event)" style="width:32px;height:28px;padding:0;border:none;cursor:pointer;" />
+                    <input type="text" :value="prop.value" @input="onCustomPropChange(prop.key, $event)" style="flex:1;" />
+                  </div>
                 </template>
                 <template v-else>
                   <input type="text" :value="prop.value" @input="onCustomPropChange(prop.key, $event)" />
+                </template>
                 </template>
               </div>
             </div>
@@ -2504,15 +2520,24 @@ const customWidgetProps = computed(() => {
   if (!config) return []
 
   const defaultProps = config.defaultProps || {}
-  const result: Array<{ key: string; type: string; value: any }> = []
+  const result: Array<{ key: string; type: string; value: any; options?: string[] }> = []
   for (const [key, defaultVal] of Object.entries(defaultProps)) {
     // 跳过系统通用属性
     if (key === 'visible' || key === 'disabled') continue
     const currentVal = (w as any)[key] ?? defaultVal
+    // 类型推断：数组 → 下拉框，颜色字符串 → 颜色选择器
     const type = typeof defaultVal === 'boolean' || typeof currentVal === 'boolean' ? 'boolean'
       : typeof defaultVal === 'number' || typeof currentVal === 'number' ? 'number'
+      : Array.isArray(defaultVal) || Array.isArray(currentVal) ? 'select'
+      : (typeof (defaultVal) === 'string' && /^#[0-9a-fA-F]{3,8}$/.test(defaultVal))
+        || (typeof (currentVal) === 'string' && /^#[0-9a-fA-F]{3,8}$/.test(currentVal)) ? 'color'
       : 'string'
-    result.push({ key, type, value: currentVal })
+    const entry: { key: string; type: string; value: any; options?: string[] } = { key, type, value: currentVal }
+    if (type === 'select') {
+      entry.options = Array.isArray(defaultVal) ? defaultVal : (Array.isArray(currentVal) ? currentVal : [])
+      entry.value = currentVal && !Array.isArray(currentVal) ? currentVal : (Array.isArray(defaultVal) ? defaultVal[0] : '')
+    }
+    result.push(entry)
   }
   return result
 })

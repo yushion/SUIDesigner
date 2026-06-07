@@ -59,13 +59,21 @@ registerCustomWidget({
       ],
     },
     defaultProps: {
+      showCount: true,                    // 复选框 → 控制是否显示 x/5 计数
       maxStars: 5,
       value: 3,
+      starColor: '#ffa500',              // 颜色选择器 → 修改星星颜色
+      starSize: ['14px', '20px', '28px'], // 下拉框 → 修改星星大小
+      visible: true,
+      disabled: false,
     },
   },
   htmlTemplate:
-    '<div class="star-icon">\u2605\u2605\u2605\u2606\u2606</div>' +
-    '<div class="star-count">{{value}}/{{maxStars}}</div>',
+    '<div class="star-icon" style="color:{{starColor}};font-size:{{starSize}}">\u2605\u2605\u2605\u2606\u2606</div>' +
+    '<div class="star-count" data-visible="{{showCount}}">{{value}}/{{maxStars}}</div>',
+  cssString:
+    '/* 复选框联动：showCount=false 时隐藏计数 */\n' +
+    '.star-count[data-visible="false"] { display: none !important; }',
 })
 
 // ================================================================
@@ -134,16 +142,23 @@ registerCustomWidget({
       ],
     },
     defaultProps: {
+      showSubtitle: true,                    // 复选框 → 控制是否显示涨跌文字
       title: '总用户数',
       value: '12,846',
       subtitle: '较昨日 +12%',
+      accentColor: '#1890ff',               // 颜色选择器 → 修改数值颜色
+      trend: ['↑ 上涨', '↓ 下跌', '→ 持平'], // 下拉框 → 切换涨跌趋势
+      visible: true,
+      disabled: false,
     },
   },
   htmlTemplate:
     '<div class="card-title">{{title}}</div>' +
-    '<div class="card-value">{{value}}</div>' +
-    '<div class="card-subtitle">{{subtitle}}</div>',
-  cssString: '',
+    '<div class="card-value" style="color:{{accentColor}}">{{value}}</div>' +
+    '<div class="card-subtitle" data-visible="{{showSubtitle}}">{{subtitle}} {{trend}}</div>',
+  cssString:
+    '/* 复选框联动：showSubtitle=false 时隐藏涨跌文字 */\n' +
+    '.card-subtitle[data-visible="false"] { display: none !important; }',
 })
 
 console.log('[customWidgetDemo] 已注册 2 个自定义控件：starRating、statCard')

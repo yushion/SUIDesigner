@@ -293,6 +293,14 @@ const VALID_CSS_PROPS = new Set([
       ...defaultProps
     }
 
+    // 下拉框类型属性：数组首项作为初始值，避免模板渲染时 String(Array) 变成逗号拼接
+    for (const key of Object.keys(defaultProps)) {
+      const val = (base as any)[key]
+      if (Array.isArray(val)) {
+        (base as any)[key] = val[0]
+      }
+    }
+
     // 处理需要动态ID的特殊控件
     if (type === 'treeView' && base.treeNodes) {
       const replaceIds = (nodes: any[]) => {
@@ -1096,6 +1104,18 @@ const VALID_CSS_PROPS = new Set([
       data.styleData = JSON.parse(JSON.stringify(w.styleData))
     }
 
+    // 自定义控件业务属性：保存 Widget 接口之外的额外属性
+    const KNOWN_KEYS = new Set(Object.keys(data))
+    const extraProps: Record<string, any> = {}
+    for (const key of Object.keys(w)) {
+      if (!KNOWN_KEYS.has(key) && key !== 'children' && key !== 'tabs' && key !== 'style' && key !== 'styleData') {
+        extraProps[key] = (w as any)[key]
+      }
+    }
+    if (Object.keys(extraProps).length > 0) {
+      data._extraProps = extraProps
+    }
+
     if (w.tabs) {
       data.tabs = w.tabs.map(t => ({ ...t }))
       data.activeTab = w.activeTab
@@ -1192,6 +1212,13 @@ const VALID_CSS_PROPS = new Set([
       const jsonConfig = getWidgetDefaultConfig(widget.type)
       if (jsonConfig) {
         widget.customCSS = generateWidgetCSSFromConfig(widget, jsonConfig)
+      }
+    }
+
+    // 恢复自定义控件业务属性（序列化时保存在 _extraProps 中）
+    if (data._extraProps) {
+      for (const [key, value] of Object.entries(data._extraProps)) {
+        (widget as any)[key] = value
       }
     }
 
