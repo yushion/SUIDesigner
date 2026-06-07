@@ -26,6 +26,39 @@
   // IconManager — 图标占位符与 emoji 互转
   // ================================================================
 
+  /**
+   * 判断 BMP 字符码点是否属于图标/符号/dingbat 区块（需转为 [U+XXXX]）
+   * 中日韩文字、拉丁扩展等正常文本字符不在此列，保留原样
+   */
+  function _isIconChar(cp) {
+    // 杂项符号 U+2600-U+26FF（★☆�?☁…✕✓✗✘❌✅…）
+    if (cp >= 0x2600 && cp <= 0x26FF) return true;
+    // 装饰符号 U+2700-U+27BF（✂✃✄✅…✕✖✗✘✙✚…）
+    if (cp >= 0x2700 && cp <= 0x27BF) return true;
+    // 杂项符号与箭头 U+2B00-U+2BFF（⬀⬁…⬆⬇⭐⭕…）
+    if (cp >= 0x2B00 && cp <= 0x2BFF) return true;
+    // 几何形状 U+25A0-U+25FF（■□▲△▼▽◆◇○◎●…）
+    if (cp >= 0x25A0 && cp <= 0x25FF) return true;
+    // 货币符号 U+20A0-U+20CF（₠₡₢₣₤₥₦₧₨₩₪₫€₭₮₯…）
+    if (cp >= 0x20A0 && cp <= 0x20CF) return true;
+    // 类字母符�? U+2100-U+214F（℃℉℗℘…）
+    if (cp >= 0x2100 && cp <= 0x214F) return true;
+    // 箭头 U+2190-U+21FF（←↑→↓↔↕…）
+    if (cp >= 0x2190 && cp <= 0x21FF) return true;
+    // 数学运算符 U+2200-U+22FF（∀∁∂∃∄∅…）
+    if (cp >= 0x2200 && cp <= 0x22FF) return true;
+    // 杂项技术符号 U+2300-U+23FF（⌀⌁⌂⌃⌄⌅⌆⌇⌈⌉⌊⌋…）
+    if (cp >= 0x2300 && cp <= 0x23FF) return true;
+    // 制表�?/方框绘制 U+2500-U+257F（─━│┃┄…）
+    if (cp >= 0x2500 && cp <= 0x257F) return true;
+    // 一般标点 U+2000-U+206F（—‖‗…†‡•…‰‹›※‼‽‾⁁）
+    if (cp >= 0x2000 && cp <= 0x206F) return true;
+    // 半角/全角形式 U+FF00-U+FFEF（全角字母数字和半角片假名之外的特殊符号）
+    if (cp >= 0xFF01 && cp <= 0xFF5E) return true;
+    if (cp >= 0xFFE0 && cp <= 0xFFE6) return true;
+    return false;
+  }
+
   var IconManager = {
     iconMap: {
       'OK': '\u2705',
@@ -234,6 +267,50 @@
         var escaped = icon.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
         var regex = new RegExp(escaped, 'g');
         result = result.replace(regex, '[' + placeholder + ']');
+      }
+      // 通用回退：将 iconMap 未能覆盖的非 ASCII 字符转为 [U+XXXX] 格式，兼容易语言等不支持 Unicode 的环境
+      return IconManager.sanitize(result);
+    },
+
+    /**
+     * 通用 Unicode 消毒：仅转换图标/符号/emoji 类字符为 [U+XXXX] 占位符
+     * 中日韩文字、拉丁扩展等正常文本字符保留不变
+     * - 杂项符号（U+2600-U+26FF）：★☆☀☁☂☃☄★☆☇☈☉☊☋☌☍☎☏☐☑☒☓…✕✓✗✘…
+     * - 装饰符号（U+2700-U+27BF）：✂✃✄✅✆✇✈✉✊✋✌✍✎✏✐✑✒✓✔✕✖✗✘…
+     * - 杂项符号与箭头（U+2B00-U+2BFF）：⬀⬁⬂⬃⬄⬅⬆⬇⬈⬉⬊⬋⬌⬍⬎⬏…
+     * - 表情符号（U+1F600-U+1F64F）、象形符号（U+1F300-U+1F5FF）等
+     * - 补充平面字符（codepoint >= 0x10000）
+     */
+    sanitize: function(str) {
+      if (!str || typeof str !== 'string') return str;
+      var result = '';
+      for (var i = 0; i < str.length; i++) {
+        var cp = str.charCodeAt(i);
+
+        // ASCII 直接保留
+        if (cp <= 127) {
+          result += str.charAt(i);
+          continue;
+        }
+
+        // 补充平面代理对（高位代理 + 低位代理）
+        if (cp >= 0xD800 && cp <= 0xDBFF && i + 1 < str.length) {
+          var lo = str.charCodeAt(i + 1);
+          if (lo >= 0xDC00 && lo <= 0xDFFF) {
+            var fullCp = ((cp - 0xD800) * 0x400) + (lo - 0xDC00) + 0x10000;
+            // 补充平面全部视为图标/emoji
+            result += '[U+' + fullCp.toString(16).toUpperCase() + ']';
+            i++;
+            continue;
+          }
+        }
+
+        // BMP 中仅图标/符号块做转换，文字类字符保留
+        if (_isIconChar(cp)) {
+          result += '[U+' + cp.toString(16).toUpperCase() + ']';
+        } else {
+          result += str.charAt(i);
+        }
       }
       return result;
     },
@@ -715,7 +792,7 @@
         data.tabTxt = data.cardTitle;
         break;
       case 'tab_container':
-        var tEl = el.closest('.tabs-container') || el;
+        var tEl = el.closest('.tabs-container') || el.closest('[data-ctrl-type="tabsContainer"]') || el;
         var ab = tEl.querySelector('.tab-header-btn.active');
         data.tabName = ab ? (ab.getAttribute('data-tab-name') || '') : '';
         data.tabTxt = ab ? (ab.textContent || '') : '';
@@ -791,17 +868,24 @@
             if (cb) { cb.checked = !cb.checked; return; }
           }
         }
-        var allContents = treeContainer.querySelectorAll('.tree-node-content.selected');
-        for (var tc = 0; tc < allContents.length; tc++) {
-          allContents[tc].classList.remove('selected');
-        }
         var clickedContent = e.target.closest('.tree-node-content');
-        if (clickedContent) clickedContent.classList.add('selected');
+        if (clickedContent) {
+          var allContents = treeContainer.querySelectorAll('.tree-node-content.selected');
+          for (var tc = 0; tc < allContents.length; tc++) {
+            allContents[tc].classList.remove('selected');
+          }
+          clickedContent.classList.add('selected');
+        } else if (treeContainer.getAttribute('data-always-show-selection') !== 'true') {
+          var allContents = treeContainer.querySelectorAll('.tree-node-content.selected');
+          for (var tc = 0; tc < allContents.length; tc++) {
+            allContents[tc].classList.remove('selected');
+          }
+        }
         lastActiveTreeView = treeContainer;
       }
     }
     if (ctrlType === 'tab_btn') {
-      var tabContainer = e.target.closest('.tabs-container');
+      var tabContainer = e.target.closest('.tabs-container') || e.target.closest('[data-ctrl-type="tabsContainer"]');
       if (tabContainer) {
         var containerId = tabContainer.id || targetId;
         var newTabName = e.target.getAttribute('data-tab-name') || '';
@@ -846,7 +930,7 @@
       }
     }
     if (ctrlType === 'tab_container') {
-      var tabRoot = e.target.closest('.tabs-container');
+      var tabRoot = e.target.closest('.tabs-container') || e.target.closest('[data-ctrl-type="tabsContainer"]');
       if (tabRoot) {
         var tcId = tabRoot.id || targetId;
         var activeBtn = tabRoot.querySelector('.tab-header-btn.active');
@@ -1190,10 +1274,34 @@
     }
   }
 
+  /**
+   * 链接点击拦截器 - 禁止所有页面跳转，通过事件消息发送超链接数据给宿主
+   */
+  function handleLinkClick(e) {
+    var link = e.target.closest('a');
+    if (!link) return;
+    var href = link.getAttribute('href');
+    if (!href || href === 'javascript:void(0)' || href === 'javascript:void(0);') {
+      e.preventDefault();
+      e.stopPropagation();
+      var dataHref = link.getAttribute('data-href') || '';
+      var targetId = '';
+      var idEl = link.closest('[id]');
+      if (idEl) targetId = idEl.id;
+      if (idEl && idEl.getAttribute('data-ctrl-type') === 'hyperlink') {
+        send('hyperlink', 'hyperlink', targetId, { href: dataHref, text: link.textContent || '' });
+      }
+      return;
+    }
+    // 任何其他链接也禁止跳转
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
   function bindEvents() {
     var tabBtns = document.querySelectorAll('.tab-header-btn.active');
     for (var i = 0; i < tabBtns.length; i++) {
-      var container = tabBtns[i].closest('.tabs-container');
+      var container = tabBtns[i].closest('.tabs-container') || tabBtns[i].closest('[data-ctrl-type="tabsContainer"]');
       if (container && container.id) {
         lastActiveTab[container.id] = {
           tabName: tabBtns[i].getAttribute('data-tab-name') || '',
@@ -1208,7 +1316,9 @@
     document.addEventListener('dblclick', handleDblClick, true);
     document.addEventListener('contextmenu', handleContextMenu, true);
     document.addEventListener('focus', handleFocus, true);
-    log('[webviewBridge] 事件委托已绑定 (click/change/input/blur/dblclick/contextmenu/focus)');
+    // 拦截所有链接跳转，发送超链接数据给宿主处理
+    document.addEventListener('click', handleLinkClick, false);
+    log('[webviewBridge] 事件委托已绑定 (click/change/input/blur/dblclick/contextmenu/focus/link)');
   }
 
   // ================================================================
@@ -1360,6 +1470,18 @@
     }
   };
 
+  /** 从函数源码提取参数名列表 */
+  function getParamNames(func) {
+    if (typeof func !== 'function') return [];
+    var fnStr = func.toString();
+    var match = fnStr.match(/function\s*\w*\s*\(([^)]*)\)/);
+    if (!match) return [];
+    var raw = match[1];
+    if (!raw.trim()) return [];
+    var params = raw.split(',').map(function(p) { return p.trim(); });
+    return params;
+  }
+
   function dispatchCommand(cmd) {
     if (!cmd || typeof cmd !== 'object') return;
     var name = cmd.command || cmd.cmd || '';
@@ -1372,6 +1494,36 @@
         warn('[webviewBridge] 默认命令执行异常:', name, e.message);
       }
       return;
+    }
+    // 通用点号命令分发：如 tabContainer.selectTab、dataGrid.addRow、listBox.selectItem 等
+    var parts = name.split('.');
+    if (parts.length >= 2 && window.webviewBridge && window.webviewBridge.api) {
+      var apiObj = window.webviewBridge.api;
+      var validPath = true;
+      for (var pi = 0; pi < parts.length - 1; pi++) {
+        if (!apiObj || !apiObj[parts[pi]]) { validPath = false; break; }
+        apiObj = apiObj[parts[pi]];
+      }
+      if (validPath && apiObj && typeof apiObj[parts[parts.length - 1]] === 'function') {
+        try {
+          var methodName = parts[parts.length - 1];
+          var fn = apiObj[methodName];
+          var paramNames = getParamNames(fn);
+          var callArgs = [];
+          for (var ai = 0; ai < paramNames.length; ai++) {
+            var pn = paramNames[ai];
+            if (cmd[pn] !== undefined) {
+              callArgs.push(cmd[pn]);
+            } else {
+              callArgs.push(undefined);
+            }
+          }
+          fn.apply(apiObj, callArgs);
+        } catch(e) {
+          warn('[webviewBridge] 点号命令执行异常:', name, e.message);
+        }
+        return;
+      }
     }
     warn('[webviewBridge] 未知命令:', name);
   }
@@ -1608,7 +1760,24 @@
   var tooltipShowTimer = null;
   var tooltipHideTimer = null;
 
+  var tooltipStyleEl = null;
+
+  function ensureTooltipDefaultStyles() {
+    if (tooltipStyleEl) return;
+    tooltipStyleEl = document.createElement('style');
+    tooltipStyleEl.setAttribute('data-tooltip-defaults', '1');
+    tooltipStyleEl.textContent =
+      '.tt-content { background:#333; color:#fff; padding:8px 12px; border-radius:6px; font-size:13px; line-height:1.5; max-width:300px; word-wrap:break-word; box-shadow:0 4px 12px rgba(0,0,0,0.25); }' +
+      '.tt-arrow { position:absolute; width:0; height:0; border:6px solid transparent; }' +
+      '.tt-arrow.bottom { border-top-color:#333; }' +
+      '.tt-arrow.top { border-bottom-color:#333; }' +
+      '.tt-arrow.right { border-left-color:#333; }' +
+      '.tt-arrow.left { border-right-color:#333; }';
+    document.head.appendChild(tooltipStyleEl);
+  }
+
   function createTooltipElement() {
+    ensureTooltipDefaultStyles();
     var wrapper = document.createElement('div');
     wrapper.className = 'tt-wrapper';
     wrapper.style.cssText = 'position:fixed;z-index:999999;pointer-events:none;';
@@ -2321,6 +2490,15 @@
 
   function init() {
     log('[webviewBridge] 初始化开始');
+    // 注入高亮选中样式（不加 !important，让用户的 #widgetId .item-selected 选择器优先级更高）
+    var style = document.createElement('style');
+    style.textContent =
+      '.item-selected { background-color: #0078d4; color: #ffffff; }' +
+      '.tree-node-content.selected { background-color: #0078d4; color: #ffffff; }' +
+      '.tree-node-content.selected .tree-label { color: #ffffff; }' +
+      '.data-grid-row-focused { background-color: #0078d4; color: #ffffff; }' +
+      '.data-grid-row-focused .data-grid-cell { color: #ffffff; }';
+    document.head.appendChild(style);
     IconManager.parseAll();
     bindEvents();
     listenHostMessages();
@@ -2460,10 +2638,12 @@
         return blockContextMenu;
       },
       getWindowSize: function() {
-        var container = document.querySelector('.page-container') || document.body;
+        var newStyles = getAllOriginalStyles('page_container');
         return {
-          width: container.offsetWidth || container.clientWidth || document.documentElement.scrollWidth,
-          height: container.offsetHeight || container.clientHeight || document.documentElement.scrollHeight
+          width: newStyles.width || container.offsetWidth || container.clientWidth || document.documentElement.scrollWidth,
+          height: newStyles.height || container.offsetHeight || container.clientHeight || document.documentElement.scrollHeight,
+          realWidth: newStyles.realWidth || -1,
+          realHeight: newStyles.realHeight || -1
         };
       },
       /**
@@ -2828,13 +3008,28 @@
           return el ? el.value : '';
         },
 
-        setValue: function(targetId, value) {
-          var el = findTarget(targetId);
-          if (!el) return false;
-          el.value = value;
-          el.dispatchEvent(new Event('change', { bubbles: true }));
-          return true;
-        },
+        // 在 webviewBridge.js 中找到 api.comboBox.setValue，替换为：
+		setValue: function(targetId, value) {
+		  var el = findTarget(targetId);
+		  if (!el) return false;
+
+		  // 检查 value 是否存在于任意 option 的 value 属性中
+		  var exists = false;
+		  for (var i = 0; i < el.options.length; i++) {
+			if (el.options[i].value == value) {  // 使用 == 允许字符串与数字比较
+			  exists = true;
+			  break;
+			}
+		  }
+		  if (!exists) {
+			// 值不存在，终止操作，不修改当前选中项，不触发 change 事件
+			return false;
+		  }
+
+		  el.value = value;
+		  el.dispatchEvent(new Event('change', { bubbles: true }));
+		  return true;
+		},
 
         getText: function(targetId) {
           var el = findTarget(targetId);
@@ -3635,7 +3830,7 @@
           var checkboxHTML = showCb ? '<span class="tree-checkbox"><input type="checkbox" class="tree-node-check" data-ctrl-type="treeview_node_checkbox"' + newNodeChecked + '></span>' : '';
           div.innerHTML = '<div class="tree-node-content">' +
             checkboxHTML +
-            '<span class="tree-toggle' + toggleClass + '" data-ctrl-type="treeview_node_toggle">▶</span>' +
+            '<span class="tree-toggle' + toggleClass + '" data-ctrl-type="treeview_node_toggle">' + (isExpanded ? '▼' : '▶') + '</span>' +
             '<span class="tree-icon' + iconClass + '">' + (hasChildren ? '📁' : '📄') + '</span>' +
             '<span class="tree-label" data-ctrl-type="treeview_node_text">' + (newNode.text || '') + '</span>' +
             '<span class="tree-edit-input" style="display:none"></span>' +
@@ -3644,13 +3839,20 @@
           if (parentNode) {
             var toggle = this._getNodeToggle(targetId, parentNodeId);
             if (toggle) {
-              toggle.className = toggle.className.replace('empty', '').replace('collapsed', '') + ' expanded';
-              toggle.textContent = '▼';
+              // 仅在父节点之前无子节点时才更新 toggle 状态
+              // 如果之前是 empty，现在有子节点了，设为 expanded 并显示箭头
+              if (toggle.classList.contains('empty')) {
+                toggle.className = 'tree-toggle expanded';
+                toggle.textContent = '▼';
+              }
+              // 如果之前已有子节点，保持其原有的 expanded/collapsed 状态不变
             }
             var icon = parentNode.querySelector('.tree-node-content .tree-icon');
             if (icon) {
-              icon.className = icon.className.replace('file', 'folder');
-              icon.textContent = '📁';
+              if (icon.classList.contains('file')) {
+                icon.className = 'tree-icon folder';
+                icon.textContent = '📁';
+              }
             }
           }
           return true;
@@ -3659,7 +3861,22 @@
         removeNode: function(targetId, nodeId) {
           var node = this._getNode(targetId, nodeId);
           if (!node) return false;
-          node.parentNode.removeChild(node);
+          var parentNode = node.parentNode;
+          parentNode.removeChild(node);
+          // 检查父节点是否还有其他子节点，如果没了则更新父级 toggle
+          if (parentNode && parentNode.classList.contains('tree-children')) {
+            var parentTreeNode = parentNode.closest('.tree-node');
+            if (parentTreeNode) {
+              var parentToggle = parentTreeNode.querySelector(':scope > .tree-node-content .tree-toggle');
+              var remaining = parentNode.querySelectorAll('.tree-node');
+              if (remaining.length === 0) {
+                if (parentToggle) {
+                  parentToggle.className = 'tree-toggle empty';
+                  parentToggle.textContent = '';
+                }
+              }
+            }
+          }
           return true;
         },
 
@@ -3679,8 +3896,8 @@
           var toggle = this._getNodeToggle(targetId, nodeId);
           var children = this._getNodeChildren(targetId, nodeId);
           if (!toggle || !children) return false;
-          toggle.className = toggle.className.replace('collapsed', 'expanded');
-          toggle.textContent = '▼';
+          toggle.classList.remove('collapsed');
+          toggle.classList.add('expanded');
           children.style.display = '';
           return true;
         },
@@ -3689,10 +3906,22 @@
           var toggle = this._getNodeToggle(targetId, nodeId);
           var children = this._getNodeChildren(targetId, nodeId);
           if (!toggle || !children) return false;
-          toggle.className = toggle.className.replace('expanded', 'collapsed');
-          toggle.textContent = '▶';
+          toggle.classList.remove('expanded');
+          toggle.classList.add('collapsed');
           children.style.display = 'none';
           return true;
+        },
+
+        toggleNode: function(targetId, nodeId) {
+          var toggle = this._getNodeToggle(targetId, nodeId);
+          var children = this._getNodeChildren(targetId, nodeId);
+          if (!toggle) return false;
+          if (toggle.classList.contains('empty')) return false;
+          if (toggle.classList.contains('expanded')) {
+            return this.collapseNode(targetId, nodeId);
+          } else {
+            return this.expandNode(targetId, nodeId);
+          }
         },
 
         expandAll: function(targetId) {
@@ -3700,8 +3929,8 @@
           if (!el) return false;
           var toggles = el.querySelectorAll('.tree-toggle.collapsed');
           for (var i = 0; i < toggles.length; i++) {
-            toggles[i].className = toggles[i].className.replace('collapsed', 'expanded');
-            toggles[i].textContent = '▼';
+            toggles[i].classList.remove('collapsed');
+            toggles[i].classList.add('expanded');
             var node = toggles[i].closest('.tree-node');
             var children = node ? node.querySelector('.tree-children') : null;
             if (children) children.style.display = '';
@@ -3714,8 +3943,8 @@
           if (!el) return false;
           var toggles = el.querySelectorAll('.tree-toggle.expanded');
           for (var i = 0; i < toggles.length; i++) {
-            toggles[i].className = toggles[i].className.replace('expanded', 'collapsed');
-            toggles[i].textContent = '▶';
+            toggles[i].classList.remove('expanded');
+            toggles[i].classList.add('collapsed');
             var node = toggles[i].closest('.tree-node');
             var children = node ? node.querySelector('.tree-children') : null;
             if (children) children.style.display = 'none';
@@ -3989,14 +4218,40 @@
           var rows = this._getRows(targetId);
           return (rowIndex >= 0 && rowIndex < rows.length) ? rows[rowIndex] : null;
         },
+		
+		_getCellObj: function(row,columnKey){
+		  var cell = row.querySelector('.data-grid-cell[data-col-name="' + columnKey + '"]');
+          if (!cell) return null;
+          var cellkey = cell.getAttribute('data-col-key');
+          if (!cellkey) return null;
+		  cell = row.querySelector('.data-grid-cell[data-col-key="' + cellkey + '"]');
+		  return cell;
+		},
+		
+		_getCellkey: function(row,columnKey){
+		  var cell = row.querySelector('.data-grid-cell[data-col-name="' + columnKey + '"]');
+          if (!cell) return null;
+          var cellkey = cell.getAttribute('data-col-key');
+		  return cellkey;
+		},
 
         _getColumns: function(targetId) {
           var header = this._getHeader(targetId);
-          if (!header) return [];
+          if (!header) {
+            // fallback: read from first data row
+            var row = this._getRow(targetId, 0);
+            if (!row) return [];
+            var dataCells = row.querySelectorAll('.data-grid-cell:not(.data-grid-checkbox)');
+            var cols = [];
+            for (var k = 0; k < dataCells.length; k++) {
+              cols.push({ field: dataCells[k].getAttribute('data-col-key') || '',header: dataCells[k].getAttribute('data-col-name') || '', index: k });
+            }
+            return cols;
+          }
           var cells = header.querySelectorAll('.data-grid-header-cell:not(.data-grid-checkbox)');
           var cols = [];
           for (var i = 0; i < cells.length; i++) {
-            cols.push({ field: cells[i].getAttribute('data-col-key') || '', index: i });
+            cols.push({ field: cells[i].getAttribute('data-col-key') || '',header: cells[i].getAttribute('data-col-name') || '', index: i });
           }
           return cols;
         },
@@ -4017,12 +4272,12 @@
           for (var j = 0; j < columns.length; j++) {
             var w = columns[j].width || 100;
             var val = '';
-            if (rowData.cells && rowData.cells[columns[j].field] !== undefined) {
-              val = String(rowData.cells[columns[j].field]);
+            if (rowData.cells && (rowData.cells[columns[j].header] !== undefined || rowData.cells[columns[j].field] !== undefined)) {
+              val = String(rowData.cells[columns[j].header]) || String(rowData.cells[columns[j].field]);
             }
             var displayVal = IconManager.parse(val);
             var escapedVal = val.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            html += '<div class="data-grid-cell" data-ctrl-type="datagrid_cell" data-col-key="' + columns[j].field + '" data-original-text="' + escapedVal + '" style="width:' + w + 'px;min-width:' + w + 'px;flex-shrink:0" title="' + displayVal.replace(/"/g, '&quot;') + '">' + displayVal + '</div>';
+            html += '<div class="data-grid-cell" data-ctrl-type="datagrid_cell" data-col-key="' + columns[j].field + '" data-col-name="' + columns[j].header + '" data-original-text="' + escapedVal + '" style="width:' + w + 'px;min-width:' + w + 'px;flex-shrink:0" title="' + displayVal.replace(/"/g, '&quot;') + '">' + displayVal + '</div>';
           }
           return html;
         },
@@ -4063,12 +4318,11 @@
         getRowCount: function(targetId) {
           return this._getRows(targetId).length;
         },
-
+		
         setCellValue: function(targetId, rowIndex, columnKey, value) {
           var row = this._getRow(targetId, rowIndex);
           if (!row) return false;
-          var cell = row.querySelector('.data-grid-cell[data-col-key="' + columnKey + '"]');
-          if (!cell) return false;
+		  var cell = this._getCellObj(row,columnKey);
           cell.textContent = String(value);
           cell.setAttribute('title', String(value));
           return true;
@@ -4077,7 +4331,7 @@
         getCellValue: function(targetId, rowIndex, columnKey) {
           var row = this._getRow(targetId, rowIndex);
           if (!row) return '';
-          var cell = row.querySelector('.data-grid-cell[data-col-key="' + columnKey + '"]');
+		  var cell = this._getCellObj(row,columnKey);
           return cell ? cell.textContent : '';
         },
 
@@ -4537,7 +4791,7 @@
 
         _getTabPanes: function(targetId) {
           var el = this._getContainer(targetId);
-          return el ? el.querySelectorAll('.tab-pane') : [];
+          return el ? el.querySelectorAll('.tab-content-panel') : [];
         },
 
         _findTabBtn: function(targetId, tabId) {
@@ -4547,7 +4801,7 @@
 
         _findTabPane: function(targetId, tabId) {
           var el = this._getContainer(targetId);
-          return el ? el.querySelector('.tab-pane[data-tab-name="' + tabId + '"]') : null;
+          return el ? el.querySelector('.tab-content-panel[data-tab-name="' + tabId + '"]') : null;
         },
 
         _deactivateAll: function(targetId) {
@@ -4558,6 +4812,7 @@
           var panes = this._getTabPanes(targetId);
           for (var j = 0; j < panes.length; j++) {
             panes[j].classList.remove('active');
+            panes[j].style.display = 'none';
           }
         },
 
@@ -4568,6 +4823,7 @@
           this._deactivateAll(targetId);
           btn.classList.add('active');
           pane.classList.add('active');
+          pane.style.display = 'block';
           return true;
         },
 
@@ -4603,10 +4859,10 @@
           btn.textContent = tabTitle;
           tabBar.appendChild(btn);
           var pane = document.createElement('div');
-          pane.className = 'tab-pane';
+          pane.className = 'tab-content-panel';
           pane.setAttribute('data-tab-name', tabId);
           contentWrapper.appendChild(pane);
-          return true;
+          return tabId;
         },
 
         removeTab: function(targetId, tabId) {
@@ -4634,6 +4890,23 @@
 
         getTabCount: function(targetId) {
           return this._getTabBtns(targetId).length;
+        },
+
+        setTabHeaderVisible: function(targetId, visible) {
+          var el = findTarget(targetId);
+          if (!el) return false;
+          var header = el.querySelector('.tab-header-bar');
+          if (!header) return false;
+          header.style.display = visible ? '' : 'none';
+          return true;
+        },
+
+        getTabHeaderVisible: function(targetId) {
+          var el = findTarget(targetId);
+          if (!el) return false;
+          var header = el.querySelector('.tab-header-bar');
+          if (!header) return true;
+          return header.style.display !== 'none';
         }
       },
 

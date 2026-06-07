@@ -44,6 +44,7 @@ function posDecl(styleData: WidgetStyleData): string {
     `  top: ${b.top ?? 0}px;`,
     `  width: ${b.width ?? 0}px;`,
     `  height: ${b.height ?? 0}px;`,
+    `  z-index: ${b.zIndex ?? 1};`,
     `  box-sizing: border-box;`
   ].join('\n')
 }
