@@ -8,6 +8,7 @@ import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import { registerAllWidgets } from './config/registerAllWidgets'
 import './examples/customWidgetDemo'  // 自定义控件示例
+import './TestWidget'   // 确保路径正确
 import App from './App.vue'
 
 // 注册所有内置控件（必须在 mount 之前执行）
