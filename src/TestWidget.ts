@@ -19,7 +19,7 @@ registerCustomWidget({
             // A1. 控件自身的样式
             base: {
                 width: 330,
-                height: 150,
+                height: 190,
                 backgroundColor: '#f9f9f9',
                 borderColor: '#ddd',
                 borderWidth: 1,
@@ -104,6 +104,7 @@ registerCustomWidget({
 
         // ---------- C. 结构样式（不可在样式编辑器中修改）----------
         structuralCSS: {
+            '.test-wrapper': ['padding: 16px', 'display: flex', 'flex-direction: column', 'gap: 12px', 'height: 100%', 'box-sizing: border-box', 'border-radius: 6px'],
             '.test-title': ['display: block', 'margin-bottom: 4px'],
             '.test-score': ['display: inline-block', 'margin-right: 12px'],
             '.test-status': ['display: inline-block', 'vertical-align: middle'],
@@ -137,7 +138,7 @@ registerCustomWidget({
     // 条件渲染请用 data 属性 + CSS 联动（见下方 cssString）
     // defaultStyleData为widget容器样式， htmlTemplate 最终预览页的显示效果
     htmlTemplate: `
-        <div data-theme="{{theme}}" style="padding:16px;display:flex;border-radius:6px; flex-direction:column;height:100%;box-sizing:border-box;">
+        <div class="test-wrapper" data-theme="{{theme}}">
             <div class="test-title">{{title}}</div>
             <div>
                 <span class="test-score">{{score}}</span>
