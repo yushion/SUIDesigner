@@ -176,6 +176,19 @@ export function useKeyboard() {
           zIndex: store.nextZIndex()
         }
       }
+      // 过滤 transition 相关属性，防止粘贴后拖拽延迟卡顿
+      delete (newWidget.style as any).transition
+      delete (newWidget.style as any).transitionDelay
+      delete (newWidget.style as any).transitionDuration
+      delete (newWidget.style as any).transitionProperty
+      delete (newWidget.style as any).transitionTimingFunction
+      if (newWidget.styleData?.base) {
+        delete newWidget.styleData.base.transition
+        delete newWidget.styleData.base.transitionDelay
+        delete newWidget.styleData.base.transitionDuration
+        delete newWidget.styleData.base.transitionProperty
+        delete newWidget.styleData.base.transitionTimingFunction
+      }
 
       // 粘贴到标签页容器内
       if (parentId) {

@@ -270,6 +270,12 @@ const VALID_CSS_PROPS = new Set([
 
     // defaultStyleData.base 已包含 structuralCSS 属性（已迁移合并），直接作为基础样式
     const baseStyle = { ...jsonConfig.defaultStyleData.base, ...(themeBase || {}) }
+    // 过滤 transition 防止拖拽延迟卡顿（base 中不应该有 transition）
+    delete (baseStyle as any).transition
+    delete (baseStyle as any).transitionDelay
+    delete (baseStyle as any).transitionDuration
+    delete (baseStyle as any).transitionProperty
+    delete (baseStyle as any).transitionTimingFunction
 
     const style: WidgetStyle = {
       ...baseStyle,
@@ -323,6 +329,12 @@ const VALID_CSS_PROPS = new Set([
 
     // 初始化 styleData（从 JSON 配置深拷贝默认样式数据，已包含 structuralCSS 属性）
     base.styleData = JSON.parse(JSON.stringify(jsonConfig.defaultStyleData)) as WidgetStyleData
+    // 过滤 transition 防止拖拽延迟（styleData.base 中的 transition 会写入 customCSS）
+    delete (base.styleData.base as any).transition
+    delete (base.styleData.base as any).transitionDelay
+    delete (base.styleData.base as any).transitionDuration
+    delete (base.styleData.base as any).transitionProperty
+    delete (base.styleData.base as any).transitionTimingFunction
     // 确保 visible 默认为 true（防止自定义控件因未设 visible 导致预览/导出跳过）
     if (base.visible === undefined) base.visible = true
     // 同步初始 left/top/width/height 到 styleData.base
