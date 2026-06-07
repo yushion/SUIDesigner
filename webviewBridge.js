@@ -26,6 +26,39 @@
   // IconManager — 图标占位符与 emoji 互转
   // ================================================================
 
+  /**
+   * 判断 BMP 字符码点是否属于图标/符号/dingbat 区块（需转为 [U+XXXX]）
+   * 中日韩文字、拉丁扩展等正常文本字符不在此列，保留原样
+   */
+  function _isIconChar(cp) {
+    // 杂项符号 U+2600-U+26FF（★☆�?☁…✕✓✗✘❌✅…）
+    if (cp >= 0x2600 && cp <= 0x26FF) return true;
+    // 装饰符号 U+2700-U+27BF（✂✃✄✅…✕✖✗✘✙✚…）
+    if (cp >= 0x2700 && cp <= 0x27BF) return true;
+    // 杂项符号与箭头 U+2B00-U+2BFF（⬀⬁…⬆⬇⭐⭕…）
+    if (cp >= 0x2B00 && cp <= 0x2BFF) return true;
+    // 几何形状 U+25A0-U+25FF（■□▲△▼▽◆◇○◎●…）
+    if (cp >= 0x25A0 && cp <= 0x25FF) return true;
+    // 货币符号 U+20A0-U+20CF（₠₡₢₣₤₥₦₧₨₩₪₫€₭₮₯…）
+    if (cp >= 0x20A0 && cp <= 0x20CF) return true;
+    // 类字母符�? U+2100-U+214F（℃℉℗℘…）
+    if (cp >= 0x2100 && cp <= 0x214F) return true;
+    // 箭头 U+2190-U+21FF（←↑→↓↔↕…）
+    if (cp >= 0x2190 && cp <= 0x21FF) return true;
+    // 数学运算符 U+2200-U+22FF（∀∁∂∃∄∅…）
+    if (cp >= 0x2200 && cp <= 0x22FF) return true;
+    // 杂项技术符号 U+2300-U+23FF（⌀⌁⌂⌃⌄⌅⌆⌇⌈⌉⌊⌋…）
+    if (cp >= 0x2300 && cp <= 0x23FF) return true;
+    // 制表�?/方框绘制 U+2500-U+257F（─━│┃┄…）
+    if (cp >= 0x2500 && cp <= 0x257F) return true;
+    // 一般标点 U+2000-U+206F（—‖‗…†‡•…‰‹›※‼‽‾⁁）
+    if (cp >= 0x2000 && cp <= 0x206F) return true;
+    // 半角/全角形式 U+FF00-U+FFEF（全角字母数字和半角片假名之外的特殊符号）
+    if (cp >= 0xFF01 && cp <= 0xFF5E) return true;
+    if (cp >= 0xFFE0 && cp <= 0xFFE6) return true;
+    return false;
+  }
+
   var IconManager = {
     iconMap: {
       'OK': '\u2705',
@@ -234,6 +267,50 @@
         var escaped = icon.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
         var regex = new RegExp(escaped, 'g');
         result = result.replace(regex, '[' + placeholder + ']');
+      }
+      // 通用回退：将 iconMap 未能覆盖的非 ASCII 字符转为 [U+XXXX] 格式，兼容易语言等不支持 Unicode 的环境
+      return IconManager.sanitize(result);
+    },
+
+    /**
+     * 通用 Unicode 消毒：仅转换图标/符号/emoji 类字符为 [U+XXXX] 占位符
+     * 中日韩文字、拉丁扩展等正常文本字符保留不变
+     * - 杂项符号（U+2600-U+26FF）：★☆☀☁☂☃☄★☆☇☈☉☊☋☌☍☎☏☐☑☒☓…✕✓✗✘…
+     * - 装饰符号（U+2700-U+27BF）：✂✃✄✅✆✇✈✉✊✋✌✍✎✏✐✑✒✓✔✕✖✗✘…
+     * - 杂项符号与箭头（U+2B00-U+2BFF）：⬀⬁⬂⬃⬄⬅⬆⬇⬈⬉⬊⬋⬌⬍⬎⬏…
+     * - 表情符号（U+1F600-U+1F64F）、象形符号（U+1F300-U+1F5FF）等
+     * - 补充平面字符（codepoint >= 0x10000）
+     */
+    sanitize: function(str) {
+      if (!str || typeof str !== 'string') return str;
+      var result = '';
+      for (var i = 0; i < str.length; i++) {
+        var cp = str.charCodeAt(i);
+
+        // ASCII 直接保留
+        if (cp <= 127) {
+          result += str.charAt(i);
+          continue;
+        }
+
+        // 补充平面代理对（高位代理 + 低位代理）
+        if (cp >= 0xD800 && cp <= 0xDBFF && i + 1 < str.length) {
+          var lo = str.charCodeAt(i + 1);
+          if (lo >= 0xDC00 && lo <= 0xDFFF) {
+            var fullCp = ((cp - 0xD800) * 0x400) + (lo - 0xDC00) + 0x10000;
+            // 补充平面全部视为图标/emoji
+            result += '[U+' + fullCp.toString(16).toUpperCase() + ']';
+            i++;
+            continue;
+          }
+        }
+
+        // BMP 中仅图标/符号块做转换，文字类字符保留
+        if (_isIconChar(cp)) {
+          result += '[U+' + cp.toString(16).toUpperCase() + ']';
+        } else {
+          result += str.charAt(i);
+        }
       }
       return result;
     },
