@@ -51,7 +51,7 @@ const DEFAULT_CANVAS_CSS = `/* ===== 画布自定义样式 ===== */
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 .canvas-titlebar .tb-left {
-  width: 48px;
+  width: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -72,12 +72,12 @@ const DEFAULT_CANVAS_CSS = `/* ===== 画布自定义样式 ===== */
   flex-shrink: 0;
 }
 .canvas-titlebar .tb-icon {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: 18px;
 }
 .canvas-titlebar .tb-title {
   font-size: 13px;
@@ -272,6 +272,7 @@ export function getDefaultCanvasConfig(): CanvasConfig {
     borderRadius: 8,
     title: '标题',
     canvasFixedSize: true,
+    disableMinimize: false,
     masterOpacity: 1,
     opacity: 1,
     customCSS: DEFAULT_CANVAS_CSS,

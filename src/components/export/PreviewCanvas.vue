@@ -117,7 +117,7 @@ const titleBarIconStyle = computed(() => ({
 }))
 
 const titleBarTitleStyle = computed(() => ({
-  fontSize: '13px',
+  fontSize: '14px',
   fontWeight: 600,
   color: props.canvasConfig.titleBarTextColor,
   userSelect: 'none' as const,

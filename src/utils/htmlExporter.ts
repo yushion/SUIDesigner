@@ -1057,7 +1057,7 @@ body { display:flex }
   display:flex;align-items:center;height:40px;user-select:none;z-index:10;
 }
 .canvas-titlebar .tb-left {
-  width:48px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  width:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
 }
 .canvas-titlebar .tb-center {
   flex:1;display:flex;align-items:center;min-width:0;
@@ -1066,7 +1066,7 @@ body { display:flex }
   display:flex;align-items:center;justify-content:flex-end;gap:2px;padding-right:4px;flex-shrink:0;
 }
 .canvas-titlebar .tb-icon {
-  width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:16px;
+  width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:18px;
 }
 .canvas-titlebar .tb-title {
   font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
@@ -1372,6 +1372,21 @@ function genPageContainerPosition(canvas: CanvasConfig): string {
 /**
  * 生成画布标题栏 HTML
  */
+/** 生成最小化/最大化按钮 HTML（根据 disableMinimize + canvasFixedSize 联动） */
+function genMinMaxButtons(canvas: CanvasConfig, btnColor: string): string {
+  const hideBoth = !!(canvas.disableMinimize && canvas.canvasFixedSize)
+  const minOnly = !!(canvas.disableMinimize && !canvas.canvasFixedSize)
+
+  let html = ''
+  if (!hideBoth) {
+    html += `<button class="tb-btn tb-btn-min${minOnly ? ' tb-btn-disabled' : ''}" id="titlebar_min" data-ctrl-type="titlebar_min" data-name="最小化" style="color:${btnColor};${minOnly ? 'opacity:0.35;cursor:not-allowed;pointer-events:none;' : ''}" title="最小化"${minOnly ? ' disabled' : ''}>`
+    html += `<svg width="10" height="1" viewBox="0 0 10 1"><rect width="10" height="1" fill="currentColor"/></svg></button>`
+    html += `<button class="tb-btn tb-btn-max${canvas.canvasFixedSize ? ' tb-btn-disabled' : ''}" id="titlebar_max" data-ctrl-type="titlebar_max" data-name="最大化" style="color:${btnColor};${canvas.canvasFixedSize ? 'opacity:0.4;cursor:not-allowed;pointer-events:none;' : ''}" title="最大化"${canvas.canvasFixedSize ? ' disabled' : ''}>`
+    html += `<svg width="10" height="10" viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></button>`
+  }
+  return html
+}
+
 function genCanvasTitleBarHTML(canvas: CanvasConfig): string {
   const alignMap: Record<string, string> = { left: 'flex-start', center: 'center', right: 'flex-end' }
   const titleAlign = alignMap[canvas.titleBarAlign] || 'flex-start'
@@ -1403,12 +1418,7 @@ function genCanvasTitleBarHTML(canvas: CanvasConfig): string {
     <span class="tb-title" id="titlebar_title" data-name="标题" data-ctrl-type="titlebar_title" style="color:${canvas.titleBarTextColor}">${esc(canvas.titleBarTitle || '我的应用')}</span>
   </div>
   <div class="tb-right">
-    <button class="tb-btn tb-btn-min" id="titlebar_min" data-ctrl-type="titlebar_min" data-name="最小化" style="color:${btnColor};" title="最小化">
-      <svg width="10" height="1" viewBox="0 0 10 1"><rect width="10" height="1" fill="currentColor"/></svg>
-    </button>
-    <button class="tb-btn tb-btn-max${canvas.canvasFixedSize ? ' tb-btn-disabled' : ''}" id="titlebar_max" data-ctrl-type="titlebar_max" data-name="最大化" style="color:${btnColor};${canvas.canvasFixedSize ? 'opacity:0.4;cursor:not-allowed;pointer-events:none;' : ''}" title="最大化"${canvas.canvasFixedSize ? ' disabled' : ''}>
-      <svg width="10" height="10" viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
-    </button>
+    ${genMinMaxButtons(canvas, btnColor)}
     <button class="tb-btn tb-btn-close" id="titlebar_close" data-ctrl-type="titlebar_close" data-name="关闭" style="color:${btnColor};" title="关闭">
       <svg width="10" height="10" viewBox="0 0 10 10"><line x1="1" y1="1" x2="9" y2="9" stroke="currentColor" stroke-width="1.2"/><line x1="9" y1="1" x2="1" y2="9" stroke="currentColor" stroke-width="1.2"/></svg>
     </button>

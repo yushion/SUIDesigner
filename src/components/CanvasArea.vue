@@ -34,10 +34,22 @@
         </div>
         <!-- 右侧：窗口控制按钮 -->
         <div class="tb-right" :style="titleBarCellStyle">
-          <button class="tb-btn" :style="titleBarBtnStyle" title="最小化">
+          <!-- 最小化按钮：禁止最小化时根据固定宽高决定隐藏还是禁用 -->
+          <button
+            v-if="!(store.canvas.disableMinimize && store.canvas.canvasFixedSize)"
+            class="tb-btn"
+            :style="{ ...titleBarBtnStyle, ...(store.canvas.disableMinimize ? { opacity: 0.35, cursor: 'not-allowed', pointerEvents: 'none' } : {}) }"
+            :title="store.canvas.disableMinimize ? '已禁止最小化' : '最小化'"
+          >
             <svg width="10" height="1" viewBox="0 0 10 1"><rect width="10" height="1" fill="currentColor"/></svg>
           </button>
-          <button class="tb-btn" :style="titleBarBtnStyle" title="最大化">
+          <!-- 最大化按钮：禁止最小化+固定宽高时隐藏 -->
+          <button
+            v-if="!(store.canvas.disableMinimize && store.canvas.canvasFixedSize)"
+            class="tb-btn"
+            :style="titleBarBtnStyle"
+            title="最大化"
+          >
             <svg width="10" height="10" viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
           </button>
           <button class="tb-btn tb-btn-close" :style="titleBarCloseBtnStyle" title="关闭">
@@ -1115,7 +1127,7 @@ onUnmounted(() => {
 }
 
 .tb-left {
-  width: 48px;
+  width: 40px;
   justify-content: center;
   flex-shrink: 0;
 }
@@ -1141,7 +1153,7 @@ onUnmounted(() => {
 }
 
 .tb-icon :deep(i) {
-  font-size: 16px;
+  font-size: 18px;
 }
 
 .tb-title {

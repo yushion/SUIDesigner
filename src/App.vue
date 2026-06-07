@@ -300,6 +300,7 @@ function saveGlobalConfigs() {
       inputBoxConfig: { ...store.inputBoxConfig },
       canvas: {
         canvasFixedSize: store.canvas.canvasFixedSize,
+        disableMinimize: store.canvas.disableMinimize,
         borderWidth: store.canvas.borderWidth,
         borderRadius: store.canvas.borderRadius,
         showTitleBar: store.canvas.showTitleBar,
@@ -330,6 +331,7 @@ function loadGlobalConfigs() {
       // 只恢复全局持久化属性，不触发 "恢复设计" 弹窗检测（这些属性已从 isCanvasDefault 中排除）
       const canvasGlobals = data.canvas as Partial<typeof store.canvas>
       if (canvasGlobals.canvasFixedSize !== undefined) store.canvas.canvasFixedSize = canvasGlobals.canvasFixedSize
+      if (canvasGlobals.disableMinimize !== undefined) store.canvas.disableMinimize = canvasGlobals.disableMinimize
       if (canvasGlobals.borderWidth !== undefined) store.canvas.borderWidth = canvasGlobals.borderWidth
       if (canvasGlobals.borderRadius !== undefined) store.canvas.borderRadius = canvasGlobals.borderRadius
       if (canvasGlobals.showTitleBar !== undefined) store.canvas.showTitleBar = canvasGlobals.showTitleBar
@@ -509,6 +511,7 @@ watch(
     ib: { ...store.inputBoxConfig },
     cv: {
       canvasFixedSize: store.canvas.canvasFixedSize,
+      disableMinimize: store.canvas.disableMinimize,
       borderWidth: store.canvas.borderWidth,
       borderRadius: store.canvas.borderRadius,
       showTitleBar: store.canvas.showTitleBar,

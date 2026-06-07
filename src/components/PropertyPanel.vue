@@ -301,11 +301,19 @@
                   <input type="number" :value="store.canvas.height" @input="onCanvasChange('height', $event)" min="100" />
                 </div>
               </div>
-              <div class="form-group" style="margin-top:2px;margin-bottom:2px;border-bottom:1px solid #e5e6eb;padding-bottom:6px;">
-                <label class="checkbox-label">
-                  <input type="checkbox" :checked="store.canvas.canvasFixedSize" @change="onCanvasChange('canvasFixedSize', $event)" />
-                  固定画布宽高<small>（仅预览页有效）</small>
-                </label>
+              <div class="form-row" style="margin-top: 4px; margin-bottom:8px;border-bottom:1px solid #e5e6eb;padding-bottom:8px;">
+                <div class="form-group half">
+                  <label class="checkbox-label">
+                    <input type="checkbox" :checked="store.canvas.canvasFixedSize" @change="onCanvasChange('canvasFixedSize', $event)" />
+                    固定画布宽高
+                  </label>
+                </div>
+                <div class="form-group half">
+                  <label class="checkbox-label">
+                    <input type="checkbox" :checked="store.canvas.disableMinimize" @change="onCanvasChange('disableMinimize', $event)" />
+                    禁止最小化
+                  </label>
+                </div>
               </div>
 			  <div class="form-row">
                 <div class="form-group half">
@@ -342,7 +350,7 @@
               <div class="form-group">
                 <label class="checkbox-label">
                   <input type="checkbox" disabled :checked="store.canvas.showShadow" @change="onCanvasChange('showShadow', $event)" />
-                  显示边框阴影<small>（已弃用,客户端可设置）</small>
+                  显示边框阴影<small>（已弃用,客户端自行控制）</small>
                 </label>
               </div>
               <div class="form-group" style="margin-top:2px;border-bottom:1.5px dashed rgb(161 161 161);padding-bottom:14px;">

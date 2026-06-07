@@ -339,6 +339,8 @@ export interface CanvasConfig {
   borderRadius: number
   /** 画布标题（作为导出 HTML 的页面 title） */
   title?: string
+  /** 禁止最小化：勾选后最小化按钮变为禁用/隐藏（与 canvasFixedSize 联动） */
+  disableMinimize: boolean
   /** 是否固定画布宽高（预览时选中则用设置的宽高，未选中则继承body宽高） */
   canvasFixedSize: boolean
   /** 总控透明度（0-1，统一调度所有控件透明度） */
