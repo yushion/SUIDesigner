@@ -153,8 +153,14 @@ function renderWidgetToString(widget: Widget): string {
       return `<div ${baseAttrs} ${styleAttr}><hr style="width:100%;border:none;border-top:${dividerHeight}px ${dividerLineStyle} ${dividerBorderColor};margin:0;" /></div>`
     }
 
-    case 'hyperlink':
-      return `<a ${baseAttrs} ${styleAttr} href="javascript:void(0)" data-href="${sanitizeAttr(widget.href || '#')}">${widget.text || '链接'}</a>`
+    case 'hyperlink': {
+      const href = sanitizeAttr(widget.href || '#')
+      const text = widget.text || '链接'
+      // 根据 showUnderline 构建 style，避免 styleData.base 中的 textDecoration 默认值覆盖用户设置
+      const linkStyle = { ...style, textDecoration: widget.showUnderline !== false ? 'underline' : 'none' }
+      const linkStyleStr = buildInlineStyle(linkStyle)
+      return `<a ${baseAttrs} style="${linkStyleStr}" href="javascript:void(0)" data-href="${href}">${text}</a>`
+    }
 
     case 'textarea':
       return `<textarea ${baseAttrs} ${styleAttr} placeholder="${sanitizeAttr(widget.placeholder || '')}">${sanitizeAttr(widget.value || '')}</textarea>`

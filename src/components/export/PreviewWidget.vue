@@ -362,6 +362,8 @@ const widgetInlineStyle = computed<any>(() => {
       st.cursor = 'pointer'
       st.overflow = 'hidden'
       st.userSelect = 'none'
+      // 下划线由 <a> 标签的 hyperlinkTextStyle 根据 showUnderline 控制，外层 div 清除避免 CSS 传播覆盖
+      st.textDecoration = 'none'
       break
     case 'textarea':
       if (!s.borderColor) st.border = '1px solid #ddd'

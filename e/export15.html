@@ -528,50 +528,6 @@ body { display:flex }
   filter: brightness(1.1);
 }
 
-/* 文本标签_1 - 基础样式 */
-#label_1 {
-  position: absolute;
-  left: 19px;
-  top: 150px;
-  width: 37px;
-  height: 36px;
-  z-index: 3;
-  box-sizing: border-box;
-  color: #ff3838;
-  font-size: 13px;
-  font-weight: 900;
-  text-align: center;
-  font-family: 'Segoe UI', sans-serif;
-  cursor: default;
-  background-color: #ffcccc;
-  border-radius: 29px;
-  text-decoration: none;
-  padding: 9px;
-}
-
-/* 文本标签_2 - 基础样式 */
-#label_2 {
-  position: absolute;
-  left: 21px;
-  top: 209px;
-  width: 37px;
-  height: 36px;
-  z-index: 3;
-  box-sizing: border-box;
-  color: #ff3838;
-  font-size: 13px;
-  font-weight: 700;
-  text-align: center;
-  font-family: 'Segoe UI', sans-serif;
-  cursor: default;
-  background-color: #ffcccc;
-  border-radius: 29px;
-  text-decoration: none;
-  padding: 9px;
-  box-shadow: 0px 0px 0px 4px rgba(254,220,220,0.62);
-  border-width: 0px;
-}
-
 /* 图标按钮_1 - 基础样式 */
 #iconButton_1 {
   position: absolute;
@@ -1332,22 +1288,6 @@ body { display:flex }
   filter: grayscale(1);
 }
 
-/* 分割线_1 - 基础样式 */
-#divider_1 {
-  position: absolute;
-  left: 39px;
-  top: 156px;
-  width: 1px;
-  height: 127px;
-  z-index: 0;
-  box-sizing: border-box;
-  border-color: #D0D0D0;
-  background-color: #fff;
-  border-top-width: 127px;
-  border-top-style: solid;
-  border-top-color: #D0D0D0;
-}
-
 /* 按钮_1 - 基础样式 */
 #button_1 {
   position: absolute;
@@ -2014,7 +1954,7 @@ body { display:flex }
   box-sizing: border-box;
   color: #0078d4;
   font-size: 13px;
-  text-decoration: underline;
+  text-decoration: none;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   cursor: pointer;
 }
@@ -3050,6 +2990,64 @@ body { display:flex }
   pointer-events: none;
 }
 
+/* 文本标签_7 - 基础样式 */
+#label_7 {
+  position: absolute;
+  left: 19px;
+  top: 131px;
+  width: 37px;
+  height: 36px;
+  z-index: 2;
+  box-sizing: border-box;
+  color: #ff3838;
+  font-size: 13px;
+  font-weight: 900;
+  text-align: center;
+  font-family: Segoe UI, Tahoma, Geneva, Verdana, sans-serif;
+  cursor: default;
+  padding: 8px;
+  border-radius: 29px;
+  background-color: #ffcccc;
+}
+
+/* 文本标签_1 - 基础样式 */
+#label_1 {
+  position: absolute;
+  left: 19px;
+  top: 185px;
+  width: 37px;
+  height: 36px;
+  z-index: 2;
+  box-sizing: border-box;
+  color: #ff3838;
+  font-size: 13px;
+  font-weight: 900;
+  text-align: center;
+  font-family: Segoe UI, Tahoma, Geneva, Verdana, sans-serif;
+  cursor: default;
+  padding: 8px;
+  border-radius: 29px;
+  background-color: #ffcccc;
+  box-shadow: 0px 0px 0px 4px rgba(254,220,220,0.62);
+  border-width: 0px;
+}
+
+/* 分割线_1 - 基础样式 */
+#divider_1 {
+  position: absolute;
+  left: 38px;
+  top: 146px;
+  width: 1px;
+  height: 109px;
+  z-index: 0;
+  box-sizing: border-box;
+  border-color: #D0D0D0;
+  background-color: #fff;
+  border-top-width: 109px;
+  border-top-style: solid;
+  border-top-color: #D0D0D0;
+}
+
 
 </style>
 </head>
@@ -3082,8 +3080,6 @@ body { display:flex }
   </div>
 </div>
 <div id="progressBar_1" data-type="progressBar" data-ctrl-type="progress_bar" data-ctrl-id="progressBar_1" data-name="进度条_1" data-editable="true" class="progress-bar-container" style="overflow:visible;" data-draggable="true"><div class="progress-track"></div><div class="progress-fill" style="width:76%;height:100%;background:#0078D4;border-radius:inherit;transition:width 0.15s;"></div><div class="progress-thumb" style="position:absolute;left:calc(76% - 11px);top:50%;transform:translateY(-50%);width:22px;height:22px;border-radius:50%;background:#fff;border:2px solid #0078D4;box-shadow:0 1px 6px rgba(0,0,0,0.3);z-index:0;cursor:pointer;"></div><span class="progress-text" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:inherit;pointer-events:none;white-space:nowrap;">76%</span></div>
-<span id="label_1" data-type="label" data-ctrl-type="label" data-ctrl-id="label_1" data-name="文本标签_1">标</span>
-<span id="label_2" data-type="label" data-ctrl-type="label" data-ctrl-id="label_2" data-name="文本标签_2">标</span>
 <button id="iconButton_1" data-type="iconButton" data-ctrl-type="icon_button" data-ctrl-id="iconButton_1" data-name="图标按钮_1"><i class="fas fa-star"></i></button>
 <span id="label_3" data-type="label" data-ctrl-type="label" data-ctrl-id="label_3" data-name="文本标签_3">🔔</span>
 <div id="cardBox_1" data-type="cardBox" data-ctrl-type="cardbox" data-ctrl-id="cardBox_1" data-name="卡片框_1" data-collapsible="true" data-collapsed="false" class="card-box"><div class="card-body" data-ctrl-type="cardbox_body"><span id="label_4" data-type="label" data-ctrl-type="label" data-ctrl-id="label_4" data-name="文本标签_4" data-parent="cardBox_1">⚠</span>
@@ -3095,7 +3091,6 @@ body { display:flex }
 <input type="datetime-local" id="datetimePicker_1" data-type="datetimePicker" data-ctrl-type="datetime_picker" data-ctrl-id="datetimePicker_1" data-name="时间框_1" data-parent="cardBox_2" value="2026-06-06T00:00" />
 <div id="radioGroup_1" data-type="radioGroup" data-ctrl-type="radio_group" data-ctrl-id="radioGroup_1" data-name="单选框_1" data-parent="cardBox_2" class="radiogroup-container"><label class="radiogroup-item"><input type="radio" data-ctrl-type="radio" name="单选框_1" value="选项1" checked />选项1</label><label class="radiogroup-item"><input type="radio" data-ctrl-type="radio" name="单选框_1" value="选项2" />选项2</label></div>
 <select id="comboBox_1" data-type="comboBox" data-ctrl-type="combobox" data-ctrl-id="comboBox_1" data-name="组合框_1" data-parent="cardBox_2"><option value="选项1" selected>选项1</option><option value="选项2">选项2</option><option value="选项3">选项3</option></select></div></div>
-<div id="divider_1" data-type="divider" data-ctrl-type="divider" data-ctrl-id="divider_1" data-name="分割线_1"></div>
 <button id="button_1" data-type="button" data-ctrl-type="button" data-ctrl-id="button_1" data-name="按钮_1">按钮</button>
 <input type="text" id="input_1" data-type="input" data-ctrl-type="input_text" data-ctrl-id="input_1" data-name="编辑框_1" placeholder="请输入..." value="✅" />
 <label id="checkbox_1" data-type="checkbox" data-ctrl-type="checkbox" data-ctrl-id="checkbox_1" data-name="选择框_1"><input type="checkbox" /><span>选项</span></label>
@@ -3181,6 +3176,9 @@ body { display:flex }
 <div id="listBox_1" data-type="listBox" data-ctrl-type="listbox" data-ctrl-id="listBox_1" data-name="列表框_1" data-editable="false" data-always-show-selection="false" data-listbox-items='[{"id":"1","text":"列表项1","selected":false},{"id":"2","text":"列表项2","selected":false},{"id":"3","text":"列表项3","selected":false}]'><div class="list-box-scroll"><div class="list-item" data-ctrl-type="listbox_item" data-item-index="0"><span class="list-item-text">列表项1</span></div>
 <div class="list-item" data-ctrl-type="listbox_item" data-item-index="1"><span class="list-item-text">列表项2</span></div>
 <div class="list-item" data-ctrl-type="listbox_item" data-item-index="2"><span class="list-item-text">列表项3</span></div></div></div>
+<span id="label_7" data-type="label" data-ctrl-type="label" data-ctrl-id="label_7" data-name="文本标签_7">标</span>
+<span id="label_1" data-type="label" data-ctrl-type="label" data-ctrl-id="label_1" data-name="文本标签_1">标</span>
+<div id="divider_1" data-type="divider" data-ctrl-type="divider" data-ctrl-id="divider_1" data-name="分割线_1"></div>
 </div>
 
 <script>

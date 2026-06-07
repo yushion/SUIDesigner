@@ -2591,13 +2591,19 @@ function onWidgetPropChange(key: string, event: Event, overrideValue?: any) {
       store.selectedWidget.customCSS = mergeStyleToCSS(currentCSS, store.selectedWidget.id, cssProps)
     }
 
-    // showUnderline 变更时同步更新 customCSS 中的 text-decoration（三方联动关键）
+    // showUnderline 变更时同步更新 customCSS 和 styleData.base 中的 text-decoration
     if (key === 'showUnderline') {
-      const cssProps: Record<string, any> = {
-        textDecoration: value ? 'underline' : 'none'
-      }
+      const td = value ? 'underline' : 'none'
+      const cssProps: Record<string, any> = { textDecoration: td }
       const currentCSS = store.selectedWidget.customCSS || ''
       store.selectedWidget.customCSS = mergeStyleToCSS(currentCSS, store.selectedWidget.id, cssProps)
+      // 同步到 styleData.base，确保导出时 CSS 块输出正确的 text-decoration
+      if (store.selectedWidget.styleData) {
+        store.selectedWidget.styleData.base.textDecoration = td
+      }
+      // 同步到 widget.style（旧格式兼容层）
+      const selStyle = store.selectedWidget.style as any
+      if (selStyle) selStyle.textDecoration = td
     }
 
     store.debouncedSaveState()
