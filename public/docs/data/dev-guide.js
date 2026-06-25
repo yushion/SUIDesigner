@@ -841,7 +841,7 @@ var config = JSON.parse(webviewBridge.api.tooltip.getConfig('tip1'));</code></pr
 6. 样式要求：
    - .pageContainer { app-region: drag; }
    - 【仅可交互控件】需要 [data-drag-type] { app-region: no-drag; }
-   - 纯布局容器（侧边栏、内容区）【不要】添加 data-drag-type，记住：能点能输才需要，纯放东西不需要。
+   - 纯布局容器（侧边栏、内容区）【不要】添加 data-drag-type，记住：能点能输入就需要，纯放东西不需要。
    - [data-ctrl-type="titlebar_max"] span { app-region: drag; }
    - [data-type] { position: absolute; box-sizing: border-box; }
 

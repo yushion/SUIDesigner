@@ -253,33 +253,28 @@ function toggleSidebar(){
 function loadDevGuide(){
   var section = document.getElementById('section-dev-guide');
   if(!section) return;
-  
-  // 如果已经加载过了，直接返回
   if(section.dataset.loaded === 'true') return;
-  
-  fetch('docs/data/dev-guide.html')
-    .then(function(response){ return response.text(); })
-    .then(function(html){
-      section.innerHTML = html;
-      section.dataset.loaded = 'true';
-      initDevGuideCopyButtons();
-      if(window.hljs) hljs.highlightAll();
-    })
-    .catch(function(err){
-      console.error('加载 dev-guide.html 失败:', err);
-      // 降级：如果 window.__devGuideHTML 存在则使用
-      if(window.__devGuideHTML){
-        var tempDiv = document.createElement('div');
-        tempDiv.innerHTML = window.__devGuideHTML;
-        var innerSection = tempDiv.querySelector('.section');
-        if(innerSection){
-          section.innerHTML = innerSection.innerHTML;
-        }else{
-          section.innerHTML = window.__devGuideHTML;
-        }
-        initDevGuideCopyButtons();
-      }
-    });
+  if(!window.__devGuideHTML){ console.warn('__devGuideHTML 未定义，请确认 dev-guide.js 已加载'); return; }
+
+  // 直接使用 dev-guide.js 的 window.__devGuideHTML
+  var tempDiv = document.createElement('div');
+  tempDiv.innerHTML = window.__devGuideHTML;
+  var innerSection = tempDiv.querySelector('.section');
+  var html = innerSection ? innerSection.innerHTML : window.__devGuideHTML;
+  section.innerHTML = html;
+  section.dataset.loaded = 'true';
+
+  // 补齐 highlight.js 语言类
+  var codes = section.querySelectorAll('pre code');
+  for(var i=0;i<codes.length;i++){
+    var c = codes[i];
+    if(!c.className.match(/language-/)){
+      var text = c.textContent || '';
+      c.className += (c.className?' ':'') + (text.match(/^\s*</)? 'language-html' : (text.match(/^\s*\{/)? 'language-json' : 'language-javascript'));
+    }
+  }
+  initDevGuideCopyButtons();
+  if(window.hljs) hljs.highlightAll();
 }
 
 function initDevGuideCopyButtons(){
