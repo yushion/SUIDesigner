@@ -28,7 +28,7 @@ window.__devGuideHTML = `
   .tag-recommend { background:#e8f5e9; color:#2e7d32; }
   .checklist { display:flex; flex-wrap:wrap; gap:8px; margin:10px 0; }
   .checklist .check-item { background:#f5f5f5; padding:4px 10px; border-radius:4px; font-size:12px; color:#555; }
-  .checklist .check-item::before { content:'☐ '; color:#aaa; }
+  .checklist .check-item::before { content:'✅ '; color:#aaa; }
   .checklist .check-item.done::before { content:'✅ '; }
   .code-block { background:transparent; border-radius:6px; margin:4px 0; overflow:hidden; box-shadow: 0px 4px 11px -5px rgba(0, 0, 0, 0.41);}
   .code-block-header { display:flex; justify-content:space-between; align-items:center; padding:6px 14px; background:linear-gradient(90deg, #cecfd1 0%, #dcdddf 0%, #f5f5f5 100%); border-bottom:1px solid #e9e9e9; }
@@ -104,26 +104,8 @@ window.__devGuideHTML = `
     <p style="margin-top:6px;"><strong>⚠️ 如果缺少此设置</strong>，最大化按钮在 Windows 11 中悬停时将不会弹出贴靠布局菜单，影响用户体验。</p>
   </div>
 
-  <h4>第 3 步：控件布局规范（重要！）</h4>
-  <p>设计器导出的所有控件均使用 <strong>绝对定位</strong>，通过 <code>left</code>、<code>top</code>、<code>width</code>、<code>height</code> 精确定位。</p>
-  <div class="code-block">
-    <div class="code-block-header">
-      <span class="lang-label">CSS（必须包含）</span>
-      <button class="copy-btn" onclick="copyCodeFromBlock(this)">复制</button>
-    </div>
-    <pre><code>/* 所有控件的基础定位（具体 left/top/width/height 在各 #id 块中） */
-[data-type] {
-  position: absolute;
-  box-sizing: border-box;
-}</code></pre>
-  </div>
-  <div class="warn-box">
-    <strong>⚠️ 每个控件必须设置以下样式属性：</strong>
-    <ul style="margin:6px 0 0 20px;">
-      <li><code>position: absolute</code>（由 <code>[data-type]</code> 统一设置）</li>
-      <li>通过 <code>id</code> 选择器设置具体的 <code>left</code>、<code>top</code>、<code>width</code>、<code>height</code></li>
-    </ul>
-  </div>
+  <h4>第 3 步：控件属性规范（重要！细节看下面第 4 步）</h4>
+  <p>每个控件必须设置<code>id</code>（唯一标识）、<code>data-ctrl-type</code>（控件类型）、<code>data-drag-type</code>（防拖拽标记）、<code>data-name</code>（中文名，推荐），与桥接脚本配合使用。</p>
 
   <h4>第 4 步：添加控件</h4>
   <p>所有控件模板都已包含 <strong>完整属性</strong>，直接复制使用即可。</p>
@@ -156,7 +138,7 @@ window.__devGuideHTML = `
         <tr><td>页面容器本身（<code>#pageContainer</code>）</td><td style="color:#c62828;font-weight:600;">❌ 否</td><td><code>#pageContainer</code>（已由 <code>app-region: drag</code> 控制）</td></tr>
       </tbody>
     </table>
-    <p style="margin-top:6px;"><strong>记忆口诀：</strong>“<strong>能点能输</strong>才需要，<strong>纯放东西</strong>不需要。”</p>
+    <p style="margin-top:6px;">记忆口诀：<strong>"能点能输入"</strong>就需要，<strong>"纯放东西"</strong>不需要。</p>
   </div>
 </div>
 
@@ -177,7 +159,6 @@ window.__devGuideHTML = `
 <div class="dev-step">
   <h3><span class="step-num">3</span> 基础控件完整模板</h3>
   <p>以下每个模板都包含 <strong>全部必要属性</strong>，直接复制到页面中即可。</p>
-  <p><strong>注意：</strong>每个控件都需要通过 <code>id</code> 选择器设置 <code>left/top/width/height</code>，示例中已包含位置属性。</p>
 
   <!-- ========== 修改点 ③：表格上方增加 data-drag-type 适用范围说明 ========== -->
   <div class="info-box">
@@ -193,7 +174,7 @@ window.__devGuideHTML = `
     <tbody>
       <tr>
         <td><strong>按钮</strong></td>
-        <td><code>&lt;button id="btn_xxx" data-type="button" data-ctrl-type="button" data-ctrl-id="btn_xxx" data-name="按钮名" data-drag-type="button" style="position:absolute;left:20px;top:50px;width:80px;height:30px;"&gt;文字&lt;/button&gt;</code></td>
+        <td><code>&lt;button id="btn_xxx" data-ctrl-type="button" data-name="按钮名" data-drag-type="button"&gt;文字&lt;/button&gt;</code></td>
         <td>点击上报 <code>click</code>，<code>data.value</code> = 按钮文字</td>
       </tr>
       <tr>
@@ -203,75 +184,74 @@ window.__devGuideHTML = `
       </tr>
       <tr>
         <td><strong>输入框</strong></td>
-        <td><code>&lt;input id="inp_xxx" type="text" data-type="input" data-ctrl-type="inputText" data-ctrl-id="inp_xxx" data-name="输入框名" data-drag-type="inputText" placeholder="提示" style="position:absolute;left:20px;top:50px;width:150px;height:30px;"&gt;</code></td>
+        <td><code>&lt;input id="inp_xxx" type="text" data-ctrl-type="inputText" data-name="输入框名" data-drag-type="inputText" placeholder="提示""&gt;</code></td>
         <td>输入/失焦上报 <code>change</code>，<code>data.value</code> = 当前值</td>
       </tr>
       <tr>
         <td><strong>密码框</strong></td>
-        <td><code>&lt;input id="pwd_xxx" type="password" data-type="input" data-ctrl-type="inputText" data-ctrl-id="pwd_xxx" data-name="密码框" data-drag-type="inputText" placeholder="请输入密码" style="position:absolute;left:20px;top:50px;width:150px;height:30px;"&gt;</code></td>
+        <td><code>&lt;input id="pwd_xxx" type="password" data-ctrl-type="inputText" data-name="密码框" data-drag-type="inputText" placeholder="请输入密码"&gt;</code></td>
         <td>同输入框，类型为 password</td>
       </tr>
       <tr>
         <td><strong>文本域</strong></td>
-        <td><code>&lt;textarea id="txt_xxx" data-type="textarea" data-ctrl-type="textarea" data-ctrl-id="txt_xxx" data-name="文本域" data-drag-type="textarea" rows="4" placeholder="请输入" style="position:absolute;left:20px;top:50px;width:200px;height:80px;"&gt;&lt;/textarea&gt;</code></td>
+        <td><code>&lt;textarea id="txt_xxx" data-ctrl-type="textarea" data-name="文本域" data-drag-type="textarea" rows="4" placeholder="请输入"&gt;&lt;/textarea&gt;</code></td>
         <td>多行文本，上报 <code>change</code></td>
       </tr>
       <tr>
         <td><strong>复选框</strong></td>
-        <td><code>&lt;label id="chk_xxx" data-type="checkbox" data-ctrl-type="checkbox" data-ctrl-id="chk_xxx" data-name="复选框" data-drag-type="checkbox" style="position:absolute;left:20px;top:50px;width:120px;height:24px;"&gt;&lt;input type="checkbox" /&gt;&lt;span&gt;选项文字&lt;/span&gt;&lt;/label&gt;</code></td>
+        <td><code>&lt;label id="chk_xxx" data-ctrl-type="checkbox" data-name="复选框" data-drag-type="checkbox"&gt;&lt;span&gt;选项文字&lt;/span&gt;&lt;/label&gt;</code></td>
         <td><code>data.checked</code> = true/false</td>
       </tr>
       <tr>
         <td><strong>单选框</strong></td>
-        <td><code>&lt;input id="rdo_xxx" type="radio" name="group" data-type="radio" data-ctrl-type="radio" data-ctrl-id="rdo_xxx" data-name="单选框" data-drag-type="radio" value="val" style="position:absolute;left:20px;top:50px;"&gt;</code></td>
+        <td><code>&lt;input id="rdo_xxx" type="radio" name="group" data-ctrl-type="radio" data-name="单选框" data-drag-type="radio" value="val"&gt;</code></td>
         <td><code>data.groupName</code> + <code>data.checked</code></td>
       </tr>
       <tr>
         <td><strong>开关</strong></td>
-        <td><code>&lt;label id="sw_xxx" data-type="toggle" data-ctrl-type="switchToggle" data-ctrl-id="sw_xxx" data-name="开关" data-drag-type="switchToggle" style="position:absolute;left:20px;top:50px;display:inline-flex;align-items:center;"&gt;&lt;input type="checkbox" /&gt;&lt;span class="slider"&gt;&lt;/span&gt;&lt;/label&gt;</code></td>
+        <td><code>&lt;label id="sw_xxx" data-ctrl-type="switchToggle" data-name="开关" data-drag-type="switchToggle"&gt;&lt;input type="checkbox" /&gt;&lt;span class="slider"&gt;&lt;/span&gt;&lt;/label&gt;</code></td>
         <td><strong>必须</strong>用 <code>switchToggle</code>，checkbox 无法区分</td>
       </tr>
       <tr>
         <td><strong>下拉框</strong></td>
-        <td><code>&lt;select id="sel_xxx" data-type="comboBox" data-ctrl-type="comboBox" data-ctrl-id="sel_xxx" data-name="下拉框" data-drag-type="comboBox" style="position:absolute;left:20px;top:50px;width:120px;height:28px;"&gt;&lt;option value="v"&gt;选项&lt;/option&gt;&lt;/select&gt;</code></td>
+        <td><code>&lt;select id="sel_xxx" data-ctrl-type="comboBox" data-name="下拉框" data-drag-type="comboBox"&gt;&lt;option value="v"&gt;选项&lt;/option&gt;&lt;/select&gt;</code></td>
         <td><code>data.value</code> = 选中值，<code>data.index</code> = 索引</td>
       </tr>
       <tr>
         <td><strong>超链接</strong></td>
-        <td><code>&lt;a id="link_xxx" data-type="hyperLink" data-ctrl-type="hyperLink" data-ctrl-id="link_xxx" data-name="链接" data-drag-type="hyperLink" data-href="https://..." style="position:absolute;left:20px;top:50px;"&gt;链接文字&lt;/a&gt;</code></td>
+        <td><code>&lt;a id="link_xxx" data-ctrl-type="hyperLink" data-name="链接" data-drag-type="hyperLink" data-href="https://..."&gt;链接文字&lt;/a&gt;</code></td>
         <td>点击上报 <code>click</code>，不跳转页面</td>
       </tr>
       <tr>
         <td><strong>文本标签</strong></td>
-        <td><code>&lt;span id="lbl_xxx" data-type="label" data-ctrl-type="label" data-ctrl-id="lbl_xxx" data-name="标签" data-drag-type="label" style="position:absolute;left:20px;top:50px;"&gt;文字&lt;/span&gt;</code></td>
+        <td><code>&lt;span id="lbl_xxx" data-ctrl-type="label" data-name="标签" data-drag-type="label" &gt;文字&lt;/span&gt;</code></td>
         <td>点击上报 <code>click</code>，<code>data.text</code> = 内容</td>
       </tr>
       <tr>
         <td><strong>图片框</strong></td>
-        <td><code>&lt;div id="img_xxx" data-type="imageBox" data-ctrl-type="imageBox" data-ctrl-id="img_xxx" data-name="图片" data-drag-type="imageBox" style="position:absolute;left:20px;top:50px;width:150px;height:150px;"&gt;&lt;img src="url" alt="描述" /&gt;&lt;/div&gt;</code></td>
+        <td><code>&lt;div id="img_xxx" data-ctrl-type="imageBox" data-name="图片" data-drag-type="imageBox"&gt;&lt;img src="url" alt="描述" /&gt;&lt;/div&gt;</code></td>
         <td><strong>必须包含 <code>&lt;img&gt;</code> 标签</strong>，<code>customname</code> 优先取 <code>data-name</code> → alt</td>
       </tr>
       <tr>
         <td><strong>进度条</strong></td>
-        <td><code>&lt;input id="prg_xxx" type="range" data-type="progressBar" data-ctrl-type="progressBar" data-ctrl-id="prg_xxx" data-name="进度条" data-drag-type="progressBar" min="0" max="100" value="50" style="position:absolute;left:20px;top:50px;width:200px;"&gt;</code></td>
+        <td><code>&lt;input id="prg_xxx" type="range" data-ctrl-type="progressBar" data-name="进度条" data-drag-type="progressBar" min="0" max="100" value="50"&gt;</code></td>
         <td>原生 range 即进度条，上报 <code>data.value</code></td>
       </tr>
       <tr>
         <td><strong>日期选择</strong></td>
-        <td><code>&lt;input id="dt_xxx" type="date" data-type="datetimePicker" data-ctrl-type="datetimePicker" data-ctrl-id="dt_xxx" data-name="日期选择" data-drag-type="datetimePicker" style="position:absolute;left:20px;top:50px;width:140px;height:32px;"&gt;</code></td>
+        <td><code>&lt;input id="dt_xxx" type="date" data-ctrl-type="datetimePicker" data-name="日期选择" data-drag-type="datetimePicker"&gt;</code></td>
         <td>type="date" / "datetime-local"</td>
       </tr>
       <tr>
         <td><strong>分割线</strong></td>
-        <td><code>&lt;div id="divider_xxx" data-type="divider" data-ctrl-type="divider" data-ctrl-id="divider_xxx" data-name="分割线" data-drag-type="divider" style="position:absolute;left:20px;top:50px;width:200px;height:1px;border-top:1px solid #D0D0D0;"&gt;&lt;/div&gt;</code></td>
+        <td><code>&lt;div id="divider_xxx" data-ctrl-type="divider" data-name="分割线" data-drag-type="divider" style="border-top:1px solid #D0D0D0;"&gt;&lt;/div&gt;</code></td>
         <td>纯样式控件，无交互事件</td>
       </tr>
     </tbody>
   </table>
 
   <div class="tip-box">
-    <strong>💡 快速记忆口诀：</strong><br/>
-    “<strong>id</strong> 唯一不能少，<strong>ctrl-type</strong> 定类型，<strong>drag-type</strong> 防拖拽，<strong>data-name</strong> 写中文，<strong>绝对定位</strong> 不能忘。”
+    <strong>💡 快速记忆口诀：</strong>“<strong>id</strong> 唯一不能少，<strong>ctrl-type</strong> 定类型，<strong>drag-type</strong> 防拖拽，<strong>data-name</strong> 写中文。”
   </div>
 </div>
 
@@ -336,7 +316,7 @@ window.__devGuideHTML = `
     <pre><code>&lt;div id="list_xxx" class="listBox" data-ctrl-type="listBox" data-drag-type="listBox" data-name="列表名"
      data-listBox-items='[{"id":"1","text":"项目1","selected":false},{"id":"2","text":"项目2","selected":false}]'
      data-editable="false" data-always-show-selection="false"
-     style="position:absolute;left:20px;top:80px;width:200px;height:200px;"&gt;
+     style="width:200px;height:200px;"&gt;
   &lt;div class="listBox_scroll"&gt;
     &lt;div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="0"&gt;
       &lt;span class="listBox_item_text"&gt;项目1&lt;/span&gt;
@@ -358,7 +338,7 @@ window.__devGuideHTML = `
      data-columns='[{"field":"col1","header":"列A"},{"field":"col2","header":"列B"}]'
      data-rows='[{"id":"row1","cells":{"col1":"数据A1","col2":"数据B1"}}]'
      data-show-checkbox="true" data-editable="false" data-always-show-selection="false"
-     style="position:absolute;left:20px;top:80px;width:400px;height:250px;"&gt;
+     style="width:400px;height:250px;"&gt;
   &lt;div class="dataGrid_header"&gt;
     &lt;div class="dataGrid_header_cell dataGrid_checkbox" style="width:36px;min-width:36px;flex-shrink:0"&gt;
       &lt;input type="checkbox" class="dataGrid_select_all"&gt;
@@ -386,7 +366,7 @@ window.__devGuideHTML = `
     </div>
     <pre><code>&lt;div id="tree_xxx" class="treeView" data-ctrl-type="treeView" data-drag-type="treeView" data-name="树形名"
      data-tree-id="tree_xxx" data-editable="false" data-show-icon="true" data-always-show-selection="true"
-     style="position:absolute;left:20px;top:80px;width:220px;height:280px;"&gt;
+     style="width:220px;height:280px;"&gt;
   &lt;div class="treeView_node" data-node-id="node1" data-level="0"&gt;
     &lt;div class="treeView_node_content"&gt;
       &lt;span class="treeView_toggle expanded" data-ctrl-type="treeview_node_toggle"&gt;▶&lt;/span&gt;
@@ -414,7 +394,7 @@ window.__devGuideHTML = `
       <button class="copy-btn" onclick="copyCodeFromBlock(this)">复制</button>
     </div>
     <pre><code>&lt;div id="tabs_xxx" class="tabsContainer" data-ctrl-type="tabsContainer" data-drag-type="tabsContainer" data-name="标签页名"
-     style="position:absolute;left:20px;top:80px;width:300px;height:200px;"&gt;
+     style="width:300px;height:200px;"&gt;
   &lt;div class="tabsContainer_headerBar"&gt;
     &lt;button class="tabsContainer_headerBar_btn active" data-tab-name="tab1" data-ctrl-type="tabsContainer_headerBar_btn" data-name="标签1" data-drag-type="tabs_btn"&gt;标签1&lt;/button&gt;
     &lt;button class="tabsContainer_headerBar_btn" data-tab-name="tab2" data-ctrl-type="tabsContainer_headerBar_btn" data-name="标签2" data-drag-type="tabs_btn"&gt;标签2&lt;/button&gt;
@@ -434,7 +414,7 @@ window.__devGuideHTML = `
     </div>
     <pre><code>&lt;div id="card_xxx" class="cardBox" data-ctrl-type="cardBox" data-drag-type="cardBox" data-name="卡片名"
      data-collapsible="true" data-collapsed="false"
-     style="position:absolute;left:20px;top:80px;width:260px;height:180px;"&gt;
+     style="width:260px;height:180px;"&gt;
   &lt;div class="cardBox_header"&gt;
     &lt;span class="cardBox_header_title"&gt;卡片标题&lt;/span&gt;
     &lt;span class="cardBox_collapse_btn" data-ctrl-type="cardBox_collapse_btn"&gt;
@@ -452,7 +432,7 @@ window.__devGuideHTML = `
       <button class="copy-btn" onclick="copyCodeFromBlock(this)">复制</button>
     </div>
     <pre><code>&lt;div id="log_xxx" class="logOutput_container" data-ctrl-type="logOutput" data-drag-type="logOutput" data-name="日志名"
-     style="position:absolute;left:20px;top:80px;width:300px;height:150px;"&gt;
+     style="width:300px;height:150px;"&gt;
   &lt;div class="logOutput_line" data-ctrl-type="logOutput_item" style="color:#333;"&gt;[INFO] 日志已就绪&lt;/div&gt;
 &lt;/div&gt;</code></pre>
   </div>
@@ -464,7 +444,7 @@ window.__devGuideHTML = `
       <button class="copy-btn" onclick="copyCodeFromBlock(this)">复制</button>
     </div>
     <pre><code>&lt;div id="radioGroup_xxx" class="radioGroup_container" data-ctrl-type="radioGroup" data-drag-type="radioGroup" data-name="单选框组"
-     style="position:absolute;left:20px;top:80px;width:120px;height:40px;"&gt;
+     style="width:120px;height:40px;"&gt;
   &lt;label class="radioGroup_item"&gt;
     &lt;input type="radio" data-ctrl-type="radio" name="groupName" value="选项1" checked /&gt;选项1
   &lt;/label&gt;
@@ -482,10 +462,10 @@ window.__devGuideHTML = `
     </div>
     <pre><code>&lt;div id="progress_xxx" class="progressBar_container" data-ctrl-type="progressBar" data-drag-type="progressBar" data-name="进度条"
      data-editable="true" data-draggable="false"
-     style="position:absolute;left:20px;top:80px;width:250px;height:10px;overflow:visible;"&gt;
+     style="width:250px;height:10px;overflow:visible;"&gt;
   &lt;div class="progressBar_track"&gt;&lt;/div&gt;
   &lt;div class="progressBar_fill" style="width:60%;height:100%;background:#0078D4;border-radius:inherit;transition:width 0.15s;"&gt;&lt;/div&gt;
-  &lt;span class="progressBar_text" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:inherit;pointer-events:none;white-space:nowrap;"&gt;60%&lt;/span&gt;
+  &lt;span class="progressBar_text" style="transform:translate(-50%,-50%);font-size:inherit;pointer-events:none;white-space:nowrap;"&gt;60%&lt;/span&gt;
 &lt;/div&gt;</code></pre>
   </div>
 </div>
@@ -503,8 +483,7 @@ window.__devGuideHTML = `
       <tr><td><code>data-ctrl-type</code></td><td><span class="tag tag-required">必填</span></td><td>控件类型，决定事件上报的 <code>ctrlType</code> 和数据提取逻辑</td><td><code>data-ctrl-type="button"</code></td></tr>
       <tr><td><code>data-drag-type</code></td><td><span class="tag tag-required">可交互控件必填</span></td><td>标记可交互控件，CSS 统一设置 <code>no-drag</code>，防止拖拽窗口。<strong>纯布局容器不需要此属性。</strong></td><td><code>data-drag-type="button"</code></td></tr>
       <tr><td><code>data-name</code></td><td><span class="tag tag-recommend">推荐</span></td><td>控件中文名称，显示在事件日志的 <code>customname</code> 字段</td><td><code>data-name="保存按钮"</code></td></tr>
-      <tr><td><code>data-type</code></td><td><span class="tag tag-optional">设计器可选</span></td><td>与 <code>data-ctrl-type</code> 值相同，设计器导出时自动生成，建议保留</td><td><code>data-type="button"</code></td></tr>
-      <tr><td><code>data-ctrl-id</code></td><td><span class="tag tag-optional">设计器可选</span></td><td>与 <code>id</code> 值相同，设计器导出时自动生成，建议保留</td><td><code>data-ctrl-id="btn_xxx"</code></td></tr>
+      <tr><td><code>data-type</code></td><td><span class="tag tag-optional">可选</span></td><td>基础控件类型，与 <code>data-ctrl-type</code> 不同，只记录原生控件最基础的标签类型，</td><td><code>data-type="select"</code></td></tr>
       <tr><td><code>aria-label</code></td><td><span class="tag tag-optional">可选</span></td><td>无障碍标签，会作为 <code>customname</code> 的回退来源</td><td><code>aria-label="保存"</code></td></tr>
       <tr><td><code>data-editable</code></td><td><span class="tag tag-optional">可选</span></td><td>是否可编辑（进度条点击调整、表格/列表/树形编辑）</td><td><code>data-editable="true"</code></td></tr>
       <tr><td><code>data-href</code></td><td><span class="tag tag-optional">可选</span></td><td>超链接的目标地址（代替 <code>href</code>，避免页面跳转）</td><td><code>data-href="https://..."</code></td></tr>
@@ -529,7 +508,7 @@ window.__devGuideHTML = `
 
   <div class="tip-box">
     <strong>💡 快速记忆口诀：</strong><br/>
-    “<strong>id</strong> 唯一不能少，<strong>ctrl-type</strong> 定类型，<strong>drag-type</strong> 防拖拽，<strong>data-name</strong> 写中文，<strong>绝对定位</strong> 不能忘，<strong>容器数据</strong> 要填好。”
+    “<strong>id</strong> 唯一不能少，<strong>ctrl-type</strong> 定类型，<strong>drag-type</strong> 防拖拽，<strong>data-name</strong> 写中文，<strong>容器数据</strong> 要填好。”
   </div>
 </div>
 
@@ -551,7 +530,6 @@ window.__devGuideHTML = `
   &lt;title&gt;我的应用&lt;/title&gt;
   &lt;style&gt;
     * { margin:0; padding:0; box-sizing:border-box; }
-    [data-type] { position:absolute; box-sizing:border-box; }
     .pageContainer {
       app-region: drag; -webkit-app-region: drag;
       position: relative;
@@ -782,8 +760,7 @@ var config = JSON.parse(webviewBridge.api.tooltip.getConfig('tip1'));</code></pr
    - data-ctrl-type（控件类型，见下表）
    - data-drag-type（拖拽标记，值任意，如 button）—— 【仅可交互控件需要】
    - data-name（中文名称，推荐）
-   - data-type（与 data-ctrl-type 值相同，设计器风格）
-   - data-ctrl-id（与 id 值相同，设计器风格）
+   - data-type（基础控件类型，与 data-ctrl-type 不同，只记录原生控件最基础的标签类型，如 select）
 
    控件类型对应关系：
    按钮: button       输入框: inputText     复选框: checkbox
@@ -793,9 +770,7 @@ var config = JSON.parse(webviewBridge.api.tooltip.getConfig('tip1'));</code></pr
    列表: listBox      表格: dataGrid        树形: treeView
    标签页: tabsContainer  卡片: cardBox     日志: logOutput
 
-3. 所有控件必须使用绝对定位（position: absolute），通过 left/top/width/height 定位。
-
-4. 复杂控件必须包含完整子结构 + 初始化数据属性（这是重点！）：
+3. 复杂控件必须包含完整子结构 + 初始化数据属性（这是重点！）：
    ▸ 列表框（ListBox）：
      容器必须设置 data-listBox-items='[{"id":"1","text":"项1","selected":false}]'
      内部必须有 .listBox_scroll → .listBox_item → .listBox_item_text
@@ -833,19 +808,18 @@ var config = JSON.parse(webviewBridge.api.tooltip.getConfig('tip1'));</code></pr
    ▸ 卡片框（CardBox）：
      容器必须设置 data-collapsible="true" 和 data-collapsed="false"
 
-5. 页面结构：
+4. 页面结构：
    - 最外层用 &lt;div class="pageContainer glass-effect" id="pageContainer" data-ctrl-type="pageContainer" data-name="canvas" style="app-region: drag;"&gt;
    - 标题栏 id="titlebar"，包含最小化/最大化/关闭按钮（最大化按钮内部必须有一个 &lt;span&gt; 包含图标，并设为 drag，固定高宽18px）
    - 所有交互控件放在内容区
 
-6. 样式要求：
+5. 样式要求：
    - .pageContainer { app-region: drag; }
    - 【仅可交互控件】需要 [data-drag-type] { app-region: no-drag; }
    - 纯布局容器（侧边栏、内容区）【不要】添加 data-drag-type，记住：能点能输入就需要，纯放东西不需要。
    - [data-ctrl-type="titlebar_max"] span { app-region: drag; }
-   - [data-type] { position: absolute; box-sizing: border-box; }
 
-7. 所有控件交互事件会自动上报给宿主，无需手动写事件监听。
+6. 所有控件交互事件会自动上报给宿主，无需手动写事件监听。
 
 【输出要求】
 - 完整可运行的 HTML 文件
@@ -869,7 +843,6 @@ var config = JSON.parse(webviewBridge.api.tooltip.getConfig('tip1'));</code></pr
     <span class="check-item">所有控件设置了 data-ctrl-type</span>
     <span class="check-item">可交互控件设置了 data-drag-type</span>
     <span class="check-item">布局容器【没有】设置 data-drag-type（保持拖拽能力）</span>
-    <span class="check-item">所有控件使用绝对定位（position: absolute）</span>
     <span class="check-item">复杂控件设置了对应的数据属性（data-listBox-items / data-columns 等）</span>
     <span class="check-item">控件可点击且事件上报正常</span>
     <span class="check-item">控制台无报错</span>
@@ -886,7 +859,6 @@ var config = JSON.parse(webviewBridge.api.tooltip.getConfig('tip1'));</code></pr
       <tr><td>点击控件时窗口跟随拖动</td><td>控件缺少 <code>data-drag-type</code> 或 CSS 未设置 <code>no-drag</code></td><td>添加 <code>data-drag-type</code> 并确保 CSS 规则生效</td></tr>
       <tr><td>无法通过拖拽空白区域移动窗口</td><td>布局容器被错误添加了 <code>data-drag-type</code></td><td>移除侧边栏、内容区等布局容器上的 <code>data-drag-type</code></td></tr>
       <tr><td>列表/表格/树形动态操作不生效</td><td>缺少初始化 JSON 属性（如 <code>data-listBox-items</code>）</td><td>参考第4节复杂控件模板，补全对应数据属性</td></tr>
-      <tr><td>控件位置错乱或重叠</td><td>未设置绝对定位或 left/top 值不正确</td><td>确保 <code>[data-type] { position: absolute; }</code> 并逐一设置坐标</td></tr>
     </tbody>
   </table>
 
