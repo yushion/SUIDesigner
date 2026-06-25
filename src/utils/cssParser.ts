@@ -273,7 +273,7 @@ export const CHILD_SELECTOR_MAP: Record<string, Record<string, Record<string, st
       'background-color': 'gridHoverBg',
       'background': 'gridHoverBg',
     },
-    ' .data-grid-row-focused': {
+    ' .data-grid-row.data-grid-row-focused': {
       'background-color': 'gridFocusedBg',
       'background': 'gridFocusedBg',
     },

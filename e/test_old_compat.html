@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>webviewBridge_v2 旧方案兼容测试</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+<style>
+* { margin:0;padding:0;box-sizing:border-box }
+html,body { width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#f0f2f5 }
+body { display:flex;flex-direction:column }
+
+.test-header {
+  background:#1a1a2e;color:#fff;padding:0 20px;height:48px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
+}
+.test-header h1 { font-size:16px }
+.test-header .badge { background:#ff9800;padding:2px 8px;border-radius:4px;font-size:12px;margin-left:8px }
+
+.main-content { flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:20px }
+
+.panel { background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.1);overflow:hidden }
+.panel-header { padding:12px 16px;background:#fafafa;border-bottom:1px solid #eee;font-weight:600;font-size:14px;color:#333;display:flex;align-items:center;gap:8px }
+.panel-body { padding:16px;display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;position:relative;min-height:80px }
+
+/* 旧方案控件样式 */
+[data-type] { position:relative;box-sizing:border-box }
+
+/* 按钮 */
+[data-ctrl-type="button"], [data-ctrl-type="iconButton"] {
+  padding:6px 16px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;cursor:pointer;font-size:13px
+}
+[data-ctrl-type="button"]:hover, [data-ctrl-type="iconButton"]:hover { background:#f0f0f0;border-color:#409EFF;color:#409EFF }
+
+/* 输入框 */
+[data-ctrl-type="inputText"] {
+  padding:6px 10px;border:1px solid #d9d9d9;border-radius:4px;font-size:13px;outline:none
+}
+
+/* 复选框/单选框 */
+[data-ctrl-type="checkbox"], [data-ctrl-type="radio"] {
+  display:inline-flex;align-items:center;gap:6px;font-size:13px;cursor:pointer
+}
+
+/* 开关 */
+[data-ctrl-type="switchToggle"] { display:inline-flex;align-items:center;gap:8px;font-size:13px }
+[data-ctrl-type="switchToggle"] input { display:none }
+[data-ctrl-type="switchToggle"] .slider {
+  width:40px;height:22px;background:#ccc;border-radius:11px;position:relative;cursor:pointer;transition:0.3s
+}
+[data-ctrl-type="switchToggle"] .slider::after {
+  content:'';position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:2px;left:2px;transition:0.3s
+}
+[data-ctrl-type="switchToggle"] input:checked + .slider { background:#409EFF }
+[data-ctrl-type="switchToggle"] input:checked + .slider::after { left:20px }
+
+/* 下拉框 */
+[data-ctrl-type="comboBox"] { padding:4px 8px;border:1px solid #d9d9d9;border-radius:4px;font-size:13px }
+
+/* 文本域 */
+[data-ctrl-type="textarea"] { padding:6px 10px;border:1px solid #d9d9d9;border-radius:4px;font-size:13px;resize:vertical;min-height:60px }
+
+/* 超链接 */
+[data-ctrl-type="hyperLink"] { color:#409EFF;text-decoration:none;font-size:13px;cursor:pointer }
+[data-ctrl-type="hyperLink"]:hover { text-decoration:underline }
+
+/* 进度条 */
+.progressBar_container { width:200px;height:24px;background:#f0f0f0;border-radius:4px;position:relative;overflow:hidden;cursor:pointer }
+.progressBar_fill { height:100%;background:#409EFF;border-radius:4px;transition:width 0.3s }
+.progressBar_text { position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:11px;color:#333 }
+
+/* 卡片 */
+.cardBox { border:1px solid #e0e0e0;border-radius:6px;overflow:hidden;min-width:200px }
+.cardBox_header { padding:8px 12px;background:#fafafa;border-bottom:1px solid #e0e0e0;display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600 }
+.cardBox_body { padding:12px;display:flex;flex-wrap:wrap;gap:8px }
+.cardBox_collapse_btn { cursor:pointer;font-size:12px }
+
+/* 单选组 */
+.radioGroup_container { display:flex;flex-direction:column;gap:6px;padding:4px }
+.radioGroup_item { display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer }
+
+/* 标签页 */
+.tabsContainer { border:1px solid #e0e0e0;border-radius:6px;overflow:hidden;min-width:300px }
+.tabsContainer_headerBar { display:flex;border-bottom:2px solid #e0e0e0;background:#fafafa }
+.tabsContainer_headerBar_btn { padding:8px 16px;background:none;border:none;cursor:pointer;font-size:13px;color:#666;border-bottom:2px solid transparent;margin-bottom:-2px }
+.tabsContainer_headerBar_btn:hover { color:#409EFF }
+.tabsContainer_headerBar_btn.active { color:#409EFF;border-bottom-color:#409EFF }
+.tabsContainer_contentWrapper { padding:12px;min-height:100px }
+.tabsContainer_contentWrapper_panel { display:none;font-size:13px }
+.tabsContainer_contentWrapper_panel.active { display:block }
+
+/* 日志输出 */
+.logOutput_container { border:1px solid #e0e0e0;border-radius:4px;padding:8px;max-height:100px;overflow-y:auto;font-size:12px;background:#fafafa;min-width:200px }
+.logOutput_line { padding:2px 0;border-bottom:1px solid #f0f0f0 }
+
+/* 列表 */
+.listBox_scroll { max-height:120px;overflow-y:auto;border:1px solid #e0e0e0;border-radius:4px;min-width:180px }
+.listBox_item { padding:6px 10px;cursor:pointer;border-bottom:1px solid #f0f0f0;font-size:13px }
+.listBox_item:hover { background:#f5f5f5 }
+.listBox_item.item-selected { background:#e6f7ff;color:#1890ff }
+.listBox_item_text { pointer-events:none }
+
+/* 表格 */
+.dataGrid_container { border:1px solid #e0e0e0;border-radius:4px;overflow:hidden;font-size:13px;min-width:300px }
+.dataGrid_header { display:flex;background:#fafafa;border-bottom:1px solid #e0e0e0;font-weight:600 }
+.dataGrid_header_cell { padding:6px 10px;border-right:1px solid #e0e0e0 }
+.dataGrid_body { max-height:120px;overflow-y:auto }
+.dataGrid_row { display:flex;border-bottom:1px solid #f0f0f0 }
+.dataGrid_row:hover { background:#f5f5f5 }
+.dataGrid_row.dataGrid_row-focused { background:#e6f7ff;color:#1890ff }
+.dataGrid_cell { padding:6px 10px;border-right:1px solid #f0f0f0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap }
+.dataGrid_checkbox { display:flex;align-items:center;justify-content:center }
+.dataGrid_row-focused .dataGrid_cell { color:#1890ff }
+
+/* 树形框 */
+.treeView_node_content { display:flex;align-items:center;padding:3px 6px;cursor:pointer;font-size:13px;gap:4px }
+.treeView_node_content:hover { background:#f5f5f5 }
+.treeView_node_content.selected { background:#e6f7ff;color:#1890ff }
+.treeView_toggle { font-size:10px;width:16px;text-align:center;transition:transform 0.2s;cursor:pointer;flex-shrink:0 }
+.treeView_toggle.expanded { transform:rotate(90deg) }
+.treeView_toggle.collapsed { transform:rotate(0deg) }
+.treeView_toggle.empty { visibility:hidden }
+.treeView_children { padding-left:20px }
+.treeView_label { pointer-events:none }
+.treeView_node_content.selected .treeView_label { color:#1890ff }
+
+/* 图片框 */
+.imageBox { border:1px dashed #d9d9d9;border-radius:4px;display:flex;align-items:center;justify-content:center;min-width:100px;min-height:60px;font-size:12px;color:#999 }
+
+/* 事件日志 */
+.event-log { max-height:200px;overflow-y:auto;background:#1e1e1e;color:#d4d4d4;font-family:Consolas,monospace;font-size:12px;padding:10px;border-radius:4px }
+.event-log .log-entry { padding:2px 0;border-bottom:1px solid #333 }
+.event-log .log-entry .action { color:#4ec9b0 }
+.event-log .log-entry .type { color:#ce9178 }
+.event-log .log-entry .id { color:#9cdcfe }
+.event-log .log-entry .source { color:#6a9955 }
+
+.status-dot { width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px }
+.status-dot.ok { background:#4caf50 }
+.status-dot.fail { background:#f44336 }
+</style>
+</head>
+<body>
+
+<div class="test-header">
+  <div><h1>webviewBridge_v2 旧方案兼容测试<span class="badge">向后兼容</span></h1></div>
+  <div style="font-size:12px;opacity:0.7">所有控件使用 data-ctrl-type 旧方案写法</div>
+</div>
+
+<div class="main-content">
+
+  <!-- 旧方案基础控件 -->
+  <div class="panel">
+    <div class="panel-header"><span class="icon">📋</span> 旧方案基础控件（data-ctrl-type 显式声明）</div>
+    <div class="panel-body">
+      <button id="button_1" data-type="button" data-ctrl-type="button" data-ctrl-id="button_1" data-name="按钮_1">按钮</button>
+      <input type="text" id="input_1" data-type="input" data-ctrl-type="inputText" data-ctrl-id="input_1" data-name="编辑框_1" placeholder="请输入..." value="测试文本" />
+      <label id="checkbox_1" data-type="checkbox" data-ctrl-type="checkbox" data-ctrl-id="checkbox_1" data-name="选择框_1"><input type="checkbox" /><span>选项</span></label>
+      <label id="toggle_1" data-type="toggle" data-ctrl-type="switchToggle" data-ctrl-id="toggle_1" data-name="开关按钮_1" style="display:inline-flex;align-items:center;"><input type="checkbox" /><span class="slider"></span></label>
+      <select id="comboBox_1" data-type="comboBox" data-ctrl-type="comboBox" data-ctrl-id="comboBox_1" data-name="组合框_1"><option value="选项1" selected>选项1</option><option value="选项2">选项2</option><option value="选项3">选项3</option></select>
+      <span id="label_3" data-type="label" data-ctrl-type="label" data-ctrl-id="label_3" data-name="文本标签_3">标签文本</span>
+      <a id="hyperlink_1" data-type="hyperLink" data-ctrl-type="hyperLink" data-ctrl-id="hyperlink_1" data-name="超链接_1" href="javascript:void(0)">超链接</a>
+      <button id="iconButton_1" data-type="iconButton" data-ctrl-type="iconButton" data-ctrl-id="iconButton_1" data-name="图标按钮_1"><i class="fas fa-star"></i> 按钮</button>
+      <textarea id="textarea_1" data-type="textarea" data-ctrl-type="textarea" data-ctrl-id="textarea_1" data-name="文本域_1" rows="3" placeholder="请输入..."></textarea>
+      <input type="datetime-local" id="datetimePicker_1" data-type="datetimePicker" data-ctrl-type="datetimePicker" data-ctrl-id="datetimePicker_1" data-name="时间框_1" value="2026-06-06T00:00" />
+      
+      <!-- 进度条 -->
+      <div id="progressBar_1" data-type="progressBar" data-ctrl-type="progressBar" data-ctrl-id="progressBar_1" data-name="进度条_1" class="progressBar_container">
+        <div class="progressBar_track"></div>
+        <div class="progressBar_fill" style="width:60%"></div>
+        <span class="progressBar_text">60%</span>
+      </div>
+
+      <!-- 单选框组 -->
+      <div id="radioGroup_1" data-type="radioGroup" data-ctrl-type="radioGroup" data-ctrl-id="radioGroup_1" data-name="单选框_1" class="radioGroup_container">
+        <label class="radioGroup_item"><input type="radio" data-ctrl-type="radio" name="单选框_1" value="选项1" checked />选项1</label>
+        <label class="radioGroup_item"><input type="radio" data-ctrl-type="radio" name="单选框_1" value="选项2" />选项2</label>
+      </div>
+
+      <!-- 图片框 -->
+      <div id="imageBox_1" data-type="imageBox" data-ctrl-type="imageBox" data-ctrl-id="imageBox_1" data-name="图片框_1" class="imageBox">图片框</div>
+    </div>
+  </div>
+
+  <!-- 旧方案复杂控件 -->
+  <div class="panel">
+    <div class="panel-header"><span class="icon">📊</span> 旧方案复杂控件（CSS class + DOM 结构识别）</div>
+    <div class="panel-body" style="flex-direction:column;align-items:stretch">
+
+      <!-- 卡片框 -->
+      <div id="cardBox_1" data-type="cardBox" data-ctrl-type="cardBox" data-ctrl-id="cardBox_1" data-name="卡片框_1" data-collapsible="true" data-collapsed="false" class="cardBox">
+        <div class="cardBox_header"><span class="cardBox_header_title">卡片标题</span><span class="cardBox_collapse_btn">▼</span></div>
+        <div class="cardBox_body" data-ctrl-type="cardBox_body">
+          <span id="label_4" data-type="label" data-ctrl-type="label" data-ctrl-id="label_4" data-name="文本标签_4" data-parent="cardBox_1">卡片内的标签</span>
+          <button id="button_3" data-type="button" data-ctrl-type="button" data-ctrl-id="button_3" data-name="按钮_3" data-parent="cardBox_1">卡片内按钮</button>
+        </div>
+      </div>
+
+      <!-- 日志框 -->
+      <div id="logOutput_1" data-type="logOutput" data-ctrl-type="logOutput" data-ctrl-id="logOutput_1" data-name="日志框_1" class="logOutput_container">
+        <div class="logOutput_line" data-ctrl-type="logOutput_item" style="color:#333333">日志输出已就绪。</div>
+        <div class="logOutput_line" data-ctrl-type="logOutput_item" style="color:#666666">这是第二条日志。</div>
+      </div>
+
+      <!-- 列表框 -->
+      <div id="listBox_1" data-type="listBox" data-ctrl-type="listBox" data-ctrl-id="listBox_1" data-name="列表框_1" data-editable="false" data-always-show-selection="true">
+        <div class="listBox_scroll">
+          <div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="0"><span class="listBox_item_text">列表项一</span></div>
+          <div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="1"><span class="listBox_item_text">列表项二</span></div>
+          <div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="2"><span class="listBox_item_text">列表项三</span></div>
+        </div>
+      </div>
+
+      <!-- 标签页 -->
+      <div id="tabsContainer_1" data-type="tabsContainer" data-ctrl-type="tabsContainer" data-ctrl-id="tabsContainer_1" data-name="标签页容器_1" class="tabsContainer">
+        <div class="tabsContainer_headerBar">
+          <button class="tabsContainer_headerBar_btn active" data-ctrl-type="tabsContainer_headerBar_btn" data-tab-name="tab1">标签1</button>
+          <button class="tabsContainer_headerBar_btn" data-ctrl-type="tabsContainer_headerBar_btn" data-tab-name="tab2">标签2</button>
+          <button class="tabsContainer_headerBar_btn" data-ctrl-type="tabsContainer_headerBar_btn" data-tab-name="tab3">标签3</button>
+        </div>
+        <div class="tabsContainer_contentWrapper">
+          <div class="tabsContainer_contentWrapper_panel active" data-tab-name="tab1" data-parent="tabsContainer_1" data-tab="0">
+            <p>标签1的内容</p>
+          </div>
+          <div class="tabsContainer_contentWrapper_panel" data-tab-name="tab2" data-parent="tabsContainer_1" data-tab="1">
+            <p>标签2的内容</p>
+          </div>
+          <div class="tabsContainer_contentWrapper_panel" data-tab-name="tab3" data-parent="tabsContainer_1" data-tab="2">
+            <p>标签3的内容</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 表格 -->
+      <div id="dataGrid_1" data-type="dataGrid" data-ctrl-type="dataGrid" data-ctrl-id="dataGrid_1" data-name="多项表格_1" data-show-checkbox="true" data-editable="false" class="dataGrid_container">
+        <div class="dataGrid_header">
+          <div class="dataGrid_header_cell dataGrid_checkbox" style="width:36px;min-width:36px;flex-shrink:0"><input type="checkbox" class="dataGrid_select_all"></div>
+          <div class="dataGrid_header_cell" data-col-key="col1" data-ctrl-type="dataGrid_cell" style="min-width:100px;flex:1">列A</div>
+          <div class="dataGrid_header_cell" data-col-key="col2" data-ctrl-type="dataGrid_cell" style="min-width:100px;flex:1">列B</div>
+          <div class="dataGrid_header_cell" data-col-key="col3" data-ctrl-type="dataGrid_cell" style="min-width:100px;flex:1">列C</div>
+        </div>
+        <div class="dataGrid_body">
+          <div class="dataGrid_row" data-row-index="0" data-row-id="dataGrid_1_row_1">
+            <div class="dataGrid_cell dataGrid_checkbox" style="width:36px;min-width:36px;flex-shrink:0"><input type="checkbox" class="dataGrid_row_check" data-ctrl-type="dataGrid_row_checkbox"></div>
+            <div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="col1" style="min-width:100px;flex:1">数据A1</div>
+            <div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="col2" style="min-width:100px;flex:1">数据B1</div>
+            <div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="col3" style="min-width:100px;flex:1">数据C1</div>
+          </div>
+          <div class="dataGrid_row" data-row-index="1" data-row-id="dataGrid_1_row_2">
+            <div class="dataGrid_cell dataGrid_checkbox" style="width:36px;min-width:36px;flex-shrink:0"><input type="checkbox" class="dataGrid_row_check" data-ctrl-type="dataGrid_row_checkbox"></div>
+            <div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="col1" style="min-width:100px;flex:1">数据A2</div>
+            <div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="col2" style="min-width:100px;flex:1">数据B2</div>
+            <div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="col3" style="min-width:100px;flex:1">数据C2</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 树形框 -->
+      <div id="treeView_1" data-type="treeView" data-ctrl-type="treeView" data-ctrl-id="treeView_1" data-name="树形框_1" data-editable="false" data-show-icon="true">
+        <div class="treeView_node" data-node-id="node_1" data-level="0">
+          <div class="treeView_node_content">
+            <span class="tree-indent" style="width:0px;display:inline-block;flex-shrink:0"></span>
+            <span class="treeView_toggle expanded" data-ctrl-type="treeview_node_toggle">▶</span>
+            <span class="treeView_icon">📁</span>
+            <span class="treeView_label" data-ctrl-type="treeview_node_text">根节点</span>
+          </div>
+          <div class="treeView_children" style="display:block">
+            <div class="treeView_node" data-node-id="node_2" data-level="1">
+              <div class="treeView_node_content">
+                <span class="tree-indent" style="width:20px;display:inline-block;flex-shrink:0"></span>
+                <span class="treeView_toggle empty" data-ctrl-type="treeview_node_toggle">▶</span>
+                <span class="treeView_icon">📄</span>
+                <span class="treeView_label" data-ctrl-type="treeview_node_text">子节点1</span>
+              </div>
+            </div>
+            <div class="treeView_node" data-node-id="node_3" data-level="1">
+              <div class="treeView_node_content">
+                <span class="tree-indent" style="width:20px;display:inline-block;flex-shrink:0"></span>
+                <span class="treeView_toggle expanded" data-ctrl-type="treeview_node_toggle">▶</span>
+                <span class="treeView_icon">📁</span>
+                <span class="treeView_label" data-ctrl-type="treeview_node_text">子节点2</span>
+              </div>
+              <div class="treeView_children" style="display:block">
+                <div class="treeView_node" data-node-id="node_4" data-level="2">
+                  <div class="treeView_node_content">
+                    <span class="tree-indent" style="width:40px;display:inline-block;flex-shrink:0"></span>
+                    <span class="treeView_toggle empty" data-ctrl-type="treeview_node_toggle">▶</span>
+                    <span class="treeView_icon">📄</span>
+                    <span class="treeView_label" data-ctrl-type="treeview_node_text">孙节点1</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 命令测试 -->
+  <div class="panel">
+    <div class="panel-header"><span class="icon">🔧</span> 旧方案命令执行测试</div>
+    <div class="panel-body">
+      <button onclick="testCmd('button_1.setValue', {value:'新按钮文字'})">setValue(按钮)</button>
+      <button onclick="testCmd('input_1.setValue', {value:'设置的新值'})">setValue(输入框)</button>
+      <button onclick="testCmd('input_1.getValue')">getValue(输入框)</button>
+      <button onclick="testCmd('button_1.hide')">hide(按钮)</button>
+      <button onclick="testCmd('button_1.show')">show(按钮)</button>
+      <button onclick="testCmd('button_1.disable')">disable(按钮)</button>
+      <button onclick="testCmd('button_1.enable')">enable(按钮)</button>
+      <button onclick="testCmd('label_3.setValue', {value:'标签已更新'})">setValue(标签)</button>
+    </div>
+  </div>
+
+  <!-- 事件日志 -->
+  <div class="panel">
+    <div class="panel-header">
+      <span class="icon">📡</span> 事件上报日志
+      <button onclick="clearLog()" style="margin-left:auto;padding:2px 8px;font-size:11px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;cursor:pointer">清空</button>
+      <span id="sourceStats" style="margin-left:8px;font-size:11px;color:#888"></span>
+    </div>
+    <div class="panel-body">
+      <div class="event-log" id="eventLog">
+        <div class="log-entry" style="color:#6a9955">等待事件上报...</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 引入 v2 桥接脚本 -->
+<script src="webviewBridge_v2.js"></script>
+
+<script>
+// 拦截 postMessage 显示在日志中
+var sourceStats = { explicit: 0, native: 0, css: 0, container: 0 };
+
+(function() {
+  var origPostMessage = window.chrome && window.chrome.webview && window.chrome.webview.postMessage;
+  if (origPostMessage) {
+    window.chrome.webview.postMessage = function(msg) {
+      addLogEntry(msg);
+      origPostMessage.call(window.chrome.webview, msg);
+    };
+  } else {
+    if (!window.chrome) window.chrome = {};
+    if (!window.chrome.webview) window.chrome.webview = {};
+    window.chrome.webview.postMessage = function(msg) {
+      addLogEntry(msg);
+    };
+    window.chrome.webview.addEventListener = function(event, callback) {
+      // 模拟
+    };
+    console.log('[TEST] 模拟 WebView2 环境已创建');
+  }
+})();
+
+function addLogEntry(msg) {
+  var log = document.getElementById('eventLog');
+  if (!log) return;
+  
+  var source = msg.source || 'explicit';
+  sourceStats[source] = (sourceStats[source] || 0) + 1;
+  updateStats();
+  
+  var entry = document.createElement('div');
+  entry.className = 'log-entry';
+  var sourceTag = '<span class="source">[' + (source === 'explicit' ? 'e' : source === 'native' ? 'n' : source === 'css' ? 'c' : '?') + ']</span>';
+  var action = msg.action || '?';
+  var ctrlType = msg.ctrlType || '';
+  var targetId = msg.targetId || '';
+  var dataStr = msg.data ? JSON.stringify(msg.data).substring(0, 80) : '{}';
+  entry.innerHTML = sourceTag + ' <span class="action">' + action + '</span> <span class="type">' + ctrlType + '</span> <span class="id">' + targetId + '</span> ' + dataStr;
+  log.appendChild(entry);
+  log.scrollTop = log.scrollHeight;
+}
+
+function updateStats() {
+  var stats = document.getElementById('sourceStats');
+  if (stats) {
+    stats.textContent = 'e:' + (sourceStats.explicit || 0) + ' n:' + (sourceStats.native || 0) + ' c:' + (sourceStats.css || 0);
+  }
+}
+
+function clearLog() {
+  var log = document.getElementById('eventLog');
+  log.innerHTML = '<div class="log-entry" style="color:#6a9955">日志已清空，等待事件上报...</div>';
+  sourceStats = { explicit: 0, native: 0, css: 0, container: 0 };
+  updateStats();
+}
+
+// 命令测试
+function testCmd(command, params) {
+  params = params || {};
+  params.command = command;
+  params.needResult = true;
+  console.log('[TEST] 发送命令:', JSON.stringify(params));
+  
+  var cmd = { command: command, needResult: true };
+  for (var k in params) {
+    if (k !== 'command' && k !== 'needResult') cmd[k] = params[k];
+  }
+  
+  if (window.chrome && window.chrome.webview && window.chrome.webview._listeners) {
+    for (var i = 0; i < window.chrome.webview._listeners.length; i++) {
+      window.chrome.webview._listeners[i]({ data: JSON.stringify(cmd) });
+    }
+  }
+}
+
+// 拦截 addEventListener 追踪监听器
+(function() {
+  if (window.chrome && window.chrome.webview && !window.chrome.webview._listeners) {
+    window.chrome.webview._listeners = [];
+    var origAddEventListener = window.chrome.webview.addEventListener;
+    window.chrome.webview.addEventListener = function(event, callback) {
+      if (event === 'message') {
+        window.chrome.webview._listeners.push(callback);
+      }
+      if (origAddEventListener) origAddEventListener.call(this, event, callback);
+    };
+  }
+})();
+
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('[TEST] 旧方案兼容测试页面就绪');
+  console.log('[TEST] 旧方案控件总数：' + document.querySelectorAll('[data-ctrl-type]').length + ' 个');
+  console.log('[TEST] 预期所有事件 source 均为 explicit');
+});
+</script>
+
+</body>
+</html>

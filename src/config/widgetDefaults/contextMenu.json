@@ -45,7 +45,8 @@
       "min-width: 160px",
       "font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
       "font-size: 13px",
-      "color: #333333"
+      "color: #333333",
+		  "user-select: none"
     ],
     ".ctx-menu-item": [
       "display: flex",

@@ -10,8 +10,7 @@ import { registerAllWidgets } from './config/registerAllWidgets'
 
 // 自定义控件示例
 import './examples/customWidgetDemo'  // 自定义 评分控件、数据卡片
-import './TestWidget'   // 自定义卡片
-import './AllFeaturesWidget'   // 自定义卡片2
+import './customWidget'   // 自定义卡片2
 
 import App from './App.vue'
 

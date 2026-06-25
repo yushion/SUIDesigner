@@ -4,7 +4,7 @@
  */
 <template>
   <div
-    class="ui-widget image-box-widget"
+    class="ui-widget imageBox-widget"
     :class="{ selected: isSelected, 'has-error': imgError, disabled: widget.disabled }"
     :id="widget.id"
     :data-widget-id="widget.id"
@@ -21,7 +21,7 @@
       @error="imgError = true"
       @load="imgError = false"
       alt=""
-      class="image-box-img"
+      class="imageBox-img"
     />
     <div v-if="!widget.src || imgError" class="image-placeholder">
       <span v-if="!widget.src" class="placeholder-icon">🖼</span>
@@ -81,7 +81,7 @@ const imgStyle = computed(() => ({
 </script>
 
 <style scoped>
-.image-box-widget {
+.imageBox-widget {
   position: absolute;
   overflow: hidden;
   cursor: move;
@@ -89,7 +89,7 @@ const imgStyle = computed(() => ({
   box-sizing: border-box;
 }
 
-.image-box-img {
+.imageBox-img {
   display: block;
 }
 
@@ -126,7 +126,7 @@ const imgStyle = computed(() => ({
   pointer-events: none;
 }
 
-.image-box-widget.disabled {
+.imageBox-widget.disabled {
   cursor: not-allowed;
   opacity: 0.6;
 }

@@ -1,0 +1,1809 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>API 反向测试 - webviewBridge 完整版</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f5f5f5;
+  padding: 15px;
+  font-size: 12px;
+  color: #333;
+}
+h1 { font-size: 18px; margin-bottom: 8px; color: #0078d4; }
+h2 { font-size: 14px; margin: 15px 0 8px; color: #333; border-bottom: 2px solid #0078d4; padding-bottom: 4px; }
+h3 { font-size: 12px; margin: 10px 0 6px; color: #555; background: #eef5ff; padding: 4px 8px; border-radius: 3px; }
+
+.page-layout {
+  display: flex;
+  gap: 15px;
+  align-items: flex-start;
+}
+.widgets-panel {
+  width: 340px;
+  flex-shrink: 0;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.api-panel {
+  flex: 1;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.log-panel {
+  width: 380px;
+  flex-shrink: 0;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.panel-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+.widget-box {
+  background: #f9f9f9;
+  border: 1px dashed #ccc;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 8px;
+  min-height: 40px;
+}
+.api-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.api-btn {
+  padding: 4px 8px;
+  font-size: 11px;
+  border: 1px solid #d9d9d9;
+  background: #fff;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.api-btn:hover {
+  border-color: #0078d4;
+  color: #0078d4;
+}
+.api-btn:active {
+  background: #e6f4ff;
+}
+.api-btn.success {
+  background: #52c41a;
+  color: #fff;
+  border-color: #52c41a;
+}
+.api-btn.fail {
+  background: #ff4d4f;
+  color: #fff;
+  border-color: #ff4d4f;
+}
+
+.summary-bar {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.summary-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+}
+.summary-count {
+  font-size: 16px;
+  font-weight: bold;
+}
+.run-all-btn {
+  margin-left: auto;
+  padding: 6px 16px;
+  background: #0078d4;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.run-all-btn:hover { background: #106ebe; }
+
+.result-log {
+  background: #1e1e1e;
+  color: #d4d4d4;
+  padding: 10px;
+  border-radius: 4px;
+  font-family: Consolas, Monaco, monospace;
+  font-size: 11px;
+  height: 75vh;
+  overflow-y: auto;
+  line-height: 1.5;
+}
+.log-success { color: #52c41a; }
+.log-fail { color: #ff4d4f; }
+.log-info { color: #569cd6; }
+.log-warn { color: #dcdcaa; }
+.log-module { color: #c586c0; font-weight: bold; }
+
+/* 控件样式 - 通用 */
+.t-input {
+  padding: 4px 8px;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  font-size: 12px;
+  width: 100%;
+}
+.t-button {
+  padding: 5px 12px;
+  background: #0078d4;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.t-button:hover { background: #106ebe; }
+
+.t-checkbox { display: flex; align-items: center; gap: 6px; }
+
+/* dataGrid 样式 */
+.dataGrid {
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  overflow: hidden;
+  font-size: 12px;
+}
+.dataGrid_header {
+  display: flex;
+  background: #f0f0f0;
+  border-bottom: 1px solid #d9d9d9;
+  font-weight: 600;
+}
+.dataGrid_header_cell {
+  padding: 4px 8px;
+  border-right: 1px solid #d9d9d9;
+  flex: 1;
+  font-size: 12px;
+}
+.dataGrid_body {
+  max-height: 100px;
+  overflow-y: auto;
+}
+.dataGrid_row {
+  display: flex;
+  border-bottom: 1px solid #e8e8e8;
+}
+.dataGrid_row:nth-child(even) { background: #fafafa; }
+.dataGrid_row:hover { background: #e6f7ff; }
+.dataGrid_row.item-selected { background: #e6f4ff; }
+.dataGrid_cell {
+  padding: 4px 8px;
+  border-right: 1px solid #e8e8e8;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+}
+.dataGrid_checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  flex-shrink: 0;
+}
+
+/* 原生 table 样式 */
+.native-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 12px;
+}
+.native-table th, .native-table td {
+  border: 1px solid #ddd;
+  padding: 4px 8px;
+  text-align: left;
+}
+.native-table th {
+  background: #f0f0f0;
+  font-weight: 600;
+}
+
+/* listBox 样式 - 符合 webviewBridge 期望结构 */
+.listBox {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 12px;
+}
+.listBox_scroll {
+  max-height: 100px;
+  overflow-y: auto;
+}
+.listBox_item {
+  padding: 4px 8px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.listBox_item:hover { background: #e6f7ff; }
+.listBox_item.item-selected { background: #e6f4ff; }
+.listBox_item_text {
+  flex: 1;
+}
+.list-empty {
+  padding: 10px;
+  text-align: center;
+  color: #999;
+}
+
+/* tabsContainer 样式 - 符合 webviewBridge 期望结构 */
+.tabsContainer {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 12px;
+}
+.tabsContainer_headerBar {
+  display: flex;
+  background: #f5f5f5;
+  border-bottom: 1px solid #ddd;
+}
+.tabsContainer_headerBar_btn {
+  padding: 6px 12px;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  border-right: 1px solid #ddd;
+  font-size: 12px;
+}
+.tabsContainer_headerBar_btn.active {
+  background: #fff;
+  border-bottom: 2px solid #0078d4;
+}
+.tabsContainer_contentWrapper {
+  padding: 10px;
+  min-height: 40px;
+}
+.tabsContainer_contentWrapper_panel {
+  display: none;
+}
+.tabsContainer_contentWrapper_panel.active {
+  display: block;
+}
+
+/* cardBox 样式 - 符合 webviewBridge 期望结构 */
+.cardBox {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 12px;
+  overflow: hidden;
+}
+.cardBox_header {
+  background: #f5f5f5;
+  padding: 6px 10px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.cardBox_header_title {
+  flex: 1;
+}
+.cardBox_collapse_btn {
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+}
+.cardBox_body {
+  padding: 10px;
+  min-height: 30px;
+}
+.cardBox.collapsed .cardBox_body {
+  display: none;
+}
+
+/* progressBar 样式 */
+.progressBar {
+  height: 16px;
+  background: #e0e0e0;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+}
+.progressBar_fill {
+  height: 100%;
+  background: #0078d4;
+  transition: width 0.2s;
+}
+
+/* logOutput 样式 */
+.logOutput {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px;
+  max-height: 60px;
+  overflow-y: auto;
+  font-size: 11px;
+  font-family: Consolas, monospace;
+  background: #fafafa;
+}
+
+/* treeView 样式 - 符合 webviewBridge 期望结构 */
+.treeView {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px;
+  font-size: 12px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+.treeView_node { padding: 2px 0; }
+.treeView_children { padding-left: 20px; }
+.treeView_node.selected > .treeView_node_content { background: #e6f4ff; }
+.treeView_node_content {
+  padding: 2px 4px;
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.treeView_node_content:hover { background: #e6f7ff; }
+.treeView_toggle {
+  display: inline-block;
+  width: 14px;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+  flex-shrink: 0;
+}
+.treeView_label {
+  flex: 1;
+}
+.treeView_node.collapsed > .treeView_children {
+  display: none;
+}
+</style>
+</head>
+<body>
+
+<h1>🧪 webviewBridge API 反向测试（完整版）</h1>
+
+<div class="summary-bar">
+  <div class="summary-item">总计: <span class="summary-count" id="totalCount">0</span></div>
+  <div class="summary-item" style="color: #52c41a;">通过: <span class="summary-count" id="passCount">0</span></div>
+  <div class="summary-item" style="color: #ff4d4f;">失败: <span class="summary-count" id="failCount">0</span></div>
+  <div class="summary-item" style="color: #faad14;">模块: <span class="summary-count" id="moduleCount">0</span></div>
+  <button class="run-all-btn" onclick="runAllTests()">▶ 一键运行全部</button>
+</div>
+
+<div class="pageContainer" data-original-width="800" data-original-height="600" style="position:relative;">
+<div class="page-layout">
+  <!-- 左侧：控件 -->
+  <div class="widgets-panel">
+    <h2>📦 测试控件</h2>
+
+    <!-- 按钮 -->
+    <div class="panel-card">
+      <h3>按钮 button</h3>
+      <div class="widget-box">
+        <button id="t_button" data-ctrl-type="button" data-name="测试按钮" class="t-button">测试按钮</button>
+      </div>
+    </div>
+
+    <!-- 输入框 -->
+    <div class="panel-card">
+      <h3>输入框 input</h3>
+      <div class="widget-box">
+        <input id="t_input" data-ctrl-type="inputText" data-name="测试输入框" class="t-input" placeholder="请输入" value="初始值" />
+      </div>
+    </div>
+
+    <!-- 文本域 -->
+    <div class="panel-card">
+      <h3>文本域 textarea</h3>
+      <div class="widget-box">
+        <textarea id="t_textarea" data-ctrl-type="inputText" data-name="测试文本域" class="t-input" placeholder="请输入" style="height:50px;">初始文本</textarea>
+      </div>
+    </div>
+
+    <!-- 复选框 -->
+    <div class="panel-card">
+      <h3>复选框 checkbox</h3>
+      <div class="widget-box">
+        <div class="t-checkbox">
+          <input id="t_checkbox" data-ctrl-type="checkBox" data-name="测试复选框" type="checkbox" />
+          <label for="t_checkbox">选项标签</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- 组合框 -->
+    <div class="panel-card">
+      <h3>组合框 comboBox</h3>
+      <div class="widget-box">
+        <select id="t_combo" data-ctrl-type="comboBox" data-name="测试组合框" class="t-input">
+          <option value="a">选项A</option>
+          <option value="b" selected>选项B</option>
+          <option value="c">选项C</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 标签 -->
+    <div class="panel-card">
+      <h3>标签 label</h3>
+      <div class="widget-box">
+        <span id="t_label" data-ctrl-type="label" data-name="测试标签">标签文字</span>
+      </div>
+    </div>
+
+    <!-- 超链接 -->
+    <div class="panel-card">
+      <h3>超链接 hyperLink</h3>
+      <div class="widget-box">
+        <a id="t_link" data-ctrl-type="hyperLink" data-name="测试超链接" href="https://example.com">点击跳转</a>
+      </div>
+    </div>
+
+    <!-- 单选框组 -->
+    <div class="panel-card">
+      <h3>单选框组 radioGroup</h3>
+      <div class="widget-box">
+        <div id="t_radiogroup" data-ctrl-type="radioGroup" data-name="测试单选组">
+          <label><input type="radio" name="t_radio" value="r1" checked /> 选项1</label>
+          <label><input type="radio" name="t_radio" value="r2" /> 选项2</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- 进度条 -->
+    <div class="panel-card">
+      <h3>进度条 progressBar</h3>
+      <div class="widget-box">
+        <div id="t_progress" data-ctrl-type="progressBar" data-name="测试进度条" class="progressBar">
+          <div class="progressBar_fill" style="width:50%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 日志框 -->
+    <div class="panel-card">
+      <h3>日志框 logOutput</h3>
+      <div class="widget-box">
+        <div id="t_log" data-ctrl-type="logOutput" data-name="测试日志框" class="logOutput">
+          <div>日志行1</div>
+          <div>日志行2</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 列表框 - 符合 webviewBridge 结构 -->
+    <div class="panel-card">
+      <h3>列表框 listBox</h3>
+      <div class="widget-box">
+        <div id="t_listbox" data-ctrl-type="listBox" data-name="测试列表框" class="listBox" data-show-checkbox="false">
+          <div class="listBox_scroll">
+            <div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="0" data-item-id="item1">
+              <span class="listBox_item_text">列表项1</span>
+            </div>
+            <div class="listBox_item item-selected" data-ctrl-type="listBox_item" data-item-index="1" data-item-id="item2">
+              <span class="listBox_item_text">列表项2</span>
+            </div>
+            <div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="2" data-item-id="item3">
+              <span class="listBox_item_text">列表项3</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 标准表格 -->
+    <div class="panel-card">
+      <h3>标准表格 dataGrid</h3>
+      <div class="widget-box">
+        <div id="t_datagrid" data-ctrl-type="dataGrid" data-name="测试标准表格" class="dataGrid">
+          <div class="dataGrid_header">
+            <div class="dataGrid_header_cell dataGrid_checkbox" style="width:30px;flex-shrink:0"><input type="checkbox" class="dataGrid_select_all"></div>
+            <div class="dataGrid_header_cell" data-col-key="name" data-col-name="姓名">姓名</div>
+            <div class="dataGrid_header_cell" data-col-key="age" data-col-name="年龄">年龄</div>
+            <div class="dataGrid_header_cell" data-col-key="city" data-col-name="城市">城市</div>
+          </div>
+          <div class="dataGrid_body">
+            <div class="dataGrid_row" data-row-index="0" data-row-id="r1">
+              <div class="dataGrid_cell dataGrid_checkbox"><input type="checkbox" class="dataGrid_row_check" data-ctrl-type="dataGrid_row_checkbox"></div>
+              <div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="name" data-col-name="姓名">张三</div>
+              <div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="age" data-col-name="年龄">25</div>
+              <div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="city" data-col-name="城市">北京</div>
+            </div>
+            <div class="dataGrid_row" data-row-index="1" data-row-id="r2">
+              <div class="dataGrid_cell dataGrid_checkbox"><input type="checkbox" class="dataGrid_row_check" data-ctrl-type="dataGrid_row_checkbox"></div>
+              <div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="name" data-col-name="姓名">李四</div>
+              <div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="age" data-col-name="年龄">30</div>
+              <div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="city" data-col-name="城市">上海</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 原生表格 -->
+    <div class="panel-card">
+      <h3>原生表格 nativeTable</h3>
+      <div class="widget-box">
+        <table id="t_nativetable" class="native-table" data-name="测试原生表格">
+          <thead>
+            <tr><th>姓名</th><th>年龄</th><th>城市</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>小明</td><td>22</td><td>深圳</td></tr>
+            <tr><td>小红</td><td>24</td><td>杭州</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 标签页 tabsContainer - 符合 webviewBridge 结构 -->
+    <div class="panel-card">
+      <h3>标签页 tabsContainer</h3>
+      <div class="widget-box">
+        <div id="t_tabs" data-ctrl-type="tabsContainer" data-name="测试标签页" class="tabsContainer">
+          <div class="tabsContainer_headerBar">
+            <button class="tabsContainer_headerBar_btn active" data-ctrl-type="tabsContainer_headerBar_btn" data-tab-name="tab1">标签1</button>
+            <button class="tabsContainer_headerBar_btn" data-ctrl-type="tabsContainer_headerBar_btn" data-tab-name="tab2">标签2</button>
+          </div>
+          <div class="tabsContainer_contentWrapper">
+            <div class="tabsContainer_contentWrapper_panel active" data-tab-name="tab1">内容1</div>
+            <div class="tabsContainer_contentWrapper_panel" data-tab-name="tab2">内容2</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 卡片框 cardBox - 符合 webviewBridge 结构 -->
+    <div class="panel-card">
+      <h3>卡片框 cardBox</h3>
+      <div class="widget-box">
+        <div id="t_card" data-ctrl-type="cardBox" data-name="测试卡片" class="cardBox" data-collapsible="true">
+          <div class="cardBox_header" data-ctrl-type="cardBox_title">
+            <span class="cardBox_header_title">卡片标题</span>
+            <span class="cardBox_collapse_btn">▼</span>
+          </div>
+          <div class="cardBox_body">卡片内容</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 树形框 treeView - 符合 webviewBridge 结构 -->
+    <div class="panel-card">
+      <h3>树形框 treeView</h3>
+      <div class="widget-box">
+        <div id="t_tree" data-ctrl-type="treeView" data-name="测试树形框" class="treeView">
+          <div class="treeView_node" data-node-id="n1" data-level="0">
+            <div class="treeView_node_content">
+              <span class="treeView_toggle expanded">▼</span>
+              <span class="treeView_icon folder">📁</span>
+              <span class="treeView_label">节点1</span>
+            </div>
+            <div class="treeView_children">
+              <div class="treeView_node" data-node-id="n11" data-level="1">
+                <div class="treeView_node_content">
+                  <span class="treeView_toggle empty"></span>
+                  <span class="treeView_icon file">📄</span>
+                  <span class="treeView_label">子节点1-1</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="treeView_node collapsed" data-node-id="n2" data-level="0">
+            <div class="treeView_node_content">
+              <span class="treeView_toggle collapsed">▶</span>
+              <span class="treeView_icon folder">📁</span>
+              <span class="treeView_label">节点2</span>
+            </div>
+            <div class="treeView_children" style="display:none">
+              <div class="treeView_node" data-node-id="n21" data-level="1">
+                <div class="treeView_node_content">
+                  <span class="treeView_toggle empty"></span>
+                  <span class="treeView_icon file">📄</span>
+                  <span class="treeView_label">子节点2-1</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 开关 switchToggle -->
+    <div class="panel-card">
+      <h3>开关 switchToggle</h3>
+      <div class="widget-box">
+        <input id="t_switch" data-ctrl-type="switchToggle" data-name="测试开关" type="checkbox" />
+      </div>
+    </div>
+
+    <!-- 日期时间选择器 dateTimePicker -->
+    <div class="panel-card">
+      <h3>日期时间选择器 dateTimePicker</h3>
+      <div class="widget-box">
+        <input id="t_datetime" data-ctrl-type="dateTimePicker" data-name="测试日期时间" type="datetime-local" class="t-input" value="2024-01-15T10:30" />
+      </div>
+    </div>
+
+    <!-- 图标按钮 iconButton -->
+    <div class="panel-card">
+      <h3>图标按钮 iconButton</h3>
+      <div class="widget-box">
+        <button id="t_iconbtn" data-ctrl-type="iconButton" data-name="测试图标按钮" class="t-button">
+          ⚙️<span>设置</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 图片框 imageBox -->
+    <div class="panel-card">
+      <h3>图片框 imageBox</h3>
+      <div class="widget-box">
+        <div id="t_imagebox" data-ctrl-type="imageBox" data-name="测试图片框" style="width:100%;height:60px;border:1px solid #ddd;background:#f5f5f5;">
+          <img src="" style="width:100%;height:100%;object-fit:cover;display:block;" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 中间：API 按钮 -->
+  <div class="api-panel">
+    <h2>🔧 API 测试按钮</h2>
+    <div id="apiButtonsContainer"></div>
+  </div>
+
+  <!-- 右侧：日志 -->
+  <div class="log-panel">
+    <h2>📋 测试日志</h2>
+    <div class="result-log" id="resultLog"></div>
+  </div>
+</div>
+</div>
+
+<script src="webviewBridge.js"></script>
+<script>
+var totalTests = 0;
+var passedTests = 0;
+var failedTests = 0;
+var moduleCount = 0;
+var testDefs = [];
+
+// ============================================================
+// 测试定义
+// ============================================================
+
+function defineTests() {
+  var groups = [
+    // ===== public 通用 API =====
+    {
+      module: 'public',
+      title: '通用 public API',
+      tests: [
+        { name: 'setValue', target: 't_input', args: ['新值'], verify: function() { return document.getElementById('t_input').value === '新值'; } },
+        { name: 'getValue', target: 't_input', args: null, verify: function(res) { return typeof res === 'string'; } },
+        { name: 'setChecked(true)', target: 't_checkbox', args: [true], verify: function() { return document.getElementById('t_checkbox').checked === true; } },
+        { name: 'getChecked', target: 't_checkbox', args: null, verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'setEnabled', target: 't_input', args: [true], verify: function() { return !document.getElementById('t_input').disabled; } },
+        { name: 'isEnabled', target: 't_input', args: null, verify: function(res) { return res === true; } },
+        { name: 'show', target: 't_button', args: null, verify: function() { return !document.getElementById('t_button').hidden; } },
+        { name: 'hide', target: 't_button', args: null, verify: function() { return document.getElementById('t_button').hidden; } },
+        { name: 'toggle', target: 't_button', args: null, verify: function() { return !document.getElementById('t_button').hidden; } },
+        { name: 'isVisible', target: 't_button', args: null, verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'focus', target: 't_input', args: null, verify: function(res) { return res === true; } },
+        { name: 'setStyle', target: 't_button', args: [{color: '#ff0000'}], verify: function() { return document.getElementById('t_button').style.color === 'rgb(255, 0, 0)'; } },
+        { name: 'getIdByName', target: null, args: ['测试输入框'], verify: function(res) { return res === 't_input'; } },
+        { name: 'getInfoById', target: null, args: ['t_input'], verify: function(res) { return res && res.name === '测试输入框'; } },
+        { name: 'setBlockContextMenu', target: null, args: [true], verify: function(res) { return res === true; } },
+        { name: 'getBlockContextMenu', target: null, args: null, verify: function(res) { return res === true; } },
+        { name: 'move', target: 't_label', args: [10, 10], verify: function(res) { return res === true; } },
+        { name: 'setSize', target: 't_label', args: [100, 30], verify: function(res) { return res === true; } },
+        { name: 'getPosition', target: 't_label', args: null, verify: function(res) { return res && typeof res.x === 'number' && typeof res.y === 'number'; } },
+        { name: 'getSize', target: 't_label', args: null, verify: function(res) { return res && typeof res.width === 'number' && typeof res.height === 'number'; } },
+        { name: 'bringToFront', target: 't_label', args: null, verify: function(res) { return res === true; } },
+        { name: 'sendToBack', target: 't_label', args: null, verify: function(res) { return res === true; } },
+        { name: 'setZIndex', target: 't_label', args: [100], verify: function(res) { return res === true; } },
+        { name: 'testReturn', target: null, args: null, verify: function(res) { return res !== undefined; } },
+        { name: 'showNotification', target: null, args: [{title:'测试',text:'内容'}], verify: function(res) { return res === true; } },
+        { name: 'addMessageListener', target: null, args: [function(){}], verify: function(res) { return res === true; } },
+        { name: 'icon.parse', moduleOverride: 'public.icon', api: 'parse', target: null, args: ['[OK]'], verify: function(res) { return typeof res === 'string' && res.indexOf('✅') > -1; } },
+        { name: 'icon.toText', moduleOverride: 'public.icon', api: 'toText', target: null, args: ['<span>✅</span>'], verify: function(res) { return typeof res === 'string'; } },
+      ]
+    },
+
+    // ===== canvas 画布 API =====
+    {
+      module: 'canvas',
+      title: '画布 canvas API',
+      tests: [
+        { name: 'setFixedCanvasSize(false)', api: 'setFixedCanvasSize', target: null, args: [false], verify: function(res) { return res === true; } },
+        { name: 'setFixedCanvasSize(true)', api: 'setFixedCanvasSize', target: null, args: [true, 800, 600], verify: function(res) { return res === true; } },
+      ]
+    },
+
+    // ===== button =====
+    {
+      module: 'button',
+      title: '按钮 button',
+      tests: [
+        { name: 'setText', target: 't_button', args: ['新按钮文字'], verify: function() { return document.getElementById('t_button').textContent === '新按钮文字'; } },
+        { name: 'getText', target: 't_button', args: null, verify: function(res) { return typeof res === 'string' && res.length > 0; } },
+      ]
+    },
+
+    // ===== input =====
+    {
+      module: 'input',
+      title: '输入框 input',
+      tests: [
+        { name: 'setValue', target: 't_input', args: ['abc123'], verify: function() { return document.getElementById('t_input').value === 'abc123'; } },
+        { name: 'getValue', target: 't_input', args: null, verify: function(res) { return typeof res === 'string'; } },
+        { name: 'setPlaceholder', target: 't_input', args: ['新提示'], verify: function() { return document.getElementById('t_input').placeholder === '新提示'; } },
+        { name: 'getPlaceholder', target: 't_input', args: null, verify: function(res) { return typeof res === 'string'; } },
+      ]
+    },
+
+    // ===== textarea =====
+    {
+      module: 'textarea',
+      title: '文本域 textarea',
+      tests: [
+        { name: 'setValue', target: 't_textarea', args: ['新内容'], verify: function() { return document.getElementById('t_textarea').value === '新内容'; } },
+        { name: 'getValue', target: 't_textarea', args: null, verify: function(res) { return typeof res === 'string'; } },
+        { name: 'setPlaceholder', target: 't_textarea', args: ['请输入内容'], verify: function() { return document.getElementById('t_textarea').placeholder === '请输入内容'; } },
+        { name: 'getPlaceholder', target: 't_textarea', args: null, verify: function(res) { return typeof res === 'string'; } },
+      ]
+    },
+
+    // ===== checkbox =====
+    {
+      module: 'checkbox',
+      title: '复选框 checkbox',
+      tests: [
+        { name: 'setChecked(true)', api: 'setChecked', target: 't_checkbox', args: [true], verify: function() { return document.getElementById('t_checkbox').checked === true; } },
+        { name: 'setChecked(false)', api: 'setChecked', target: 't_checkbox', args: [false], verify: function() { return document.getElementById('t_checkbox').checked === false; } },
+        { name: 'getChecked', target: 't_checkbox', args: null, verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'setLabel', target: 't_checkbox', args: ['新标签'], verify: function(res) { return res === true; } },
+        { name: 'getLabel', target: 't_checkbox', args: null, verify: function(res) { return typeof res === 'string'; } },
+      ]
+    },
+
+    // ===== comboBox =====
+    {
+      module: 'comboBox',
+      title: '组合框 comboBox',
+      tests: [
+        { name: 'setValue', target: 't_combo', args: ['a'], verify: function() { return document.getElementById('t_combo').value === 'a'; } },
+        { name: 'getValue', target: 't_combo', args: null, verify: function(res) { return res === 'a'; } },
+        { name: 'setIndex', target: 't_combo', args: [2], verify: function() { return document.getElementById('t_combo').selectedIndex === 2; } },
+        { name: 'getIndex', target: 't_combo', args: null, verify: function(res) { return res === 2; } },
+        { name: 'getText', target: 't_combo', args: null, verify: function(res) { return typeof res === 'string'; } },
+        { name: 'getItemCount', target: 't_combo', args: null, verify: function(res) { return res === 3; } },
+        { name: 'addItem', target: 't_combo', args: ['新选项', 'd'], verify: function() { return document.getElementById('t_combo').options.length === 4; } },
+        { name: 'removeItem', target: 't_combo', args: [3], verify: function() { return document.getElementById('t_combo').options.length === 3; } },
+        { name: 'clearItems', target: 't_combo', args: null, verify: function() { return document.getElementById('t_combo').options.length === 0; } },
+      ]
+    },
+
+    // ===== label =====
+    {
+      module: 'label',
+      title: '标签 label',
+      tests: [
+        { name: 'setText', target: 't_label', args: ['新标签文字'], verify: function() { return document.getElementById('t_label').textContent === '新标签文字'; } },
+        { name: 'getText', target: 't_label', args: null, verify: function(res) { return typeof res === 'string'; } },
+      ]
+    },
+
+    // ===== hyperLink =====
+    {
+      module: 'hyperLink',
+      title: '超链接 hyperLink',
+      tests: [
+        { name: 'setText', target: 't_link', args: ['新链接文字'], verify: function() { return document.getElementById('t_link').textContent === '新链接文字'; } },
+        { name: 'getText', target: 't_link', args: null, verify: function(res) { return typeof res === 'string'; } },
+        { name: 'setHref', target: 't_link', args: ['https://test.com'], verify: function() { return document.getElementById('t_link').href.indexOf('test.com') > -1; } },
+        { name: 'getHref', target: 't_link', args: null, verify: function(res) { return typeof res === 'string'; } },
+      ]
+    },
+
+    // ===== radioGroup =====
+    {
+      module: 'radioGroup',
+      title: '单选框组 radioGroup',
+      tests: [
+        { name: 'setValue', target: 't_radiogroup', args: ['r2'], verify: function(res) { return res === true; } },
+        { name: 'getValue', target: 't_radiogroup', args: null, verify: function(res) { return res === 'r2'; } },
+        { name: 'setIndex', target: 't_radiogroup', args: [0], verify: function(res) { return res === true; } },
+        { name: 'getIndex', target: 't_radiogroup', args: null, verify: function(res) { return typeof res === 'number'; } },
+        { name: 'addOption', target: 't_radiogroup', args: ['新选项', 'r3'], verify: function(res) { return res === true; } },
+      ]
+    },
+
+    // ===== progressBar =====
+    {
+      module: 'progressBar',
+      title: '进度条 progressBar',
+      tests: [
+        { name: 'setValue', target: 't_progress', args: [80], verify: function(res) { return res === true; } },
+        { name: 'getValue', target: 't_progress', args: null, verify: function(res) { return typeof res === 'number'; } },
+        { name: 'setRange', target: 't_progress', args: [0, 100], verify: function(res) { return res === true; } },
+        { name: 'increment', target: 't_progress', args: [5], verify: function(res) { return res === true; } },
+        { name: 'decrement', target: 't_progress', args: [5], verify: function(res) { return res === true; } },
+        { name: 'enableClick', target: 't_progress', args: null, verify: function(res) { return res === true; } },
+        { name: 'disableClick', target: 't_progress', args: null, verify: function(res) { return res === true; } },
+      ]
+    },
+
+    // ===== logOutput =====
+    {
+      module: 'logOutput',
+      title: '日志框 logOutput',
+      tests: [
+        { name: 'addLog', target: 't_log', args: ['测试日志行'], verify: function(res) { return res === true; } },
+        { name: 'addHtmlLog', target: 't_log', args: ['<b>加粗</b>'], verify: function(res) { return res === true; } },
+        { name: 'getLogCount', target: 't_log', args: null, verify: function(res) { return typeof res === 'number' && res >= 2; } },
+        { name: 'clearLog', target: 't_log', args: null, verify: function(res) { return res === true; } },
+      ]
+    },
+
+    // ===== listBox =====
+    {
+      module: 'listBox',
+      title: '列表框 listBox',
+      tests: [
+        { name: 'addItem', target: 't_listbox', args: ['新增项'], verify: function(res) { return res === true; } },
+        { name: 'getItemCount', target: 't_listbox', args: null, verify: function(res) { return res === 4; } },
+        { name: 'setItemText', target: 't_listbox', args: [0, '修改后文本'], verify: function(res) { return res === true; } },
+        { name: 'getItemText', target: 't_listbox', args: [0], verify: function(res) { return typeof res === 'string'; } },
+        { name: 'selectItem', target: 't_listbox', args: [0], verify: function(res) { return res === true; } },
+        { name: 'getHighlightedItem', target: 't_listbox', args: null, verify: function(res) { return res !== null && typeof res === 'object'; } },
+        { name: 'deselectItem', target: 't_listbox', args: [0], verify: function(res) { return res === true; } },
+        { name: 'setAlwaysShowSelection', target: 't_listbox', args: [true], verify: function(res) { return res === true; } },
+        { name: 'getAlwaysShowSelection', target: 't_listbox', args: null, verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'removeItem', target: 't_listbox', args: [3], verify: function(res) { return res === true; } },
+        { name: 'clearItems', target: 't_listbox', args: null, verify: function(res) { return res === true; } },
+      ]
+    },
+
+    // ===== dataGrid 标准表格 =====
+    {
+      module: 'dataGrid',
+      title: '标准表格 dataGrid',
+      tests: [
+        { name: 'getRowCount', target: 't_datagrid', args: null, verify: function(res) { return res === 2; } },
+        { name: 'getCellValue(colKey)', api: 'getCellValue', target: 't_datagrid', args: [0, 'name'], verify: function(res) { return res === '张三'; } },
+        { name: 'getCellValue(colName)', api: 'getCellValue', target: 't_datagrid', args: [0, '姓名'], verify: function(res) { return res === '张三'; } },
+        { name: 'setCellValue(colKey)', api: 'setCellValue', target: 't_datagrid', args: [0, 'name', '张三丰'], verify: function() { var r=document.querySelectorAll('#t_datagrid .dataGrid_row')[0].querySelectorAll('.dataGrid_cell'); return r[1].textContent === '张三丰'; } },
+        { name: 'setCellValue(colName)', api: 'setCellValue', target: 't_datagrid', args: [1, '年龄', '99'], verify: function() { var r=document.querySelectorAll('#t_datagrid .dataGrid_row')[1].querySelectorAll('.dataGrid_cell'); return r[2].textContent === '99'; } },
+        { name: 'setCellValueByIndex', target: 't_datagrid', args: [0, 2, '深圳'], verify: function() { var r=document.querySelectorAll('#t_datagrid .dataGrid_row')[0].querySelectorAll('.dataGrid_cell'); return r[3].textContent === '深圳'; } },
+        { name: 'getCellValueByIndex', target: 't_datagrid', args: [0, 2], verify: function(res) { return res === '深圳'; } },
+        { name: 'addRow', target: 't_datagrid', args: [{id:'r3', cells:{name:'王五', age:28, city:'广州'}}], verify: function(res) { return res === true; } },
+        { name: 'getRowData(新增行)', api: 'getRowData', target: 't_datagrid', args: [2], verify: function(res) { return res && res.cells && res.cells.name === '王五'; } },
+        { name: 'setRowData', target: 't_datagrid', args: [0, {cells:{name:'赵六', age:35, city:'成都'}}], verify: function(res) { return res === true; } },
+        { name: 'selectRow', target: 't_datagrid', args: [0], verify: function(res) { return res === true; } },
+        { name: 'deselectRow', target: 't_datagrid', args: [0], verify: function(res) { return res === true; } },
+        { name: 'getHighlightedRow', target: 't_datagrid', args: null, verify: function(res) { return res !== undefined; } },
+        { name: 'setAlwaysShowSelection', target: 't_datagrid', args: [true], verify: function(res) { return res === true; } },
+        { name: 'getAlwaysShowSelection', target: 't_datagrid', args: null, verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'setRowChecked', target: 't_datagrid', args: [0, true], verify: function(res) { return res === true; } },
+        { name: 'getRowChecked', target: 't_datagrid', args: [0], verify: function(res) { return res === true; } },
+        { name: 'checkAll', target: 't_datagrid', args: null, verify: function(res) { return res === true; } },
+        { name: 'getCheckedRows(after checkAll)', api: 'getCheckedRows', target: 't_datagrid', args: null, verify: function(res) { return Array.isArray(res) && res.length > 0; } },
+        { name: 'uncheckAll', target: 't_datagrid', args: null, verify: function(res) { return res === true; } },
+        { name: 'getCheckedRows(after uncheckAll)', api: 'getCheckedRows', target: 't_datagrid', args: null, verify: function(res) { return Array.isArray(res) && res.length === 0; } },
+        { name: 'removeRow', target: 't_datagrid', args: [2], verify: function(res) { return res === true; } },
+        { name: 'clearRows', target: 't_datagrid', args: null, verify: function(res) { return res === true; } },
+      ]
+    },
+
+    // ===== 原生表格（用 dataGrid API） =====
+    {
+      module: 'dataGrid (native)',
+      title: '原生表格 native table',
+      tests: [
+        { name: 'getRowCount', target: 't_nativetable', args: null, verify: function(res) { return res === 2; } },
+        { name: 'getCellValue(col0格式)', api: 'getCellValue', target: 't_nativetable', args: [0, 'col0'], verify: function(res) { return res === '小明'; } },
+        { name: 'getCellValue(表头名)', api: 'getCellValue', target: 't_nativetable', args: [1, '年龄'], verify: function(res) { return res === '24'; } },
+        { name: 'setCellValue(col0格式)', api: 'setCellValue', target: 't_nativetable', args: [0, 'col1', '88'], verify: function() { var r=document.querySelectorAll('#t_nativetable tbody tr')[0]; return r.cells[1].textContent === '88'; } },
+        { name: 'setCellValue(表头名)', api: 'setCellValue', target: 't_nativetable', args: [1, '城市', '武汉'], verify: function() { var r=document.querySelectorAll('#t_nativetable tbody tr')[1]; return r.cells[2].textContent === '武汉'; } },
+        { name: 'setCellValueByIndex', target: 't_nativetable', args: [0, 0, '小龙'], verify: function() { var r=document.querySelectorAll('#t_nativetable tbody tr')[0]; return r.cells[0].textContent === '小龙'; } },
+        { name: 'getCellValueByIndex', target: 't_nativetable', args: [0, 0], verify: function(res) { return res === '小龙'; } },
+      ]
+    },
+
+    // ===== tabContainer =====
+    {
+      module: 'tabContainer',
+      title: '标签页 tabContainer',
+      tests: [
+        { name: 'selectTab', target: 't_tabs', args: ['tab2'], verify: function(res) { return res === true; } },
+        { name: 'getActiveTab', target: 't_tabs', args: null, verify: function(res) { return res === 'tab2'; } },
+        { name: 'getActiveTabIndex', target: 't_tabs', args: null, verify: function(res) { return res === 1; } },
+        { name: 'getTabCount', target: 't_tabs', args: null, verify: function(res) { return res === 2; } },
+        { name: 'addTab', target: 't_tabs', args: ['tab3', '标签3'], verify: function(res) { return res === 'tab3'; } },
+        { name: 'renameTab', target: 't_tabs', args: ['tab1', '新标签1'], verify: function(res) { return res === true; } },
+        { name: 'removeTab', target: 't_tabs', args: ['tab3'], verify: function(res) { return res === true; } },
+      ]
+    },
+
+    // ===== cardBox =====
+    {
+      module: 'cardBox',
+      title: '卡片框 cardBox',
+      tests: [
+        { name: 'setCardTitle', target: 't_card', args: ['新卡片标题'], verify: function(res) { return res === true; } },
+        { name: 'getCardTitle', target: 't_card', args: null, verify: function(res) { return res === '新卡片标题'; } },
+        { name: 'collapseCard', target: 't_card', args: null, verify: function(res) { return res === true; } },
+        { name: 'isCardCollapsed', target: 't_card', args: null, verify: function(res) { return res === true; } },
+        { name: 'expandCard', target: 't_card', args: null, verify: function(res) { return res === true; } },
+        { name: 'isCardHeaderVisible', target: 't_card', args: null, verify: function(res) { return res === true; } },
+        { name: 'hideCardHeader', target: 't_card', args: null, verify: function(res) { return res === true; } },
+        { name: 'showCardHeader', target: 't_card', args: null, verify: function(res) { return res === true; } },
+      ]
+    },
+
+    // ===== treeView =====
+    {
+      module: 'treeView',
+      title: '树形框 treeView',
+      tests: [
+        { name: 'getNodeText', target: 't_tree', args: ['n1'], verify: function(res) { return typeof res === 'string'; } },
+        { name: 'updateNode', target: 't_tree', args: ['n1', '节点1新名称'], verify: function(res) { return res === true; } },
+        { name: 'expandNode', target: 't_tree', args: ['n2'], verify: function(res) { return res === true; } },
+        { name: 'collapseNode', target: 't_tree', args: ['n2'], verify: function(res) { return res === true; } },
+        { name: 'toggleNode', target: 't_tree', args: ['n1'], verify: function(res) { return res === true; } },
+        { name: 'selectNode', target: 't_tree', args: ['n1'], verify: function(res) { return res === true; } },
+        { name: 'getSelectedNode', target: 't_tree', args: null, verify: function(res) { return res !== undefined; } },
+        { name: 'getHighlightedNode', target: 't_tree', args: null, verify: function(res) { return res !== undefined; } },
+        { name: 'deselectNode', target: 't_tree', args: ['n1'], verify: function(res) { return res === true; } },
+        { name: 'clearSelection', target: 't_tree', args: null, verify: function(res) { return res === true; } },
+        { name: 'setAlwaysShowSelection', target: 't_tree', args: [true], verify: function(res) { return res === true; } },
+        { name: 'getAlwaysShowSelection', target: 't_tree', args: null, verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'getNodeLevel', target: 't_tree', args: ['n11'], verify: function(res) { return typeof res === 'number'; } },
+        { name: 'addNode', target: 't_tree', args: ['n1', {id:'n12', text:'新节点'}], verify: function(res) { return res === true; } },
+        { name: 'removeNode', target: 't_tree', args: ['n12'], verify: function(res) { return res === true; } },
+        { name: 'expandAll', target: 't_tree', args: null, verify: function(res) { return res === true; } },
+        { name: 'collapseAll', target: 't_tree', args: null, verify: function(res) { return res === true; } },
+        { name: 'clearTree', target: 't_tree', args: null, verify: function(res) { return res === true; } },
+      ]
+    },
+
+    // ===== switchToggle =====
+    {
+      module: 'switchToggle',
+      title: '开关 switchToggle',
+      tests: [
+        { name: 'setChecked(true)', api: 'setChecked', target: 't_switch', args: [true], verify: function() { return document.getElementById('t_switch').checked === true; } },
+        { name: 'getChecked', target: 't_switch', args: null, verify: function(res) { return res === true; } },
+        { name: 'setChecked(false)', api: 'setChecked', target: 't_switch', args: [false], verify: function() { return document.getElementById('t_switch').checked === false; } },
+      ]
+    },
+
+    // ===== dateTimePicker =====
+    {
+      module: 'dateTimePicker',
+      title: '日期时间选择器 dateTimePicker',
+      tests: [
+        { name: 'setValue', target: 't_datetime', args: ['2025-06-15T14:30'], verify: function() { return document.getElementById('t_datetime').value === '2025-06-15T14:30'; } },
+        { name: 'getValue', target: 't_datetime', args: null, verify: function(res) { return typeof res === 'string'; } },
+      ]
+    },
+
+    // ===== iconButton =====
+    {
+      module: 'iconButton',
+      title: '图标按钮 iconButton',
+      tests: [
+        { name: 'getText', target: 't_iconbtn', args: null, verify: function(res) { return typeof res === 'string' && res.length > 0; } },
+        { name: 'setText', target: 't_iconbtn', args: ['新按钮文字'], verify: function(res) { return res === true; } },
+        { name: 'getIconHtml', target: 't_iconbtn', args: null, verify: function(res) { return typeof res === 'string'; } },
+        { name: 'setIconHtml', target: 't_iconbtn', args: ['[OK]'], verify: function(res) { return res === true; } },
+      ]
+    },
+
+    // ===== imageBox =====
+    {
+      module: 'imageBox',
+      title: '图片框 imageBox',
+      tests: [
+        { name: 'getSrc', target: 't_imagebox', args: null, verify: function(res) { return typeof res === 'string'; } },
+        { name: 'setSrc', target: 't_imagebox', args: ['https://example.com/test.jpg'], verify: function(res) { return res === true; } },
+        { name: 'getFit', target: 't_imagebox', args: null, verify: function(res) { return typeof res === 'string'; } },
+        { name: 'setFit', target: 't_imagebox', args: ['contain'], verify: function(res) { return res === true; } },
+      ]
+    },
+
+    // ===== radioGroup 补充 =====
+    {
+      module: 'radioGroup+',
+      title: '单选框组 radioGroup (补充)',
+      tests: [
+        { name: 'removeOption', target: 't_radiogroup', args: ['r3'], verify: function(res) { return res === true; } },
+      ]
+    },
+
+    // ===== listBox 补充 =====
+    {
+      module: 'listBox+',
+      title: '列表框 listBox (补充)',
+      tests: [
+        { name: 'addItemWithHtml', target: 't_listbox', args: ['<b>加粗项</b>'], verify: function(res) { return res === true; } },
+        { name: 'showCheckbox(true)', api: 'showCheckbox', target: 't_listbox', args: [true], verify: function(res) { return res === true; } },
+        { name: 'setItemChecked', target: 't_listbox', args: [0, true], verify: function(res) { return res === true; } },
+        { name: 'getItemChecked', target: 't_listbox', args: [0], verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'isItemChecked', target: 't_listbox', args: [0], verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'checkAll', target: 't_listbox', args: null, verify: function(res) { return res === true; } },
+        { name: 'getCheckedItems', target: 't_listbox', args: null, verify: function(res) { return Array.isArray(res); } },
+        { name: 'uncheckAll', target: 't_listbox', args: null, verify: function(res) { return res === true; } },
+        { name: 'selectAll', target: 't_listbox', args: null, verify: function(res) { return res === true; } },
+        { name: 'toggleAll', target: 't_listbox', args: null, verify: function(res) { return res === true; } },
+        { name: 'getSelectedItemId', target: 't_listbox', args: null, verify: function(res) { return typeof res === 'number'; } },
+        { name: 'deleteSelected', target: 't_listbox', args: null, verify: function(res) { return res === true; } },
+        { name: 'enableDblClickEdit', target: 't_listbox', args: null, verify: function(res) { return res === true; } },
+        { name: 'disableDblClickEdit', target: 't_listbox', args: null, verify: function(res) { return res === true; } },
+      ]
+    },
+
+    // ===== dataGrid 补充 =====
+    {
+      module: 'dataGrid+',
+      title: '标准表格 dataGrid (补充)',
+      tests: [
+        { name: 'selectAllRows', target: 't_datagrid', args: null, verify: function(res) { return res === true; } },
+        { name: 'getSelectedRows', target: 't_datagrid', args: null, verify: function(res) { return Array.isArray(res); } },
+        { name: 'getSelectedRowCount', target: 't_datagrid', args: null, verify: function(res) { return typeof res === 'number'; } },
+        { name: 'toggleAllRows', target: 't_datagrid', args: null, verify: function(res) { return res === true; } },
+        { name: 'deleteSelectedRows', target: 't_datagrid', args: null, verify: function(res) { return res === true; } },
+        { name: 'enableCellEdit', target: 't_datagrid', args: [1], verify: function(res) { return res === true; } },
+        { name: 'isCellEditable', target: 't_datagrid', args: [1], verify: function(res) { return res === true; } },
+        { name: 'disableCellEdit', target: 't_datagrid', args: [1], verify: function(res) { return res === true; } },
+        { name: 'enableGlobalEdit', target: 't_datagrid', args: null, verify: function(res) { return res === true; } },
+        { name: 'isGlobalEditEnabled', target: 't_datagrid', args: null, verify: function(res) { return res === true; } },
+        { name: 'disableGlobalEdit', target: 't_datagrid', args: null, verify: function(res) { return res === true; } },
+        { name: 'showRowCheckbox(true)', api: 'showRowCheckbox', target: 't_datagrid', args: [true], verify: function(res) { return res === true; } },
+        { name: 'isRowChecked', target: 't_datagrid', args: [0], verify: function(res) { return typeof res === 'boolean'; } },
+      ]
+    },
+
+    // ===== treeView 补充 =====
+    {
+      module: 'treeView+',
+      title: '树形框 treeView (补充)',
+      tests: [
+        { name: 'addNode(重建n1)', api: 'addNode', target: 't_tree', args: [null, {id:'n1', text:'节点1', children:[{id:'n11', text:'子节点1-1'}], expanded:true}], verify: function(res) { return res === true; } },
+        { name: 'enableNodeEdit', target: 't_tree', args: ['n1'], verify: function(res) { return res === true; } },
+        { name: 'disableNodeEdit', target: 't_tree', args: ['n1'], verify: function(res) { return res === true; } },
+        { name: 'enableAllEdit', target: 't_tree', args: null, verify: function(res) { return res === true; } },
+        { name: 'isAllEditEnabled', target: 't_tree', args: null, verify: function(res) { return res === true; } },
+        { name: 'disableAllEdit', target: 't_tree', args: null, verify: function(res) { return res === true; } },
+        { name: 'showCheckbox(true)', api: 'showCheckbox', target: 't_tree', args: [true], verify: function(res) { return res === true; } },
+        { name: 'isCheckboxVisible', target: 't_tree', args: null, verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'setNodeChecked', target: 't_tree', args: ['n1', true], verify: function(res) { return res === true; } },
+        { name: 'isNodeChecked', target: 't_tree', args: ['n1'], verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'getCheckedNodes', target: 't_tree', args: null, verify: function(res) { return Array.isArray(res); } },
+        { name: 'checkAll', target: 't_tree', args: null, verify: function(res) { return res === true; } },
+        { name: 'uncheckAll', target: 't_tree', args: null, verify: function(res) { return res === true; } },
+      ]
+    },
+
+    // ===== cardBox 补充 =====
+    {
+      module: 'cardBox+',
+      title: '卡片框 cardBox (补充)',
+      tests: [
+        { name: 'showCollapseButton(true)', api: 'showCollapseButton', target: 't_card', args: [true], verify: function(res) { return res === true; } },
+        { name: 'isCollapseButtonVisible', target: 't_card', args: null, verify: function(res) { return typeof res === 'boolean'; } },
+      ]
+    },
+
+    // ===== tabsContainer 补充 =====
+    {
+      module: 'tabContainer+',
+      title: '标签页 tabContainer (补充)',
+      tests: [
+        { name: 'setTabHeaderVisible(false)', api: 'setTabHeaderVisible', target: 't_tabs', args: [false], verify: function(res) { return res === true; } },
+        { name: 'getTabHeaderVisible', target: 't_tabs', args: null, verify: function(res) { return res === false; } },
+        { name: 'setTabHeaderVisible(true)', api: 'setTabHeaderVisible', target: 't_tabs', args: [true], verify: function(res) { return res === true; } },
+      ]
+    },
+
+    // ===== input 补充 =====
+    {
+      module: 'input+',
+      title: '输入框 input (补充)',
+      tests: [
+        { name: 'setType', target: 't_input', args: ['password'], verify: function() { return document.getElementById('t_input').type === 'password'; } },
+      ]
+    },
+
+    // ===== textarea 补充 =====
+    {
+      module: 'textarea+',
+      title: '文本域 textarea (补充)',
+      tests: [
+        { name: 'setRows', target: 't_textarea', args: [10], verify: function() { return document.getElementById('t_textarea').rows === 10; } },
+      ]
+    },
+
+    // ===== canvas 补充 =====
+    {
+      module: 'canvas+',
+      title: '画布 canvas (补充)',
+      tests: [
+        { name: 'getTitleBarTitle', moduleOverride: 'canvas', api: 'getTitleBarTitle', target: null, args: null, verify: function(res) { return typeof res === 'string'; } },
+        { name: 'setTitleBarTitle(无标题栏)', moduleOverride: 'canvas', api: 'setTitleBarTitle', target: null, args: ['新标题'], verify: function(res) { return res === false; } },
+      ]
+    },
+
+    // ===== contextMenu =====
+    {
+      module: 'contextMenu',
+      title: '右键菜单 contextMenu',
+      tests: [
+        { name: 'hide', target: null, args: null, verify: function(res) { return res === true; } },
+        { name: 'isVisible', target: null, args: null, verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'updateItems(不存在的菜单)', api: 'updateItems', target: 'nonexist_menu', args: [[{text:'测试'}]], verify: function(res) { return res === false; } },
+        { name: 'getItems(不存在的菜单)', api: 'getItems', target: 'nonexist_menu', args: null, verify: function(res) { return res === ''; } },
+      ]
+    },
+
+    // ===== tooltip =====
+    {
+      module: 'tooltip',
+      title: '提示框 tooltip',
+      tests: [
+        { name: 'hide', target: null, args: null, verify: function(res) { return res === true; } },
+        { name: 'isVisible', target: null, args: null, verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'updateConfig(不存在的提示)', api: 'updateConfig', target: 'nonexist_tip', args: [{content:'测试'}], verify: function(res) { return res === false; } },
+        { name: 'getConfig(不存在的提示)', api: 'getConfig', target: 'nonexist_tip', args: null, verify: function(res) { return res === ''; } },
+      ]
+    },
+
+    // ===== messageBox =====
+    {
+      module: 'messageBox',
+      title: '消息框 messageBox',
+      tests: [
+        { name: 'getConfig', target: null, args: null, verify: function(res) { return res === '' || typeof res === 'object'; } },
+        { name: 'updateConfig', target: null, args: [{title:'测试标题'}], verify: function(res) { return res === true; } },
+        { name: 'hide', target: null, args: null, verify: function(res) { return res !== undefined; } },
+      ]
+    },
+
+    // ===== inputBox =====
+    {
+      module: 'inputBox',
+      title: '输入框 inputBox',
+      tests: [
+        { name: 'getConfig', target: null, args: null, verify: function(res) { return res === '' || typeof res === 'object'; } },
+        { name: 'updateConfig', target: null, args: [{title:'测试标题'}], verify: function(res) { return res === true; } },
+        { name: 'hide', target: null, args: null, verify: function(res) { return res !== undefined; } },
+      ]
+    },
+
+    // ===== public 补充 =====
+    {
+      module: 'public+',
+      title: '通用 public (补充)',
+      tests: [
+        { name: 'getWindowSize', moduleOverride: 'public', api: 'getWindowSize', target: null, args: null, verify: function(res) { return res && typeof res.width === 'number'; } },
+        { name: 'removeMessageListener', moduleOverride: 'public', api: 'removeMessageListener', target: null, args: [function(){}], verify: function(res) { return res === true; } },
+        { name: 'sendMessage', moduleOverride: 'public', api: 'sendMessage', target: null, args: ['test_action', 'button', 'click', 't_button', {value:'test'}], verify: function(res) { return typeof res === 'string'; } },
+      ]
+    },
+
+    // ===== button 补充测试 =====
+    {
+      module: 'button',
+      title: 'button API (补充)',
+      tests: [
+        { name: 'getText', target: 't_button', args: null, verify: function(res) { return typeof res === 'string'; } },
+      ]
+    },
+
+    // ===== canvas 补充测试 =====
+    {
+      module: 'public',
+      title: 'canvas API (补充)',
+      tests: [
+        { name: 'addMessageListener', target: null, args: [function(){}], verify: function(res) { return res === true; } },
+        { name: 'bringToFront', target: 't_label', args: null, verify: function(res) { return res === true; } },
+        { name: 'getPosition', target: 't_label', args: null, verify: function(res) { return res && typeof res.x === 'number'; } },
+        { name: 'getSize', target: 't_label', args: null, verify: function(res) { return res && typeof res.width === 'number'; } },
+        { name: 'getTitleBarTitle', moduleOverride: 'canvas', api: 'getTitleBarTitle', target: null, args: null, verify: function(res) { return typeof res === 'string'; } },
+        { name: 'move', target: 't_label', args: [50, 50], verify: function(res) { return res === true; } },
+        { name: 'parse', moduleOverride: 'public.icon', api: 'parse', target: null, args: ['[OK]'], verify: function(res) { return typeof res === 'string'; } },
+        { name: 'removeMessageListener', target: null, args: [function(){}], verify: function(res) { return res === true; } },
+        { name: 'sendMessage', target: null, args: ['test', 'button', 'click', 't_button', {}], verify: function(res) { return typeof res === 'string'; } },
+        { name: 'sendToBack', target: 't_label', args: null, verify: function(res) { return res === true; } },
+        { name: 'setSize', target: 't_label', args: [150, 50], verify: function(res) { return res === true; } },
+        { name: 'setTitleBarTitle', moduleOverride: 'canvas', api: 'setTitleBarTitle', target: null, args: ['测试标题'], verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'setZIndex', target: 't_label', args: [99], verify: function(res) { return res === true; } },
+        { name: 'showNotification', target: null, args: [{title:'测试', text:'内容'}], verify: function(res) { return res === true; } },
+        { name: 'testReturn', target: null, args: null, verify: function(res) { return res !== undefined; } },
+        { name: 'toText', moduleOverride: 'public.icon', api: 'toText', target: null, args: ['[OK]'], verify: function(res) { return typeof res === 'string'; } },
+      ]
+    },
+
+    // ===== cardBox 补充测试 =====
+    {
+      module: 'cardBox',
+      title: 'cardBox API (补充)',
+      tests: [
+        { name: 'collapseCard', target: 't_card', args: null, verify: function(res) { return res === true; } },
+        { name: 'expandCard', target: 't_card', args: null, verify: function(res) { return res === true; } },
+        { name: 'getCardTitle', target: 't_card', args: null, verify: function(res) { return typeof res === 'string'; } },
+        { name: 'hideCardHeader', target: 't_card', args: null, verify: function(res) { return res === true; } },
+        { name: 'isCardCollapsed', target: 't_card', args: null, verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'isCardHeaderVisible', target: 't_card', args: null, verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'isCollapseButtonVisible', target: 't_card', args: null, verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'showCardHeader', target: 't_card', args: null, verify: function(res) { return res === true; } },
+      ]
+    },
+
+    // ===== checkbox 补充测试 =====
+    {
+      module: 'checkbox',
+      title: 'checkbox API (补充)',
+      tests: [
+        { name: 'getChecked', target: 't_checkbox', args: null, verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'getLabel', target: 't_checkbox', args: null, verify: function(res) { return typeof res === 'string'; } },
+        { name: 'setLabel', target: 't_checkbox', args: ['新标签'], verify: function(res) { return res === true; } },
+      ]
+    },
+
+    // ===== comboBox 补充测试 =====
+    {
+      module: 'comboBox',
+      title: 'comboBox API (补充)',
+      tests: [
+        { name: 'addItem', target: 't_combo', args: ['新选项', 'new'], verify: function(res) { return res === true; } },
+        { name: 'clearItems', target: 't_combo', args: null, verify: function(res) { return res === true; } },
+        { name: 'getIndex', target: 't_combo', args: null, verify: function(res) { return typeof res === 'number'; } },
+        { name: 'getItemCount', target: 't_combo', args: null, verify: function(res) { return typeof res === 'number'; } },
+        { name: 'getText', target: 't_combo', args: null, verify: function(res) { return typeof res === 'string'; } },
+        { name: 'getValue', target: 't_combo', args: null, verify: function(res) { return typeof res === 'string'; } },
+        { name: 'removeItem', target: 't_combo', args: [0], verify: function(res) { return res === true; } },
+        { name: 'setIndex', target: 't_combo', args: [0], verify: function(res) { return res === true; } },
+      ]
+    },
+
+    // ===== contextMenu 补充测试 =====
+    {
+      module: 'contextMenu',
+      title: 'contextMenu API (补充)',
+      tests: [
+        { name: 'getItems', target: null, args: null, verify: function(res) { return res === '' || Array.isArray(res); } },
+        { name: 'show', target: null, args: null, verify: function(res) { return typeof res === 'boolean'; } },
+      ]
+    },
+
+    // ===== dataGrid 补充测试 =====
+    {
+      module: 'dataGrid',
+      title: 'dataGrid API (补充)',
+      tests: [
+        { name: 'addRow', target: 't_datagrid', args: [{id:'new1', cells:{name:'新增', age:30, city:'北京'}}], verify: function(res) { return res === true; } },
+        { name: 'checkAll', target: 't_datagrid', args: null, verify: function(res) { return res === true; } },
+        { name: 'clearRows', target: 't_datagrid', args: null, verify: function(res) { return res === true; } },
+        { name: 'deselectRow', target: 't_datagrid', args: [0], verify: function(res) { return res === true; } },
+        { name: 'disableCellEdit', target: 't_datagrid', args: [0], verify: function(res) { return res === true; } },
+        { name: 'disableGlobalEdit', target: 't_datagrid', args: null, verify: function(res) { return res === true; } },
+        { name: 'enableGlobalEdit', target: 't_datagrid', args: null, verify: function(res) { return res === true; } },
+        { name: 'getAlwaysShowSelection', target: 't_datagrid', args: null, verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'getCellValueByIndex', target: 't_datagrid', args: [0, 1], verify: function(res) { return typeof res === 'string'; } },
+        { name: 'getCheckedRows', target: 't_datagrid', args: null, verify: function(res) { return Array.isArray(res); } },
+        { name: 'getHighlightedRow', target: 't_datagrid', args: null, verify: function(res) { return res !== undefined; } },
+        { name: 'getRowChecked', target: 't_datagrid', args: [0], verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'getRowData', target: 't_datagrid', args: [0], verify: function(res) { return res !== undefined; } },
+        { name: 'isCellEditable', target: 't_datagrid', args: [0], verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'isGlobalEditEnabled', target: 't_datagrid', args: null, verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'isRowChecked', target: 't_datagrid', args: [0], verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'removeRow', target: 't_datagrid', args: [0], verify: function(res) { return res === true; } },
+        { name: 'selectRow', target: 't_datagrid', args: [0], verify: function(res) { return res === true; } },
+        { name: 'setAlwaysShowSelection', target: 't_datagrid', args: [true], verify: function(res) { return res === true; } },
+        { name: 'setCellValue', api: 'setCellValue', target: 't_datagrid', args: [0, 'name', '测试值'], verify: function(res) { return res === true; } },
+        { name: 'setCellValueByIndex', target: 't_datagrid', args: [0, 1, '测试'], verify: function(res) { return res === true; } },
+        { name: 'setRowChecked', target: 't_datagrid', args: [0, true], verify: function(res) { return res === true; } },
+        { name: 'setRowData', target: 't_datagrid', args: [0, {cells:{name:'修改', age:25, city:'杭州'}}], verify: function(res) { return res === true; } },
+        { name: 'showRowCheckbox', target: 't_datagrid', args: [true], verify: function(res) { return res === true; } },
+        { name: 'uncheckAll', target: 't_datagrid', args: null, verify: function(res) { return res === true; } },
+      ]
+    },
+
+    // ===== dateTimePicker 补充测试 =====
+    {
+      module: 'dateTimePicker',
+      title: 'dateTimePicker API (补充)',
+      tests: [
+        { name: 'getValue', target: 't_datetime', args: null, verify: function(res) { return typeof res === 'string'; } },
+      ]
+    },
+
+    // ===== hyperLink 补充测试 =====
+    {
+      module: 'hyperLink',
+      title: 'hyperLink API (补充)',
+      tests: [
+        { name: 'getHref', target: 't_link', args: null, verify: function(res) { return typeof res === 'string'; } },
+        { name: 'getText', target: 't_link', args: null, verify: function(res) { return typeof res === 'string'; } },
+        { name: 'setHref', target: 't_link', args: ['https://test.com'], verify: function(res) { return res === true; } },
+      ]
+    },
+
+    // ===== iconButton 补充测试 =====
+    {
+      module: 'iconButton',
+      title: 'iconButton API (补充)',
+      tests: [
+        { name: 'getIconHtml', target: 't_iconbtn', args: null, verify: function(res) { return typeof res === 'string'; } },
+        { name: 'setIconHtml', target: 't_iconbtn', args: ['[OK]'], verify: function(res) { return res === true; } },
+      ]
+    },
+
+    // ===== imageBox 补充测试 =====
+    {
+      module: 'imageBox',
+      title: 'imageBox API (补充)',
+      tests: [
+        { name: 'getFit', target: 't_imagebox', args: null, verify: function(res) { return typeof res === 'string'; } },
+        { name: 'setFit', target: 't_imagebox', args: ['cover'], verify: function(res) { return res === true; } },
+      ]
+    },
+
+    // ===== input 补充测试 =====
+    {
+      module: 'input',
+      title: 'input API (补充)',
+      tests: [
+        { name: 'getPlaceholder', target: 't_input', args: null, verify: function(res) { return typeof res === 'string'; } },
+        { name: 'getValue', target: 't_input', args: null, verify: function(res) { return typeof res === 'string'; } },
+        { name: 'setPlaceholder', target: 't_input', args: ['新提示'], verify: function(res) { return res === true; } },
+      ]
+    },
+
+    // ===== inputBox 补充测试 =====
+    {
+      module: 'inputBox',
+      title: 'inputBox API (补充)',
+      tests: [
+        { name: 'hide', target: null, args: null, verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'show', target: null, args: null, verify: function(res) { return typeof res === 'boolean'; } },
+      ]
+    },
+
+    // ===== label 补充测试 =====
+    {
+      module: 'label',
+      title: 'label API (补充)',
+      tests: [
+        { name: 'getText', target: 't_label', args: null, verify: function(res) { return typeof res === 'string'; } },
+      ]
+    },
+
+    // ===== listBox 补充测试 =====
+    {
+      module: 'listBox',
+      title: 'listBox API (补充)',
+      tests: [
+        { name: 'checkAll', target: 't_listbox', args: null, verify: function(res) { return res === true; } },
+        { name: 'clearItems', target: 't_listbox', args: null, verify: function(res) { return res === true; } },
+        { name: 'deleteSelected', target: 't_listbox', args: null, verify: function(res) { return res === true; } },
+        { name: 'deselectItem', target: 't_listbox', args: [0], verify: function(res) { return res === true; } },
+        { name: 'disableDblClickEdit', target: 't_listbox', args: null, verify: function(res) { return res === true; } },
+        { name: 'enableDblClickEdit', target: 't_listbox', args: null, verify: function(res) { return res === true; } },
+        { name: 'getAlwaysShowSelection', target: 't_listbox', args: null, verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'getCheckedItems', target: 't_listbox', args: null, verify: function(res) { return Array.isArray(res); } },
+        { name: 'getHighlightedItem', target: 't_listbox', args: null, verify: function(res) { return res !== null; } },
+        { name: 'getItemChecked', target: 't_listbox', args: [0], verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'getItemCount', target: 't_listbox', args: null, verify: function(res) { return typeof res === 'number'; } },
+        { name: 'getItemText', target: 't_listbox', args: [0], verify: function(res) { return typeof res === 'string'; } },
+        { name: 'getSelectedItemId', target: 't_listbox', args: null, verify: function(res) { return typeof res === 'number'; } },
+        { name: 'isItemChecked', target: 't_listbox', args: [0], verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'removeItem', target: 't_listbox', args: [0], verify: function(res) { return res === true; } },
+        { name: 'selectAll', target: 't_listbox', args: null, verify: function(res) { return res === true; } },
+        { name: 'selectItem', target: 't_listbox', args: [0], verify: function(res) { return res === true; } },
+        { name: 'setAlwaysShowSelection', target: 't_listbox', args: [true], verify: function(res) { return res === true; } },
+        { name: 'setItemChecked', target: 't_listbox', args: [0, true], verify: function(res) { return res === true; } },
+        { name: 'setItemText', target: 't_listbox', args: [0, '修改文本'], verify: function(res) { return res === true; } },
+        { name: 'showCheckbox', target: 't_listbox', args: [true], verify: function(res) { return res === true; } },
+        { name: 'toggleAll', target: 't_listbox', args: null, verify: function(res) { return res === true; } },
+        { name: 'uncheckAll', target: 't_listbox', args: null, verify: function(res) { return res === true; } },
+      ]
+    },
+
+    // ===== logOutput 补充测试 =====
+    {
+      module: 'logOutput',
+      title: 'logOutput API (补充)',
+      tests: [
+        { name: 'addHtmlLog', target: 't_log', args: ['<b>加粗</b>'], verify: function(res) { return res === true; } },
+        { name: 'clearLog', target: 't_log', args: null, verify: function(res) { return res === true; } },
+        { name: 'getLogCount', target: 't_log', args: null, verify: function(res) { return typeof res === 'number'; } },
+      ]
+    },
+
+    // ===== messageBox 补充测试 =====
+    {
+      module: 'messageBox',
+      title: 'messageBox API (补充)',
+      tests: [
+        { name: 'hide', target: null, args: null, verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'show', target: null, args: null, verify: function(res) { return typeof res === 'boolean'; } },
+      ]
+    },
+
+    // ===== progressBar 补充测试 =====
+    {
+      module: 'progressBar',
+      title: 'progressBar API (补充)',
+      tests: [
+        { name: 'decrement', target: 't_progress', args: [10], verify: function(res) { return res === true; } },
+        { name: 'disableClick', target: 't_progress', args: null, verify: function(res) { return res === true; } },
+        { name: 'enableClick', target: 't_progress', args: null, verify: function(res) { return res === true; } },
+        { name: 'getValue', target: 't_progress', args: null, verify: function(res) { return typeof res === 'number'; } },
+        { name: 'increment', target: 't_progress', args: [10], verify: function(res) { return res === true; } },
+        { name: 'setRange', target: 't_progress', args: [0, 100], verify: function(res) { return res === true; } },
+      ]
+    },
+
+    // ===== public 补充测试 =====
+    {
+      module: 'public',
+      title: 'public API (补充)',
+      tests: [
+        { name: 'addMessageListener', target: null, args: [function(){}], verify: function(res) { return res === true; } },
+        { name: 'bringToFront', target: 't_label', args: null, verify: function(res) { return res === true; } },
+        { name: 'focus', target: 't_input', args: null, verify: function(res) { return res === true; } },
+        { name: 'getBlockContextMenu', target: null, args: null, verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'getChecked', target: 't_checkbox', args: null, verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'getIdByName', target: null, args: ['测试按钮'], verify: function(res) { return res === 't_button'; } },
+        { name: 'getInfoById', target: null, args: ['t_button'], verify: function(res) { return res && typeof res === 'object'; } },
+        { name: 'getPosition', target: 't_label', args: null, verify: function(res) { return res && typeof res.x === 'number'; } },
+        { name: 'getSize', target: 't_label', args: null, verify: function(res) { return res && typeof res.width === 'number'; } },
+        { name: 'getTitleBarTitle', moduleOverride: 'canvas', api: 'getTitleBarTitle', target: null, args: null, verify: function(res) { return typeof res === 'string'; } },
+        { name: 'getValue', target: 't_input', args: null, verify: function(res) { return typeof res === 'string'; } },
+        { name: 'hide', target: 't_label', args: null, verify: function(res) { return res === true; } },
+        { name: 'isEnabled', target: 't_input', args: null, verify: function(res) { return res === true; } },
+        { name: 'isVisible', target: 't_label', args: null, verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'move', target: 't_label', args: [20, 20], verify: function(res) { return res === true; } },
+        { name: 'parse', moduleOverride: 'public.icon', api: 'parse', target: null, args: ['[OK]'], verify: function(res) { return typeof res === 'string'; } },
+        { name: 'sendMessage', target: null, args: ['test', 'button', 'click', 't_button', {}], verify: function(res) { return typeof res === 'string'; } },
+        { name: 'sendToBack', target: 't_label', args: null, verify: function(res) { return res === true; } },
+        { name: 'setBlockContextMenu', target: null, args: [false], verify: function(res) { return res === true; } },
+        { name: 'setChecked', target: 't_checkbox', args: [true], verify: function(res) { return res === true; } },
+        { name: 'setEnabled', target: 't_input', args: [true], verify: function(res) { return res === true; } },
+        { name: 'setFixedCanvasSize', moduleOverride: 'canvas', api: 'setFixedCanvasSize', target: null, args: [false], verify: function(res) { return res === true; } },
+        { name: 'setSize', target: 't_label', args: [120, 40], verify: function(res) { return res === true; } },
+        { name: 'setStyle', target: 't_label', args: [{backgroundColor:'#f0f0f0'}], verify: function(res) { return res === true; } },
+        { name: 'setTitleBarTitle', moduleOverride: 'canvas', api: 'setTitleBarTitle', target: null, args: ['新标题'], verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'setZIndex', target: 't_label', args: [10], verify: function(res) { return res === true; } },
+        { name: 'show', target: 't_label', args: null, verify: function(res) { return res === true; } },
+        { name: 'showNotification', target: null, args: [{title:'测试', text:'内容'}], verify: function(res) { return res === true; } },
+        { name: 'testReturn', target: null, args: null, verify: function(res) { return res !== undefined; } },
+        { name: 'toText', moduleOverride: 'public.icon', api: 'toText', target: null, args: ['[OK]'], verify: function(res) { return typeof res === 'string'; } },
+        { name: 'toggle', target: 't_label', args: null, verify: function(res) { return res === true; } },
+      ]
+    },
+
+    // ===== radioGroup 补充测试 =====
+    {
+      module: 'radioGroup',
+      title: 'radioGroup API (补充)',
+      tests: [
+        { name: 'addOption', target: 't_radiogroup', args: ['新选项', 'new_opt'], verify: function(res) { return res === true; } },
+        { name: 'getIndex', target: 't_radiogroup', args: null, verify: function(res) { return typeof res === 'number'; } },
+        { name: 'getValue', target: 't_radiogroup', args: null, verify: function(res) { return typeof res === 'string'; } },
+        { name: 'setIndex', target: 't_radiogroup', args: [0], verify: function(res) { return res === true; } },
+      ]
+    },
+
+    // ===== switchToggle 补充测试 =====
+    {
+      module: 'switchToggle',
+      title: 'switchToggle API (补充)',
+      tests: [
+        { name: 'getChecked', target: 't_switch', args: null, verify: function(res) { return typeof res === 'boolean'; } },
+      ]
+    },
+
+    // ===== tabContainer 补充测试 =====
+    {
+      module: 'tabContainer',
+      title: 'tabContainer API (补充)',
+      tests: [
+        { name: 'addTab', target: 't_tabs', args: ['newtab', '新标签'], verify: function(res) { return typeof res === 'string'; } },
+        { name: 'getActiveTab', target: 't_tabs', args: null, verify: function(res) { return typeof res === 'string'; } },
+        { name: 'getActiveTabIndex', target: 't_tabs', args: null, verify: function(res) { return typeof res === 'number'; } },
+        { name: 'getTabCount', target: 't_tabs', args: null, verify: function(res) { return typeof res === 'number'; } },
+        { name: 'getTabHeaderVisible', target: 't_tabs', args: null, verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'removeTab', target: 't_tabs', args: ['newtab'], verify: function(res) { return res === true; } },
+        { name: 'renameTab', target: 't_tabs', args: ['tab1', '重命名'], verify: function(res) { return res === true; } },
+      ]
+    },
+
+    // ===== textarea 补充测试 =====
+    {
+      module: 'textarea',
+      title: 'textarea API (补充)',
+      tests: [
+        { name: 'getPlaceholder', target: 't_textarea', args: null, verify: function(res) { return typeof res === 'string'; } },
+        { name: 'getValue', target: 't_textarea', args: null, verify: function(res) { return typeof res === 'string'; } },
+        { name: 'setPlaceholder', target: 't_textarea', args: ['请输入'], verify: function(res) { return res === true; } },
+      ]
+    },
+
+    // ===== tooltip 补充测试 =====
+    {
+      module: 'tooltip',
+      title: 'tooltip API (补充)',
+      tests: [
+        { name: 'getConfig', target: null, args: null, verify: function(res) { return res === '' || typeof res === 'object'; } },
+        { name: 'show', target: null, args: null, verify: function(res) { return typeof res === 'boolean'; } },
+      ]
+    },
+
+    // ===== treeView 补充测试 =====
+    {
+      module: 'treeView',
+      title: 'treeView API (补充)',
+      tests: [
+        { name: 'checkAll', target: 't_tree', args: null, verify: function(res) { return res === true; } },
+        { name: 'clearSelection', target: 't_tree', args: null, verify: function(res) { return res === true; } },
+        { name: 'clearTree', target: 't_tree', args: null, verify: function(res) { return res === true; } },
+        { name: 'collapseAll', target: 't_tree', args: null, verify: function(res) { return res === true; } },
+        { name: 'collapseNode', target: 't_tree', args: ['n1'], verify: function(res) { return res === true; } },
+        { name: 'deselectNode', target: 't_tree', args: ['n1'], verify: function(res) { return res === true; } },
+        { name: 'disableAllEdit', target: 't_tree', args: null, verify: function(res) { return res === true; } },
+        { name: 'disableNodeEdit', target: 't_tree', args: ['n1'], verify: function(res) { return res === true; } },
+        { name: 'enableAllEdit', target: 't_tree', args: null, verify: function(res) { return res === true; } },
+        { name: 'enableNodeEdit', target: 't_tree', args: ['n1'], verify: function(res) { return res === true; } },
+        { name: 'expandAll', target: 't_tree', args: null, verify: function(res) { return res === true; } },
+        { name: 'expandNode', target: 't_tree', args: ['n1'], verify: function(res) { return res === true; } },
+        { name: 'getAlwaysShowSelection', target: 't_tree', args: null, verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'getCheckedNodes', target: 't_tree', args: null, verify: function(res) { return Array.isArray(res); } },
+        { name: 'getHighlightedNode', target: 't_tree', args: null, verify: function(res) { return res !== null; } },
+        { name: 'getNodeLevel', target: 't_tree', args: ['n1'], verify: function(res) { return typeof res === 'number'; } },
+        { name: 'getSelectedNode', target: 't_tree', args: null, verify: function(res) { return typeof res === 'string'; } },
+        { name: 'isAllEditEnabled', target: 't_tree', args: null, verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'isCheckboxVisible', target: 't_tree', args: null, verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'isNodeChecked', target: 't_tree', args: ['n1'], verify: function(res) { return typeof res === 'boolean'; } },
+        { name: 'removeNode', target: 't_tree', args: ['n1'], verify: function(res) { return res === true; } },
+        { name: 'selectNode', target: 't_tree', args: ['n1'], verify: function(res) { return res === true; } },
+        { name: 'setAlwaysShowSelection', target: 't_tree', args: [true], verify: function(res) { return res === true; } },
+        { name: 'setNodeChecked', target: 't_tree', args: ['n1', true], verify: function(res) { return res === true; } },
+        { name: 'showCheckbox', target: 't_tree', args: [true], verify: function(res) { return res === true; } },
+        { name: 'toggleNode', target: 't_tree', args: ['n1'], verify: function(res) { return res === true; } },
+        { name: 'uncheckAll', target: 't_tree', args: null, verify: function(res) { return res === true; } },
+        { name: 'updateNode', target: 't_tree', args: ['n1', '新名称'], verify: function(res) { return res === true; } },
+      ]
+    },
+  ];
+
+  return groups;
+}
+
+// ============================================================
+// 渲染 API 按钮
+// ============================================================
+
+function renderApiButtons() {
+  var container = document.getElementById('apiButtonsContainer');
+  var groups = defineTests();
+  testDefs = [];
+  moduleCount = groups.length;
+
+  for (var g = 0; g < groups.length; g++) {
+    var group = groups[g];
+    var panel = document.createElement('div');
+    panel.className = 'panel-card';
+
+    var h3 = document.createElement('h3');
+    h3.textContent = group.title + ' (' + group.tests.length + ')';
+    panel.appendChild(h3);
+
+    var btnDiv = document.createElement('div');
+    btnDiv.className = 'api-buttons';
+
+    for (var t = 0; t < group.tests.length; t++) {
+      var test = group.tests[t];
+      var btn = document.createElement('button');
+      btn.className = 'api-btn';
+      btn.textContent = test.name;
+      btn.dataset.module = group.module;
+      btn.dataset.testIndex = testDefs.length;
+      btn.onclick = function(e) {
+        var idx = parseInt(e.target.dataset.testIndex, 10);
+        runSingleTest(idx, e.target);
+      };
+      btnDiv.appendChild(btn);
+      testDefs.push({
+        module: group.module,
+        moduleOverride: test.moduleOverride,
+        name: test.name,
+        api: test.api || test.name.replace(/\(.*\)/, ''),
+        target: test.target,
+        args: test.args,
+        verify: test.verify
+      });
+    }
+
+    panel.appendChild(btnDiv);
+    container.appendChild(panel);
+  }
+
+  document.getElementById('moduleCount').textContent = moduleCount;
+}
+
+// ============================================================
+// 测试执行
+// ============================================================
+
+function log(msg, type) {
+  var logDiv = document.getElementById('resultLog');
+  var p = document.createElement('div');
+  p.className = 'log-' + (type || 'info');
+  var time = new Date().toLocaleTimeString();
+  p.innerHTML = '[' + time + '] ' + msg;
+  logDiv.appendChild(p);
+  logDiv.scrollTop = logDiv.scrollHeight;
+}
+
+function updateSummary() {
+  document.getElementById('totalCount').textContent = totalTests;
+  document.getElementById('passCount').textContent = passedTests;
+  document.getElementById('failCount').textContent = failedTests;
+}
+
+function parseResult(res) {
+  if (typeof res === 'string') {
+    try {
+      var parsed = JSON.parse(res);
+      if (typeof parsed === 'object' && parsed !== null) {
+        return parsed;
+      }
+    } catch(e) {}
+  }
+  return res;
+}
+
+function runSingleTest(idx, btn) {
+  var test = testDefs[idx];
+  if (!test) return;
+
+  totalTests++;
+  var api = test.api;
+  var module = test.moduleOverride || test.module;
+  if (module === 'dataGrid (native)') module = 'dataGrid';
+  module = module.replace(/\+$/, '');
+  if (module === 'tabsContainer') module = 'tabContainer';
+
+  var argDesc = '';
+  if (test.args) {
+    argDesc = test.args.map(function(a) {
+      if (typeof a === 'string') return '"' + a + '"';
+      if (typeof a === 'object' && a !== null) return JSON.stringify(a).substring(0, 30);
+      return a;
+    }).join(', ');
+  }
+
+  var callStr = test.module + '.' + test.name + '(' + (test.target ? '"' + test.target + '"' : '') + (argDesc ? (test.target ? ', ' : '') + argDesc : '') + ')';
+
+  log('<span class="log-module">' + test.module + '</span> ▶ ' + callStr, 'info');
+
+  try {
+    var apiObj = webviewBridge.api;
+    var moduleParts = module.split('.');
+    for (var mi = 0; mi < moduleParts.length; mi++) {
+      apiObj = apiObj[moduleParts[mi]];
+      if (!apiObj) break;
+    }
+    if (!apiObj || typeof apiObj[api] !== 'function') {
+      failedTests++;
+      btn.classList.add('fail');
+      log('✗ API 不存在: ' + module + '.' + api, 'fail');
+      updateSummary();
+      return;
+    }
+
+    var result;
+    var callArgs = [];
+    if (test.target) callArgs.push(test.target);
+    if (test.args) callArgs = callArgs.concat(test.args);
+
+    result = apiObj[api].apply(apiObj, callArgs);
+
+    var parsedResult = parseResult(result);
+
+    var passed = true;
+    if (test.verify) {
+      try {
+        passed = test.verify(parsedResult, result) === true;
+      } catch(e) {
+        passed = false;
+        log('  验证异常: ' + e.message, 'warn');
+      }
+    }
+
+    if (passed) {
+      passedTests++;
+      btn.classList.add('success');
+      var resStr = typeof result === 'object' ? JSON.stringify(result).substring(0, 50) : String(result);
+      log('✓ 通过 → ' + resStr, 'success');
+    } else {
+      failedTests++;
+      btn.classList.add('fail');
+      var resStr2 = typeof result === 'object' ? JSON.stringify(result).substring(0, 50) : String(result);
+      log('✗ 失败 → 返回: ' + resStr2, 'fail');
+    }
+  } catch(e) {
+    failedTests++;
+    btn.classList.add('fail');
+    log('✗ 异常: ' + e.message + (e.stack ? '\n' + e.stack.substring(0, 200) : ''), 'fail');
+  }
+
+  updateSummary();
+}
+
+function runAllTests() {
+  totalTests = 0;
+  passedTests = 0;
+  failedTests = 0;
+  document.getElementById('resultLog').innerHTML = '';
+
+  var btns = document.querySelectorAll('.api-btn');
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].classList.remove('success', 'fail');
+  }
+
+  log('========== 开始批量测试 (' + testDefs.length + ' 个用例) ==========', 'info');
+
+  var idx = 0;
+  function runNext() {
+    if (idx >= testDefs.length) {
+      log('========== 测试完成 ==========', 'info');
+      var passRate = totalTests > 0 ? Math.round(passedTests / totalTests * 100) : 0;
+      var color = passedTests === totalTests ? 'success' : 'fail';
+      log('总计: ' + totalTests + ' | 通过: <span style="color:#52c41a">' + passedTests + '</span> | 失败: <span style="color:#ff4d4f">' + failedTests + '</span> | 通过率: ' + passRate + '%', color);
+      return;
+    }
+    var btn = document.querySelectorAll('.api-btn')[idx];
+    idx++;
+    if (btn) {
+      btn.click();
+    }
+    setTimeout(runNext, 20);
+  }
+
+  setTimeout(runNext, 100);
+}
+
+// 初始化
+renderApiButtons();
+log('API 测试页面加载完成，共 ' + testDefs.length + ' 个测试用例，' + moduleCount + ' 个模块', 'success');
+log('点击按钮或"一键运行全部"开始测试', 'info');
+</script>
+
+</body>
+</html>

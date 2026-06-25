@@ -12,13 +12,13 @@ import type { CanvasConfig, MessageBoxConfig, InputBoxConfig } from '@/types/ind
 const DEFAULT_CANVAS_CSS = `/* ===== 画布自定义样式 ===== */
 
 /* 页面容器（border/border-radius 由画布配置动态生成，此处不写死） */
-.page-container {
+.pageContainer {
   position: relative;
   overflow: hidden;
   --canvas-bg-color: #ffffff;
   --canvas-opacity: 1;
 }
-.page-container::before {
+.pageContainer::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -30,13 +30,13 @@ const DEFAULT_CANVAS_CSS = `/* ===== 画布自定义样式 ===== */
 }
 
 /* 毛玻璃效果 */
-.page-container.glass-effect {
+.pageContainer.glass-effect {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
 
 /* 标题栏容器 */
-.canvas-titlebar {
+.titlebar {
   position: absolute;
   top: 0;
   left: 0;
@@ -44,50 +44,50 @@ const DEFAULT_CANVAS_CSS = `/* ===== 画布自定义样式 ===== */
   display: flex;
   align-items: center;
   height: 40px;
-  background-color: #f5f5f5;
+  background-color: #F8F8F8;
   opacity: 1;
   user-select: none;
   z-index: 10;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
-.canvas-titlebar .tb-left {
+.titlebar .titlebar_left {
   width: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  margin-left: 2px;
 }
-.canvas-titlebar .tb-center {
+.titlebar .titlebar_center {
   flex: 1;
   display: flex;
   align-items: center;
   min-width: 0;
 }
-.canvas-titlebar .tb-right {
+.titlebar .titlebar_right {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 2px;
   padding-right: 4px;
   flex-shrink: 0;
 }
-.canvas-titlebar .tb-icon {
-  width: 32px;
-  height: 32px;
+.titlebar .titlebar_left_icon {
+  width: 22px;
+  height: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 18px;
 }
-.canvas-titlebar .tb-title {
+.titlebar .titlebar_center_title {
   font-size: 13px;
   font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.canvas-titlebar .tb-btn {
-  width: 32px;
+.titlebar .titlebar_rightBtn {
+  width: 35px;
   height: 32px;
   display: flex;
   align-items: center;
@@ -98,10 +98,10 @@ const DEFAULT_CANVAS_CSS = `/* ===== 画布自定义样式 ===== */
   border-radius: 4px;
   flex-shrink: 0;
 }
-.canvas-titlebar .tb-btn:hover { background: rgba(0, 0, 0, 0.06); }
-.canvas-titlebar .tb-btn:active { background: rgba(0, 0, 0, 0.1); }
-.canvas-titlebar .tb-btn-close:hover { background: #e81123; color: #fff; }
-.canvas-titlebar .tb-btn-close:active { background: #bf0a1a; color: #fff; }
+.titlebar .titlebar_rightBtn:hover { background: rgba(0, 0, 0, 0.06); }
+.titlebar .titlebar_rightBtn:active { background: rgba(0, 0, 0, 0.1); }
+.titlebar .titlebar_rightBtn_close:hover { background: #e81123; color: #fff; }
+.titlebar .titlebar_rightBtn_close:active { background: #bf0a1a; color: #fff; }
 `
 
 /** 信息框默认 CSS 模板 */
@@ -267,7 +267,7 @@ export function getDefaultCanvasConfig(): CanvasConfig {
     width: 800,
     height: 500,
     backgroundColor: '#ffffff',
-    borderColor: '#e5e5e5',
+    borderColor: '#D6D6D6',
     borderWidth: 1,
     borderRadius: 8,
     title: '标题',
@@ -281,12 +281,13 @@ export function getDefaultCanvasConfig(): CanvasConfig {
     titleBarAlign: 'left',
     titleBarIconName: 'fa-star',
     titleBarIconHtml: '',
-    titleBarBgColor: '#f5f5f5',
+    titleBarBgColor: '#F8F8F8',
     titleBarTextColor: '#333333',
     titleBarBtnColor: '#333333',
     titleBarOpacity: 1,
     glassEffect: true,
     showShadow: false,
+    noIndentTitleBar: false,
     canvasDraggable: true,
     bodyBackground: {
       enabled: false,

@@ -61,7 +61,7 @@
     <template v-else-if="widget.type === 'divider'">
       <hr :style="dividerLineStyle" />
     </template>
-    <template v-else-if="widget.type === 'hyperlink'">
+    <template v-else-if="widget.type === 'hyperLink'">
       <a class="hl-text" href="javascript:void(0)" :data-href="widget.href || '#'" :style="hyperlinkTextStyle">{{ widget.text || '超链接' }}</a>
     </template>
     <template v-else-if="widget.type === 'textarea'">
@@ -92,18 +92,18 @@
       </label>
     </template>
     <template v-else-if="widget.type === 'tabsContainer'">
-      <div v-if="!widget.hideTabHeader" class="tab-header-bar" :style="tabHeaderBarStyle">
+      <div v-if="!widget.hideTabHeader" class="tabsContainer_headerBar" :style="tabHeaderBarStyle">
         <span
           v-for="(tab, i) in (widget.tabs || [{ name: 'tab1', title: '标签1' }])"
           :key="i"
-          class="tab-header-btn"
-          data-ctrl-type="tab_btn"
+          class="tabsContainer_headerBar_btn"
+          data-ctrl-type="tabsContainer_headerBar_btn"
           :data-tab-name="tab.name"
           :class="{ active: tab.name === (widget.activeTab || (widget.tabs?.[0]?.name || 'tab1')) }"
           :style="tabBtnStyle(i)"
         >{{ tab.title || tab.name }}</span>
       </div>
-      <div class="tab-content-wrapper">
+      <div class="tabsContainer_contentWrapper">
         <div
           v-for="(tab, i) in (widget.tabs || [{ name: 'tab1', title: '标签1' }])"
           :key="i"
@@ -120,8 +120,8 @@
       </div>
     </template>
     <template v-else-if="widget.type === 'progressBar'">
-      <span class="progress-fill" :style="progressFillStyle"></span>
-      <span class="progress-text" :style="progressTextStyle">{{ widget.progressValue ?? 0 }}%</span>
+      <span class="progressBar_fill" :style="progressFillStyle"></span>
+      <span class="progressBar_text" :style="progressTextStyle">{{ widget.progressValue ?? 0 }}%</span>
     </template>
     <template v-else-if="widget.type === 'datetimePicker'">
       <input
@@ -136,7 +136,7 @@
       <span
         v-for="(log, i) in (widget.logs || [])"
         :key="i"
-        class="log-line"
+        class="logOutput_line"
         :style="{ color: log.color || '#333' }"
       >{{ log.text }}</span>
     </template>
@@ -155,10 +155,10 @@
       <img v-if="widget.src" :src="widget.src" :style="imageStyle" alt="" />
     </template>
     <template v-else-if="widget.type === 'cardBox'">
-      <div v-if="widget.showHeader !== false" class="card-header" :style="cardHeaderStyle">
-        <span class="card-header-title" :style="cardTitleStyle">{{ widget.headerTitle || '卡片标题' }}</span>
+      <div v-if="widget.showHeader !== false" class="cardBox_header" :style="cardHeaderStyle">
+        <span class="cardBox_header_title" :style="cardTitleStyle">{{ widget.headerTitle || '卡片标题' }}</span>
       </div>
-      <div class="card-body" :style="cardBodyStyle">
+      <div class="cardBox_body" :style="cardBodyStyle">
         <PreviewWidget
           v-for="child in (widget.children || [])"
           :key="child.id"
@@ -167,43 +167,43 @@
       </div>
     </template>
     <template v-else-if="widget.type === 'listBox'">
-      <div class="list-box-scroll" :style="listScrollStyle">
+      <div class="listBox_scroll" :style="listScrollStyle">
         <template v-if="(widget.items || []).length === 0">
           <span class="list-empty">暂无数据</span>
         </template>
         <span
           v-for="(item, i) in (widget.items || [])"
           :key="i"
-          class="list-item"
+          class="listBox_item"
           :class="{ 'item-selected': item.selected }"
           :style="listItemStyle"
         >
-          <span v-if="widget.showCheckbox" class="list-item-check">☐</span>
-          <span class="list-item-text">{{ item.text }}</span>
+          <span v-if="widget.showCheckbox" class="listBox_item-check">☐</span>
+          <span class="listBox_item_text">{{ item.text }}</span>
         </span>
       </div>
     </template>
     <template v-else-if="widget.type === 'treeView'">
       <div v-for="(node, ni) in (widget.treeNodes || [])" :key="ni">
-        <div class="tree-node" :data-node-id="node.id" :style="{ paddingLeft: ((node.level || 0) * 16) + 'px' }">
-          <div class="tree-node-content">
-            <span class="tree-toggle" :class="(node.children && node.children.length > 0) ? (node.isExpanded ? 'expanded' : 'collapsed') : 'empty'">{{ (node.children && node.children.length > 0) ? (node.isExpanded ? '▼' : '▶') : '' }}</span>
-            <span class="tree-icon" :style="{ marginRight: '4px' }">{{ node.icon || '　' }}</span>
-            <span class="tree-label">{{ node.label || node.name || '节点' }}</span>
+        <div class="treeView_node" :data-node-id="node.id" :style="{ paddingLeft: ((node.level || 0) * 16) + 'px' }">
+          <div class="treeView_node_content">
+            <span class="treeView_toggle" :class="(node.children && node.children.length > 0) ? (node.isExpanded ? 'expanded' : 'collapsed') : 'empty'">{{ (node.children && node.children.length > 0) ? (node.isExpanded ? '▼' : '▶') : '' }}</span>
+            <span class="treeView_icon" :style="{ marginRight: '4px' }">{{ node.icon || '　' }}</span>
+            <span class="treeView_label">{{ node.label || node.name || '节点' }}</span>
           </div>
-          <div v-if="node.children && node.children.length > 0" class="tree-children" :style="{ display: node.isExpanded ? 'block' : 'none' }">
-            <div v-for="(child, ci) in node.children" :key="ni + '_' + ci" class="tree-node" :data-node-id="child.id" :style="{ paddingLeft: ((node.level || 0) + 1) * 16 + 'px' }">
-              <div class="tree-node-content">
-                <span class="tree-toggle" :class="(child.children && child.children.length > 0) ? (child.isExpanded ? 'expanded' : 'collapsed') : 'empty'">{{ (child.children && child.children.length > 0) ? (child.isExpanded ? '▼' : '▶') : '' }}</span>
-                <span class="tree-icon" :style="{ marginRight: '4px' }">{{ child.icon || '　' }}</span>
-                <span class="tree-label">{{ child.label || child.name || '子节点' }}</span>
+          <div v-if="node.children && node.children.length > 0" class="treeView_children" :style="{ display: node.isExpanded ? 'block' : 'none' }">
+            <div v-for="(child, ci) in node.children" :key="ni + '_' + ci" class="treeView_node" :data-node-id="child.id" :style="{ paddingLeft: ((node.level || 0) + 1) * 16 + 'px' }">
+              <div class="treeView_node_content">
+                <span class="treeView_toggle" :class="(child.children && child.children.length > 0) ? (child.isExpanded ? 'expanded' : 'collapsed') : 'empty'">{{ (child.children && child.children.length > 0) ? (child.isExpanded ? '▼' : '▶') : '' }}</span>
+                <span class="treeView_icon" :style="{ marginRight: '4px' }">{{ child.icon || '　' }}</span>
+                <span class="treeView_label">{{ child.label || child.name || '子节点' }}</span>
               </div>
-              <div v-if="child.children && child.children.length > 0" class="tree-children" :style="{ display: child.isExpanded ? 'block' : 'none' }">
-                <div v-for="(gc, gi) in child.children" :key="ni + '_' + ci + '_' + gi" class="tree-node" :data-node-id="gc.id" :style="{ paddingLeft: ((node.level || 0) + 2) * 16 + 'px' }">
-                  <div class="tree-node-content">
-                    <span class="tree-toggle" :class="(gc.children && gc.children.length > 0) ? (gc.isExpanded ? 'expanded' : 'collapsed') : 'empty'">{{ (gc.children && gc.children.length > 0) ? (gc.isExpanded ? '▼' : '▶') : '' }}</span>
-                    <span class="tree-icon" :style="{ marginRight: '4px' }">{{ gc.icon || '　' }}</span>
-                    <span class="tree-label">{{ gc.label || gc.name || '三级节点' }}</span>
+              <div v-if="child.children && child.children.length > 0" class="treeView_children" :style="{ display: child.isExpanded ? 'block' : 'none' }">
+                <div v-for="(gc, gi) in child.children" :key="ni + '_' + ci + '_' + gi" class="treeView_node" :data-node-id="gc.id" :style="{ paddingLeft: ((node.level || 0) + 2) * 16 + 'px' }">
+                  <div class="treeView_node_content">
+                    <span class="treeView_toggle" :class="(gc.children && gc.children.length > 0) ? (gc.isExpanded ? 'expanded' : 'collapsed') : 'empty'">{{ (gc.children && gc.children.length > 0) ? (gc.isExpanded ? '▼' : '▶') : '' }}</span>
+                    <span class="treeView_icon" :style="{ marginRight: '4px' }">{{ gc.icon || '　' }}</span>
+                    <span class="treeView_label">{{ gc.label || gc.name || '三级节点' }}</span>
                   </div>
                 </div>
               </div>
@@ -213,26 +213,26 @@
       </div>
     </template>
     <template v-else-if="widget.type === 'dataGrid'">
-      <div class="data-grid-header" :style="gridHeaderStyle">
+      <div class="dataGrid_header" :style="gridHeaderStyle">
         <span
           v-for="col in (widget.columns || [])"
           :key="col.field"
-          class="data-grid-header-cell"
+          class="dataGrid_header_cell"
           :data-col-key="col.field"
           :style="{ width: (col.width || 100) + 'px' }"
         >{{ col.header }}</span>
       </div>
-      <div class="data-grid-body">
+      <div class="dataGrid_body">
         <div
           v-for="(row, ri) in (Array.isArray(widget.rows) ? widget.rows : [])"
           :key="ri"
-          class="data-grid-row"
+          class="dataGrid_row"
           :data-row-index="ri"
         >
           <span
             v-for="col in (widget.columns || [])"
             :key="col.field"
-            class="data-grid-cell"
+            class="dataGrid_cell"
             :data-col-key="col.field"
             :style="{ width: (col.width || 100) + 'px' }"
           >{{ row.cells?.[col.field] ?? '' }}</span>
@@ -355,7 +355,7 @@ const widgetInlineStyle = computed<any>(() => {
       st.display = 'flex'
       st.alignItems = 'center'
       break
-    case 'hyperlink':
+    case 'hyperLink':
       if (!s.color) st.color = '#0078d4'
       if (!s.fontSize) st.fontSize = '13px'
       if (!s.fontFamily) st.fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"

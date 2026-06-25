@@ -16357,7 +16357,7 @@
     LeftParenthesisExpected: new CSSIssueType("css-lparentexpected", t("( expected")),
     RightParenthesisExpected: new CSSIssueType("css-rparentexpected", t(") expected")),
     CommaExpected: new CSSIssueType("css-commaexpected", t("comma expected")),
-    PageDirectiveOrDeclarationExpected: new CSSIssueType("css-pagedirordeclexpected", t("page directive or declaraton expected")),
+    PageDirectiveOrDeclarationExpected: new CSSIssueType("css-pagedirordeclexpected", t("pageContainer directive or declaraton expected")),
     UnknownAtRule: new CSSIssueType("css-unknownatrule", t("at-rule unknown")),
     UnknownKeyword: new CSSIssueType("css-unknownkeyword", t("unknown keyword")),
     SelectorExpected: new CSSIssueType("css-selectorexpected", t("selector expected")),
@@ -19631,7 +19631,7 @@
       return this._parsePageMarginBox() || this._parseRuleSetDeclaration();
     }
     _parsePage() {
-      if (!this.peekKeyword("@page")) {
+      if (!this.peekKeyword("@pageContainer")) {
         return null;
       }
       const node = this.create(Page);
@@ -27153,7 +27153,7 @@ Syntax: ${textToMarkedString(entry.syntax)}`;
           this._ch = null;
           this._input = null;
           this.NESTED_AT_RULE = {
-            "page": true,
+            "pageContainer": true,
             "font-face": true,
             "keyframes": true,
             // also in CONDITIONAL_GROUP_RULE below
@@ -28525,7 +28525,7 @@ ${trimLeft(value)}`;
         "values": [
           {
             "name": "fixed",
-            "description": "The background is fixed with regard to the viewport. In paged media where there is no viewport, a 'fixed' background is fixed with respect to the page box and therefore replicated on every page."
+            "description": "The background is fixed with regard to the viewport. In paged media where there is no viewport, a 'fixed' background is fixed with respect to the pageContainer box and therefore replicated on every pageContainer."
           },
           {
             "name": "local",
@@ -28573,7 +28573,7 @@ ${trimLeft(value)}`;
         "values": [
           {
             "name": "fixed",
-            "description": "The background is fixed with regard to the viewport. In paged media where there is no viewport, a 'fixed' background is fixed with respect to the page box and therefore replicated on every page."
+            "description": "The background is fixed with regard to the viewport. In paged media where there is no viewport, a 'fixed' background is fixed with respect to the pageContainer box and therefore replicated on every pageContainer."
           },
           {
             "name": "local",
@@ -30408,11 +30408,11 @@ ${trimLeft(value)}`;
         "values": [
           {
             "name": "always",
-            "description": "Always force a page break before/after the generated box."
+            "description": "Always force a pageContainer break before/after the generated box."
           },
           {
             "name": "auto",
-            "description": "Neither force nor forbid a page/column break before/after the principal box."
+            "description": "Neither force nor forbid a pageContainer/column break before/after the principal box."
           },
           {
             "name": "avoid",
@@ -30423,8 +30423,8 @@ ${trimLeft(value)}`;
             "description": "Avoid a column break before/after the principal box."
           },
           {
-            "name": "avoid-page",
-            "description": "Avoid a page break before/after the principal box."
+            "name": "avoid-pageContainer",
+            "description": "Avoid a pageContainer break before/after the principal box."
           },
           {
             "name": "column",
@@ -30432,18 +30432,18 @@ ${trimLeft(value)}`;
           },
           {
             "name": "left",
-            "description": "Force one or two page breaks before/after the generated box so that the next page is formatted as a left page."
+            "description": "Force one or two pageContainer breaks before/after the generated box so that the next pageContainer is formatted as a left pageContainer."
           },
           {
-            "name": "page",
-            "description": "Always force a page break before/after the principal box."
+            "name": "pageContainer",
+            "description": "Always force a pageContainer break before/after the principal box."
           },
           {
             "name": "right",
-            "description": "Force one or two page breaks before/after the generated box so that the next page is formatted as a right page."
+            "description": "Force one or two pageContainer breaks before/after the generated box so that the next pageContainer is formatted as a right pageContainer."
           }
         ],
-        "syntax": "auto | avoid | always | all | avoid-page | page | left | right | recto | verso | avoid-column | column | avoid-region | region",
+        "syntax": "auto | avoid | always | all | avoid-pageContainer | pageContainer | left | right | recto | verso | avoid-column | column | avoid-region | region",
         "relevance": 50,
         "references": [
           {
@@ -30451,7 +30451,7 @@ ${trimLeft(value)}`;
             "url": "https://developer.mozilla.org/docs/Web/CSS/break-after"
           }
         ],
-        "description": "Describes the page/column/region break behavior after the generated box.",
+        "description": "Describes the pageContainer/column/region break behavior after the generated box.",
         "restrictions": [
           "enum"
         ]
@@ -30469,11 +30469,11 @@ ${trimLeft(value)}`;
         "values": [
           {
             "name": "always",
-            "description": "Always force a page break before/after the generated box."
+            "description": "Always force a pageContainer break before/after the generated box."
           },
           {
             "name": "auto",
-            "description": "Neither force nor forbid a page/column break before/after the principal box."
+            "description": "Neither force nor forbid a pageContainer/column break before/after the principal box."
           },
           {
             "name": "avoid",
@@ -30484,8 +30484,8 @@ ${trimLeft(value)}`;
             "description": "Avoid a column break before/after the principal box."
           },
           {
-            "name": "avoid-page",
-            "description": "Avoid a page break before/after the principal box."
+            "name": "avoid-pageContainer",
+            "description": "Avoid a pageContainer break before/after the principal box."
           },
           {
             "name": "column",
@@ -30493,18 +30493,18 @@ ${trimLeft(value)}`;
           },
           {
             "name": "left",
-            "description": "Force one or two page breaks before/after the generated box so that the next page is formatted as a left page."
+            "description": "Force one or two pageContainer breaks before/after the generated box so that the next pageContainer is formatted as a left pageContainer."
           },
           {
-            "name": "page",
-            "description": "Always force a page break before/after the principal box."
+            "name": "pageContainer",
+            "description": "Always force a pageContainer break before/after the principal box."
           },
           {
             "name": "right",
-            "description": "Force one or two page breaks before/after the generated box so that the next page is formatted as a right page."
+            "description": "Force one or two pageContainer breaks before/after the generated box so that the next pageContainer is formatted as a right pageContainer."
           }
         ],
-        "syntax": "auto | avoid | always | all | avoid-page | page | left | right | recto | verso | avoid-column | column | avoid-region | region",
+        "syntax": "auto | avoid | always | all | avoid-pageContainer | pageContainer | left | right | recto | verso | avoid-column | column | avoid-region | region",
         "relevance": 50,
         "references": [
           {
@@ -30512,7 +30512,7 @@ ${trimLeft(value)}`;
             "url": "https://developer.mozilla.org/docs/Web/CSS/break-before"
           }
         ],
-        "description": "Describes the page/column/region break behavior before the generated box.",
+        "description": "Describes the pageContainer/column/region break behavior before the generated box.",
         "restrictions": [
           "enum"
         ]
@@ -30541,11 +30541,11 @@ ${trimLeft(value)}`;
             "description": "Avoid a column break within the box."
           },
           {
-            "name": "avoid-page",
-            "description": "Avoid a page break within the box."
+            "name": "avoid-pageContainer",
+            "description": "Avoid a pageContainer break within the box."
           }
         ],
-        "syntax": "auto | avoid | avoid-page | avoid-column | avoid-region",
+        "syntax": "auto | avoid | avoid-pageContainer | avoid-column | avoid-region",
         "relevance": 51,
         "references": [
           {
@@ -30553,7 +30553,7 @@ ${trimLeft(value)}`;
             "url": "https://developer.mozilla.org/docs/Web/CSS/break-inside"
           }
         ],
-        "description": "Describes the page/column/region break behavior inside the principal box.",
+        "description": "Describes the pageContainer/column/region break behavior inside the principal box.",
         "restrictions": [
           "enum"
         ]
@@ -31055,7 +31055,7 @@ ${trimLeft(value)}`;
             "url": "https://developer.mozilla.org/docs/Web/CSS/column-span"
           }
         ],
-        "description": "Describes the page/column break behavior after the generated box.",
+        "description": "Describes the pageContainer/column break behavior after the generated box.",
         "restrictions": [
           "enum"
         ]
@@ -31185,7 +31185,7 @@ ${trimLeft(value)}`;
             "url": "https://developer.mozilla.org/docs/Web/CSS/content"
           }
         ],
-        "description": "Determines which page-based occurrence of a given element is applied to a counter or string value.",
+        "description": "Determines which pageContainer-based occurrence of a given element is applied to a counter or string value.",
         "restrictions": [
           "string",
           "url"
@@ -31695,7 +31695,7 @@ ${trimLeft(value)}`;
             "description": "Inline-level table wrapper box containing table box."
           },
           {
-            "name": "list-item",
+            "name": "listBox_item",
             "description": "One or more block boxes and one marker box."
           },
           {
@@ -34947,7 +34947,7 @@ ${trimLeft(value)}`;
           },
           {
             "name": "normal",
-            "description": "The IME state should be normal; this value can be used in a user style sheet to override the page setting."
+            "description": "The IME state should be normal; this value can be used in a user style sheet to override the pageContainer setting."
           }
         ],
         "status": "obsolete",
@@ -36912,7 +36912,7 @@ ${trimLeft(value)}`;
             "name": "groupbox"
           },
           {
-            "name": "listbox"
+            "name": "listBox"
           },
           {
             "name": "menuarrow"
@@ -37074,7 +37074,7 @@ ${trimLeft(value)}`;
             "name": "treetwistyopen"
           },
           {
-            "name": "treeview"
+            "name": "treeView"
           },
           {
             "name": "treewisty"
@@ -37084,7 +37084,7 @@ ${trimLeft(value)}`;
           }
         ],
         "status": "nonstandard",
-        "syntax": "none | button | button-arrow-down | button-arrow-next | button-arrow-previous | button-arrow-up | button-bevel | button-focus | caret | checkbox | checkbox-container | checkbox-label | checkmenuitem | dualbutton | groupbox | listbox | listitem | menuarrow | menubar | menucheckbox | menuimage | menuitem | menuitemtext | menulist | menulist-button | menulist-text | menulist-textfield | menupopup | menuradio | menuseparator | meterbar | meterchunk | progressbar | progressbar-vertical | progresschunk | progresschunk-vertical | radio | radio-container | radio-label | radiomenuitem | range | range-thumb | resizer | resizerpanel | scale-horizontal | scalethumbend | scalethumb-horizontal | scalethumbstart | scalethumbtick | scalethumb-vertical | scale-vertical | scrollbarbutton-down | scrollbarbutton-left | scrollbarbutton-right | scrollbarbutton-up | scrollbarthumb-horizontal | scrollbarthumb-vertical | scrollbartrack-horizontal | scrollbartrack-vertical | searchfield | separator | sheet | spinner | spinner-downbutton | spinner-textfield | spinner-upbutton | splitter | statusbar | statusbarpanel | tab | tabpanel | tabpanels | tab-scroll-arrow-back | tab-scroll-arrow-forward | textfield | textfield-multiline | toolbar | toolbarbutton | toolbarbutton-dropdown | toolbargripper | toolbox | tooltip | treeheader | treeheadercell | treeheadersortarrow | treeitem | treeline | treetwisty | treetwistyopen | treeview | -moz-mac-unified-toolbar | -moz-win-borderless-glass | -moz-win-browsertabbar-toolbox | -moz-win-communicationstext | -moz-win-communications-toolbox | -moz-win-exclude-glass | -moz-win-glass | -moz-win-mediatext | -moz-win-media-toolbox | -moz-window-button-box | -moz-window-button-box-maximized | -moz-window-button-close | -moz-window-button-maximize | -moz-window-button-minimize | -moz-window-button-restore | -moz-window-frame-bottom | -moz-window-frame-left | -moz-window-frame-right | -moz-window-titlebar | -moz-window-titlebar-maximized",
+        "syntax": "none | button | button-arrow-down | button-arrow-next | button-arrow-previous | button-arrow-up | button-bevel | button-focus | caret | checkbox | checkbox-container | checkbox-label | checkmenuitem | dualbutton | groupbox | listBox | listitem | menuarrow | menubar | menucheckbox | menuimage | menuitem | menuitemtext | menulist | menulist-button | menulist-text | menulist-textfield | menupopup | menuradio | menuseparator | meterbar | meterchunk | progressbar | progressbar-vertical | progresschunk | progresschunk-vertical | radio | radio-container | radio-label | radiomenuitem | range | range-thumb | resizer | resizerpanel | scale-horizontal | scalethumbend | scalethumb-horizontal | scalethumbstart | scalethumbtick | scalethumb-vertical | scale-vertical | scrollbarbutton-down | scrollbarbutton-left | scrollbarbutton-right | scrollbarbutton-up | scrollbarthumb-horizontal | scrollbarthumb-vertical | scrollbartrack-horizontal | scrollbartrack-vertical | searchfield | separator | sheet | spinner | spinner-downbutton | spinner-textfield | spinner-upbutton | splitter | statusbar | statusbarpanel | tab | tabpanel | tabpanels | tab-scroll-arrow-back | tab-scroll-arrow-forward | textfield | textfield-multiline | toolbar | toolbarbutton | toolbarbutton-dropdown | toolbargripper | toolbox | tooltip | treeheader | treeheadercell | treeheadersortarrow | treeitem | treeline | treetwisty | treetwistyopen | treeView | -moz-mac-unified-toolbar | -moz-win-borderless-glass | -moz-win-browsertabbar-toolbox | -moz-win-communicationstext | -moz-win-communications-toolbox | -moz-win-exclude-glass | -moz-win-glass | -moz-win-mediatext | -moz-win-media-toolbox | -moz-window-button-box | -moz-window-button-box-maximized | -moz-window-button-close | -moz-window-button-maximize | -moz-window-button-minimize | -moz-window-button-restore | -moz-window-frame-bottom | -moz-window-frame-left | -moz-window-frame-right | -moz-window-titlebar | -moz-window-titlebar-maximized",
         "relevance": 0,
         "description": "Used in Gecko (Firefox) to display an element using a platform-native styling based on the operating system's theme.",
         "restrictions": [
@@ -38891,7 +38891,7 @@ ${trimLeft(value)}`;
           },
           {
             "name": "normal",
-            "description": "The IME state should be normal; this value can be used in a user style sheet to override the page setting."
+            "description": "The IME state should be normal; this value can be used in a user style sheet to override the pageContainer setting."
           }
         ],
         "relevance": 50,
@@ -41670,7 +41670,7 @@ ${trimLeft(value)}`;
         ]
       },
       {
-        "name": "page-break-after",
+        "name": "pageContainer-break-after",
         "browsers": [
           "E12",
           "FF1",
@@ -41682,23 +41682,23 @@ ${trimLeft(value)}`;
         "values": [
           {
             "name": "always",
-            "description": "Always force a page break after the generated box."
+            "description": "Always force a pageContainer break after the generated box."
           },
           {
             "name": "auto",
-            "description": "Neither force nor forbid a page break after generated box."
+            "description": "Neither force nor forbid a pageContainer break after generated box."
           },
           {
             "name": "avoid",
-            "description": "Avoid a page break after the generated box."
+            "description": "Avoid a pageContainer break after the generated box."
           },
           {
             "name": "left",
-            "description": "Force one or two page breaks after the generated box so that the next page is formatted as a left page."
+            "description": "Force one or two pageContainer breaks after the generated box so that the next pageContainer is formatted as a left pageContainer."
           },
           {
             "name": "right",
-            "description": "Force one or two page breaks after the generated box so that the next page is formatted as a right page."
+            "description": "Force one or two pageContainer breaks after the generated box so that the next pageContainer is formatted as a right pageContainer."
           }
         ],
         "syntax": "auto | always | avoid | left | right | recto | verso",
@@ -41706,16 +41706,16 @@ ${trimLeft(value)}`;
         "references": [
           {
             "name": "MDN Reference",
-            "url": "https://developer.mozilla.org/docs/Web/CSS/page-break-after"
+            "url": "https://developer.mozilla.org/docs/Web/CSS/pageContainer-break-after"
           }
         ],
-        "description": "Defines rules for page breaks after an element.",
+        "description": "Defines rules for pageContainer breaks after an element.",
         "restrictions": [
           "enum"
         ]
       },
       {
-        "name": "page-break-before",
+        "name": "pageContainer-break-before",
         "browsers": [
           "E12",
           "FF1",
@@ -41727,23 +41727,23 @@ ${trimLeft(value)}`;
         "values": [
           {
             "name": "always",
-            "description": "Always force a page break before the generated box."
+            "description": "Always force a pageContainer break before the generated box."
           },
           {
             "name": "auto",
-            "description": "Neither force nor forbid a page break before the generated box."
+            "description": "Neither force nor forbid a pageContainer break before the generated box."
           },
           {
             "name": "avoid",
-            "description": "Avoid a page break before the generated box."
+            "description": "Avoid a pageContainer break before the generated box."
           },
           {
             "name": "left",
-            "description": "Force one or two page breaks before the generated box so that the next page is formatted as a left page."
+            "description": "Force one or two pageContainer breaks before the generated box so that the next pageContainer is formatted as a left pageContainer."
           },
           {
             "name": "right",
-            "description": "Force one or two page breaks before the generated box so that the next page is formatted as a right page."
+            "description": "Force one or two pageContainer breaks before the generated box so that the next pageContainer is formatted as a right pageContainer."
           }
         ],
         "syntax": "auto | always | avoid | left | right | recto | verso",
@@ -41751,16 +41751,16 @@ ${trimLeft(value)}`;
         "references": [
           {
             "name": "MDN Reference",
-            "url": "https://developer.mozilla.org/docs/Web/CSS/page-break-before"
+            "url": "https://developer.mozilla.org/docs/Web/CSS/pageContainer-break-before"
           }
         ],
-        "description": "Defines rules for page breaks before an element.",
+        "description": "Defines rules for pageContainer breaks before an element.",
         "restrictions": [
           "enum"
         ]
       },
       {
-        "name": "page-break-inside",
+        "name": "pageContainer-break-inside",
         "browsers": [
           "E12",
           "FF19",
@@ -41772,11 +41772,11 @@ ${trimLeft(value)}`;
         "values": [
           {
             "name": "auto",
-            "description": "Neither force nor forbid a page break inside the generated box."
+            "description": "Neither force nor forbid a pageContainer break inside the generated box."
           },
           {
             "name": "avoid",
-            "description": "Avoid a page break inside the generated box."
+            "description": "Avoid a pageContainer break inside the generated box."
           }
         ],
         "syntax": "auto | avoid",
@@ -41784,10 +41784,10 @@ ${trimLeft(value)}`;
         "references": [
           {
             "name": "MDN Reference",
-            "url": "https://developer.mozilla.org/docs/Web/CSS/page-break-inside"
+            "url": "https://developer.mozilla.org/docs/Web/CSS/pageContainer-break-inside"
           }
         ],
-        "description": "Defines rules for page breaks inside an element.",
+        "description": "Defines rules for pageContainer breaks inside an element.",
         "restrictions": [
           "enum"
         ]
@@ -41965,7 +41965,7 @@ ${trimLeft(value)}`;
             "description": "The box's position is calculated according to the 'absolute' model, but in addition, the box is fixed with respect to some reference. As with the 'absolute' model, the box's margins do not collapse with any other margins."
           },
           {
-            "name": "-ms-page",
+            "name": "-ms-pageContainer",
             "browsers": [
               "E12",
               "FF1",
@@ -42746,10 +42746,10 @@ ${trimLeft(value)}`;
           "C",
           "O8"
         ],
-        "atRule": "@page",
-        "syntax": "<length>{1,2} | auto | [ <page-size> || [ portrait | landscape ] ]",
+        "atRule": "@pageContainer",
+        "syntax": "<length>{1,2} | auto | [ <pageContainer-size> || [ portrait | landscape ] ]",
         "relevance": 53,
-        "description": "The size CSS at-rule descriptor, used with the @page at-rule, defines the size and orientation of the box which is used to represent a page. Most of the time, this size corresponds to the target size of the printed page if applicable.",
+        "description": "The size CSS at-rule descriptor, used with the @pageContainer at-rule, defines the size and orientation of the box which is used to represent a pageContainer. Most of the time, this size corresponds to the target size of the printed pageContainer if applicable.",
         "restrictions": [
           "length"
         ]
@@ -44947,7 +44947,7 @@ ${trimLeft(value)}`;
             "name": "default-button"
           },
           {
-            "name": "listbox"
+            "name": "listBox"
           },
           {
             "name": "listitem"
@@ -45062,7 +45062,7 @@ ${trimLeft(value)}`;
           }
         ],
         "status": "nonstandard",
-        "syntax": "none | button | button-bevel | caret | checkbox | default-button | inner-spin-button | listbox | listitem | media-controls-background | media-controls-fullscreen-background | media-current-time-display | media-enter-fullscreen-button | media-exit-fullscreen-button | media-fullscreen-button | media-mute-button | media-overlay-play-button | media-play-button | media-seek-back-button | media-seek-forward-button | media-slider | media-sliderthumb | media-time-remaining-display | media-toggle-closed-captions-button | media-volume-slider | media-volume-slider-container | media-volume-sliderthumb | menulist | menulist-button | menulist-text | menulist-textfield | meter | progress-bar | progress-bar-value | push-button | radio | searchfield | searchfield-cancel-button | searchfield-decoration | searchfield-results-button | searchfield-results-decoration | slider-horizontal | slider-vertical | sliderthumb-horizontal | sliderthumb-vertical | square-button | textarea | textfield | -apple-pay-button",
+        "syntax": "none | button | button-bevel | caret | checkbox | default-button | inner-spin-button | listBox | listitem | media-controls-background | media-controls-fullscreen-background | media-current-time-display | media-enter-fullscreen-button | media-exit-fullscreen-button | media-fullscreen-button | media-mute-button | media-overlay-play-button | media-play-button | media-seek-back-button | media-seek-forward-button | media-slider | media-sliderthumb | media-time-remaining-display | media-toggle-closed-captions-button | media-volume-slider | media-volume-slider-container | media-volume-sliderthumb | menulist | menulist-button | menulist-text | menulist-textfield | meter | progress-bar | progress-bar-value | push-button | radio | searchfield | searchfield-cancel-button | searchfield-decoration | searchfield-results-button | searchfield-results-decoration | slider-horizontal | slider-vertical | sliderthumb-horizontal | sliderthumb-vertical | square-button | textarea | textfield | -apple-pay-button",
         "relevance": 0,
         "description": "Changes the appearance of buttons and other controls to resemble native controls.",
         "restrictions": [
@@ -45461,23 +45461,23 @@ ${trimLeft(value)}`;
         "values": [
           {
             "name": "always",
-            "description": "Always force a page break before/after the generated box."
+            "description": "Always force a pageContainer break before/after the generated box."
           },
           {
             "name": "auto",
-            "description": "Neither force nor forbid a page/column break before/after the generated box."
+            "description": "Neither force nor forbid a pageContainer/column break before/after the generated box."
           },
           {
             "name": "avoid",
-            "description": "Avoid a page/column break before/after the generated box."
+            "description": "Avoid a pageContainer/column break before/after the generated box."
           },
           {
             "name": "avoid-column",
             "description": "Avoid a column break before/after the generated box."
           },
           {
-            "name": "avoid-page",
-            "description": "Avoid a page break before/after the generated box."
+            "name": "avoid-pageContainer",
+            "description": "Avoid a pageContainer break before/after the generated box."
           },
           {
             "name": "avoid-region"
@@ -45488,22 +45488,22 @@ ${trimLeft(value)}`;
           },
           {
             "name": "left",
-            "description": "Force one or two page breaks before/after the generated box so that the next page is formatted as a left page."
+            "description": "Force one or two pageContainer breaks before/after the generated box so that the next pageContainer is formatted as a left pageContainer."
           },
           {
-            "name": "page",
-            "description": "Always force a page break before/after the generated box."
+            "name": "pageContainer",
+            "description": "Always force a pageContainer break before/after the generated box."
           },
           {
             "name": "region"
           },
           {
             "name": "right",
-            "description": "Force one or two page breaks before/after the generated box so that the next page is formatted as a right page."
+            "description": "Force one or two pageContainer breaks before/after the generated box so that the next pageContainer is formatted as a right pageContainer."
           }
         ],
         "relevance": 50,
-        "description": "Describes the page/column break behavior before the generated box.",
+        "description": "Describes the pageContainer/column break behavior before the generated box.",
         "restrictions": [
           "enum"
         ]
@@ -45516,23 +45516,23 @@ ${trimLeft(value)}`;
         "values": [
           {
             "name": "always",
-            "description": "Always force a page break before/after the generated box."
+            "description": "Always force a pageContainer break before/after the generated box."
           },
           {
             "name": "auto",
-            "description": "Neither force nor forbid a page/column break before/after the generated box."
+            "description": "Neither force nor forbid a pageContainer/column break before/after the generated box."
           },
           {
             "name": "avoid",
-            "description": "Avoid a page/column break before/after the generated box."
+            "description": "Avoid a pageContainer/column break before/after the generated box."
           },
           {
             "name": "avoid-column",
             "description": "Avoid a column break before/after the generated box."
           },
           {
-            "name": "avoid-page",
-            "description": "Avoid a page break before/after the generated box."
+            "name": "avoid-pageContainer",
+            "description": "Avoid a pageContainer break before/after the generated box."
           },
           {
             "name": "avoid-region"
@@ -45543,22 +45543,22 @@ ${trimLeft(value)}`;
           },
           {
             "name": "left",
-            "description": "Force one or two page breaks before/after the generated box so that the next page is formatted as a left page."
+            "description": "Force one or two pageContainer breaks before/after the generated box so that the next pageContainer is formatted as a left pageContainer."
           },
           {
-            "name": "page",
-            "description": "Always force a page break before/after the generated box."
+            "name": "pageContainer",
+            "description": "Always force a pageContainer break before/after the generated box."
           },
           {
             "name": "region"
           },
           {
             "name": "right",
-            "description": "Force one or two page breaks before/after the generated box so that the next page is formatted as a right page."
+            "description": "Force one or two pageContainer breaks before/after the generated box so that the next pageContainer is formatted as a right pageContainer."
           }
         ],
         "relevance": 50,
-        "description": "Describes the page/column break behavior before the generated box.",
+        "description": "Describes the pageContainer/column break behavior before the generated box.",
         "restrictions": [
           "enum"
         ]
@@ -45571,26 +45571,26 @@ ${trimLeft(value)}`;
         "values": [
           {
             "name": "auto",
-            "description": "Neither force nor forbid a page/column break inside the generated box."
+            "description": "Neither force nor forbid a pageContainer/column break inside the generated box."
           },
           {
             "name": "avoid",
-            "description": "Avoid a page/column break inside the generated box."
+            "description": "Avoid a pageContainer/column break inside the generated box."
           },
           {
             "name": "avoid-column",
             "description": "Avoid a column break inside the generated box."
           },
           {
-            "name": "avoid-page",
-            "description": "Avoid a page break inside the generated box."
+            "name": "avoid-pageContainer",
+            "description": "Avoid a pageContainer break inside the generated box."
           },
           {
             "name": "avoid-region"
           }
         ],
         "relevance": 50,
-        "description": "Describes the page/column break behavior inside the generated box.",
+        "description": "Describes the pageContainer/column break behavior inside the generated box.",
         "restrictions": [
           "enum"
         ]
@@ -45606,23 +45606,23 @@ ${trimLeft(value)}`;
         "values": [
           {
             "name": "always",
-            "description": "Always force a page break before/after the generated box."
+            "description": "Always force a pageContainer break before/after the generated box."
           },
           {
             "name": "auto",
-            "description": "Neither force nor forbid a page/column break before/after the generated box."
+            "description": "Neither force nor forbid a pageContainer/column break before/after the generated box."
           },
           {
             "name": "avoid",
-            "description": "Avoid a page/column break before/after the generated box."
+            "description": "Avoid a pageContainer/column break before/after the generated box."
           },
           {
             "name": "avoid-column",
             "description": "Avoid a column break before/after the generated box."
           },
           {
-            "name": "avoid-page",
-            "description": "Avoid a page break before/after the generated box."
+            "name": "avoid-pageContainer",
+            "description": "Avoid a pageContainer break before/after the generated box."
           },
           {
             "name": "avoid-region"
@@ -45633,22 +45633,22 @@ ${trimLeft(value)}`;
           },
           {
             "name": "left",
-            "description": "Force one or two page breaks before/after the generated box so that the next page is formatted as a left page."
+            "description": "Force one or two pageContainer breaks before/after the generated box so that the next pageContainer is formatted as a left pageContainer."
           },
           {
-            "name": "page",
-            "description": "Always force a page break before/after the generated box."
+            "name": "pageContainer",
+            "description": "Always force a pageContainer break before/after the generated box."
           },
           {
             "name": "region"
           },
           {
             "name": "right",
-            "description": "Force one or two page breaks before/after the generated box so that the next page is formatted as a right page."
+            "description": "Force one or two pageContainer breaks before/after the generated box so that the next pageContainer is formatted as a right pageContainer."
           }
         ],
         "relevance": 50,
-        "description": "Describes the page/column break behavior before the generated box.",
+        "description": "Describes the pageContainer/column break behavior before the generated box.",
         "restrictions": [
           "enum"
         ]
@@ -45664,23 +45664,23 @@ ${trimLeft(value)}`;
         "values": [
           {
             "name": "always",
-            "description": "Always force a page break before/after the generated box."
+            "description": "Always force a pageContainer break before/after the generated box."
           },
           {
             "name": "auto",
-            "description": "Neither force nor forbid a page/column break before/after the generated box."
+            "description": "Neither force nor forbid a pageContainer/column break before/after the generated box."
           },
           {
             "name": "avoid",
-            "description": "Avoid a page/column break before/after the generated box."
+            "description": "Avoid a pageContainer/column break before/after the generated box."
           },
           {
             "name": "avoid-column",
             "description": "Avoid a column break before/after the generated box."
           },
           {
-            "name": "avoid-page",
-            "description": "Avoid a page break before/after the generated box."
+            "name": "avoid-pageContainer",
+            "description": "Avoid a pageContainer break before/after the generated box."
           },
           {
             "name": "avoid-region"
@@ -45691,22 +45691,22 @@ ${trimLeft(value)}`;
           },
           {
             "name": "left",
-            "description": "Force one or two page breaks before/after the generated box so that the next page is formatted as a left page."
+            "description": "Force one or two pageContainer breaks before/after the generated box so that the next pageContainer is formatted as a left pageContainer."
           },
           {
-            "name": "page",
-            "description": "Always force a page break before/after the generated box."
+            "name": "pageContainer",
+            "description": "Always force a pageContainer break before/after the generated box."
           },
           {
             "name": "region"
           },
           {
             "name": "right",
-            "description": "Force one or two page breaks before/after the generated box so that the next page is formatted as a right page."
+            "description": "Force one or two pageContainer breaks before/after the generated box so that the next pageContainer is formatted as a right pageContainer."
           }
         ],
         "relevance": 50,
-        "description": "Describes the page/column break behavior before the generated box.",
+        "description": "Describes the pageContainer/column break behavior before the generated box.",
         "restrictions": [
           "enum"
         ]
@@ -45722,26 +45722,26 @@ ${trimLeft(value)}`;
         "values": [
           {
             "name": "auto",
-            "description": "Neither force nor forbid a page/column break inside the generated box."
+            "description": "Neither force nor forbid a pageContainer/column break inside the generated box."
           },
           {
             "name": "avoid",
-            "description": "Avoid a page/column break inside the generated box."
+            "description": "Avoid a pageContainer/column break inside the generated box."
           },
           {
             "name": "avoid-column",
             "description": "Avoid a column break inside the generated box."
           },
           {
-            "name": "avoid-page",
-            "description": "Avoid a page break inside the generated box."
+            "name": "avoid-pageContainer",
+            "description": "Avoid a pageContainer break inside the generated box."
           },
           {
             "name": "avoid-region"
           }
         ],
         "relevance": 50,
-        "description": "Describes the page/column break behavior inside the generated box.",
+        "description": "Describes the pageContainer/column break behavior inside the generated box.",
         "restrictions": [
           "enum"
         ]
@@ -45870,7 +45870,7 @@ ${trimLeft(value)}`;
           }
         ],
         "relevance": 50,
-        "description": "Describes the page/column break behavior after the generated box.",
+        "description": "Describes the pageContainer/column break behavior after the generated box.",
         "restrictions": [
           "enum"
         ]
@@ -49923,7 +49923,7 @@ ${trimLeft(value)}`;
         "description": "The padding-inline CSS property defines the logical inline start and end padding of an element, which maps to physical padding properties depending on the element's writing mode, directionality, and text orientation."
       },
       {
-        "name": "page",
+        "name": "pageContainer",
         "syntax": "auto | <custom-ident>",
         "relevance": 50,
         "browsers": [
@@ -49936,10 +49936,10 @@ ${trimLeft(value)}`;
         "references": [
           {
             "name": "MDN Reference",
-            "url": "https://developer.mozilla.org/docs/Web/CSS/page"
+            "url": "https://developer.mozilla.org/docs/Web/CSS/pageContainer"
           }
         ],
-        "description": "The page CSS property is used to specify the named page, a specific type of page defined by the @page at-rule."
+        "description": "The pageContainer CSS property is used to specify the named pageContainer, a specific type of pageContainer defined by the @pageContainer at-rule."
       },
       {
         "name": "place-content",
@@ -51265,24 +51265,24 @@ ${trimLeft(value)}`;
       },
       {
         "name": "bleed",
-        "atRule": "@page",
+        "atRule": "@pageContainer",
         "syntax": "auto | <length>",
         "relevance": 50,
-        "description": "The bleed CSS at-rule descriptor, used with the @page at-rule, specifies the extent of the page bleed area outside the page box. This property only has effect if crop marks are enabled using the marks property."
+        "description": "The bleed CSS at-rule descriptor, used with the @pageContainer at-rule, specifies the extent of the pageContainer bleed area outside the pageContainer box. This property only has effect if crop marks are enabled using the marks property."
       },
       {
         "name": "marks",
-        "atRule": "@page",
+        "atRule": "@pageContainer",
         "syntax": "none | [ crop || cross ]",
         "relevance": 50,
-        "description": "The marks CSS at-rule descriptor, used with the @page at-rule, adds crop and/or cross marks to the presentation of the document. Crop marks indicate where the page should be cut. Cross marks are used to align sheets."
+        "description": "The marks CSS at-rule descriptor, used with the @pageContainer at-rule, adds crop and/or cross marks to the presentation of the document. Crop marks indicate where the pageContainer should be cut. Cross marks are used to align sheets."
       },
       {
-        "name": "page-orientation",
-        "atRule": "@page",
+        "name": "pageContainer-orientation",
+        "atRule": "@pageContainer",
         "syntax": "upright | rotate-left | rotate-right ",
         "relevance": 50,
-        "description": "The page-orientation CSS descriptor for the @page at-rule controls the rotation of a printed page. It handles the flow of content across pages when the orientation of a page is changed. This behavior differs from the size descriptor in that a user can define the direction in which to rotate the page."
+        "description": "The pageContainer-orientation CSS descriptor for the @pageContainer at-rule controls the rotation of a printed pageContainer. It handles the flow of content across pages when the orientation of a pageContainer is changed. This behavior differs from the size descriptor in that a user can define the direction in which to rotate the pageContainer."
       },
       {
         "name": "syntax",
@@ -51514,7 +51514,7 @@ ${trimLeft(value)}`;
         "description": "Specifies the size, zoom factor, and orientation of the viewport."
       },
       {
-        "name": "@page",
+        "name": "@pageContainer",
         "browsers": [
           "E12",
           "FF19",
@@ -51526,10 +51526,10 @@ ${trimLeft(value)}`;
         "references": [
           {
             "name": "MDN Reference",
-            "url": "https://developer.mozilla.org/docs/Web/CSS/@page"
+            "url": "https://developer.mozilla.org/docs/Web/CSS/@pageContainer"
           }
         ],
-        "description": "Directive defines various page parameters."
+        "description": "Directive defines various pageContainer parameters."
       },
       {
         "name": "@property",
@@ -51608,7 +51608,7 @@ ${trimLeft(value)}`;
             "url": "https://developer.mozilla.org/docs/Web/CSS/:any-link"
           }
         ],
-        "description": "Represents an element that acts as the source anchor of a hyperlink. Applies to both visited and unvisited links."
+        "description": "Represents an element that acts as the source anchor of a hyperLink. Applies to both visited and unvisited links."
       },
       {
         "name": ":checked",
@@ -51747,7 +51747,7 @@ ${trimLeft(value)}`;
             "url": "https://developer.mozilla.org/docs/Web/CSS/:first"
           }
         ],
-        "description": "When printing double-sided documents, the page boxes on left and right pages may be different. This can be expressed through CSS pseudo-classes defined in the  page context."
+        "description": "When printing double-sided documents, the pageContainer boxes on left and right pages may be different. This can be expressed through CSS pseudo-classes defined in the  pageContainer context."
       },
       {
         "name": ":first-child",
@@ -52020,7 +52020,7 @@ ${trimLeft(value)}`;
             "url": "https://developer.mozilla.org/docs/Web/CSS/:left"
           }
         ],
-        "description": "When printing double-sided documents, the page boxes on left and right pages may be different. This can be expressed through CSS pseudo-classes defined in the  page context."
+        "description": "When printing double-sided documents, the pageContainer boxes on left and right pages may be different. This can be expressed through CSS pseudo-classes defined in the  pageContainer context."
       },
       {
         "name": ":link",
@@ -52059,7 +52059,7 @@ ${trimLeft(value)}`;
         "browsers": [
           "FF1"
         ],
-        "description": "Represents an element that acts as the source anchor of a hyperlink. Applies to both visited and unvisited links."
+        "description": "Represents an element that acts as the source anchor of a hyperLink. Applies to both visited and unvisited links."
       },
       {
         "name": ":-moz-broken",
@@ -52441,7 +52441,7 @@ ${trimLeft(value)}`;
             "url": "https://developer.mozilla.org/docs/Web/CSS/:right"
           }
         ],
-        "description": "When printing double-sided documents, the page boxes on left and right pages may be different. This can be expressed through CSS pseudo-classes defined in the  page context."
+        "description": "When printing double-sided documents, the pageContainer boxes on left and right pages may be different. This can be expressed through CSS pseudo-classes defined in the  pageContainer context."
       },
       {
         "name": ":root",
@@ -53633,7 +53633,7 @@ ${trimLeft(value)}`;
             "url": "https://developer.mozilla.org/docs/Web/CSS/::marker"
           }
         ],
-        "description": "The ::marker CSS pseudo-element selects the marker box of a list item, which typically contains a bullet or number. It works on any element or pseudo-element set to display: list-item, such as the <li> and <summary> elements."
+        "description": "The ::marker CSS pseudo-element selects the marker box of a list item, which typically contains a bullet or number. It works on any element or pseudo-element set to display: listBox_item, such as the <li> and <summary> elements."
       },
       {
         "name": "::part",
@@ -53717,7 +53717,7 @@ ${trimLeft(value)}`;
             "url": "https://developer.mozilla.org/docs/Web/CSS/::view-transition"
           }
         ],
-        "description": "The ::view-transition CSS pseudo-element represents the root of the view transitions overlay, which contains all view transitions and sits over the top of all other page content."
+        "description": "The ::view-transition CSS pseudo-element represents the root of the view transitions overlay, which contains all view transitions and sits over the top of all other pageContainer content."
       },
       {
         "name": "::view-transition-group",

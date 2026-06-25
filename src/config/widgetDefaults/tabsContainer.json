@@ -24,7 +24,7 @@
     },
     "pseudo": {},
     "sub": {
-      ".tab-header-bar": {
+      ".tabsContainer_headerBar": {
         "display": "flex",
         "flex-direction": "row",
         "flex-wrap": "nowrap",
@@ -37,7 +37,7 @@
         "overflow-y": "hidden",
         "background-color": "#f5f5f5"
       },
-      ".tab-header-btn": {
+      ".tabsContainer_headerBar_btn": {
         "display": "flex",
         "align-items": "center",
         "justify-content": "center",
@@ -54,20 +54,20 @@
         "color": "#333333",
         "font-weight": 500
       },
-      ".tab-header-btn.active": {
+      ".tabsContainer_headerBar_btn.active": {
         "border-bottom-width": "3px",
         "border-bottom-style": "solid",
         "background-color": "#ffffff",
         "border-bottom-color": "#1890ff"
       },
-      ".tab-header-btn:hover": {
+      ".tabsContainer_headerBar_btn:hover": {
       },
-      ".tab-content-wrapper": {
+      ".tabsContainer_contentWrapper": {
         "flex": "1",
         "position": "relative",
         "overflow": "hidden"
       },
-      ".tab-content-panel": {
+      ".tabsContainer_contentWrapper_panel": {
         "position": "absolute",
         "top": "0",
         "left": "0",
@@ -75,7 +75,7 @@
         "height": "100%",
         "display": "none"
       },
-      ".tab-content-panel.active": {
+      ".tabsContainer_contentWrapper_panel.active": {
         "display": "block"
       }
     }
@@ -113,7 +113,7 @@
     "sub": {}
   },
   "structuralCSS": {
-    ".tab-header-bar": [
+    ".tabsContainer_headerBar": [
       "display: flex",
       "flex-direction: row",
       "flex-wrap: nowrap",
@@ -124,7 +124,7 @@
       "overflow-x: auto",
       "overflow-y: hidden"
     ],
-    ".tab-header-btn": [
+    ".tabsContainer_headerBar_btn": [
       "display: flex",
       "align-items: center",
       "justify-content: center",
@@ -138,20 +138,20 @@
       "flex-shrink: 0",
       "border-right: none"
     ],
-    ".tab-header-btn.active": [
+    ".tabsContainer_headerBar_btn.active": [
       "border-bottom-width: 3px",
       "border-bottom-style: solid",
       "background-color: #ffffff",
       "border-bottom-color: #1890ff"
     ],
-    ".tab-header-btn:hover": [
+    ".tabsContainer_headerBar_btn:hover": [
     ],
-    ".tab-content-wrapper": [
+    ".tabsContainer_contentWrapper": [
       "flex: 1",
       "position: relative",
       "overflow: hidden"
     ],
-    ".tab-content-panel": [
+    ".tabsContainer_contentWrapper_panel": [
       "position: absolute",
       "top: 0",
       "left: 0",
@@ -159,13 +159,13 @@
       "height: 100%",
       "display: none"
     ],
-    ".tab-content-panel.active": [
+    ".tabsContainer_contentWrapper_panel.active": [
       "display: block"
     ]
   },
   "mappedProps": [
     {
-      "selector": ".tab-header-bar",
+      "selector": ".tabsContainer_headerBar",
       "base": {
         "borderBottomColor": "#d9d9d9",
         "backgroundColor": "#f5f5f5"
@@ -173,7 +173,7 @@
       "pseudo": {}
     },
     {
-      "selector": ".tab-header-btn",
+      "selector": ".tabsContainer_headerBar_btn",
       "base": {
         "backgroundColor": "#f5f5f5",
         "color": "#333333",
@@ -187,7 +187,7 @@
       }
     },
     {
-      "selector": ".tab-header-btn.active",
+      "selector": ".tabsContainer_headerBar_btn.active",
       "base": {
         "backgroundColor": "#ffffff",
         "borderBottomColor": "#1890ff"

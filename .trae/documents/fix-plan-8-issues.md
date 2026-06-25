@@ -16,13 +16,13 @@
 ### 修复方案
 1. **删除 webviewBridge.js 第 780-796 行**（treeview_node_toggle 点击事件处理中的箭头文字和 class 操作），改为只发送 `send('nodeToggle', ...)` 通知宿主
 2. **删除 webviewBridge.js 的 `expandNode`/`collapseNode`/`expandAll`/`collapseAll` 中的箭头文字操作**（`toggle.textContent = '▶'` / `'▼'`），改为只切换 class 和控制 display
-3. **在 ssrRenderer.ts 中**：树节点渲染时，箭头文字由 `node.expanded` 决定（`'▼'` 或 `'▶'`），同时给 `.tree-toggle` 添加对应的 CSS class（`expanded` / `collapsed`）
+3. **在 ssrRenderer.ts 中**：树节点渲染时，箭头文字由 `node.expanded` 决定（`'▼'` 或 `'▶'`），同时给 `.treeView_toggle` 添加对应的 CSS class（`expanded` / `collapsed`）
 4. **在 webviewBridge.js 的 `expandNode`/`collapseNode` 中**：切换 expanded/collapsed class，CSS 通过 `::before` 伪元素或 `content` 属性控制箭头方向，不再直接写 `textContent`
 5. 确保箭头方向由 CSS 控制，而非 JS 直接设置文字内容
 
 ### 涉及文件
 - `public/webviewBridge.js`：删除第 780-796 行，修改 expandNode/collapseNode/expandAll/collapseAll
-- `src/utils/ssrRenderer.ts`：确保 tree-toggle 的 class 和文字由 node.expanded 决定
+- `src/utils/ssrRenderer.ts`：确保 treeView_toggle 的 class 和文字由 node.expanded 决定
 
 ---
 
@@ -30,9 +30,9 @@
 
 ### 现状分析
 - 在 `webviewBridge.js` 第 798-816 行，点击树形框内部时：
-  - 先清除所有 `.tree-node-content.selected`（第 808-810 行）
+  - 先清除所有 `.treeView_node_content.selected`（第 808-810 行）
   - 再给被点击的节点添加 `.selected`（第 812-813 行）
-- 当点击树形框内部空白处（非任何节点）时，`e.target.closest('.tree-node-content')` 返回 null，所以不会添加新选中，但旧的选中已被清除
+- 当点击树形框内部空白处（非任何节点）时，`e.target.closest('.treeView_node_content')` 返回 null，所以不会添加新选中，但旧的选中已被清除
 - 没有检查 `data-always-show-selection` 属性
 
 ### 修复方案
@@ -88,18 +88,18 @@
 
 ### 现状分析
 - `webviewBridge.js` 的 `dataGrid` API 通过 `data-col-key` 属性查找列
-- `_getColumns`（第 4120-4128 行）从 `.data-grid-header-cell` 读取 `data-col-key`
-- `setCellValue`（第 4194-4201 行）通过 `.data-grid-cell[data-col-key="..."]` 查找单元格
+- `_getColumns`（第 4120-4128 行）从 `.dataGrid_header_cell` 读取 `data-col-key`
+- `setCellValue`（第 4194-4201 行）通过 `.dataGrid_cell[data-col-key="..."]` 查找单元格
 - `addRow`（第 4157-4178 行）通过 `_getColumns` 获取列定义，`_makeRowHtml` 使用 `rowData.cells[columns[j].field]` 获取值
 - `ssrRenderer.ts` 第 268、272 行：header 和 data cell 都设置了 `data-col-key`
 - 问题排查方向：
   - `_getRows` 返回的是 `NodeList`（通过 `querySelectorAll`），但 `_getRow` 使用数组索引访问，确认正确
   - `_getColumns` 返回 `{ field, index }`，`_makeRowHtml` 使用 `columns[j].width`（undefined，默认 100）
-  - 可能问题：`addRow` 调用时 `_getColumns` 返回空数组？需要检查 `.data-grid-header` 是否能被正确找到
+  - 可能问题：`addRow` 调用时 `_getColumns` 返回空数组？需要检查 `.dataGrid_header` 是否能被正确找到
 
 ### 修复方案
 1. 在 `ssrRenderer.ts` 第 268 行：确保 header cell 的 `data-col-key` 与 `widget.columns[].field` 一致
-2. 检查 `_getColumns` 中的选择器：`.data-grid-header-cell:not(.data-grid-checkbox)` 是否匹配正确的元素
+2. 检查 `_getColumns` 中的选择器：`.dataGrid_header_cell:not(.dataGrid_checkbox)` 是否匹配正确的元素
 3. 在 `_makeRowHtml` 中添加调试：如果 columns 为空，新建行也应该有基本结构
 4. 确保 `findTarget` 能找到 dataGrid 元素（通过 id 或 data-ctrl-id）
 

@@ -11,12 +11,12 @@
     :style="containerStyle"
     @click.stop
   >
-    <div class="list-box-scroll">
+    <div class="listBox_scroll">
       <div
         v-for="(item, index) in widget.items || []"
         :key="item.id || index"
         :data-item-index="index"
-        class="list-item"
+        class="listBox_item"
         :class="{ 'item-selected': selectedIndices[index] }"
         @click="onItemClick(index, $event)"
         @dblclick="onItemDblClick(index)"
@@ -24,20 +24,20 @@
         <input
           v-if="widget.showCheckbox"
           type="checkbox"
-          class="list-item-checkbox"
+          class="listBox_item-checkbox"
           :checked="item.selected || false"
           @click.stop
           @change="onCheckboxChange(index, $event)"
         />
         <span
           v-if="editingIndex !== index"
-          class="list-item-text"
+          class="listBox_item_text"
         >{{ item.text }}</span>
         <input
           v-if="editingIndex === index"
           ref="editInputRef"
           v-model="editText"
-          class="list-item-edit-input"
+          class="listBox_item-edit-input"
           @keydown.enter="saveEdit(index)"
           @keydown.escape="cancelEdit"
           @blur="saveEdit(index)"
@@ -85,9 +85,9 @@ const containerStyle = computed(() => {
     ...base,
     color: s.itemColor || s.color || undefined,
     fontFamily: s.fontFamily || undefined,
-    '--list-item-selected-bg': s.itemSelectedBg || '#e6f4ff',
-    '--list-item-border-bottom': s.listItemBorderBottom || '1px solid #f0f0f0',
-    '--list-item-hover-bg': s.listItemHoverBg || '#f5f5f5',
+    '--listBox_item-selected-bg': s.itemSelectedBg || '#e6f4ff',
+    '--listBox_item-border-bottom': s.listItemBorderBottom || '1px solid #f0f0f0',
+    '--listBox_item-hover-bg': s.listItemHoverBg || '#f5f5f5',
   } as any
 })
 
@@ -107,7 +107,7 @@ function onItemDblClick(index: number) {
   editingIndex.value = index
   editText.value = props.widget.items[index].text || ''
   nextTick(() => {
-    const el = (document.querySelector(`[data-widget-id="${props.widget.id}"] .list-item-edit-input`) as HTMLInputElement)
+    const el = (document.querySelector(`[data-widget-id="${props.widget.id}"] .listBox_item-edit-input`) as HTMLInputElement)
     if (el) { el.focus(); el.select() }
   })
 }
@@ -155,48 +155,44 @@ function onCheckboxChange(index: number, event: Event) {
   flex-direction: column;
 }
 
-.list-box-scroll {
+.listBox_scroll {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
 }
 
-.list-item {
+.listBox_item {
   display: flex;
   align-items: center;
   height: 32px;
   padding: 0 10px;
   cursor: pointer;
   user-select: none;
-  border-bottom: var(--list-item-border-bottom, 1px solid #f0f0f0);
+  border-bottom: var(--listBox_item-border-bottom, 1px solid #f0f0f0);
   gap: 8px;
 }
 
-.list-item:last-child {
-  border-bottom: none;
+.listBox_item:hover {
+  background-color: var(--listBox_item-hover-bg, #f5f5f5);
 }
 
-.list-item:hover {
-  background-color: var(--list-item-hover-bg, #f5f5f5);
+.listBox_item.item-selected {
+  background-color: var(--listBox_item-selected-bg, #e6f4ff);
 }
 
-.list-item.item-selected {
-  background-color: var(--list-item-selected-bg, #e6f4ff);
-}
-
-.list-item-checkbox {
+.listBox_item-checkbox {
   margin: 0;
   flex-shrink: 0;
 }
 
-.list-item-text {
+.listBox_item_text {
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.list-item-edit-input {
+.listBox_item-edit-input {
   flex: 1;
   height: 24px;
   border: 1px solid #1890ff;

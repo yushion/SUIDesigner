@@ -23,12 +23,12 @@
     },
     "pseudo": {},
     "sub": {
-      ".data-grid-header": {
+      ".dataGrid_header": {
         "display": "flex",
         "border-bottom": "1px solid #d9d9d9",
         "background": "#f0f0f0"
       },
-      ".data-grid-header-cell": {
+      ".dataGrid_header_cell": {
         "padding": "6px 10px",
         "font-weight": "600",
         "border-right": "1px solid #d9d9d9",
@@ -37,24 +37,21 @@
         "white-space": "nowrap",
         "box-sizing": "border-box"
       },
-      ".data-grid-body": {
+      ".dataGrid_body": {
         "flex": "1",
         "overflow-y": "auto"
       },
-      ".data-grid-row": {
+      ".dataGrid_row": {
         "display": "flex",
         "border-bottom": "1px solid #e8e8e8"
       },
-      ".data-grid-row:nth-child(even)": {
+      ".dataGrid_row:nth-child(even)": {
         "background": "#fafafa"
       },
-      ".data-grid-row:hover": {
+      ".dataGrid_row:hover": {
         "background": "#e6f7ff"
       },
-      ".data-grid-row:last-child": {
-        "border-bottom": "none"
-      },
-      ".data-grid-cell": {
+      ".dataGrid_cell": {
         "padding": "6px 10px",
         "border-right": "1px solid #e8e8e8",
         "overflow": "hidden",
@@ -62,21 +59,21 @@
         "white-space": "nowrap",
         "box-sizing": "border-box"
       },
-      ".data-grid-cell:hover": {
+      ".dataGrid_cell:hover": {
         "background-color": "rgba(0, 120, 212, 0.05)"
       },
-      ".data-grid-checkbox": {
+      ".dataGrid_checkbox": {
         "display": "flex",
         "align-items": "center",
         "justify-content": "center",
         "width": "40px",
         "flex-shrink": "0"
       },
-      ".data-grid-checkbox input": {
+      ".dataGrid_checkbox input": {
         "margin": "0",
         "cursor": "pointer"
       },
-      ".data-grid-row-focused": {
+      ".dataGrid_row.dataGrid_row-focused": {
         "background": "#d6e4ff"
       }
     }
@@ -114,11 +111,11 @@
     "sub": {}
   },
   "structuralCSS": {
-    ".data-grid-header": [
+    ".dataGrid_header": [
       "display: flex",
       "border-bottom: 1px solid #d9d9d9"
     ],
-    ".data-grid-header-cell": [
+    ".dataGrid_header_cell": [
       "padding: 6px 10px",
       "font-weight: 600",
       "border-right: 1px solid #d9d9d9",
@@ -127,24 +124,21 @@
       "white-space: nowrap",
       "box-sizing: border-box"
     ],
-    ".data-grid-body": [
+    ".dataGrid_body": [
       "flex: 1",
       "overflow-y: auto"
     ],
-    ".data-grid-row": [
+    ".dataGrid_row": [
       "display: flex",
       "border-bottom: 1px solid #e8e8e8"
     ],
-    ".data-grid-row:nth-child(even)": [
+    ".dataGrid_row:nth-child(even)": [
       "background: #fafafa"
     ],
-    ".data-grid-row:hover": [
+    ".dataGrid_row:hover": [
       "background: #e6f7ff"
     ],
-    ".data-grid-row:last-child": [
-      "border-bottom: none"
-    ],
-    ".data-grid-cell": [
+    ".dataGrid_cell": [
       "padding: 6px 10px",
       "border-right: 1px solid #e8e8e8",
       "overflow: hidden",
@@ -152,42 +146,42 @@
       "white-space: nowrap",
       "box-sizing: border-box"
     ],
-    ".data-grid-cell:hover": [
+    ".dataGrid_cell:hover": [
       "background-color: rgba(0, 120, 212, 0.05)",
       "cursor: pointer"
     ],
-    ".data-grid-checkbox": [
+    ".dataGrid_checkbox": [
       "display: flex",
       "align-items: center",
       "justify-content: center",
       "width: 40px",
       "flex-shrink: 0"
     ],
-    ".data-grid-checkbox input": [
+    ".dataGrid_checkbox input": [
       "margin: 0",
       "cursor: pointer"
     ],
-    ".data-grid-row-focused": [
+    ".dataGrid_row.dataGrid_row-focused": [
       "background: #d6e4ff"
     ]
   },
   "mappedProps": [
     {
-      "selector": ".data-grid-header",
+      "selector": ".dataGrid_header",
       "base": {
         "background": "#f0f0f0"
       },
       "pseudo": {}
     },
     {
-      "selector": ".data-grid-row:hover",
+      "selector": ".dataGrid_row:hover",
       "base": {
         "background": "#e6f7ff"
       },
       "pseudo": {}
     },
     {
-      "selector": ".data-grid-row:nth-child(even)",
+      "selector": ".dataGrid_row:nth-child(even)",
       "base": {
         "background": "#fafafa"
       },

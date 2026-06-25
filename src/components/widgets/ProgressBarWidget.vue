@@ -12,14 +12,14 @@
     :style="widgetStyle"
     @click.stop="onClick"
   >
-    <div class="progress-track"></div>
-    <div class="progress-fill" :style="fillStyle"></div>
+    <div class="progressBar_track"></div>
+    <div class="progressBar_fill" :style="fillStyle"></div>
     <div
       v-if="hasThumb"
-      class="progress-thumb"
+      class="progressBar_thumb"
       :style="{ left: `calc(${progressPercent}% - 10px)`, borderColor: barColor }"
     ></div>
-    <span v-if="showText" class="progress-text" :style="textStyle">{{ progressPercent }}%</span>
+    <span v-if="showText" class="progressBar_text" :style="textStyle">{{ progressPercent }}%</span>
   </div>
 </template>
 
@@ -97,7 +97,7 @@ function onClick(e: MouseEvent) {
   cursor: pointer;
 }
 
-.progress-track {
+.progressBar_track {
   position: absolute;
   left: 0;
   top: 0;
@@ -106,7 +106,7 @@ function onClick(e: MouseEvent) {
   border-radius: inherit;
 }
 
-.progress-fill {
+.progressBar_fill {
   position: absolute;
   left: 0;
   top: 0;
@@ -117,7 +117,7 @@ function onClick(e: MouseEvent) {
 }
 
 /* 圆圈独立于fill层，绝对定位于bar-widget，不受fill裁剪 */
-.progress-thumb {
+.progressBar_thumb {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -131,7 +131,7 @@ function onClick(e: MouseEvent) {
   pointer-events: none;
 }
 
-.progress-text {
+.progressBar_text {
   position: absolute;
   left: 50%;
   top: 50%;

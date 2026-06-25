@@ -307,8 +307,14 @@ const VALID_CSS_PROPS = new Set([
       ...defaultProps
     }
 
-    // 下拉框类型属性：数组首项作为初始值，避免模板渲染时 String(Array) 变成逗号拼接
+    // 自定义控件下拉框属性：数组首项作为初始值，避免模板渲染时 String(Array) 变成逗号拼接
+    // 跳过内置控件本身就为数组的属性（options/rows/logs/items/columns/treeNodes 等）
+    const BUILTIN_ARRAY_PROPS = new Set([
+      'options', 'rows', 'logs', 'items', 'columns', 'treeNodes',
+      'contextMenuItems', 'tabs', 'children'
+    ])
     for (const key of Object.keys(defaultProps)) {
+      if (BUILTIN_ARRAY_PROPS.has(key)) continue
       const val = (base as any)[key]
       if (Array.isArray(val)) {
         (base as any)[key] = val[0]

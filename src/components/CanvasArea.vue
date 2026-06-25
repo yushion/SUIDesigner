@@ -21,39 +21,44 @@
       <!-- 画布标题栏 -->
       <div
         v-if="store.canvas.showTitleBar"
-        class="canvas-titlebar"
+        class="titlebar"
         :style="titleBarStyle"
       >
         <!-- 左侧：Logo/图标 -->
-        <div class="tb-left" :style="titleBarCellStyle">
-          <span class="tb-icon" v-html="titleBarSafeIcon" :style="titleBarIconStyle"></span>
+        <div class="titlebar_left" :style="titleBarCellStyle">
+          <span class="titlebar_left_icon" v-html="titleBarSafeIcon" :style="titleBarIconStyle"></span>
         </div>
         <!-- 中间：标题文字 -->
-        <div class="tb-center" :style="titleBarCenterStyle">
-          <span class="tb-title" :style="titleBarTitleStyle">{{ store.canvas.titleBarTitle || '我的应用' }}</span>
+        <div class="titlebar_center" :style="titleBarCenterStyle">
+          <span class="titlebar_center_title" :style="titleBarTitleStyle">{{ store.canvas.titleBarTitle || '我的应用' }}</span>
         </div>
         <!-- 右侧：窗口控制按钮 -->
-        <div class="tb-right" :style="titleBarCellStyle">
+        <div class="titlebar_right" :style="titleBarRightStyle">
           <!-- 最小化按钮：禁止最小化时根据固定宽高决定隐藏还是禁用 -->
           <button
             v-if="!(store.canvas.disableMinimize && store.canvas.canvasFixedSize)"
-            class="tb-btn"
-            :style="{ ...titleBarBtnStyle, ...(store.canvas.disableMinimize ? { opacity: 0.35, cursor: 'not-allowed', pointerEvents: 'none' } : {}) }"
+            class="titlebar_rightBtn"
+            :style="{ ...titleBarBtnStyle, ...(store.canvas.disableMinimize ? { opacity: 0.35, cursor: 'not-allowed', pointerEvents: 'none' } : {}), marginLeft: 'auto' }"
             :title="store.canvas.disableMinimize ? '已禁止最小化' : '最小化'"
           >
-            <svg width="10" height="1" viewBox="0 0 10 1"><rect width="10" height="1" fill="currentColor"/></svg>
+            <svg width="12" height="1" viewBox="0 0 10 1"><rect width="10" height="1" fill="currentColor"/></svg>
           </button>
           <!-- 最大化按钮：禁止最小化+固定宽高时隐藏 -->
           <button
             v-if="!(store.canvas.disableMinimize && store.canvas.canvasFixedSize)"
-            class="tb-btn"
-            :style="titleBarBtnStyle"
+            class="titlebar_rightBtn"
+            :style="{ ...titleBarBtnStyle, marginLeft: 'auto' }"
             title="最大化"
           >
-            <svg width="10" height="10" viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
+            <span style="width:18px;height:14px;display:flex;align-items:center;justify-content:center;">
+              <svg width="12" height="12" viewBox="0 0 10 10" shape-rendering="crispEdges"><rect x="1" y="1" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1"/></svg>
+            </span>
           </button>
-          <button class="tb-btn tb-btn-close" :style="titleBarCloseBtnStyle" title="关闭">
-            <svg width="10" height="10" viewBox="0 0 10 10"><line x1="1" y1="1" x2="9" y2="9" stroke="currentColor" stroke-width="1.2"/><line x1="9" y1="1" x2="1" y2="9" stroke="currentColor" stroke-width="1.2"/></svg>
+          <button class="titlebar_rightBtn titlebar_rightBtn_close" 
+            :style="{ ...titleBarCloseBtnStyle, marginLeft: 'auto' }"
+            title="关闭"
+          >
+            <svg width="12" height="12" viewBox="0 0 10 10"><line x1="1" y1="1" x2="9" y2="9" stroke="currentColor" stroke-width="0.8"/><line x1="9" y1="1" x2="1" y2="9" stroke="currentColor" stroke-width="0.8"/></svg>
           </button>
         </div>
       </div>
@@ -175,25 +180,37 @@ const titleBarSafeIcon = computed(() => {
 })
 
 /** 标题栏整体样式（绝对定位，脱离正常流，不干扰控件及控制点坐标计算） */
-const titleBarStyle = computed(() => ({
-  display: 'flex',
-  alignItems: 'center',
-  position: 'absolute' as any,
-  top: '0',
-  left: '0',
-  right: '0',
-  height: '40px',
-  backgroundColor: store.canvas.titleBarBgColor,
-  opacity: (store.canvas.titleBarOpacity ?? 1) * (store.canvas.masterOpacity ?? 1),
-  userSelect: 'none' as any,
-  zIndex: 10
-}))
+const titleBarStyle = computed(() => {
+  const noIndent = store.canvas.noIndentTitleBar && store.canvas.showTitleBar
+  return {
+    display: 'flex',
+    alignItems: 'center',
+    position: 'absolute' as any,
+    top: '0',
+    left: '0',
+    right: '0',
+    height: noIndent ? '32px' : '40px',
+    backgroundColor: store.canvas.titleBarBgColor,
+    opacity: (store.canvas.titleBarOpacity ?? 1) * (store.canvas.masterOpacity ?? 1),
+    userSelect: 'none' as any,
+    zIndex: 10
+  }
+})
 
 /** 标题栏左侧/中间/右侧单元格通用样式 */
-const titleBarCellStyle = computed(() => ({
-  display: 'flex',
-  alignItems: 'center',
-  height: '40px'
+const titleBarCellStyle = computed(() => {
+  const noIndent = store.canvas.noIndentTitleBar && store.canvas.showTitleBar
+  return {
+    display: 'flex',
+    alignItems: 'center',
+    height: noIndent ? '32px' : '40px'
+  }
+})
+
+/** 标题栏右侧单元格样式（无缩进时去除右边距） */
+const titleBarRightStyle = computed(() => ({
+  ...titleBarCellStyle.value,
+  paddingRight: (store.canvas.noIndentTitleBar && store.canvas.showTitleBar) ? 0 : '4px'
 }))
 
 /** 标题栏图标样式 */
@@ -209,15 +226,18 @@ const titleBarIconStyle = computed(() => ({
 }))
 
 /** 标题栏文字样式 */
-const titleBarTitleStyle = computed(() => ({
-  fontSize: '13px',
-  fontWeight: 600 as any,
-  color: store.canvas.titleBarTextColor,
-  userSelect: 'none' as any,
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap'
-}))
+const titleBarTitleStyle = computed(() => {
+  const noIndent = store.canvas.noIndentTitleBar && store.canvas.showTitleBar
+  return {
+    fontSize: '13px',
+    fontWeight: (noIndent ? 500 : 600) as any,
+    color: store.canvas.titleBarTextColor,
+    userSelect: 'none' as any,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap'
+  }
+})
 
 /** 标题栏中间对齐方式 */
 const titleBarCenterStyle = computed(() => {
@@ -229,24 +249,26 @@ const titleBarCenterStyle = computed(() => {
 })
 
 /** 标题栏按钮通用样式（固定颜色，不随标题颜色联动） */
-const titleBarBtnStyle = computed(() => ({
-  width: '32px',
-  height: '32px',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  border: 'none',
-  background: 'transparent',
-  color: store.canvas.titleBarBtnColor || '#333',
-  cursor: 'default',
-  borderRadius: '4px',
-  flexShrink: 0
-}))
+const titleBarBtnStyle = computed(() => {
+  const noIndent = store.canvas.noIndentTitleBar && store.canvas.showTitleBar
+  return {
+    width: noIndent ? '46px' : '35px',
+    height: '32px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    border: 'none',
+    background: 'transparent',
+    color: store.canvas.titleBarBtnColor || '#333',
+    cursor: 'default',
+    borderRadius: noIndent ? 0 : '4px',
+    flexShrink: 0
+  }
+})
 
 /** 标题栏关闭按钮样式（悬停红色） */
 const titleBarCloseBtnStyle = computed(() => ({
-  ...titleBarBtnStyle.value,
-  borderRadius: '4px'
+  ...titleBarBtnStyle.value
 }))
 
 /** 获取控件对应组件（委托给 widgetRegistry） */
@@ -990,7 +1012,7 @@ function onDrop(event: DragEvent) {
   }
 
   // 检查是否拖放到卡片框容器
-  const cardBody = target.closest('[data-container-type="card-body"]') as HTMLElement | null
+  const cardBody = target.closest('[data-container-type="cardBox_body"]') as HTMLElement | null
   if (cardBody) {
     const parentId = cardBody.getAttribute('data-parent-id')
     if (parentId) {
@@ -1115,7 +1137,7 @@ onUnmounted(() => {
 }
 
 /* ===== 画布标题栏（绝对定位，脱离正常流） ===== */
-.canvas-titlebar {
+.titlebar {
   position: absolute;
   top: 0;
   left: 0;
@@ -1126,45 +1148,51 @@ onUnmounted(() => {
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-.tb-left {
+.titlebar_left {
   width: 40px;
   justify-content: center;
   flex-shrink: 0;
+  margin-left: 2px;
 }
 
-.tb-center {
+.titlebar_center {
   flex: 1;
   justify-content: center;
   min-width: 0;
 }
 
-.tb-right {
-  width: auto;
+.titlebar_right {
+  width: 138px;
   justify-content: flex-end;
   gap: 2px;
   padding-right: 4px;
   flex-shrink: 0;
 }
 
-.tb-icon {
+.titlebar_left_icon {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.tb-icon :deep(i) {
+.titlebar_left_icon :deep(i) {
   font-size: 18px;
 }
 
-.tb-title {
+.titlebar_left_icon :deep(img) {
+  width: 22px !important;
+  height: 22px !important;
+}
+
+.titlebar_center_title {
   user-select: none;
 }
 
-.tb-btn:hover {
+.titlebar_rightBtn:hover {
   background: rgba(0, 0, 0, 0.06);
 }
 
-.tb-btn-close:hover {
+.titlebar_rightBtn_close:hover {
   background: #e81123 !important;
   color: #fff !important;
 }

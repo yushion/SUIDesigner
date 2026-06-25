@@ -30,7 +30,7 @@
 - `mergeDeduplicateCSS` 和 `prettyFormatHTML` 有已知 bug
 
 ### webviewBridge.js 依赖
-- 通过 `data-ctrl-type` 属性识别控件类型（如 `button`、`input_text`、`combobox`、`listbox_item` 等）
+- 通过 `data-ctrl-type` 属性识别控件类型（如 `button`、`inputText`、`comboBox`、`listBox_item` 等）
 - 通过 `id` 属性定位控件
 - 通过 `data-name` 获取控件名称
 - 期望控件是原生 HTML 元素（用于 `closest()` 查找、`tagName` 判断等）
@@ -73,17 +73,17 @@
 - `genHyperlink` → `<a id="..." ... href="javascript:void(0)" data-href="...">text</a>`
 - `genDateTimePicker` → `<input type="datetime-local" id="..." ... />`
 - `genTextarea` → `<textarea id="..." ...>value</textarea>`
-- `genRadioGroup` → `<div id="..." class="radiogroup-container"><label class="radiogroup-item"><input type="radio" ... />text</label></div>`
-- `genProgressBar` → `<div id="..." class="progress-bar-container"><div class="progress-fill" style="width:X%"></div><span class="progress-text">X%</span></div>`
+- `genRadioGroup` → `<div id="..." class="radioGroup_container"><label class="radioGroup_item"><input type="radio" ... />text</label></div>`
+- `genProgressBar` → `<div id="..." class="progressBar_container"><div class="progressBar_fill" style="width:X%"></div><span class="progressBar_text">X%</span></div>`
 - `genCanvas` → `<div id="..." class="canvas-box">...</div>`
-- `genLogOutput` → `<div id="..." class="log-output-container"><div class="log-line" style="color:...">text</div></div>`
+- `genLogOutput` → `<div id="..." class="logOutput_container"><div class="logOutput_line" style="color:...">text</div></div>`
 - `genIconButton` → `<button id="..." ...><i class="fas fa-star"></i><span>text</span></button>`
-- `genImageBox` → `<div id="..." class="image-box"><img src="..." /></div>`
-- `genCardBox` → 包含 header + collapse-btn + card-body + children
-- `genListBox` → 包含 list-box-scroll + list-item + checkbox
-- `genTreeView` → 递归生成 tree-node + tree-node-content + tree-toggle + tree-icon + tree-label
-- `genDataGrid` → 包含 data-grid-header + data-grid-body + rows
-- `genTabsContainer` → 包含 tab-header-bar + tab-header-btn + tab-content-wrapper + tab-pane + children
+- `genImageBox` → `<div id="..." class="imageBox"><img src="..." /></div>`
+- `genCardBox` → 包含 header + collapse-btn + cardBox_body + children
+- `genListBox` → 包含 listBox_scroll + listBox_item + checkbox
+- `genTreeView` → 递归生成 treeView_node + treeView_node_content + treeView_toggle + treeView_icon + treeView_label
+- `genDataGrid` → 包含 dataGrid_header + dataGrid_body + rows
+- `genTabsContainer` → 包含 tabsContainer_headerBar + tabsContainer_headerBar_btn + tabsContainer_contentWrapper + tab-pane + children
 
 **D. 运行时脚本**
 - `BRIDGE_SCRIPT` — 标签页切换 + 卡片框折叠
@@ -125,7 +125,7 @@ SSR 导出不再使用，保留文件但移除导出逻辑引用。App.vue 中�
 
 1. **widgetToCtrlType 映射**：使用原项目的完整 26 个控件类型映射
 2. **data-* 属性**：使用原项目的 `dataAttrs()` 逻辑，包含 `data-columns`、`data-rows`、`data-show-checkbox`、`data-allow-add`、`data-allow-delete`、`data-editable`、`data-always-show-selection` 等
-3. **CSS 子选择器**：使用原项目完整版（toggle-slider、radiogroup-item、tab-header-btn、card-collapse-btn、list-item、tree-node、data-grid-row 等）
+3. **CSS 子选择器**：使用原项目完整版（toggle-slider、radioGroup_item、tabsContainer_headerBar_btn、cardBox_collapse_btn、listBox_item、treeView_node、dataGrid_row 等）
 4. **运行时脚本**：使用原项目的完整脚本（BRIDGE_SCRIPT、LISTBOX_RUNTIME、TREEVIEW_RUNTIME + TREE_INIT_SCRIPT、DATA_GRID_INIT_SCRIPT）
 5. **保留改进**：titleBarBtnColor、bodyBackground 无颜色、user-select:none、预览窗口智能更新
 

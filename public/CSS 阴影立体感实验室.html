@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Div 阴影立体感生成器</title>
+    <script src="https://cdn.tailwindcss.com">
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            line-height: 5px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f3f4f6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #app-container {
+            width: 1360px;
+            height: 820px;
+            max-width: 98vw;
+            max-height: 98vh;
+            display: flex;
+            flex-direction: column;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #ffffff;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+			border: 1px solid #e9e9e9;
+        }
+
+        .demo-bg {
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        #target-div {
+            transition: all 0.3s ease;
+        }
+
+        .code-block {
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        aside::-webkit-scrollbar {
+            width: 4px;
+        }
+        aside::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        aside::-webkit-scrollbar-thumb {
+            background: #c4c4c4;
+            border-radius: 4px;
+        }
+        aside::-webkit-scrollbar-thumb:hover {
+            background: #a0a0a0;
+        }
+
+        @media (max-width: 1024px) {
+            #app-container {
+                width: 100vw;
+                height: 100vh;
+                max-width: 100vw;
+                max-height: 100vh;
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+
+        <header class="bg-white/90 backdrop-blur-sm border-b border-gray-200/80 flex-shrink-0 px-6 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-layer-group text-indigo-600 text-2xl"></i>
+                <h1 class="text-xl font-bold text-gray-900 tracking-tight">CSS 阴影立体感实验室</h1>
+            </div>
+            <div class="text-sm text-gray-500 flex items-center gap-2">
+                <span class="hidden sm:inline">实时预览 box-shadow</span>
+                <i class="fa-regular fa-circle-check text-indigo-500"></i>
+            </div>
+        </header>
+
+        <div class="flex-1 flex flex-col lg:flex-row overflow-hidden">
+
+            <!-- 左侧：预览区域 -->
+            <section class="flex-1 demo-bg flex flex-col items-center justify-center p-6 relative min-h-[400px]">
+                <div class="absolute top-4 right-4 bg-white/80 backdrop-blur px-4 py-2 rounded-full text-xs font-medium text-gray-600 shadow-sm border border-gray-200/80">
+                    <i class="fa-solid fa-eye mr-1"></i> 实时预览
+                </div>
+
+                <div id="target-div" class="w-[400px] h-[400px] bg-white rounded-2xl flex items-center justify-center text-center p-6 border border-gray-100/80 shadow-sm">
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2">立体感</h3>
+                        <p class="text-gray-500 text-sm max-w-[220px] mx-auto">调整右侧参数以改变阴影形态，观察元素与背景的层级关系。</p>
+                        <div class="mt-4 inline-flex items-center justify-center w-14 h-14 rounded-full bg-indigo-100 text-indigo-600">
+                            <i class="fa-solid fa-cube text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-10 max-w-2xl text-center px-4">
+                    <h4 class="text-lg font-semibold text-gray-800 mb-2">原理说明</h4>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        CSS 的 <code class="bg-gray-200 px-1.5 py-0.5 rounded text-red-500 text-xs font-mono">box-shadow</code> 属性通过模拟光线投射来创建立体感。
+                        <br class="hidden sm:block" />
+                        <strong>X / Y 偏移</strong> 决定光源方向，<strong>模糊半径</strong> 决定阴影柔和度，<strong>扩展半径</strong> 控制阴影大小。
+                        结合 <strong>内阴影 (inset)</strong> 可创造凹陷或按压效果。
+                    </p>
+                </div>
+            </section>
+
+            <!-- 右侧：控制面板 -->
+            <aside class="w-full lg:w-[380px] flex-shrink-0 bg-white/90 backdrop-blur-sm border-l border-gray-200/80 overflow-y-auto p-6 z-0">
+                <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-indigo-500"></i> 参数调整
+                </h2>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">快速预设</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="applyPreset('flat')" class="px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg border border-gray-300 transition">扁平微影</button>
+                        <button onclick="applyPreset('lifted')" class="px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg border border-gray-300 transition">悬浮卡片</button>
+                        <button onclick="applyPreset('deep')" class="px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg border border-gray-300 transition">深层凹陷</button>
+                        <button onclick="applyPreset('neumorphism')" class="px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg border border-gray-300 transition">新拟态</button>
+                        <button onclick="applyPreset('retro')" class="px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg border border-gray-300 transition">复古硬边</button>
+                        <button onclick="applyPreset('glow')" class="px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg border border-gray-300 transition">发光效果</button>
+                    </div>
+                </div>
+
+                <hr class="my-4 border-gray-200" />
+
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-sm font-medium text-gray-700">水平偏移 (X)</label>
+                            <span id="val-x" class="text-sm text-indigo-600 font-mono">10px</span>
+                        </div>
+                        <input type="range" id="input-x" min="-50" max="50" value="10" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600" />
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-sm font-medium text-gray-700">垂直偏移 (Y)</label>
+                            <span id="val-y" class="text-sm text-indigo-600 font-mono">10px</span>
+                        </div>
+                        <input type="range" id="input-y" min="-50" max="50" value="10" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600" />
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-sm font-medium text-gray-700">模糊半径 (Blur)</label>
+                            <span id="val-blur" class="text-sm text-indigo-600 font-mono">15px</span>
+                        </div>
+                        <input type="range" id="input-blur" min="0" max="100" value="15" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600" />
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-sm font-medium text-gray-700">扩展半径 (Spread)</label>
+                            <span id="val-spread" class="text-sm text-indigo-600 font-mono">0px</span>
+                        </div>
+                        <input type="range" id="input-spread" min="-50" max="50" value="0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600" />
+                    </div>
+
+                    <!-- 颜色与透明度 — 对齐优化 -->
+                    <div class="grid grid-cols-2 gap-4 items-center">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">阴影颜色</label>
+                            <input type="color" id="input-color" value="#000000" class="w-full h-10 p-1 border border-gray-300 rounded-lg cursor-pointer" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">透明度 (<span id="val-opacity">0.2</span>)</label>
+                            <input type="range" id="input-opacity" min="0" max="1" step="0.01" value="0.2" class="w-full h-10 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600" />
+                        </div>
+                    </div>
+
+                    <div class="flex items-center mt-2">
+                        <input type="checkbox" id="input-inset" class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" />
+                        <label for="input-inset" class="ml-2 block text-sm text-gray-900">启用内阴影 (Inset)</label>
+                    </div>
+                </div>
+
+                <hr class="my-6 border-gray-200" />
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">CSS 代码</label>
+                    <div class="relative">
+                        <textarea id="css-output" readonly class="w-full h-24 p-3 text-xs code-block bg-gray-800 text-green-400 rounded-lg border border-gray-700 focus:outline-none resize-none"></textarea>
+                        <button onclick="copyCode()" class="absolute top-2 right-2 text-gray-400 hover:text-white transition">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </div>
+                    <p id="copy-msg" class="text-xs text-green-600 mt-1 hidden">已复制到剪贴板!</p>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const targetDiv = document.getElementById('target-div');
+        const cssOutput = document.getElementById('css-output');
+        const copyMsg = document.getElementById('copy-msg');
+
+        const inputs = {
+            x: document.getElementById('input-x'),
+            y: document.getElementById('input-y'),
+            blur: document.getElementById('input-blur'),
+            spread: document.getElementById('input-spread'),
+            color: document.getElementById('input-color'),
+            opacity: document.getElementById('input-opacity'),
+            inset: document.getElementById('input-inset')
+        };
+
+        const labels = {
+            x: document.getElementById('val-x'),
+            y: document.getElementById('val-y'),
+            blur: document.getElementById('val-blur'),
+            spread: document.getElementById('val-spread'),
+            opacity: document.getElementById('val-opacity')
+        };
+
+        function updateShadow() {
+            const x = inputs.x.value;
+            const y = inputs.y.value;
+            const blur = inputs.blur.value;
+            const spread = inputs.spread.value;
+            const hexColor = inputs.color.value;
+            const opacity = inputs.opacity.value;
+            const isInset = inputs.inset.checked ? 'inset' : '';
+
+            const r = parseInt(hexColor.substr(1, 2), 16);
+            const g = parseInt(hexColor.substr(3, 2), 16);
+            const b = parseInt(hexColor.substr(5, 2), 16);
+            const rgbaColor = `rgba(${r}, ${g}, ${b}, ${opacity})`;
+
+            const shadowValue = `${isInset} ${x}px ${y}px ${blur}px ${spread}px ${rgbaColor}`.trim();
+
+            targetDiv.style.boxShadow = shadowValue;
+
+            labels.x.textContent = `${x}px`;
+            labels.y.textContent = `${y}px`;
+            labels.blur.textContent = `${blur}px`;
+            labels.spread.textContent = `${spread}px`;
+            labels.opacity.textContent = opacity;
+
+            cssOutput.value = `\n\nbox-shadow: ${shadowValue};`;
+        }
+
+        Object.values(inputs).forEach(input => {
+            input.addEventListener('input', updateShadow);
+        });
+
+        const presets = {
+            flat: { x: 0, y: 4, blur: 6, spread: -1, color: '#000000', opacity: 0.1, inset: false },
+            lifted: { x: 0, y: 10, blur: 25, spread: -5, color: '#000000', opacity: 0.2, inset: false },
+            deep: { x: 0, y: 20, blur: 40, spread: -10, color: '#000000', opacity: 0.3, inset: false },
+            neumorphism: { x: 5, y: 5, blur: 10, spread: 0, color: '#a3b1c6', opacity: 0.5, inset: false },
+            retro: { x: 8, y: 8, blur: 0, spread: 0, color: '#000000', opacity: 1, inset: false },
+            glow: { x: 0, y: 0, blur: 20, spread: 5, color: '#4f46e5', opacity: 0.6, inset: false }
+        };
+
+        window.applyPreset = function(type) {
+            const p = presets[type];
+            if (!p) return;
+
+            inputs.x.value = p.x;
+            inputs.y.value = p.y;
+            inputs.blur.value = p.blur;
+            inputs.spread.value = p.spread;
+            inputs.color.value = p.color;
+            inputs.opacity.value = p.opacity;
+            inputs.inset.checked = p.inset;
+
+            if (type === 'neumorphism') {
+                targetDiv.style.backgroundColor = '#e0e5ec';
+                targetDiv.style.borderColor = 'transparent';
+            } else {
+                targetDiv.style.backgroundColor = '#ffffff';
+                targetDiv.style.borderColor = '#f3f4f6';
+            }
+
+            updateShadow();
+        };
+
+        window.copyCode = function() {
+            cssOutput.select();
+            document.execCommand('copy');
+            copyMsg.classList.remove('hidden');
+            setTimeout(() => {
+                copyMsg.classList.add('hidden');
+            }, 2000);
+        };
+
+        updateShadow();
+    </script>
+
+</body>
+</html>

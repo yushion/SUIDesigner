@@ -67,7 +67,7 @@ export async function renderCanvasToString(
     canvasStyleAttrs.push(`-webkit-backdrop-filter:${backdropFilter}`)
   }
 
-  return `<div class="page-container" style="${canvasStyleAttrs.join(';')}">${widgetHTML}</div>`
+  return `<div class="pageContainer" style="${canvasStyleAttrs.join(';')}">${widgetHTML}</div>`
 }
 
 /**
@@ -93,13 +93,13 @@ function renderTitleBar(config: CanvasConfig): string {
     `flex:1`,
   ].join(';')
 
-  return `<div class="canvas-titlebar" style="${barStyle}">
-    <div class="tb-left"><span class="tb-icon">${config.titleBarIconHtml || config.titleBarIconName || ''}</span></div>
-    <div class="tb-center" style="${titleStyle}"><span class="tb-title">${config.titleBarTitle || '我的应用'}</span></div>
-    <div class="tb-right">
-      <button class="tb-btn"><svg width="10" height="1"><rect width="10" height="1"/></svg></button>
-      <button class="tb-btn"><svg width="10" height="10"><rect x="1" y="1" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></button>
-      <button class="tb-btn tb-btn-close"><svg width="10" height="10"><line x1="1" y1="1" x2="9" y2="9" stroke="currentColor" stroke-width="1.2"/><line x1="9" y1="1" x2="1" y2="9" stroke="currentColor" stroke-width="1.2"/></svg></button>
+  return `<div class="titlebar" style="${barStyle}">
+    <div class="titlebar_left"><span class="titlebar_left_icon">${config.titleBarIconHtml || config.titleBarIconName || ''}</span></div>
+    <div class="titlebar_center" style="${titleStyle}"><span class="titlebar_center_title">${config.titleBarTitle || '我的应用'}</span></div>
+    <div class="titlebar_right">
+      <button class="titlebar_rightBtn"><svg width="10" height="1"><rect width="10" height="1"/></svg></button>
+      <button class="titlebar_rightBtn"><svg width="10" height="10"><rect x="1" y="1" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></button>
+      <button class="titlebar_rightBtn titlebar_rightBtn_close"><svg width="10" height="10"><line x1="1" y1="1" x2="9" y2="9" stroke="currentColor" stroke-width="1.2"/><line x1="9" y1="1" x2="1" y2="9" stroke="currentColor" stroke-width="1.2"/></svg></button>
     </div>
   </div>`
 }
@@ -153,7 +153,7 @@ function renderWidgetToString(widget: Widget): string {
       return `<div ${baseAttrs} ${styleAttr}><hr style="width:100%;border:none;border-top:${dividerHeight}px ${dividerLineStyle} ${dividerBorderColor};margin:0;" /></div>`
     }
 
-    case 'hyperlink': {
+    case 'hyperLink': {
       const href = sanitizeAttr(widget.href || '#')
       const text = widget.text || '链接'
       // 根据 showUnderline 构建 style，避免 styleData.base 中的 textDecoration 默认值覆盖用户设置
@@ -166,7 +166,9 @@ function renderWidgetToString(widget: Widget): string {
       return `<textarea ${baseAttrs} ${styleAttr} placeholder="${sanitizeAttr(widget.placeholder || '')}">${sanitizeAttr(widget.value || '')}</textarea>`
 
     case 'comboBox': {
-      const opts = (widget.options || []).map((o: string) =>
+      const rawOpts = widget.options
+      const optsArr = Array.isArray(rawOpts) ? rawOpts : []
+      const opts = optsArr.map((o: string) =>
         `<option value="${sanitizeAttr(o)}">${o}</option>`
       ).join('')
       return `<select ${baseAttrs} ${styleAttr}>${opts}</select>`
@@ -175,8 +177,10 @@ function renderWidgetToString(widget: Widget): string {
     case 'radioGroup': {
       const layout = widget.layout || 'vertical'
       const flexDir = layout === 'horizontal' ? 'display:flex;gap:8px;' : ''
-      const radios = (widget.options || []).map((opt: string, i: number) =>
-        `<label class="radiogroup-item"><input type="radio" name="${id}" ${i === widget.selectedIndex ? 'checked' : ''} ${widget.disabled ? 'disabled' : ''} />${opt}</label>`
+      const rawOpts = widget.options
+      const optsArr = Array.isArray(rawOpts) ? rawOpts : []
+      const radios = optsArr.map((opt: string, i: number) =>
+        `<label class="radioGroup_item"><input type="radio" name="${id}" ${i === widget.selectedIndex ? 'checked' : ''} ${widget.disabled ? 'disabled' : ''} />${opt}</label>`
       ).join('')
       return `<div ${baseAttrs} ${styleAttr}><div style="${flexDir}">${radios}</div></div>`
     }
@@ -187,10 +191,10 @@ function renderWidgetToString(widget: Widget): string {
       const barRadius = style.borderRadius || 0
       const showText = widget.showProgressText !== false
       const isDraggable = !!(widget as any).draggable
-      const thumbHtml = isDraggable ? `<div class="progress-thumb" style="position:absolute;left:calc(${pct}% - 11px);top:50%;transform:translateY(-50%);width:22px;height:22px;border-radius:50%;background:#fff;border:2px solid ${barColor};box-shadow:0 1px 6px rgba(0,0,0,0.3);z-index:3;cursor:pointer;"></div>` : ''
-      const textHtml = showText ? `<span class="progress-text" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:inherit;pointer-events:none;white-space:nowrap;">${pct}%</span>` : ''
+      const thumbHtml = isDraggable ? `<div class="progressBar_thumb" style="position:absolute;left:calc(${pct}% - 11px);top:50%;transform:translateY(-50%);width:22px;height:22px;border-radius:50%;background:#fff;border:2px solid ${barColor};box-shadow:0 1px 6px rgba(0,0,0,0.3);z-index:3;cursor:pointer;"></div>` : ''
+      const textHtml = showText ? `<span class="progressBar_text" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:inherit;pointer-events:none;white-space:nowrap;">${pct}%</span>` : ''
       const draggableAttr = isDraggable ? ` data-draggable="true"` : ''
-      return `<div ${baseAttrs} ${styleAttr}${draggableAttr} class="progress-bar-container" style="overflow:visible;"><div class="progress-fill" style="width:${pct}%;height:100%;background:${barColor};border-radius:${barRadius}px;transition:width 0.15s;"></div>${thumbHtml}${textHtml}</div>`
+      return `<div ${baseAttrs} ${styleAttr}${draggableAttr} class="progressBar_container" style="overflow:visible;"><div class="progressBar_fill" style="width:${pct}%;height:100%;background:${barColor};border-radius:${barRadius}px;transition:width 0.15s;"></div>${thumbHtml}${textHtml}</div>`
     }
 
     case 'datetimePicker':
@@ -198,7 +202,7 @@ function renderWidgetToString(widget: Widget): string {
 
     case 'logOutput': {
       const logLines = (widget.logs || []).map((l: any) =>
-        `<div class="log-line" style="padding:2px 4px;color:${l.color || '#333'};font-size:12px;border-bottom:1px solid #eee;">${sanitizeAttr(l.text)}</div>`
+        `<div class="logOutput_line" style="padding:2px 4px;color:${l.color || '#333'};font-size:12px;border-bottom:1px solid #eee;">${sanitizeAttr(l.text)}</div>`
       ).join('')
       return `<div ${baseAttrs} ${styleAttr} style="overflow-y:auto;">${logLines}</div>`
     }
@@ -227,10 +231,10 @@ function renderWidgetToString(widget: Widget): string {
       const hdrTitle = widget.headerTitle || ''
       const hdrFontSize = style.fontSize || 13
       return `<div ${baseAttrs} ${styleAttr}>
-        <div class="card-header" style="display:flex;align-items:center;padding:0 12px;height:32px;background:${hdrColor};user-select:none;border-bottom:1px solid #e8e8e8;">
-          <span class="card-header-title" style="font-size:${hdrFontSize}px;font-weight:600;color:${hdrTitleColor};">${sanitizeAttr(hdrTitle)}</span>
+        <div class="cardBox_header" style="display:flex;align-items:center;padding:0 12px;height:32px;background:${hdrColor};user-select:none;border-bottom:1px solid #e8e8e8;">
+          <span class="cardBox_header_title" style="font-size:${hdrFontSize}px;font-weight:600;color:${hdrTitleColor};">${sanitizeAttr(hdrTitle)}</span>
         </div>
-        <div class="card-body" style="position:relative;overflow:hidden;"></div>
+        <div class="cardBox_body" style="position:relative;overflow:hidden;"></div>
       </div>`
     }
 
@@ -238,36 +242,36 @@ function renderWidgetToString(widget: Widget): string {
       const tabs = widget.tabs || []
       const hideHeader = widget.hideTabHeader === true
       const tabHeaders = tabs.map((t: any, idx: number) =>
-        `<button class="tab-header-btn${(t.name === widget.activeTab || (!widget.activeTab && idx === 0)) ? ' active' : ''}" data-ctrl-type="tab_btn" data-tab-name="${sanitizeAttr(t.name)}" style="padding:6px 16px;border:none;background:transparent;cursor:pointer;font-size:13px;">${sanitizeAttr(t.title || t.name)}</button>`
+        `<button class="tabsContainer_headerBar_btn${(t.name === widget.activeTab || (!widget.activeTab && idx === 0)) ? ' active' : ''}" data-ctrl-type="tabsContainer_headerBar_btn" data-tab-name="${sanitizeAttr(t.name)}" style="padding:6px 16px;border:none;background:transparent;cursor:pointer;font-size:13px;">${sanitizeAttr(t.title || t.name)}</button>`
       ).join('')
       const tabPanes = tabs.map((t: any, idx: number) =>
         `<div class="tab-pane${(t.name === widget.activeTab || (!widget.activeTab && idx === 0)) ? ' active' : ''}" data-tab-name="${sanitizeAttr(t.name)}" style="display:${(t.name === widget.activeTab || (!widget.activeTab && idx === 0)) ? 'block' : 'none'};"></div>`
       ).join('')
       return `<div ${baseAttrs} ${styleAttr}>
-        ${hideHeader ? '' : `<div class="tab-header-bar" style="display:flex;border-bottom:1px solid #e5e5e5;">${tabHeaders}</div>`}
-        <div class="tab-content-wrapper" style="position:relative;overflow:hidden;">${tabPanes}</div>
+        ${hideHeader ? '' : `<div class="tabsContainer_headerBar" style="display:flex;border-bottom:1px solid #e5e5e5;">${tabHeaders}</div>`}
+        <div class="tabsContainer_contentWrapper" style="position:relative;overflow:hidden;">${tabPanes}</div>
       </div>`
     }
 
     case 'listBox': {
       const items = widget.items || []
       const listItems = items.map((item: any) =>
-        `<div class="list-item${item.selected ? ' item-selected' : ''}" style="padding:6px 10px;cursor:pointer;display:flex;align-items:center;gap:6px;">${widget.showCheckbox ? '<input type="checkbox" class="list-item-checkbox" />' : ''}<span class="list-item-text">${sanitizeAttr(item.text || '')}</span></div>`
+        `<div class="listBox_item${item.selected ? ' item-selected' : ''}" style="padding:6px 10px;cursor:pointer;display:flex;align-items:center;gap:6px;">${widget.showCheckbox ? '<input type="checkbox" class="listBox_item-checkbox" />' : ''}<span class="listBox_item_text">${sanitizeAttr(item.text || '')}</span></div>`
       ).join('')
-      return `<div ${baseAttrs} ${styleAttr}><div class="list-box-scroll" style="overflow-y:auto;height:100%;">${listItems || '<div class="list-empty" style="padding:20px;text-align:center;color:#999;">暂无数据</div>'}</div></div>`
+      return `<div ${baseAttrs} ${styleAttr}><div class="listBox_scroll" style="overflow-y:auto;height:100%;">${listItems || '<div class="list-empty" style="padding:20px;text-align:center;color:#999;">暂无数据</div>'}</div></div>`
     }
 
     case 'treeView': {
       const renderNodes = (nodes: any[]): string => {
         return nodes.map(node => `
-          <div class="tree-node" style="padding-left:16px;">
-            <div class="tree-node-content${node.selected ? ' selected' : ''}" style="display:flex;align-items:center;gap:4px;padding:4px 6px;cursor:pointer;">
-              <span class="tree-toggle ${node.children?.length ? 'expanded' : 'empty'}" style="width:16px;text-align:center;"></span>
+          <div class="treeView_node" style="padding-left:16px;">
+            <div class="treeView_node_content${node.selected ? ' selected' : ''}" style="display:flex;align-items:center;gap:4px;padding:4px 6px;cursor:pointer;">
+              <span class="treeView_toggle ${node.children?.length ? 'expanded' : 'empty'}" style="width:16px;text-align:center;"></span>
               ${widget.treeShowCheckbox ? '<input type="checkbox" class="tree-checkbox" />' : ''}
-              <span class="tree-icon">${node.icon || ''}</span>
-              <span class="tree-label">${sanitizeAttr(node.text)}</span>
+              <span class="treeView_icon">${node.icon || ''}</span>
+              <span class="treeView_label">${sanitizeAttr(node.text)}</span>
             </div>
-            ${node.children?.length ? `<div class="tree-children">${renderNodes(node.children)}</div>` : ''}
+            ${node.children?.length ? `<div class="treeView_children">${renderNodes(node.children)}</div>` : ''}
           </div>
         `).join('')
       }
@@ -276,17 +280,17 @@ function renderWidgetToString(widget: Widget): string {
 
     case 'dataGrid': {
       const cols = widget.columns || []
-      const hdrCells = cols.map((c, i) => `<div class="data-grid-header-cell" data-col-key="${sanitizeAttr(c.field || 'col' + (i + 1))}" style="flex:1;padding:6px 8px;font-weight:600;border-right:1px solid #e0e0e0;">${sanitizeAttr(c.header || '')}</div>`).join('')
+      const hdrCells = cols.map((c, i) => `<div class="dataGrid_header_cell" data-col-key="${sanitizeAttr(c.field || 'col' + (i + 1))}" style="flex:1;padding:6px 8px;font-weight:600;border-right:1px solid #e0e0e0;">${sanitizeAttr(c.header || '')}</div>`).join('')
       const rows = ((widget.rows || []) as TableRow[]).map((row: any, idx: number) => {
         const cells = cols.map((c, j) => {
           const val = (row.cells && row.cells[c.field] !== undefined) ? String(row.cells[c.field]) : ''
-          return `<div class="data-grid-cell" data-col-key="${sanitizeAttr(c.field || 'col' + (j + 1))}" style="flex:1;padding:4px 8px;border-right:1px solid #eee;">${sanitizeAttr(val)}</div>`
+          return `<div class="dataGrid_cell" data-col-key="${sanitizeAttr(c.field || 'col' + (j + 1))}" style="flex:1;padding:4px 8px;border-right:1px solid #eee;">${sanitizeAttr(val)}</div>`
         }).join('')
-        return `<div class="data-grid-row" style="display:flex;border-bottom:1px solid #eee;">${cells}</div>`
+        return `<div class="dataGrid_row" style="display:flex;border-bottom:1px solid #eee;">${cells}</div>`
       }).join('')
       return `<div ${baseAttrs} ${styleAttr} style="overflow-y:auto;">
-        <div class="data-grid-header" style="display:flex;background:#fafafa;border-bottom:2px solid #e0e0e0;">${hdrCells}</div>
-        <div class="data-grid-body">${rows}</div>
+        <div class="dataGrid_header" style="display:flex;background:#fafafa;border-bottom:2px solid #e0e0e0;">${hdrCells}</div>
+        <div class="dataGrid_body">${rows}</div>
       </div>`
     }
 
@@ -351,25 +355,25 @@ function buildInlineStyle(style: Record<string, any>): string {
 function widgetTypeToCtrlType(type: string): string {
   const map: Record<string, string> = {
     button: 'button',
-    input: 'input_text',
+    input: 'inputText',
     checkbox: 'checkbox',
-    toggle: 'switch_toggle',
-    comboBox: 'combobox',
+    toggle: 'switchToggle',
+    comboBox: 'comboBox',
     label: 'label',
     divider: 'divider',
-    hyperlink: 'hyperlink',
+    hyperLink: 'hyperLink',
     textarea: 'textarea',
-    radioGroup: 'radio_group',
-    progressBar: 'progress_bar',
-    datetimePicker: 'datetime_picker',
-    logOutput: 'logbox',
-    iconButton: 'icon_button',
+    radioGroup: 'radioGroup',
+    progressBar: 'progressBar',
+    datetimePicker: 'datetimePicker',
+    logOutput: 'logOutput',
+    iconButton: 'iconButton',
     imageBox: 'imagebox',
-    cardBox: 'cardbox',
-    tabsContainer: 'tab_container',
-    listBox: 'listbox',
-    treeView: 'treeview',
-    dataGrid: 'datagrid',
+    cardBox: 'cardBox',
+    tabsContainer: 'tabsContainer',
+    listBox: 'listBox',
+    treeView: 'treeView',
+    dataGrid: 'dataGrid',
     contextMenu: 'context_menu',
     tooltip: 'tooltip',
     messageBox: 'message_box',

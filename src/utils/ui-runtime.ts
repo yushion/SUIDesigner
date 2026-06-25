@@ -49,6 +49,7 @@ export const TREE_RUNTIME_SCRIPT = `
       }
 
       TreeManager._bindGlobalEvents(container, treeId);
+      TreeManager._bindBlur(container, treeId);
     },
 
     /**
@@ -90,7 +91,7 @@ export const TREE_RUNTIME_SCRIPT = `
 
       var toggle = document.createElement('span');
       toggle.className = 'tree-toggle';
-      toggle.textContent = '';
+      toggle.textContent = '▶';
       if (node.children && node.children.length > 0) {
         if (node.expanded === true) {
           toggle.classList.add('expanded');
@@ -178,7 +179,7 @@ export const TREE_RUNTIME_SCRIPT = `
       var container = document.getElementById(treeId);
       if (!container) return;
 
-      var prevSelected = container.querySelector('.tree-node-content.selected');
+      var prevSelected = container.querySelector('.tree-node.selected');
       if (prevSelected) {
         prevSelected.classList.remove('selected');
       }
@@ -186,10 +187,7 @@ export const TREE_RUNTIME_SCRIPT = `
       var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
       if (!nodeEl) return;
 
-      var content = nodeEl.querySelector(':scope > .tree-node-content');
-      if (content) {
-        content.classList.add('selected');
-      }
+      nodeEl.classList.add('selected');
 
       TreeManager.selectedNodes[treeId] = nodeId;
     },
@@ -600,6 +598,23 @@ export const TREE_RUNTIME_SCRIPT = `
         var descendants = nodeEl.querySelectorAll('.tree-node-check');
         for (var i = 0; i < descendants.length; i++) {
           descendants[i].checked = checked;
+        }
+      });
+    }
+  ,
+
+    /**
+     * 失焦处理 — 点击树外部时根据 alwaysShowSelection 清除选中
+     * @param {HTMLElement} container - 树容器元素
+     * @param {string} treeId - 树控件 ID
+     */
+    _bindBlur: function(container, treeId) {
+      document.addEventListener('mousedown', function(e) {
+        if (container.getAttribute('data-always-show-selection') === 'true') return;
+        if (!container.contains(e.target)) {
+          var allSelected = container.querySelectorAll('.tree-node.selected');
+          allSelected.forEach(function(n) { n.classList.remove('selected'); });
+          delete TreeManager.selectedNodes[treeId];
         }
       });
     }

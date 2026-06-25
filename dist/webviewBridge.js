@@ -26,6 +26,39 @@
   // IconManager — 图标占位符与 emoji 互转
   // ================================================================
 
+  /**
+   * 判断 BMP 字符码点是否属于图标/符号/dingbat 区块（需转为 [U+XXXX]）
+   * 中日韩文字、拉丁扩展等正常文本字符不在此列，保留原样
+   */
+  function _isIconChar(cp) {
+    // 杂项符号 U+2600-U+26FF（★☆�?☁…✕✓✗✘❌✅…）
+    if (cp >= 0x2600 && cp <= 0x26FF) return true;
+    // 装饰符号 U+2700-U+27BF（✂✃✄✅…✕✖✗✘✙✚…）
+    if (cp >= 0x2700 && cp <= 0x27BF) return true;
+    // 杂项符号与箭头 U+2B00-U+2BFF（⬀⬁…⬆⬇⭐⭕…）
+    if (cp >= 0x2B00 && cp <= 0x2BFF) return true;
+    // 几何形状 U+25A0-U+25FF（■□▲△▼▽◆◇○◎●…）
+    if (cp >= 0x25A0 && cp <= 0x25FF) return true;
+    // 货币符号 U+20A0-U+20CF（₠₡₢₣₤₥₦₧₨₩₪₫€₭₮₯…）
+    if (cp >= 0x20A0 && cp <= 0x20CF) return true;
+    // 类字母符�? U+2100-U+214F（℃℉℗℘…）
+    if (cp >= 0x2100 && cp <= 0x214F) return true;
+    // 箭头 U+2190-U+21FF（←↑→↓↔↕…）
+    if (cp >= 0x2190 && cp <= 0x21FF) return true;
+    // 数学运算符 U+2200-U+22FF（∀∁∂∃∄∅…）
+    if (cp >= 0x2200 && cp <= 0x22FF) return true;
+    // 杂项技术符号 U+2300-U+23FF（⌀⌁⌂⌃⌄⌅⌆⌇⌈⌉⌊⌋…）
+    if (cp >= 0x2300 && cp <= 0x23FF) return true;
+    // 制表�?/方框绘制 U+2500-U+257F（─━│┃┄…）
+    if (cp >= 0x2500 && cp <= 0x257F) return true;
+    // 一般标点 U+2000-U+206F（—‖‗…†‡•…‰‹›※‼‽‾⁁）
+    if (cp >= 0x2000 && cp <= 0x206F) return true;
+    // 半角/全角形式 U+FF00-U+FFEF（全角字母数字和半角片假名之外的特殊符号）
+    if (cp >= 0xFF01 && cp <= 0xFF5E) return true;
+    if (cp >= 0xFFE0 && cp <= 0xFFE6) return true;
+    return false;
+  }
+
   var IconManager = {
     iconMap: {
       'OK': '\u2705',
@@ -235,6 +268,50 @@
         var regex = new RegExp(escaped, 'g');
         result = result.replace(regex, '[' + placeholder + ']');
       }
+      // 通用回退：将 iconMap 未能覆盖的非 ASCII 字符转为 [U+XXXX] 格式，兼容易语言等不支持 Unicode 的环境
+      return IconManager.sanitize(result);
+    },
+
+    /**
+     * 通用 Unicode 消毒：仅转换图标/符号/emoji 类字符为 [U+XXXX] 占位符
+     * 中日韩文字、拉丁扩展等正常文本字符保留不变
+     * - 杂项符号（U+2600-U+26FF）：★☆☀☁☂☃☄★☆☇☈☉☊☋☌☍☎☏☐☑☒☓…✕✓✗✘…
+     * - 装饰符号（U+2700-U+27BF）：✂✃✄✅✆✇✈✉✊✋✌✍✎✏✐✑✒✓✔✕✖✗✘…
+     * - 杂项符号与箭头（U+2B00-U+2BFF）：⬀⬁⬂⬃⬄⬅⬆⬇⬈⬉⬊⬋⬌⬍⬎⬏…
+     * - 表情符号（U+1F600-U+1F64F）、象形符号（U+1F300-U+1F5FF）等
+     * - 补充平面字符（codepoint >= 0x10000）
+     */
+    sanitize: function(str) {
+      if (!str || typeof str !== 'string') return str;
+      var result = '';
+      for (var i = 0; i < str.length; i++) {
+        var cp = str.charCodeAt(i);
+
+        // ASCII 直接保留
+        if (cp <= 127) {
+          result += str.charAt(i);
+          continue;
+        }
+
+        // 补充平面代理对（高位代理 + 低位代理）
+        if (cp >= 0xD800 && cp <= 0xDBFF && i + 1 < str.length) {
+          var lo = str.charCodeAt(i + 1);
+          if (lo >= 0xDC00 && lo <= 0xDFFF) {
+            var fullCp = ((cp - 0xD800) * 0x400) + (lo - 0xDC00) + 0x10000;
+            // 补充平面全部视为图标/emoji
+            result += '[U+' + fullCp.toString(16).toUpperCase() + ']';
+            i++;
+            continue;
+          }
+        }
+
+        // BMP 中仅图标/符号块做转换，文字类字符保留
+        if (_isIconChar(cp)) {
+          result += '[U+' + cp.toString(16).toUpperCase() + ']';
+        } else {
+          result += str.charAt(i);
+        }
+      }
       return result;
     },
 
@@ -318,12 +395,8 @@
     if (type === 'string') {
       return IconManager.toText(raw);
     }
-    try {
-      var jsonStr = JSON.stringify(raw);
-      return IconManager.toText(jsonStr);
-    } catch(e) {
-      return '';
-    }
+    // 对象/数组：原样返回，不做 stringify。宿主 WebView2 自身会序列化 JSON
+    return raw;
   }
 
   // ================================================================
@@ -358,6 +431,28 @@
     if (parent) {
       return parseInt(parent.getAttribute(attr), 10);
     }
+    // 自动计算：先找到行/项元素，再计算同级索引
+    var itemEl = el;
+    var itemSelector = type === 'row' ? 'tr, .dataGrid_row' : 'li, .listBox_item';
+    if (el.closest) {
+      var found = el.closest(itemSelector);
+      if (found) itemEl = found;
+    }
+    var container = itemEl.parentElement;
+    if (container) {
+      var children;
+      if (type === 'row') {
+        children = Array.prototype.filter.call(container.children, function(c) {
+          return c.tagName === 'TR' || (c.classList && c.classList.contains('dataGrid_row'));
+        });
+      } else {
+        children = Array.prototype.filter.call(container.children, function(c) {
+          return c.tagName === 'LI' || (c.classList && c.classList.contains('listBox_item'));
+        });
+      }
+      var idx = children.indexOf(itemEl);
+      if (idx !== -1) return idx;
+    }
     return -1;
   }
 
@@ -365,7 +460,7 @@
     if (el.hasAttribute('data-node-id')) {
       return el.getAttribute('data-node-id');
     }
-    var nodeEl = el.closest('.tree-node');
+    var nodeEl = el.closest('.treeView_node');
     if (nodeEl && nodeEl.hasAttribute('data-node-id')) {
       return nodeEl.getAttribute('data-node-id');
     }
@@ -373,7 +468,82 @@
   }
 
   function getColKey(el) {
-    return el.getAttribute('data-col-key') || '';
+    // 优先取 data-col-key 属性（API 用来定位列）
+    var colKey = el.getAttribute('data-col-key');
+    if (colKey) return colKey;
+    // 自动计算：找到单元格，计算列索引，返回 col0/col1/col2 格式
+    var cellEl = el;
+    if (el.closest) {
+      var found = el.closest('td, th, .dataGrid_cell');
+      if (found) cellEl = found;
+    }
+    var rowEl = cellEl.parentElement;
+    if (rowEl) {
+      var cells = Array.prototype.filter.call(rowEl.children, function(c) {
+        return c.tagName === 'TD' || c.tagName === 'TH' ||
+               (c.classList && c.classList.contains('dataGrid_cell'));
+      });
+      var colIndex = cells.indexOf(cellEl);
+      if (colIndex !== -1) {
+        return 'col' + colIndex;
+      }
+    }
+    return '';
+  }
+
+  function getColName(el) {
+    // 获取列名称（给人看的中文名称）
+    // 优先级：data-col-name 属性 > 表头 data-col-name > 表头文字
+    var cellEl = el;
+    if (el.closest) {
+      var found = el.closest('td, th, .dataGrid_cell, .dataGrid_header_cell');
+      if (found) cellEl = found;
+    }
+    // 方式1：单元格自身的 data-col-name 属性
+    var colName = cellEl.getAttribute('data-col-name');
+    if (colName) return colName;
+    var rowEl = cellEl.parentElement;
+    if (rowEl) {
+      var cells = Array.prototype.filter.call(rowEl.children, function(c) {
+        return c.tagName === 'TD' || c.tagName === 'TH' ||
+               (c.classList && (c.classList.contains('dataGrid_cell') || c.classList.contains('dataGrid_header_cell')));
+      });
+      var colIndex = cells.indexOf(cellEl);
+      if (colIndex !== -1) {
+        var tableEl = cellEl.closest ? cellEl.closest('table, .dataGrid') : null;
+        if (tableEl) {
+          var headerRow = null;
+          // 先找 dataGrid 风格的表头
+          var dataGridHeader = tableEl.querySelector('.dataGrid_header');
+          if (dataGridHeader) {
+            headerRow = dataGridHeader;
+          }
+          // 再找原生 table 的 thead
+          if (!headerRow) {
+            var thead = tableEl.querySelector('thead');
+            if (thead) {
+              headerRow = thead.querySelector('tr');
+            }
+          }
+          // 最后找第一行 tr
+          if (!headerRow) {
+            headerRow = tableEl.querySelector('tr');
+          }
+          if (headerRow) {
+            var headerCells = headerRow.querySelectorAll('th, td, .dataGrid_header_cell, .dataGrid_cell');
+            if (headerCells[colIndex]) {
+              // 方式2：表头单元格的 data-col-name 属性
+              var headerColName = headerCells[colIndex].getAttribute('data-col-name');
+              if (headerColName) return headerColName;
+              // 方式3：表头文字
+              var headerText = headerCells[colIndex].textContent.trim();
+              if (headerText) return headerText;
+            }
+          }
+        }
+      }
+    }
+    return '';
   }
 
   function directChild(parent, selector) {
@@ -388,13 +558,56 @@
 
   function getRootWidgetId(el) {
     var current = el;
+    var containerTypes = [
+      'listBox', 'treeView', 'dataGrid', 'cardBox', 'tabsContainer',
+      'logOutput', 'progressBar', 'pageContainer', 'imageBox', 'canvas'
+    ];
     while (current) {
-      if (current.id && current.hasAttribute('data-ctrl-type')) {
-        return current.id;
+      if (current.id) {
+        // Layer 1: data-ctrl-type 显式声明
+        if (current.hasAttribute && current.hasAttribute('data-ctrl-type')) {
+          return current.id;
+        }
+        // Layer 2: ARIA role
+        if (current.getAttribute) {
+          var role = current.getAttribute('role');
+          if (role && ARIA_ROLE_MAP[role]) {
+            var ct = ARIA_ROLE_MAP[role];
+            if (containerTypes.indexOf(ct) >= 0 || ct === 'button' || ct === 'inputText') {
+              return current.id;
+            }
+          }
+        }
+        // Layer 3: CSS class 容器类
+        if (current.classList) {
+          var cls = current.classList;
+          if (cls.contains('listBox') || cls.contains('listBox_scroll') ||
+              cls.contains('dataGrid') || cls.contains('dataGrid_container') ||
+              cls.contains('treeView') || cls.contains('treeView_children') ||
+              cls.contains('cardBox') || cls.contains('tabsContainer') ||
+              cls.contains('logOutput') || cls.contains('logOutput_container') ||
+              cls.contains('progressBar') || cls.contains('progressBar_container') ||
+              cls.contains('imageBox') || cls.contains('pageContainer')) {
+            return current.id;
+          }
+        }
+        // Layer 4/5: 原生标签容器
+        var tag = (current.tagName || '').toUpperCase();
+        if (tag === 'TABLE' || tag === 'UL' || tag === 'OL' ||
+            tag === 'PROGRESS' || tag === 'CANVAS') {
+          return current.id;
+        }
       }
       current = current.parentElement;
     }
-    var idEl = el.closest('[id]');
+    var idEl = el.closest ? el.closest('[id]') : null;
+    if (!idEl) {
+      var cur = el.parentElement;
+      while (cur) {
+        if (cur.id) { idEl = cur; break; }
+        cur = cur.parentElement;
+      }
+    }
     return idEl ? idEl.id : '';
   }
 
@@ -407,38 +620,710 @@
     }
   }
 
+  // ================================================================
+  // Layer 2: ARIA Role → ctrlType 映射表（Web 标准语义化识别）
+  // 使用标准 role 属性替代硬编码的 data-ctrl-type
+  // ================================================================
+  var ARIA_ROLE_MAP = {
+    'button': 'button',
+    'link': 'hyperLink',
+    'textbox': 'inputText',
+    'textarea': 'textarea',
+    'checkbox': 'checkbox',
+    'radio': 'radio',
+    'listbox': 'listBox',
+    'option': 'listBox_item',
+    'tree': 'treeView',
+    'treeitem': 'treeview_node_text',
+    'grid': 'dataGrid',
+    'gridcell': 'dataGrid_cell',
+    'row': 'dataGrid_row',
+    'columnheader': 'dataGrid_header',
+    'tablist': 'tabsContainer',
+    'tab': 'tabsContainer_headerBar_btn',
+    'tabpanel': 'tabsContainer_panel',
+    'progressbar': 'progressBar',
+    'img': 'imageBox',
+    'log': 'logOutput',
+    'status': 'label',
+    'article': 'cardBox',
+    'region': 'cardBox',
+    'combobox': 'comboBox',
+    'searchbox': 'inputText',
+    'slider': 'progressBar',
+    'switch': 'switchToggle',
+    'menuitem': 'button'
+  };
+
+  /**
+   * 从 ARIA role 属性推断 ctrlType（Layer 2，标准语义化识别）
+   * @param {Element} el - DOM 元素
+   * @returns {string} ctrlType 或空字符串
+   */
+  function inferCtrlTypeFromAria(el) {
+    if (!el) return '';
+    var current = el;
+    while (current) {
+      if (current.getAttribute) {
+        var role = current.getAttribute('role');
+        if (role && ARIA_ROLE_MAP[role]) {
+          return ARIA_ROLE_MAP[role];
+        }
+      }
+      current = current.parentElement;
+    }
+    return '';
+  }
+
+  // ================================================================
+  // Layer 5: 原生 HTML 标签 → ctrlType 自动推断映射表（兜底检测）
+  // 让纯 HTML 元素无需 data-ctrl-type 也能被识别
+  // ================================================================
+  var NATIVE_TAG_MAP = {
+    'BUTTON': 'button',
+    'A': 'hyperLink',
+    'SELECT': 'comboBox',
+    'TEXTAREA': 'textarea',
+    'INPUT': function(el) {
+      var t = (el.type || 'text').toLowerCase();
+      var map = {
+        'text': 'inputText', 'password': 'inputText', 'email': 'inputText',
+        'number': 'inputText', 'tel': 'inputText', 'url': 'inputText', 'search': 'inputText',
+        'checkbox': 'checkbox', 'radio': 'radio',
+        'range': 'progressBar', 'datetime-local': 'datetimePicker',
+        'date': 'datetimePicker', 'time': 'datetimePicker', 'color': 'inputText',
+        'submit': 'button', 'reset': 'button', 'button': 'button'
+      };
+      return map[t] || 'inputText';
+    },
+    'SPAN': 'label',
+    'LABEL': function(el) {
+      var input = el.querySelector('input[type="checkbox"], input[type="radio"]');
+      if (input) return (input.type === 'checkbox') ? 'checkbox' : 'radio';
+      return 'label';
+    },
+    'IMG': 'imageBox',
+    'UL': 'listBox',
+    'OL': 'listBox',
+    'TABLE': 'dataGrid',
+    'PROGRESS': 'progressBar',
+    'CANVAS': 'canvas'
+  };
+
+  /**
+   * 从原生 HTML 标签推断 ctrlType（Layer 5，兜底检测）
+   * @param {Element} el - DOM 元素
+   * @returns {string} ctrlType 或空字符串
+   */
+  function inferCtrlTypeFromTag(el) {
+    if (!el) return '';
+    var tag = el.tagName.toUpperCase();
+    var handler = NATIVE_TAG_MAP[tag];
+    if (!handler) return '';
+    if (typeof handler === 'function') return handler(el);
+    return handler;
+  }
+
+  // ================================================================
+  // Layer 4: DOM 结构特征智能推断
+  // 通过分析 DOM 结构特征自动识别复杂控件，无需任何特殊属性
+  // ================================================================
+
+  /**
+   * 判断元素是否在列表容器内
+   * @param {Element} el - 元素
+   * @returns {Element|null} 列表容器或 null
+   */
+  function findListContainer(el) {
+    if (!el) return null;
+    var current = el.parentElement;
+    while (current) {
+      var tag = current.tagName || '';
+      tag = tag.toUpperCase();
+      if (tag === 'UL' || tag === 'OL') return current;
+      if (current.getAttribute && current.getAttribute('role') === 'listbox') return current;
+      if (current.classList && (
+        current.classList.contains('listBox') ||
+        current.classList.contains('listbox') ||
+        current.classList.contains('list-container')
+      )) return current;
+      current = current.parentElement;
+    }
+    return null;
+  }
+
+  /**
+   * 判断元素是否在表格容器内
+   * @param {Element} el - 元素
+   * @returns {Element|null} 表格容器或 null
+   */
+  function findGridContainer(el) {
+    if (!el) return null;
+    var current = el.parentElement;
+    while (current) {
+      var tag = current.tagName || '';
+      tag = tag.toUpperCase();
+      if (tag === 'TABLE') return current;
+      if (current.getAttribute && current.getAttribute('role') === 'grid') return current;
+      if (current.classList && (
+        current.classList.contains('dataGrid') ||
+        current.classList.contains('datagrid') ||
+        current.classList.contains('grid') ||
+        current.classList.contains('table-container')
+      )) return current;
+      current = current.parentElement;
+    }
+    return null;
+  }
+
+  /**
+   * 判断元素是否在树形容器内
+   * @param {Element} el - 元素
+   * @returns {Element|null} 树形容器或 null
+   */
+  function findTreeContainer(el) {
+    if (!el) return null;
+    var current = el.parentElement;
+    while (current) {
+      if (current.getAttribute && current.getAttribute('role') === 'tree') return current;
+      if (current.classList && (
+        current.classList.contains('treeView') ||
+        current.classList.contains('treeview') ||
+        current.classList.contains('tree')
+      )) return current;
+      var tag = current.tagName || '';
+      tag = tag.toUpperCase();
+      if (tag === 'UL' || tag === 'OL') {
+        var parent = current.parentElement;
+        if (parent) {
+          var pTag = (parent.tagName || '').toUpperCase();
+          if (pTag === 'LI') return findTreeRoot(current);
+        }
+      }
+      current = current.parentElement;
+    }
+    return null;
+  }
+
+  /**
+   * 找到树的根容器
+   */
+  function findTreeRoot(el) {
+    var current = el;
+    while (current && current.parentElement) {
+      var parent = current.parentElement;
+      var pTag = (parent.tagName || '').toUpperCase();
+      if (pTag !== 'LI' && pTag !== 'UL' && pTag !== 'OL') {
+        return current;
+      }
+      if (pTag === 'UL' || pTag === 'OL') {
+        current = parent;
+      } else {
+        break;
+      }
+    }
+    return current;
+  }
+
+  /**
+   * 判断元素是否在标签页容器内
+   * @param {Element} el - 元素
+   * @returns {Element|null} 标签页容器或 null
+   */
+  function findTabsContainer(el) {
+    if (!el) return null;
+    var current = el.parentElement;
+    while (current) {
+      if (current.getAttribute && current.getAttribute('role') === 'tablist') return current;
+      if (current.classList && (
+        current.classList.contains('tabsContainer') ||
+        current.classList.contains('tabs') ||
+        current.classList.contains('tab-container')
+      )) return current;
+      current = current.parentElement;
+    }
+    return null;
+  }
+
+  /**
+   * 判断元素是否在卡片容器内
+   * @param {Element} el - 元素
+   * @returns {Element|null} 卡片容器或 null
+   */
+  function findCardContainer(el) {
+    if (!el) return null;
+    var current = el.parentElement;
+    var depth = 0;
+    while (current && depth < 5) {
+      if (current.classList && (
+        current.classList.contains('cardBox') ||
+        current.classList.contains('card')
+      )) return current;
+      if (current.getAttribute) {
+        var role = current.getAttribute('role');
+        if (role === 'article' || role === 'region') return current;
+      }
+      current = current.parentElement;
+      depth++;
+    }
+    return null;
+  }
+
+  /**
+   * 判断是否为列表项复选框
+   */
+  function isListCheckbox(el) {
+    var listContainer = findListContainer(el);
+    if (!listContainer) return false;
+    var li = el.closest ? el.closest('li') : null;
+    if (!li) {
+      var cur = el.parentElement;
+      for (var i = 0; i < 3 && cur; i++) {
+        if (cur.classList && (cur.classList.contains('listBox_item') || cur.classList.contains('list-item'))) {
+          return true;
+        }
+        cur = cur.parentElement;
+      }
+    }
+    return !!li;
+  }
+
+  /**
+   * 判断是否为表格行复选框
+   */
+  function isGridCheckbox(el) {
+    var gridContainer = findGridContainer(el);
+    if (!gridContainer) return false;
+    var tr = el.closest ? el.closest('tr') : null;
+    if (!tr) {
+      var cur = el.parentElement;
+      for (var i = 0; i < 3 && cur; i++) {
+        if (cur.classList && (cur.classList.contains('dataGrid_row') || cur.classList.contains('table-row'))) {
+          return true;
+        }
+        cur = cur.parentElement;
+      }
+    }
+    return !!tr;
+  }
+
+  /**
+   * 通过 DOM 结构特征推断 ctrlType（Layer 4，智能识别）
+   * @param {Element} el - DOM 元素
+   * @returns {string} ctrlType 或空字符串
+   */
+  function inferCtrlTypeFromStructure(el) {
+    if (!el) return '';
+    var tag = (el.tagName || '').toUpperCase();
+
+    // 复选框：判断是独立的还是在列表/表格里
+    if (tag === 'INPUT' && el.type === 'checkbox') {
+      if (isGridCheckbox(el)) return 'dataGrid_row_checkbox';
+      if (isListCheckbox(el)) return 'listbox_item_checkbox';
+      return 'checkbox';
+    }
+
+    // 列表项识别
+    if (tag === 'LI') {
+      var listEl = findListContainer(el);
+      if (listEl) return 'listBox_item';
+    }
+
+    // 表格单元格识别
+    if (tag === 'TD' || tag === 'TH') {
+      var gridEl = findGridContainer(el);
+      if (gridEl) return tag === 'TH' ? 'dataGrid_header' : 'dataGrid_cell';
+    }
+
+    // 表格行识别
+    if (tag === 'TR') {
+      var gridEl2 = findGridContainer(el);
+      if (gridEl2) return 'dataGrid';
+    }
+
+    // 树节点识别
+    var treeEl = findTreeContainer(el);
+    if (treeEl) {
+      if (tag === 'LI') return 'treeview_node_text';
+      if (el.classList && el.classList.contains('toggle')) return 'treeview_node_toggle';
+      if (tag === 'SPAN' || tag === 'DIV') {
+        var parentLi = el.closest ? el.closest('li') : null;
+        if (parentLi) return 'treeview_node_text';
+      }
+    }
+
+    // 标签页识别
+    var tabsEl = findTabsContainer(el);
+    if (tabsEl) {
+      if (el.classList && (
+        el.classList.contains('tab') ||
+        el.classList.contains('tabsContainer_headerBar_btn') ||
+        el.classList.contains('tab-item')
+      )) return 'tabsContainer_headerBar_btn';
+      if (tag === 'BUTTON' || tag === 'DIV') {
+        if (el.getAttribute && el.getAttribute('role') === 'tab') return 'tabsContainer_headerBar_btn';
+      }
+    }
+
+    // 卡片识别
+    var cardEl = findCardContainer(el);
+    if (cardEl && (el.classList && el.classList.contains('card-body'))) {
+      return 'cardBox_body';
+    }
+
+    return '';
+  }
+
+  /**
+   * 五层智能识别机制（从高到低优先级）：
+   * Layer 1: data-ctrl-type 显式声明（向后兼容，最高优先级）
+   * Layer 2: ARIA role 语义化角色（Web 标准）
+   * Layer 3: CSS class 约定命名（现有约定）
+   * Layer 4: DOM 结构特征推断（智能识别）
+   * Layer 5: 原生 HTML 标签推断（兜底检测）
+   */
+
+  /**
+   * 获取控件检测来源（用于消息溯源）
+   * @param {Element} el - DOM 元素
+   * @param {string} ctrlType - 已识别的 ctrlType
+   * @returns {string} 'explicit' | 'aria' | 'css' | 'structure' | 'native'
+   */
+  function getCtrlSource(el, ctrlType, sourceEl) {
+    if (!ctrlType) return '';
+    if (!el && !sourceEl) return 'unknown';
+    var detectEl = sourceEl || el;
+    // Layer 1: 显式 data-ctrl-type
+    var current = detectEl;
+    while (current) {
+      if (current.hasAttribute && current.hasAttribute('data-ctrl-type')) return 'explicit';
+      current = current.parentElement;
+    }
+    // Layer 2: ARIA role（先检测源元素，再检测根元素）
+    if (inferCtrlTypeFromAria(detectEl) === ctrlType) return 'aria';
+    if (el && el !== detectEl && inferCtrlTypeFromAria(el) === ctrlType) return 'aria';
+    // Layer 3: CSS class 检测
+    if (inferCtrlTypeFromCss(detectEl) === ctrlType) return 'css';
+    if (el && el !== detectEl && inferCtrlTypeFromCss(el) === ctrlType) return 'css';
+    // Layer 4: DOM 结构特征推断
+    if (inferCtrlTypeFromStructure(detectEl) === ctrlType) return 'structure';
+    if (el && el !== detectEl && inferCtrlTypeFromStructure(el) === ctrlType) return 'structure';
+    // Layer 5: 原生 HTML 标签推断
+    if (inferCtrlTypeFromTag(detectEl) === ctrlType) return 'native';
+    if (el && el !== detectEl && inferCtrlTypeFromTag(el) === ctrlType) return 'native';
+    return 'unknown';
+  }
+
+  /**
+   * 从 CSS class 推断 ctrlType（Layer 3，约定命名）
+   * @param {Element} el - DOM 元素
+   * @returns {string} ctrlType 或空字符串
+   */
+  function inferCtrlTypeFromCss(el) {
+    if (!el) return '';
+    var current = el;
+    while (current) {
+      if (current.classList) {
+        if (current.classList.contains('treeView_toggle')) return 'treeview_node_toggle';
+        if (current.classList.contains('treeView_label')) return 'treeview_node_text';
+        if (current.classList.contains('treeView_node_content')) {
+          var lbl = current.querySelector('.treeView_label');
+          if (lbl && lbl === el) return 'treeview_node_text';
+          var tgl = current.querySelector('.treeView_toggle');
+          if (tgl && tgl === el) return 'treeview_node_toggle';
+        }
+        if (current.classList.contains('listBox_scroll')) return 'listBox';
+        if (current.classList.contains('listBox_item')) return 'listBox_item';
+        if (current.classList.contains('listBox_item_text')) return 'listBox_item';
+        if (current.classList.contains('listBox_item-checkbox')) return 'listbox_item_checkbox';
+        if (current.classList.contains('logOutput_container')) return 'logOutput';
+        if (current.classList.contains('logOutput_line')) return 'logOutput_item';
+        if (current.classList.contains('dataGrid_container')) return 'dataGrid';
+        if (current.classList.contains('dataGrid_body')) return 'dataGrid';
+        if (current.classList.contains('dataGrid_header')) return 'dataGrid';
+        if (current.classList.contains('dataGrid_cell')) return 'dataGrid_cell';
+        if (current.classList.contains('dataGrid_row')) return 'dataGrid';
+        if (current.classList.contains('treeView_children')) return 'treeView';
+        if (current.classList.contains('treeView_node')) return 'treeView';
+        if (current.classList.contains('pageContainer')) return 'pageContainer';
+        if (current.classList.contains('progressBar_container')) return 'progressBar';
+      }
+      current = current.parentElement;
+    }
+    return '';
+  }
+
+  /**
+   * 检测控件类型（五层智能识别，从高到低优先级）
+   * @param {Element} el - DOM 元素
+   * @returns {string} ctrlType 或空字符串
+   */
   function detectCtrlType(el) {
+    if (!el) return '';
+    var result;
+
+    // Layer 1: data-ctrl-type 显式声明（最高优先级，向后兼容）
     var current = el;
     while (current) {
       if (current.hasAttribute && current.hasAttribute('data-ctrl-type')) {
         return current.getAttribute('data-ctrl-type');
       }
-      if (current.classList) {
-        if (current.classList.contains('tree-toggle')) return 'treeview_node_toggle';
-        if (current.classList.contains('tree-label')) return 'treeview_node_text';
-        if (current.classList.contains('tree-node-content')) {
-          var lbl = current.querySelector('.tree-label');
-          if (lbl && lbl === el) return 'treeview_node_text';
-          var tgl = current.querySelector('.tree-toggle');
-          if (tgl && tgl === el) return 'treeview_node_toggle';
-        }
-        if (current.classList.contains('list-box-scroll')) return 'listbox';
-        if (current.classList.contains('list-item')) return 'listbox_item';
-        if (current.classList.contains('list-item-text')) return 'listbox_item';
-        if (current.classList.contains('list-item-checkbox')) return 'listbox_item_checkbox';
-        if (current.classList.contains('log-output-container')) return 'logbox';
-        if (current.classList.contains('log-line')) return 'log_item';
-        if (current.classList.contains('data-grid-container')) return 'datagrid';
-        if (current.classList.contains('data-grid-body')) return 'datagrid';
-        if (current.classList.contains('data-grid-header')) return 'datagrid';
-        if (current.classList.contains('data-grid-cell')) return 'datagrid_cell';
-        if (current.classList.contains('data-grid-row')) return 'datagrid';
-        if (current.classList.contains('tree-children')) return 'treeview';
-        if (current.classList.contains('tree-node')) return 'treeview';
-        if (current.classList.contains('page-container')) return 'page';
-        if (current.classList.contains('progress-bar-container')) return 'progress_bar';
-      }
       current = current.parentElement;
+    }
+
+    // Layer 2: ARIA role 语义化角色（Web 标准）
+    result = inferCtrlTypeFromAria(el);
+    if (result) return result;
+
+    // Layer 3: CSS class 约定命名
+    result = inferCtrlTypeFromCss(el);
+    if (result) return result;
+
+    // Layer 4: DOM 结构特征推断（智能识别）
+    result = inferCtrlTypeFromStructure(el);
+    if (result) return result;
+
+    // Layer 5: 原生 HTML 标签兜底推断
+    return inferCtrlTypeFromTag(el) || '';
+  }
+
+  // ================================================================
+  // 智能名称推断：自动从 DOM 中获取控件的中文名称
+  // 当没有设置 data-name 时，自动推断一个直观的名称
+  // ================================================================
+
+  /**
+   * 获取关联的 label 元素文本
+   */
+  function getAssociatedLabelText(el) {
+    if (!el) return '';
+    // 方式1: id 关联的 label
+    if (el.id) {
+      var label = document.querySelector('label[for="' + el.id + '"]');
+      if (label) return label.textContent.trim();
+    }
+    // 方式2: 父级 label 包裹
+    var parentLabel = el.closest ? el.closest('label') : null;
+    if (!parentLabel) {
+      var cur = el.parentElement;
+      for (var i = 0; i < 3 && cur; i++) {
+        if (cur.tagName === 'LABEL') { parentLabel = cur; break; }
+        cur = cur.parentElement;
+      }
+    }
+    if (parentLabel) return parentLabel.textContent.trim();
+    return '';
+  }
+
+  /**
+   * 获取前面的文本（用于复选框、单选框等）
+   */
+  function getFollowingText(el) {
+    if (!el) return '';
+    // 检查后面的兄弟节点文本
+    if (el.nextSibling && el.nextSibling.nodeType === 3) {
+      var text = el.nextSibling.textContent.trim();
+      if (text) return text;
+    }
+    // 检查父元素的文本
+    if (el.parentElement) {
+      var pText = el.parentElement.textContent.trim();
+      if (pText && pText.length < 50) return pText;
+    }
+    return '';
+  }
+
+  /**
+   * 智能推断控件名称（customname）
+   * 优先级：data-name > aria-label > 关联 label > 文本内容 > placeholder > title > alt > id
+   * @param {Element} el - 控件元素
+   * @param {string} ctrlType - 控件类型
+   * @param {Element} sourceEl - 事件源元素（可能是子元素）
+   * @returns {string} 推断出的名称
+   */
+  function inferControlName(el, ctrlType, sourceEl) {
+    if (!el) return '';
+    var actualEl = sourceEl || el;
+
+    // 1. 优先取 data-name
+    var dataName = el.getAttribute('data-name');
+    if (dataName) return dataName;
+
+    // 2. aria-label
+    var ariaLabel = actualEl.getAttribute('aria-label');
+    if (ariaLabel) return ariaLabel;
+
+    // 3. 根据控件类型推断
+    switch (ctrlType) {
+      case 'button':
+      case 'iconButton':
+        return getOriginalText(actualEl) || actualEl.value || '';
+
+      case 'inputText':
+      case 'textarea':
+      case 'datetimePicker':
+        // 先找 label，再找 placeholder
+        var labelText = getAssociatedLabelText(actualEl);
+        if (labelText) return labelText;
+        var placeholder = actualEl.getAttribute('placeholder');
+        if (placeholder) return placeholder;
+        break;
+
+      case 'checkbox':
+      case 'radio':
+      case 'switchToggle':
+        // 找 label 或后面的文本
+        var cbLabel = getAssociatedLabelText(actualEl);
+        if (cbLabel) return cbLabel;
+        var followText = getFollowingText(actualEl);
+        if (followText) return followText;
+        break;
+
+      case 'comboBox':
+        var selLabel = getAssociatedLabelText(actualEl);
+        if (selLabel) return selLabel;
+        if (actualEl.options && actualEl.selectedIndex >= 0) {
+          return actualEl.options[actualEl.selectedIndex].text || '';
+        }
+        break;
+
+      case 'hyperLink':
+        return getOriginalText(actualEl) || actualEl.getAttribute('data-href') || actualEl.href || '';
+
+      case 'label':
+        return getOriginalText(actualEl);
+
+      case 'imageBox':
+        return actualEl.getAttribute('alt') || actualEl.getAttribute('title') || '';
+
+      case 'listBox':
+      case 'listBox_item':
+        var listEl = actualEl.tagName === 'LI' ? actualEl : (actualEl.querySelector('li') || actualEl);
+        var itemText = listEl ? listEl.textContent.trim() : '';
+        if (itemText && itemText.length < 30) return itemText;
+        break;
+
+      case 'listbox_item_checkbox':
+        var item = findListContainer(actualEl);
+        if (item) {
+          var li = actualEl.closest ? actualEl.closest('li') : null;
+          if (li) return li.textContent.trim().substring(0, 30);
+        }
+        break;
+
+      case 'dataGrid':
+      case 'dataGrid_cell':
+        var td = actualEl.tagName === 'TD' || actualEl.tagName === 'TH' ? actualEl : (actualEl.querySelector('td') || actualEl);
+        var cellText = td ? td.textContent.trim() : '';
+        if (cellText && cellText.length < 30) return cellText;
+        break;
+
+      case 'dataGrid_row_checkbox':
+        var tr = actualEl.closest ? actualEl.closest('tr') : null;
+        if (tr) {
+          var tds = tr.querySelectorAll('td');
+          for (var i = 0; i < tds.length; i++) {
+            var t = tds[i].textContent.trim();
+            if (t && t.length < 30 && t.length > 0) return t;
+          }
+        }
+        break;
+
+      case 'treeview_node_text':
+      case 'treeview_node_toggle':
+      case 'treeView':
+        var nodeText = actualEl.textContent ? actualEl.textContent.trim() : '';
+        if (nodeText && nodeText.length < 30) return nodeText;
+        break;
+
+      case 'tabsContainer':
+      case 'tabsContainer_headerBar_btn':
+        var tabText = actualEl.textContent ? actualEl.textContent.trim() : '';
+        if (tabText && tabText.length < 20) return tabText;
+        break;
+
+      case 'progressBar':
+        var progText = actualEl.textContent ? actualEl.textContent.trim() : '';
+        if (progText) return progText;
+        var progLabel = getAssociatedLabelText(actualEl);
+        if (progLabel) return progLabel;
+        break;
+
+      case 'logOutput':
+      case 'logOutput_item':
+        var logText = actualEl.textContent ? actualEl.textContent.trim() : '';
+        if (logText && logText.length < 50) return logText.substring(0, 30);
+        break;
+
+      case 'cardBox':
+      case 'cardBox_body':
+        var cardTitle = actualEl.querySelector('.cardBox_header_title, .card-title, [class*="title"]');
+        if (cardTitle) return cardTitle.textContent.trim().substring(0, 30);
+        break;
+    }
+
+    // 4. title 属性
+    var title = actualEl.getAttribute('title');
+    if (title) return title;
+
+    // 5. 最后用 id 兜底
+    if (el.id) return el.id;
+
+    return '';
+  }
+
+  /**
+   * ctrlType 到中文基础类型的映射
+   */
+  var CTRL_TYPE_CN_MAP = {
+    'button': '按钮',
+    'iconButton': '图标按钮',
+    'inputText': '输入框',
+    'textarea': '文本域',
+    'checkbox': '复选框',
+    'radio': '单选框',
+    'switchToggle': '开关',
+    'comboBox': '组合框',
+    'hyperLink': '超链接',
+    'label': '文本标签',
+    'imageBox': '图片框',
+    'progressBar': '进度条',
+    'datetimePicker': '时间框',
+    'listBox': '列表框',
+    'listBox_item': '列表项',
+    'listbox_item_checkbox': '列表复选框',
+    'treeView': '树形框',
+    'treeview_node_text': '树节点',
+    'treeview_node_toggle': '树节点开关',
+    'dataGrid': '数据表格',
+    'dataGrid_cell': '表格单元格',
+    'dataGrid_row_checkbox': '表格行复选框',
+    'dataGrid_header': '表格表头',
+    'cardBox': '卡片框',
+    'cardBox_body': '卡片主体',
+    'tabsContainer': '标签页',
+    'tabsContainer_headerBar_btn': '标签按钮',
+    'logOutput': '日志框',
+    'logOutput_item': '日志项',
+    'canvas': '画布',
+    'pageContainer': '页面容器'
+  };
+
+  /**
+   * 智能推断控件基础类型（basictype）
+   * 优先级：data-type > 自动从 ctrlType 映射中文名称
+   * @param {Element} el - 控件元素
+   * @param {string} ctrlType - 控件类型
+   * @returns {string} 中文基础类型
+   */
+  function inferBasicType(el, ctrlType) {
+    if (!el) return '';
+    // 优先取 data-type
+    var dataType = el.getAttribute('data-type');
+    if (dataType) return dataType;
+    // 自动从 ctrlType 映射
+    if (ctrlType && CTRL_TYPE_CN_MAP[ctrlType]) {
+      return CTRL_TYPE_CN_MAP[ctrlType];
     }
     return '';
   }
@@ -463,23 +1348,23 @@
   }
 
   function getItemLabel(el, ctrlType) {
-    if (ctrlType === 'listbox_item') {
-      var textEl = el.querySelector('.list-item-text');
+    if (ctrlType === 'listBox_item') {
+      var textEl = el.querySelector('.listBox_item_text');
       if (textEl) return getOriginalText(textEl);
       return getOriginalText(el);
     }
     if (ctrlType === 'listbox_item_checkbox') {
-      var itemEl = el.closest('.list-item');
-      if (itemEl) return getItemLabel(itemEl, 'listbox_item');
+      var itemEl = el.closest('.listBox_item');
+      if (itemEl) return getItemLabel(itemEl, 'listBox_item');
       return '';
     }
     if (ctrlType === 'treeview_node_text') {
       return getOriginalText(el);
     }
     if (ctrlType === 'treeview_node_toggle') {
-      var node = el.closest('.tree-node');
+      var node = el.closest('.treeView_node');
       if (node) {
-        var label = node.querySelector('.tree-label');
+        var label = node.querySelector('.treeView_label');
         if (label) return getOriginalText(label);
       }
       return '';
@@ -536,15 +1421,21 @@
   // 消息发送
   // ================================================================
 
-  function send(action, ctrlType, targetId, data) {
+  function send(action, ctrlType, targetId, data, sourceEl) {
     var targetEl = targetId ? findTarget(targetId) : null;
+    // v2: 自动推断控件来源（explicit / aria / css / structure / native）
+    var source = getCtrlSource(targetEl, ctrlType, sourceEl);
+    // v3: 智能推断 customname 和 basictype
+    var customname = targetEl ? inferControlName(targetEl, ctrlType, sourceEl) : '';
+    var basictype = targetEl ? inferBasicType(targetEl, ctrlType) : '';
     var msg = {
       title: document.title || '',
       action: action,
-      customname: targetEl ? (targetEl.getAttribute('data-name') || '') : '',
+      customname: customname,
       targetId: targetId,
-      basictype: targetEl ? (targetEl.getAttribute('data-type') || '') : '',
+      basictype: basictype,
       ctrlType: ctrlType,
+      source: source,
       data: data || {},
       timestamp: Date.now()
     };
@@ -587,16 +1478,16 @@
       case 'button':
         data.value = getOriginalText(el);
         break;
-      case 'hyperlink':
+      case 'hyperLink':
         data.value = el.getAttribute('data-href') || el.href || getOriginalText(el);
         break;
-      case 'icon_button':
+      case 'iconButton':
         data.value = getOriginalText(el);
         break;
-      case 'tab_btn':
+      case 'tabsContainer_headerBar_btn':
         data.value = el.textContent || '';
         break;
-      case 'input_text':
+      case 'inputText':
       case 'textarea':
         data.value = el.value || '';
         break;
@@ -604,7 +1495,7 @@
         data.checked = el.checked || false;
         data.value = el.checked ? 'on' : 'off';
         break;
-      case 'switch_toggle':
+      case 'switchToggle':
         data.checked = el.checked || false;
         data.value = el.checked ? 'on' : 'off';
         break;
@@ -614,16 +1505,16 @@
         data.groupName = el.name || '';
         data.checked = el.checked || false;
         break;
-      case 'combobox':
+      case 'comboBox':
         data.value = el.value || '';
         data.index = el.selectedIndex;
         data.text = el.options && el.options[el.selectedIndex] ? el.options[el.selectedIndex].text : '';
         break;
-      case 'progress_bar':
-        var progressRoot = el.closest('[data-ctrl-type="progress_bar"]');
+      case 'progressBar':
+        var progressRoot = el.closest('[data-ctrl-type="progressBar"]');
         if (!progressRoot) break;
-        var fillEl = progressRoot.querySelector('.progress-fill');
-        var textEl = progressRoot.querySelector('.progress-text');
+        var fillEl = progressRoot.querySelector('.progressBar_fill');
+        var textEl = progressRoot.querySelector('.progressBar_text');
         var curVal = 0;
         if (fillEl) {
           curVal = parseFloat(fillEl.style.width) || 0;
@@ -651,10 +1542,10 @@
           data.value = curVal;
         }
         break;
-      case 'datetime_picker':
+      case 'datetimePicker':
         data.value = el.value || '';
         break;
-      case 'listbox_item':
+      case 'listBox_item':
         data.itemIndex = getElementIndex(el, 'item');
         data.label = getItemLabel(el, ctrlType);
         break;
@@ -663,13 +1554,14 @@
         data.checked = el.checked || false;
         data.label = getItemLabel(el, ctrlType);
         break;
-      case 'datagrid_row_checkbox':
+      case 'dataGrid_row_checkbox':
         data.rowIndex = getElementIndex(el, 'row');
         data.checked = el.checked || false;
         break;
-      case 'datagrid_cell':
+      case 'dataGrid_cell':
         data.rowIndex = getElementIndex(el, 'row');
         data.colKey = getColKey(el);
+        data.colName = getColName(el);
         data.value = getOriginalText(el);
         break;
       case 'treeview_node_text':
@@ -679,9 +1571,9 @@
         break;
       case 'treeview_node_toggle':
         data.nodeId = getNodeId(el);
-        var nodeEl = el.closest('.tree-node');
+        var nodeEl = el.closest('.treeView_node');
         if (nodeEl) {
-          var childrenEl = directChild(nodeEl, '.tree-children');
+          var childrenEl = directChild(nodeEl, '.treeView_children');
           data.expanded = childrenEl ? (childrenEl.style.display !== 'none') : false;
         } else {
           data.expanded = false;
@@ -689,34 +1581,34 @@
         data.text = getItemLabel(el, 'treeview_node_toggle');
         data.value = data.text;
         break;
-      case 'cardbox_body':
-        var cardEl = el.closest('.card-box');
+      case 'cardBox_body':
+        var cardEl = el.closest('.cardBox');
         if (cardEl) {
           data.collapsed = cardEl.getAttribute('data-collapsed') === 'true';
-          var cardTitleEl = cardEl.querySelector('.card-header-title');
+          var cardTitleEl = cardEl.querySelector('.cardBox_header_title');
           data.cardTitle = cardTitleEl ? (cardTitleEl.textContent || '') : '';
           data.tabTxt = data.cardTitle;
         }
         break;
-      case 'log_item':
+      case 'logOutput_item':
         data.value = el.textContent || '';
         break;
       case 'label':
         data.value = el.textContent || '';
         break;
-      case 'image_box':
+      case 'imageBox':
       case 'canvas':
         break;
-      case 'cardbox':
-        var cEl = el.closest('.card-box') || el;
+      case 'cardBox':
+        var cEl = el.closest('.cardBox') || el;
         data.collapsed = cEl.getAttribute('data-collapsed') === 'true';
-        var cTitle = cEl.querySelector('.card-header-title');
+        var cTitle = cEl.querySelector('.cardBox_header_title');
         data.cardTitle = cTitle ? (cTitle.textContent || '') : '';
         data.tabTxt = data.cardTitle;
         break;
-      case 'tab_container':
-        var tEl = el.closest('.tabs-container') || el.closest('[data-ctrl-type="tabsContainer"]') || el;
-        var ab = tEl.querySelector('.tab-header-btn.active');
+      case 'tabsContainer':
+        var tEl = el.closest('.tabsContainer') || el.closest('[data-ctrl-type="tabsContainer"]') || el;
+        var ab = tEl.querySelector('.tabsContainer_headerBar_btn.active');
         data.tabName = ab ? (ab.getAttribute('data-tab-name') || '') : '';
         data.tabTxt = ab ? (ab.textContent || '') : '';
         break;
@@ -739,76 +1631,77 @@
     var targetId = getRootWidgetId(e.target);
     var data = extractEventData(e.target, ctrlType, e);
     if (ctrlType === 'listbox_item_checkbox') return;
-    if (ctrlType === 'listbox_item') {
-      var listContainer = e.target.closest('[data-ctrl-type="listbox"]');
+    if (ctrlType === 'listBox_item') {
+      var listContainer = e.target.closest('[data-ctrl-type="listBox"]');
       if (listContainer) {
         if (e.ctrlKey && listContainer.getAttribute('data-show-checkbox') === 'true') {
-          var cbItem = e.target.closest('.list-item');
+          var cbItem = e.target.closest('.listBox_item');
           if (cbItem) {
-            var cb = cbItem.querySelector('.list-item-checkbox');
+            var cb = cbItem.querySelector('.listBox_item-checkbox');
             if (cb) { cb.checked = !cb.checked; return; }
           }
         }
-        var allItems = listContainer.querySelectorAll('.list-item');
+        var allItems = listContainer.querySelectorAll('.listBox_item');
         for (var li = 0; li < allItems.length; li++) {
           allItems[li].classList.remove('item-selected');
         }
-        var clickedItem = e.target.closest('.list-item');
+        var clickedItem = e.target.closest('.listBox_item');
         if (clickedItem) clickedItem.classList.add('item-selected');
         lastActiveListbox = listContainer;
       }
     }
-    if (ctrlType === 'datagrid_cell') {
-      var gridContainer = e.target.closest('[data-ctrl-type="datagrid"]');
+    if (ctrlType === 'dataGrid_cell') {
+      var gridContainer = e.target.closest('[data-ctrl-type="dataGrid"]');
       if (gridContainer) {
         if (e.ctrlKey && gridContainer.getAttribute('data-show-checkbox') === 'true') {
-          var cbRow = e.target.closest('.data-grid-row');
+          var cbRow = e.target.closest('.dataGrid_row');
           if (cbRow) {
-            var cb = cbRow.querySelector('.data-grid-row-check');
+            var cb = cbRow.querySelector('.dataGrid_row_check');
             if (cb) { cb.checked = !cb.checked; return; }
           }
         }
-        var allRows = gridContainer.querySelectorAll('.data-grid-row');
+        var allRows = gridContainer.querySelectorAll('.dataGrid_row');
         for (var ri = 0; ri < allRows.length; ri++) {
-          allRows[ri].classList.remove('data-grid-row-focused');
+          allRows[ri].classList.remove('dataGrid_row-focused');
         }
-        var clickedRow = e.target.closest('.data-grid-row');
-        if (clickedRow) clickedRow.classList.add('data-grid-row-focused');
+        var clickedRow = e.target.closest('.dataGrid_row');
+        if (clickedRow) clickedRow.classList.add('dataGrid_row-focused');
         lastActiveDataGrid = gridContainer;
       }
     }
     if (ctrlType === 'treeview_node_toggle') {
-      send('nodeToggle', ctrlType, targetId, data);
+      send('nodeToggle', ctrlType, targetId, data, e.target);
       return;
     }
-    if (ctrlType === 'treeview_node_text' || ctrlType === 'treeview') {
+    if (ctrlType === 'treeview_node_text' || ctrlType === 'treeView') {
       var treeContainer = e.target.closest('[data-type="treeView"]');
       if (treeContainer) {
         if (e.ctrlKey && treeContainer.getAttribute('data-show-checkbox') === 'true') {
-          var cbContent = e.target.closest('.tree-node-content');
+          var cbContent = e.target.closest('.treeView_node_content');
           if (cbContent) {
-            var cb = cbContent.querySelector('.tree-node-check');
+            var cb = cbContent.querySelector('.treeView_node-check');
             if (cb) { cb.checked = !cb.checked; return; }
           }
         }
-        var clickedContent = e.target.closest('.tree-node-content');
+        var clickedContent = e.target.closest('.treeView_node_content');
         if (clickedContent) {
-          var allContents = treeContainer.querySelectorAll('.tree-node-content.selected');
-          for (var tc = 0; tc < allContents.length; tc++) {
-            allContents[tc].classList.remove('selected');
+          var allNodes = treeContainer.querySelectorAll('.treeView_node.selected');
+          for (var tn = 0; tn < allNodes.length; tn++) {
+            allNodes[tn].classList.remove('selected');
           }
-          clickedContent.classList.add('selected');
+          var clickedNode = clickedContent.closest('.treeView_node');
+          if (clickedNode) clickedNode.classList.add('selected');
         } else if (treeContainer.getAttribute('data-always-show-selection') !== 'true') {
-          var allContents = treeContainer.querySelectorAll('.tree-node-content.selected');
-          for (var tc = 0; tc < allContents.length; tc++) {
-            allContents[tc].classList.remove('selected');
+          var allNodes = treeContainer.querySelectorAll('.treeView_node.selected');
+          for (var tn = 0; tn < allNodes.length; tn++) {
+            allNodes[tn].classList.remove('selected');
           }
         }
         lastActiveTreeView = treeContainer;
       }
     }
-    if (ctrlType === 'tab_btn') {
-      var tabContainer = e.target.closest('.tabs-container') || e.target.closest('[data-ctrl-type="tabsContainer"]');
+    if (ctrlType === 'tabsContainer_headerBar_btn') {
+      var tabContainer = e.target.closest('.tabsContainer') || e.target.closest('[data-ctrl-type="tabsContainer"]');
       if (tabContainer) {
         var containerId = tabContainer.id || targetId;
         var newTabName = e.target.getAttribute('data-tab-name') || '';
@@ -825,38 +1718,38 @@
         return;
       }
     }
-    if (ctrlType === 'cardbox_body' || ctrlType === 'cardbox') {
-      var cardRoot = e.target.closest('.card-box');
+    if (ctrlType === 'cardBox_body' || ctrlType === 'cardBox') {
+      var cardRoot = e.target.closest('.cardBox');
       if (cardRoot) {
         var cardId = cardRoot.id || targetId;
         if (!data.collapsed) data.collapsed = cardRoot.getAttribute('data-collapsed') === 'true';
         if (!data.cardTitle) {
-          var ctEl = cardRoot.querySelector('.card-header-title');
+          var ctEl = cardRoot.querySelector('.cardBox_header_title');
           data.cardTitle = ctEl ? (ctEl.textContent || '') : '';
           data.tabTxt = data.cardTitle;
         }
-        var collapseBtn = e.target.closest('.card-collapse-btn');
+        var collapseBtn = e.target.closest('.cardBox_collapse_btn');
         if (collapseBtn) {
           data.isCollapseBtn = true;
           data.collapsed = cardRoot.getAttribute('data-collapsed') === 'true';
-          send('click', 'cardbox', cardId, data);
+          send('click', 'cardBox', cardId, data);
           return;
         }
-        var cardHeader = e.target.closest('.card-header');
+        var cardHeader = e.target.closest('.cardBox_header');
         if (cardHeader) {
           data.isHeader = true;
-          send('click', 'cardbox', cardId, data);
+          send('click', 'cardBox', cardId, data);
           return;
         }
         send('click', ctrlType, cardId, data);
         return;
       }
     }
-    if (ctrlType === 'tab_container') {
-      var tabRoot = e.target.closest('.tabs-container') || e.target.closest('[data-ctrl-type="tabsContainer"]');
+    if (ctrlType === 'tabsContainer') {
+      var tabRoot = e.target.closest('.tabsContainer') || e.target.closest('[data-ctrl-type="tabsContainer"]');
       if (tabRoot) {
         var tcId = tabRoot.id || targetId;
-        var activeBtn = tabRoot.querySelector('.tab-header-btn.active');
+        var activeBtn = tabRoot.querySelector('.tabsContainer_headerBar_btn.active');
         data.tabName = activeBtn ? (activeBtn.getAttribute('data-tab-name') || '') : '';
         data.tabTxt = activeBtn ? (activeBtn.textContent || '') : '';
         send('click', ctrlType, tcId, data);
@@ -864,10 +1757,10 @@
       }
     }
     if (lastActiveListbox) {
-      var clickedInListbox = e.target.closest('[data-ctrl-type="listbox"]');
+      var clickedInListbox = e.target.closest('[data-ctrl-type="listBox"]');
       if (clickedInListbox !== lastActiveListbox) {
         if (lastActiveListbox.getAttribute('data-always-show-selection') !== 'true') {
-          var clearItems = lastActiveListbox.querySelectorAll('.list-item');
+          var clearItems = lastActiveListbox.querySelectorAll('.listBox_item');
           for (var cl = 0; cl < clearItems.length; cl++) {
             clearItems[cl].classList.remove('item-selected');
           }
@@ -876,12 +1769,12 @@
       }
     }
     if (lastActiveDataGrid) {
-      var clickedInGrid = e.target.closest('[data-ctrl-type="datagrid"]');
+      var clickedInGrid = e.target.closest('[data-ctrl-type="dataGrid"]');
       if (clickedInGrid !== lastActiveDataGrid) {
         if (lastActiveDataGrid.getAttribute('data-always-show-selection') !== 'true') {
-          var clearRows = lastActiveDataGrid.querySelectorAll('.data-grid-row');
+          var clearRows = lastActiveDataGrid.querySelectorAll('.dataGrid_row');
           for (var cr = 0; cr < clearRows.length; cr++) {
-            clearRows[cr].classList.remove('data-grid-row-focused');
+            clearRows[cr].classList.remove('dataGrid_row-focused');
           }
         }
         lastActiveDataGrid = null;
@@ -891,33 +1784,33 @@
       var clickedInTree = e.target.closest('[data-type="treeView"]');
       if (clickedInTree !== lastActiveTreeView) {
         if (lastActiveTreeView.getAttribute('data-always-show-selection') !== 'true') {
-          var clearContents = lastActiveTreeView.querySelectorAll('.tree-node-content.selected');
-          for (var ct = 0; ct < clearContents.length; ct++) {
-            clearContents[ct].classList.remove('selected');
+          var clearNodes = lastActiveTreeView.querySelectorAll('.treeView_node.selected');
+          for (var cn = 0; cn < clearNodes.length; cn++) {
+            clearNodes[cn].classList.remove('selected');
           }
         }
         lastActiveTreeView = null;
       }
     }
     var clickableTypes = [
-      'button', 'hyperlink', 'icon_button',
-      'input_text', 'textarea', 'checkbox', 'radio', 'switch_toggle',
-      'combobox', 'datetime_picker', 'progress_bar',
-      'listbox_item', 'datagrid_cell', 'datagrid_row_checkbox',
+      'button', 'hyperLink', 'iconButton',
+      'inputText', 'textarea', 'checkbox', 'radio', 'switchToggle',
+      'comboBox', 'datetimePicker', 'progressBar',
+      'listBox_item', 'dataGrid_cell', 'dataGrid_row_checkbox',
       'treeview_node_text',
-      'log_item', 'label', 'image_box', 'canvas',
-      'logbox', 'listbox', 'datagrid', 'treeview',
-      'cardbox', 'cardbox_body', 'tab_container',
-      'radio_group', 'page',
-      'titlebar_icon', 'titlebar_title', 'titlebar_min', 'titlebar_max', 'titlebar_close'
+      'logOutput_item', 'label', 'imageBox', 'canvas',
+      'logOutput', 'listBox', 'dataGrid', 'treeView',
+      'cardBox', 'cardBox_body', 'tabsContainer',
+      'radioGroup', 'pageContainer',
+      'titlebar_left_icon', 'titlebar_title', 'titlebar_min', 'titlebar_max', 'titlebar_close'
     ];
     if (clickableTypes.indexOf(ctrlType) !== -1) {
-      send('click', ctrlType, targetId, data);
+      send('click', ctrlType, targetId, data, e.target);
     }
   }
 
   function handleChange(e) {
-    var selectAll = e.target.closest('.data-grid-select-all');
+    var selectAll = e.target.closest('.dataGrid_select_all');
     if (selectAll) {
       var gridId = getRootWidgetId(selectAll);
       var saData = { selectAll: true, checked: selectAll.checked || false, mouse: 'left' };
@@ -928,9 +1821,9 @@
     if (!ctrlType) return;
     var targetId = getRootWidgetId(e.target);
     var data = extractEventData(e.target, ctrlType, e);
-    var changeTypes = ['checkbox', 'switch_toggle', 'radio', 'combobox', 'datetime_picker', 'listbox_item_checkbox', 'datagrid_row_checkbox'];
+    var changeTypes = ['checkbox', 'switchToggle', 'radio', 'comboBox', 'datetimePicker', 'listbox_item_checkbox', 'dataGrid_row_checkbox'];
     if (changeTypes.indexOf(ctrlType) !== -1) {
-      send('change', ctrlType, targetId, data);
+      send('change', ctrlType, targetId, data, e.target);
       return;
     }
   }
@@ -938,10 +1831,10 @@
   function handleInput(e) {
     var ctrlType = detectCtrlType(e.target);
     if (!ctrlType) return;
-    if (ctrlType === 'input_text' || ctrlType === 'textarea') {
+    if (ctrlType === 'inputText' || ctrlType === 'textarea') {
       var targetId = getRootWidgetId(e.target);
       var data = extractEventData(e.target, ctrlType, e);
-      send('change', ctrlType, targetId, data);
+      send('change', ctrlType, targetId, data, e.target);
       return;
     }
   }
@@ -949,7 +1842,7 @@
   function handleBlur(e) {
     var ctrlType = detectCtrlType(e.target);
     if (!ctrlType) return;
-    if (ctrlType === 'input_text' || ctrlType === 'textarea') {
+    if (ctrlType === 'inputText' || ctrlType === 'textarea') {
       var targetId = getRootWidgetId(e.target);
       var newValue = e.target.value || '';
       var oldValue = inputOldValues[targetId] !== undefined ? inputOldValues[targetId] : newValue;
@@ -957,7 +1850,7 @@
       data.value = newValue;
       data.oldvalue = oldValue;
       data.type = 'end';
-      send('change', ctrlType, targetId, data);
+      send('change', ctrlType, targetId, data, e.target);
       return;
     }
   }
@@ -966,17 +1859,17 @@
     var ctrlType = detectCtrlType(e.target);
     if (!ctrlType) return;
     var focusTypes = [
-      'input_text', 'textarea', 'combobox', 'datetime_picker',
-      'checkbox', 'radio', 'button', 'hyperlink', 'icon_button',
-      'datagrid_cell'
+      'inputText', 'textarea', 'comboBox', 'datetimePicker',
+      'checkbox', 'radio', 'button', 'hyperLink', 'iconButton',
+      'dataGrid_cell'
     ];
     if (focusTypes.indexOf(ctrlType) === -1) return;
     var targetId = getRootWidgetId(e.target);
-    if (ctrlType === 'input_text' || ctrlType === 'textarea') {
+    if (ctrlType === 'inputText' || ctrlType === 'textarea') {
       inputOldValues[targetId] = e.target.value || '';
     }
     var data = extractEventData(e.target, ctrlType, e);
-    send('focus', ctrlType, targetId, data);
+    send('focus', ctrlType, targetId, data, e.target);
   }
 
   function makeEditable(el, ctrlType, targetId, options) {
@@ -1039,9 +1932,9 @@
     if (!ctrlType) return;
     var targetId = getRootWidgetId(e.target);
     var data = extractEventData(e.target, ctrlType, e);
-    if (ctrlType === 'datagrid_cell') {
+    if (ctrlType === 'dataGrid_cell') {
       var cell = e.target;
-      if (cell.closest('.data-grid-checkbox')) return;
+      if (cell.closest('.dataGrid_checkbox')) return;
       var container = cell.closest('[data-editable]');
       if (container && container.getAttribute('data-editable') !== 'true') return;
       send('cellEdit', ctrlType, targetId, data);
@@ -1109,12 +2002,12 @@
       });
       return;
     }
-    if (ctrlType === 'listbox_item') {
-      var itemEl = e.target.closest('.list-item');
+    if (ctrlType === 'listBox_item') {
+      var itemEl = e.target.closest('.listBox_item');
       if (!itemEl) return;
       var containerEl = itemEl.closest('[data-editable]');
       if (containerEl && containerEl.getAttribute('data-editable') !== 'true') return;
-      var textEl = itemEl.querySelector('.list-item-text');
+      var textEl = itemEl.querySelector('.listBox_item_text');
       if (!textEl) return;
       var lbData = extractEventData(textEl, ctrlType, e);
       send('itemEdit', ctrlType, targetId, lbData);
@@ -1146,51 +2039,51 @@
     var targetId = getRootWidgetId(e.target);
     var data = extractEventData(e.target, ctrlType, e);
 
-    if (ctrlType === 'listbox_item') {
-      var listContainer = e.target.closest('[data-ctrl-type="listbox"]');
+    if (ctrlType === 'listBox_item') {
+      var listContainer = e.target.closest('[data-ctrl-type="listBox"]');
       if (listContainer) {
-        var allItems = listContainer.querySelectorAll('.list-item');
+        var allItems = listContainer.querySelectorAll('.listBox_item');
         for (var li = 0; li < allItems.length; li++) {
           allItems[li].classList.remove('item-selected');
         }
-        var clickedItem = e.target.closest('.list-item');
+        var clickedItem = e.target.closest('.listBox_item');
         if (clickedItem) clickedItem.classList.add('item-selected');
         lastActiveListbox = listContainer;
       }
     }
-    if (ctrlType === 'datagrid_cell') {
-      var gridContainer = e.target.closest('[data-ctrl-type="datagrid"]');
+    if (ctrlType === 'dataGrid_cell') {
+      var gridContainer = e.target.closest('[data-ctrl-type="dataGrid"]');
       if (gridContainer) {
-        var allRows = gridContainer.querySelectorAll('.data-grid-row');
+        var allRows = gridContainer.querySelectorAll('.dataGrid_row');
         for (var ri = 0; ri < allRows.length; ri++) {
-          allRows[ri].classList.remove('data-grid-row-focused');
+          allRows[ri].classList.remove('dataGrid_row-focused');
         }
-        var clickedRow = e.target.closest('.data-grid-row');
-        if (clickedRow) clickedRow.classList.add('data-grid-row-focused');
+        var clickedRow = e.target.closest('.dataGrid_row');
+        if (clickedRow) clickedRow.classList.add('dataGrid_row-focused');
         lastActiveDataGrid = gridContainer;
       }
     }
     if (ctrlType === 'treeview_node_text') {
       var treeContainer = e.target.closest('[data-type="treeView"]');
       if (treeContainer) {
-        var allContents = treeContainer.querySelectorAll('.tree-node-content.selected');
-        for (var tc = 0; tc < allContents.length; tc++) {
-          allContents[tc].classList.remove('selected');
+        var allSelected = treeContainer.querySelectorAll('.treeView_node.selected');
+        for (var ts = 0; ts < allSelected.length; ts++) {
+          allSelected[ts].classList.remove('selected');
         }
-        var clickedContent = e.target.closest('.tree-node-content');
+        var clickedContent = e.target.closest('.treeView_node_content');
         if (clickedContent) clickedContent.classList.add('selected');
         lastActiveTreeView = treeContainer;
       }
     }
 
     var ctxTypes = [
-      'button', 'hyperlink', 'tab_btn', 'icon_button',
-      'listbox_item', 'datagrid_cell', 'treeview_node_text',
-      'combobox', 'input_text', 'textarea',
-      'checkbox', 'radio', 'progress_bar', 'datetime_picker',
-      'log_item', 'label', 'logbox', 'image_box', 'datagrid', 'tab_container',
-      'cardbox', 'cardbox_body', 'canvas', 'listbox', 'treeview', 'radio_group', 'page',
-      'titlebar_icon', 'titlebar_title', 'titlebar_min', 'titlebar_max', 'titlebar_close'
+      'button', 'hyperLink', 'tabsContainer_headerBar_btn', 'iconButton',
+      'listBox_item', 'dataGrid_cell', 'treeview_node_text',
+      'comboBox', 'inputText', 'textarea',
+      'checkbox', 'radio', 'progressBar', 'datetimePicker',
+      'logOutput_item', 'label', 'logOutput', 'imageBox', 'dataGrid', 'tabsContainer',
+      'cardBox', 'cardBox_body', 'canvas', 'listBox', 'treeView', 'radioGroup', 'pageContainer',
+      'titlebar_left_icon', 'titlebar_title', 'titlebar_min', 'titlebar_max', 'titlebar_close'
     ];
     if (ctxTypes.indexOf(ctrlType) !== -1) {
       send('click', ctrlType, targetId, data);
@@ -1211,8 +2104,8 @@
       var targetId = '';
       var idEl = link.closest('[id]');
       if (idEl) targetId = idEl.id;
-      if (idEl && idEl.getAttribute('data-ctrl-type') === 'hyperlink') {
-        send('hyperlink', 'hyperlink', targetId, { href: dataHref, text: link.textContent || '' });
+      if (idEl && idEl.getAttribute('data-ctrl-type') === 'hyperLink') {
+        send('hyperLink', 'hyperLink', targetId, { href: dataHref, text: link.textContent || '' });
       }
       return;
     }
@@ -1222,9 +2115,9 @@
   }
 
   function bindEvents() {
-    var tabBtns = document.querySelectorAll('.tab-header-btn.active');
+    var tabBtns = document.querySelectorAll('.tabsContainer_headerBar_btn.active');
     for (var i = 0; i < tabBtns.length; i++) {
-      var container = tabBtns[i].closest('.tabs-container') || tabBtns[i].closest('[data-ctrl-type="tabsContainer"]');
+      var container = tabBtns[i].closest('.tabsContainer') || tabBtns[i].closest('[data-ctrl-type="tabsContainer"]');
       if (container && container.id) {
         lastActiveTab[container.id] = {
           tabName: tabBtns[i].getAttribute('data-tab-name') || '',
@@ -1264,206 +2157,21 @@
   var messageListeners = [];
 
   // ================================================================
-  // 默认命令处理器（直接调用 api 方法）
+  // 宿主消息监听 — 仅记录收到的命令消息，暂不做分发处理
   // ================================================================
-
-  var defaultCommands = {
-    setValue: function(cmd) {
-      if (window.webviewBridge && window.webviewBridge.api && window.webviewBridge.api.setValue) {
-        window.webviewBridge.api.setValue(cmd.targetId, cmd.value);
-      }
-    },
-    setChecked: function(cmd) {
-      if (window.webviewBridge && window.webviewBridge.api && window.webviewBridge.api.setChecked) {
-        window.webviewBridge.api.setChecked(cmd.targetId, cmd.checked);
-      }
-    },
-    setDisabled: function(cmd) {
-      if (window.webviewBridge && window.webviewBridge.api && window.webviewBridge.api.setEnabled) {
-        window.webviewBridge.api.setEnabled(cmd.targetId, false);
-      }
-    },
-    setEnabled: function(cmd) {
-      if (window.webviewBridge && window.webviewBridge.api && window.webviewBridge.api.setEnabled) {
-        window.webviewBridge.api.setEnabled(cmd.targetId, true);
-      }
-    },
-    show: function(cmd) {
-      if (window.webviewBridge && window.webviewBridge.api && window.webviewBridge.api.show) {
-        window.webviewBridge.api.show(cmd.targetId);
-      }
-    },
-    hide: function(cmd) {
-      if (window.webviewBridge && window.webviewBridge.api && window.webviewBridge.api.hide) {
-        window.webviewBridge.api.hide(cmd.targetId);
-      }
-    },
-    toggle: function(cmd) {
-      if (window.webviewBridge && window.webviewBridge.api && window.webviewBridge.api.toggle) {
-        window.webviewBridge.api.toggle(cmd.targetId);
-      }
-    },
-    focus: function(cmd) {
-      if (window.webviewBridge && window.webviewBridge.api && window.webviewBridge.api.focus) {
-        window.webviewBridge.api.focus(cmd.targetId);
-      }
-    },
-    setStyle: function(cmd) {
-      if (window.webviewBridge && window.webviewBridge.api && window.webviewBridge.api.setStyle) {
-        window.webviewBridge.api.setStyle(cmd.targetId, cmd.style || cmd.css);
-      }
-    },
-    setBlockContextMenu: function(cmd) {
-      if (window.webviewBridge && window.webviewBridge.api && window.webviewBridge.api.setBlockContextMenu) {
-        window.webviewBridge.api.setBlockContextMenu(cmd.block);
-      }
-    },
-    showNotification: function(cmd) {
-      if (window.webviewBridge && window.webviewBridge.api && window.webviewBridge.api.showNotification) {
-        window.webviewBridge.api.showNotification({
-          title: cmd.title,
-          text: cmd.text,
-          text2: cmd.text2,
-          image: cmd.image,
-          button1: cmd.button1,
-          button2: cmd.button2
-        });
-      }
-    },
-    iconParse: function(cmd) {
-      var el = findTarget(cmd.targetId);
-      if (el && window.webviewBridge.api.icon.parse) {
-        el.innerHTML = window.webviewBridge.api.icon.parse(cmd.text || el.innerHTML);
-      }
-    },
-    iconToText: function(cmd) {
-      var el = findTarget(cmd.targetId);
-      if (el && window.webviewBridge.api.icon.toText) {
-        el.innerHTML = window.webviewBridge.api.icon.toText(cmd.html || el.innerHTML);
-      }
-    },
-    showMessageBox: function(cmd) {
-      if (window.webviewBridge && window.webviewBridge.api && window.webviewBridge.api.messageBox) {
-        window.webviewBridge.api.messageBox.show(cmd.overrides, cmd.requestId);
-      }
-    },
-    'messageBox.getConfig': function() {
-      if (window.webviewBridge && window.webviewBridge.api && window.webviewBridge.api.messageBox) {
-        return window.webviewBridge.api.messageBox.getConfig();
-      }
-      return null;
-    },
-    'messageBox.updateConfig': function(cmd) {
-      if (window.webviewBridge && window.webviewBridge.api && window.webviewBridge.api.messageBox) {
-        window.webviewBridge.api.messageBox.updateConfig(cmd.config);
-      }
-    },
-    showInputBox: function(cmd) {
-      if (window.webviewBridge && window.webviewBridge.api && window.webviewBridge.api.inputBox) {
-        window.webviewBridge.api.inputBox.show(cmd.overrides, cmd.requestId);
-      }
-    },
-    'inputBox.getConfig': function() {
-      if (window.webviewBridge && window.webviewBridge.api && window.webviewBridge.api.inputBox) {
-        return window.webviewBridge.api.inputBox.getConfig();
-      }
-      return null;
-    },
-    'inputBox.updateConfig': function(cmd) {
-      if (window.webviewBridge && window.webviewBridge.api && window.webviewBridge.api.inputBox) {
-        window.webviewBridge.api.inputBox.updateConfig(cmd.config);
-      }
-    },
-    setFixedCanvasSize: function(cmd) {
-      if (window.webviewBridge && window.webviewBridge.api && window.webviewBridge.api.canvas) {
-        window.webviewBridge.api.canvas.setFixedCanvasSize(cmd.isFixed, cmd.width, cmd.height);
-      }
-    },
-    getIdByName: function(cmd) {
-      if (window.webviewBridge && window.webviewBridge.api) {
-        var result = window.webviewBridge.api.getIdByName(cmd.dataName);
-        send('getIdByNameResult', '', '', { dataName: cmd.dataName, result: result });
-      }
-    },
-    getInfoById: function(cmd) {
-      if (window.webviewBridge && window.webviewBridge.api) {
-        var result = window.webviewBridge.api.getInfoById(cmd.id);
-        send('getInfoByIdResult', '', '', { id: cmd.id, result: result });
-      }
-    }
-  };
-
-  /** 从函数源码提取参数名列表 */
-  function getParamNames(func) {
-    if (typeof func !== 'function') return [];
-    var fnStr = func.toString();
-    var match = fnStr.match(/function\s*\w*\s*\(([^)]*)\)/);
-    if (!match) return [];
-    var raw = match[1];
-    if (!raw.trim()) return [];
-    var params = raw.split(',').map(function(p) { return p.trim(); });
-    return params;
-  }
-
-  function dispatchCommand(cmd) {
-    if (!cmd || typeof cmd !== 'object') return;
-    var name = cmd.command || cmd.cmd || '';
-    if (!name) return;
-    log('[webviewBridge] 收到命令:', name, cmd);
-    if (defaultCommands[name]) {
-      try {
-        defaultCommands[name](cmd);
-      } catch(e) {
-        warn('[webviewBridge] 默认命令执行异常:', name, e.message);
-      }
-      return;
-    }
-    // 通用点号命令分发：如 tabContainer.selectTab、dataGrid.addRow、listBox.selectItem 等
-    var parts = name.split('.');
-    if (parts.length >= 2 && window.webviewBridge && window.webviewBridge.api) {
-      var apiObj = window.webviewBridge.api;
-      var validPath = true;
-      for (var pi = 0; pi < parts.length - 1; pi++) {
-        if (!apiObj || !apiObj[parts[pi]]) { validPath = false; break; }
-        apiObj = apiObj[parts[pi]];
-      }
-      if (validPath && apiObj && typeof apiObj[parts[parts.length - 1]] === 'function') {
-        try {
-          var methodName = parts[parts.length - 1];
-          var fn = apiObj[methodName];
-          var paramNames = getParamNames(fn);
-          var callArgs = [];
-          for (var ai = 0; ai < paramNames.length; ai++) {
-            var pn = paramNames[ai];
-            if (cmd[pn] !== undefined) {
-              callArgs.push(cmd[pn]);
-            } else {
-              callArgs.push(undefined);
-            }
-          }
-          fn.apply(apiObj, callArgs);
-        } catch(e) {
-          warn('[webviewBridge] 点号命令执行异常:', name, e.message);
-        }
-        return;
-      }
-    }
-    warn('[webviewBridge] 未知命令:', name);
-  }
 
   function listenHostMessages() {
     try {
       if (window.chrome && window.chrome.webview && window.chrome.webview.addEventListener) {
         window.chrome.webview.addEventListener('message', function(e) {
-          log('[webviewBridge] 收到宿主消息:', e.data);
           try {
             var cmd = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
             if (Array.isArray(cmd)) {
               for (var i = 0; i < cmd.length; i++) {
-                dispatchCommand(cmd[i]);
+                log('[webviewBridge] 收到宿主命令:', cmd[i].command || cmd[i].cmd || '(无命令名)', cmd[i]);
               }
             } else {
-              dispatchCommand(cmd);
+              log('[webviewBridge] 收到宿主命令:', cmd.command || cmd.cmd || '(无命令名)', cmd);
             }
           } catch(parseErr) {
             warn('[webviewBridge] 消息解析失败:', parseErr.message);
@@ -1683,27 +2391,10 @@
   var tooltipShowTimer = null;
   var tooltipHideTimer = null;
 
-  var tooltipStyleEl = null;
-
-  function ensureTooltipDefaultStyles() {
-    if (tooltipStyleEl) return;
-    tooltipStyleEl = document.createElement('style');
-    tooltipStyleEl.setAttribute('data-tooltip-defaults', '1');
-    tooltipStyleEl.textContent =
-      '.tt-content { background:#333; color:#fff; padding:8px 12px; border-radius:6px; font-size:13px; line-height:1.5; max-width:300px; word-wrap:break-word; box-shadow:0 4px 12px rgba(0,0,0,0.25); }' +
-      '.tt-arrow { position:absolute; width:0; height:0; border:6px solid transparent; }' +
-      '.tt-arrow.bottom { border-top-color:#333; }' +
-      '.tt-arrow.top { border-bottom-color:#333; }' +
-      '.tt-arrow.right { border-left-color:#333; }' +
-      '.tt-arrow.left { border-right-color:#333; }';
-    document.head.appendChild(tooltipStyleEl);
-  }
-
   function createTooltipElement() {
-    ensureTooltipDefaultStyles();
     var wrapper = document.createElement('div');
     wrapper.className = 'tt-wrapper';
-    wrapper.style.cssText = 'position:fixed;z-index:999999;pointer-events:none;';
+    wrapper.style.cssText = 'position:fixed;z-index:999999;pointer-events:none;app-region:no-drag;-webkit-app-region:no-drag;';
 
     var content = document.createElement('div');
     content.className = 'tt-content';
@@ -1918,25 +2609,47 @@
       messageBoxConfig = window.__messageBoxConfig;
       log('[webviewBridge] 信息提示框配置已加载');
     }
+  }
 
-    if (!document.querySelector('[data-messagebox-base-style]')) {
-      var baseStyle = document.createElement('style');
-      baseStyle.setAttribute('data-messagebox-base-style', '1');
-      baseStyle.textContent = '.mb-overlay{position:fixed;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:99999;display:flex;align-items:center;justify-content:center;}' +
-        '.mb-dialog{background:#fff;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.2);max-width:90vw;overflow:hidden;display:flex;flex-direction:column;}' +
-        '.mb-header{padding:16px 20px 8px;font-size:16px;font-weight:600;color:#333;cursor:default;display:flex;align-items:center;justify-content:space-between;}' +
-        '.mb-header-title{flex:1;}' +
-        '.mb-header-close{width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;background:transparent;color:#999;font-size:16px;border-radius:4px;}' +
-        '.mb-header-close:hover{background:#f0f0f0;color:#333;}' +
-        '.mb-body{padding:8px 20px 16px;display:flex;align-items:flex-start;gap:12px;}' +
-        '.mb-icon{font-size:28px;flex-shrink:0;}' +
-        '.mb-message{font-size:14px;color:#555;line-height:1.6;word-wrap:break-word;flex:1;}' +
-        '.mb-footer{padding:12px 20px 16px;display:flex;justify-content:flex-end;gap:8px;}' +
-        '.mb-btn{padding:7px 20px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;font-size:13px;cursor:pointer;}' +
-        '.mb-btn:hover{border-color:#409eff;color:#409eff;}' +
-        '.mb-btn.mb-btn-primary{background:#409eff;color:#fff;border-color:#409eff;}' +
-        '.mb-btn.mb-btn-primary:hover{background:#66b1ff;}';
-      document.head.appendChild(baseStyle);
+  // ================================================================
+  // 标题栏最大化/还原
+  // ================================================================
+
+  var _titlebarMaxIcon = '<span style="width:18px;height:14px;display:flex;align-items:center;justify-content:center;"><svg width="12" height="12" viewBox="0 0 10 10" shape-rendering="crispEdges"><rect x="1" y="1" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1" /></svg></span>';
+  var _titlebarRestoreIcon = '<span style="width:18px;height:14px;display:flex;align-items:center;justify-content:center;"><svg width="12" height="12" viewBox="0 0 10 10" shape-rendering="crispEdges"><line x1="4" y1="1" x2="10" y2="1" stroke="currentColor" stroke-width="1" /><line x1="10" y1="1" x2="10" y2="6" stroke="currentColor" stroke-width="1" /><rect x="2" y="3" width="6" height="6" fill="none" stroke="currentColor" stroke-width="1" /></svg></span>';
+  var _titlebarIsMaximized = false;
+
+  function initTitleBar() {
+    var maxBtn = document.getElementById('titlebar_max');
+    if (!maxBtn) return;
+
+    /** 切换到最大化状态：换图标 + 发消息 */
+    function doMaximize() {
+      _titlebarIsMaximized = true;
+      maxBtn.innerHTML = _titlebarRestoreIcon;
+      maxBtn.title = '还原';
+    }
+
+    /** 切换到还原状态：换图标 + 发消息 */
+    function doRestore() {
+      _titlebarIsMaximized = false;
+      maxBtn.innerHTML = _titlebarMaxIcon;
+      maxBtn.title = '最大化';
+    }
+
+    // 暴露 API
+    if (!window.webviewBridge.api.titleBar) {
+      window.webviewBridge.api.titleBar = {
+        maximize: doMaximize,
+        restore: doRestore,
+        isMaximized: function() { return _titlebarIsMaximized; },
+        setIcon: function(iconHTML) {
+          if (iconHTML) _titlebarMaxIcon = iconHTML;
+        },
+        setRestoreIcon: function(iconHTML) {
+          if (iconHTML) _titlebarRestoreIcon = iconHTML;
+        }
+      };
     }
   }
 
@@ -1944,27 +2657,6 @@
     if (window.__inputBoxConfig) {
       inputBoxConfig = window.__inputBoxConfig;
       log('[webviewBridge] 输入框配置已加载');
-    }
-
-    if (!document.querySelector('[data-inputbox-base-style]')) {
-      var baseStyle = document.createElement('style');
-      baseStyle.setAttribute('data-inputbox-base-style', '1');
-      baseStyle.textContent = '.ib-overlay{position:fixed;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:99999;display:flex;align-items:center;justify-content:center;}' +
-        '.ib-dialog{background:#fff;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.2);max-width:90vw;overflow:hidden;display:flex;flex-direction:column;}' +
-        '.ib-header{padding:16px 20px 8px;font-size:16px;font-weight:600;color:#333;display:flex;align-items:center;justify-content:space-between;}' +
-        '.ib-header-title{flex:1;}' +
-        '.ib-header-close{width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;background:transparent;color:#999;font-size:16px;border-radius:4px;}' +
-        '.ib-header-close:hover{background:#f0f0f0;color:#333;}' +
-        '.ib-body{padding:8px 20px 16px;}' +
-        '.ib-prompt{font-size:14px;color:#555;line-height:1.6;margin-bottom:10px;}' +
-        '.ib-input{width:100%;padding:7px 10px;border:1px solid #d9d9d9;border-radius:4px;font-size:13px;color:#333;outline:none;box-sizing:border-box;}' +
-        '.ib-input:focus{border-color:#409eff;box-shadow:0 0 0 2px rgba(64,158,255,0.2);}' +
-        '.ib-footer{padding:12px 20px 16px;display:flex;justify-content:flex-end;gap:8px;}' +
-        '.ib-btn{padding:7px 20px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;font-size:13px;cursor:pointer;}' +
-        '.ib-btn:hover{border-color:#409eff;color:#409eff;}' +
-        '.ib-btn.ib-btn-primary{background:#409eff;color:#fff;border-color:#409eff;}' +
-        '.ib-btn.ib-btn-primary:hover{background:#66b1ff;}';
-      document.head.appendChild(baseStyle);
     }
   }
 
@@ -2095,6 +2787,8 @@
     dialog.style.left = '50%';
     dialog.style.top = '50%';
     dialog.style.transform = 'translate(-50%, -50%)';
+    dialog.style.setProperty('app-region', 'no-drag');
+    dialog.style.setProperty('-webkit-app-region', 'no-drag');
 
     if (draggable) {
       var isDragging = false;
@@ -2207,6 +2901,8 @@
     dialog.style.left = '50%';
     dialog.style.top = '50%';
     dialog.style.transform = 'translate(-50%, -50%)';
+    dialog.style.setProperty('app-region', 'no-drag');
+    dialog.style.setProperty('-webkit-app-region', 'no-drag');
 
     var header = document.createElement('div');
     header.className = 'ib-header';
@@ -2341,14 +3037,14 @@
     }
   }
 
-  function getAllOriginalStyles(targetId) {
-    var newStyles = {width: '', height: '', realWidth: '', realHeight: ''};
-    var element = document.getElementById(targetId);
-    var styles = {width: '', height: ''};
+  function getAllOriginalStyles(element) {
+    var newStyles = { width: 0, height: 0, realWidth: 0, realHeight: 0 };
+    var widthVal = '';
+    var heightVal = '';
+
+    // 1. 从样式表中提取原始 width 和 height 值
     var styleSheets = document.styleSheets;
     var matches = element.matches || element.msMatchesSelector || element.webkitMatchesSelector;
-
-    // 遍历所有样式表
     for (var i = 0; i < styleSheets.length; i++) {
         var sheet = styleSheets[i];
         try {
@@ -2357,71 +3053,485 @@
             for (var j = 0; j < cssRules.length; j++) {
                 var rule = cssRules[j];
                 if (matches.call(element, rule.selectorText)) {
-                    for (var k = 0; k < rule.style.length; k++) {
-                        var prop = rule.style[k];
-                        styles[prop] = rule.style.getPropertyValue(prop);
-                    }
+                    var w = rule.style.getPropertyValue('width');
+                    if (w) widthVal = w;
+                    var h = rule.style.getPropertyValue('height');
+                    if (h) heightVal = h;
                 }
             }
-        } catch (e) {}
+        } catch (e) { /* 忽略跨域样式表 */ }
     }
 
+    // 保存原始内联样式用于恢复
     var orig = element.style.cssText;
 
-    // ═══════════════════════════════════════
-    // 🔑 处理 width = 100%
-    // ═══════════════════════════════════════
-    if (styles.width === "100%") {
-        newStyles.width = -1;  // 标记为百分比
-
-        element.style.width = 'auto';
-        element.style.height = 'auto';       // ✅ 加上这个
-        element.style.position = 'absolute';
-        element.style.left = '-9999px';
-        element.style.top = '-9999px';       // ✅ 加上这个
-
-        newStyles.realWidth = element.scrollWidth;
-
-        element.style.cssText = orig;
-    } else {
-        var widthNum = parseInt(styles.width) || 0;
-        newStyles.width = widthNum;  // ✅ 删除 box-shadow 判断
-    }
-
-    // ═══════════════════════════════════════
-    // 🔑 处理 height = 100%
-    // ═══════════════════════════════════════
-    if (styles.height === "100%") {
-        newStyles.height = -1;  // 标记为百分比
-
-        element.style.width = 'auto';       // ✅ 加上这个
-        element.style.height = 'auto';
+    // 离屏测量滚动尺寸（用于自适应时的实际内容尺寸）
+    function measureScrollSize() {
         element.style.position = 'absolute';
         element.style.left = '-9999px';
         element.style.top = '-9999px';
-
-        newStyles.realHeight = element.scrollHeight;  // ✅ 修复：d → element
-
+        element.style.width = 'auto';
+        element.style.height = 'auto';
+        var dummy = element.offsetHeight; // 强制重排
+        var sw = element.scrollWidth;
+        var sh = element.scrollHeight;
         element.style.cssText = orig;
+        return { scrollWidth: sw, scrollHeight: sh };
+    }
+
+    // 获取最终计算像素值（用于回退）
+    var computedStyle = window.getComputedStyle(element);
+    var computedWidth = parseFloat(computedStyle.width) || 0;
+    var computedHeight = parseFloat(computedStyle.height) || 0;
+
+    // 辅助：判断值是否为固定像素（如 "200px"）或数值+px
+    function isFixedPixel(val) {
+        if (!val) return false;
+        var trimmed = val.trim();
+        // 如果以 px 结尾，并且数字部分不为 0，认为是固定像素
+        if (/^\d+(\.\d+)?px$/i.test(trimmed)) {
+            return true;
+        }
+        // 如果纯数字（无单位），也视为固定像素（旧式写法）
+        if (/^\d+(\.\d+)?$/.test(trimmed)) {
+            return true;
+        }
+        return false;
+    }
+
+    // 处理宽度
+    if (widthVal && isFixedPixel(widthVal)) {
+        // 固定像素：直接取数值
+        var num = parseFloat(widthVal);
+        newStyles.width = num;
+        newStyles.realWidth = num;
     } else {
-        var heightNum = parseInt(styles.height) || 0;
-        newStyles.height = heightNum;  // ✅ 删除 box-shadow 判断
+        // 非固定（auto、%、vw等）：视为自适应，width=0，realWidth为实际内容宽度
+        newStyles.width = 0;
+        // 尝试获取实际内容宽度：离屏测量滚动宽度
+        var size = measureScrollSize();
+        newStyles.realWidth = size.scrollWidth || computedWidth || 0;
+    }
+
+    // 处理高度
+    if (heightVal && isFixedPixel(heightVal)) {
+        var num2 = parseFloat(heightVal);
+        newStyles.height = num2;
+        newStyles.realHeight = num2;
+    } else {
+        newStyles.height = 0;
+        var size2 = measureScrollSize();
+        newStyles.realHeight = size2.scrollHeight || computedHeight || 0;
     }
 
     return newStyles;
+}
+   /**
+   * 自动寻找页面中最大的可见块级容器（div/main/section/article）
+   * 跳过隐藏元素、遮罩层（fixed + z-index 高）以及太小或比例失调的元素
+   * @returns {Element} 找到的容器元素，若失败则返回 document.body
+   */
+function findMainContainer() {
+    // ----- 辅助函数：判断元素是否“可视”（不检查 opacity）-----
+    const isVisible = (el) => {
+        if (!el) return false;
+        const style = getComputedStyle(el);
+        if (style.display === 'none' || style.visibility === 'hidden') return false;
+        const rect = el.getBoundingClientRect();
+        if (rect.width < 10 || rect.height < 10) return false;
+        return true;
+    };
+
+    // 获取元素面积
+    const getArea = (el) => {
+        const rect = el.getBoundingClientRect();
+        return rect.width * rect.height;
+    };
+
+    const body = document.body;
+    const html = document.documentElement;
+
+    // ----- 第一步：判断 body 自身是否可以作为主容器 -----
+    // 如果 body 本身不可见，直接跳过，进入子元素搜索
+    if (!isVisible(body)) {
+        return searchInChildren(body);
+    }
+
+    // body 可见，比较尺寸
+    const bodyRect = body.getBoundingClientRect();
+    const htmlRect = html.getBoundingClientRect();
+    // 允许 1px 误差（考虑滚动条造成的细微差异）
+    const widthMatch = Math.abs(bodyRect.width - htmlRect.width) <= 1;
+    const heightMatch = Math.abs(bodyRect.height - htmlRect.height) <= 1;
+
+    // 如果 body 尺寸与 html 不同，说明 body 本身就是内容容器（例如有 margin/padding）
+    if (!widthMatch || !heightMatch) {
+        return body;
+    }
+
+    // 如果 body 尺寸与 html 相同，说明 body 只是一个全屏包裹层，往下找真正的容器
+    return searchInChildren(body);
+
+    // ----- 第二步：在指定元素的子元素中逐层查找最大可视容器 -----
+    function searchInChildren(startEl) {
+        let current = startEl;
+        let depth = 0;
+        const MAX_DEPTH = 10; // 防止死循环
+
+        while (current && depth < MAX_DEPTH) {
+            const children = current.children;
+
+            // 没有子元素 → 回退到起始元素（body）
+            if (children.length === 0) {
+                return startEl;
+            }
+
+            // 找出当前层面积最大的子元素
+            let bestChild = null;
+            let maxArea = -1;
+            for (let i = 0; i < children.length; i++) {
+                const el = children[i];
+                const area = getArea(el);
+                if (area > maxArea) {
+                    maxArea = area;
+                    bestChild = el;
+                }
+            }
+
+            // 所有子元素面积为 0 → 回退到起始
+            if (!bestChild || maxArea <= 0) {
+                return startEl;
+            }
+
+            // 如果面积最大的子元素是可视的 → 直接返回它
+            if (isVisible(bestChild)) {
+                return bestChild;
+            }
+
+            // 否则（不可见），钻进这个不可见容器内部继续找
+            if (bestChild.children.length > 0) {
+                current = bestChild;
+                depth++;
+                continue;
+            }
+
+            // 不可见且没有子元素 → 死胡同，回退到起始
+            return startEl;
+        }
+
+        // 超过深度限制，回退到起始
+        return startEl;
+    }
+}
+
+/**
+ * 增强版：分析标题栏元素，提取高度和右侧最右边的三个按钮坐标
+ * 支持扁平布局（所有控件直接平铺）和容器布局（左、中、右分区）
+ * @param {HTMLElement} titleBarEl - 标题栏 DOM 元素
+ * @param {DOMRect} containerRect - 主容器的 getBoundingClientRect()
+ * @returns {Object|null} 包含 height 和 buttonRects 的对象，若按钮少于2个则返回 null
+ */
+function analyzeTitleBarElement(titleBarEl, containerRect) {
+    if (!titleBarEl) return null;
+    var elRect = titleBarEl.getBoundingClientRect();
+    var titleBarHeight = elRect.height;
+    var width = elRect.width;
+
+    // 收集所有可能为按钮的候选元素（去重）
+    var candidates = [];
+
+    // ---- 第一步：基于特征直接查找窗口控制按钮 ----
+    var windowControlSelectors = [
+		// ID 选择器（精准定位）
+		'#titlebar_min', '#titlebar_max', '#titlebar_close',
+		// data-ctrl-type
+		'[data-ctrl-type="titlebar_min"]',
+		'[data-ctrl-type="titlebar_max"]',
+		'[data-ctrl-type="titlebar_close"]',
+		// 常见类名
+		'.minimize', '.maximize', '.close', '.restore',
+		'.window-control', '.window-close', '.window-max', '.window-min',
+		'.btn-min', '.btn-max', '.btn-close',
+		// data 属性
+		'[data-action="minimize"]', '[data-action="maximize"]', '[data-action="close"]', '[data-action="restore"]',
+		// aria-label
+		'[aria-label*="minimize" i]', '[aria-label*="maximize" i]', '[aria-label*="close" i]', '[aria-label*="restore" i]',
+		// title
+		'[title*="最小化" i]', '[title*="最大化" i]', '[title*="关闭" i]', '[title*="还原" i]',
+		'[title*="minimize" i]', '[title*="maximize" i]', '[title*="close" i]', '[title*="restore" i]'
+	];
+    var featureMatches = titleBarEl.querySelectorAll(windowControlSelectors.join(','));
+    for (var f = 0; f < featureMatches.length; f++) {
+        var el = featureMatches[f];
+        var r = el.getBoundingClientRect();
+        // 只收集位于右侧区域的（左边界 > 30% 宽度）
+        if (r.left > elRect.left + width * 0.3) {
+            if (candidates.indexOf(el) === -1) {
+                candidates.push(el);
+            }
+        }
+    }
+
+    // ---- 第二步：如果特征查找找到至少2个，直接使用；否则回退到通用几何检测 ----
+    if (candidates.length < 2) {
+        candidates = [];
+        var isButtonSized = function(r) {
+            return r.width >= 10 && r.width <= titleBarHeight * 1.5 &&
+                   r.height >= 10 && r.height <= titleBarHeight;
+        };
+
+        // 检查直接子元素
+        for (var i = 0; i < titleBarEl.children.length; i++) {
+            var child = titleBarEl.children[i];
+            var r = child.getBoundingClientRect();
+            if (r.left < elRect.left + width * 0.7) continue;
+
+            var style = getComputedStyle(child);
+            var isClickable = style.cursor === 'pointer' ||
+                              child.classList.contains('btn') ||
+                              child.classList.contains('button') ||
+                              child.hasAttribute('role') ||
+                              child.tagName === 'BUTTON';
+
+            if (isButtonSized(r) && isClickable) {
+                if (candidates.indexOf(child) === -1) candidates.push(child);
+                continue;
+            }
+
+            if (r.width > titleBarHeight * 1.5) {
+                for (var j = 0; j < child.children.length; j++) {
+                    var sub = child.children[j];
+                    var sr = sub.getBoundingClientRect();
+                    if (!isButtonSized(sr)) continue;
+                    var subStyle = getComputedStyle(sub);
+                    var isSubClickable = subStyle.cursor === 'pointer' ||
+                                         sub.classList.contains('btn') ||
+                                         sub.classList.contains('button') ||
+                                         sub.hasAttribute('role') ||
+                                         sub.tagName === 'BUTTON';
+                    if (isSubClickable && candidates.indexOf(sub) === -1) {
+                        candidates.push(sub);
+                    }
+                }
+            }
+        }
+
+        // 如果仍然少于2个，用选择器补查直接子元素
+        if (candidates.length < 2) {
+            var directBtns = titleBarEl.querySelectorAll(':scope > .btn, :scope > [class*="btn"], :scope > button, :scope > [role="button"]');
+            for (var k = 0; k < directBtns.length; k++) {
+                var btn = directBtns[k];
+                var r2 = btn.getBoundingClientRect();
+                if (r2.left > elRect.left + width * 0.7) {
+                    if (candidates.indexOf(btn) === -1) candidates.push(btn);
+                }
+            }
+        }
+    }
+
+    // 如果候选数少于2，返回 null
+    if (candidates.length < 2) return null;
+
+    // ---- 第三步：按左边界从右到左排序，只取最右边的三个 ----
+    candidates.sort(function(a, b) {
+        var ra = a.getBoundingClientRect();
+        var rb = b.getBoundingClientRect();
+        return rb.left - ra.left; // 降序，最右在前
+    });
+    candidates = candidates.slice(0, 3);
+
+    // 重新按从左到右排序（保持视觉顺序）
+    candidates.sort(function(a, b) {
+        var ra = a.getBoundingClientRect();
+        var rb = b.getBoundingClientRect();
+        return ra.left - rb.left;
+    });
+
+    // ---- 第四步：构建坐标数据 ----
+    var buttonRects = candidates.map(function(btn) {
+        var r = btn.getBoundingClientRect();
+        // 尝试获取样式表中的声明尺寸（非百分比）
+        var declared = getAllOriginalStyles(btn);
+        // 若声明值有效（>0），则使用声明值；否则回退到渲染尺寸
+        var width = (declared.width > 0) ? declared.width : r.width;
+        var height = (declared.height > 0) ? declared.height : r.height;
+        return {
+            x: containerRect.right - r.left,
+            y: r.top - containerRect.top,
+            width: width,
+            height: height
+        };
+    });
+
+    return {
+        height: titleBarHeight,
+        buttonRects: buttonRects
+    };
+}
+
+
+function getTitleBarInfo(container) {
+    if (!container) return null;
+
+    var containerRect = container.getBoundingClientRect();
+    var children = container.children;
+    var candidates = [];
+
+    for (var i = 0; i < children.length; i++) {
+        var child = children[i];
+        var rect = child.getBoundingClientRect();
+        if (rect.top - containerRect.top > 5) continue;
+
+        var height = rect.height;
+        var width = rect.width;
+        if (height < 15 || height > 80) continue;
+        if (width < containerRect.width * 0.7) continue;
+
+        var style = getComputedStyle(child);
+        if (style.position === 'fixed' && parseInt(style.zIndex) > 1000) continue;
+
+        candidates.push(child);
+    }
+
+    candidates.sort(function(a, b) {
+        return a.getBoundingClientRect().top - b.getBoundingClientRect().top;
+    });
+
+    for (var j = 0; j < candidates.length; j++) {
+        var el = candidates[j];
+        var info = analyzeTitleBarElement(el, containerRect);
+        if (info) {
+            // 获取当前元素的矩形用于标题文本定位
+            var elRect = el.getBoundingClientRect();
+            var width = elRect.width;
+
+            var titleText = '';
+            var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
+                acceptNode: function(node) {
+                    if (node.textContent.trim().length === 0) return NodeFilter.FILTER_REJECT;
+                    return NodeFilter.FILTER_ACCEPT;
+                }
+            });
+            var node = walker.nextNode();
+            while (node) {
+                var text = node.textContent.trim();
+                if (text.length > 0 && text.length <= 30) {
+                    var range = document.createRange();
+                    range.selectNode(node);
+                    var rect = range.getBoundingClientRect();
+                    var relX = (rect.left + rect.right) / 2 - elRect.left;
+                    if (relX >= width * 0.3 && relX <= width * 0.7) {
+                        titleText = text;
+                        break;
+                    }
+                }
+                node = walker.nextNode();
+            }
+            if (!titleText) {
+                var allText = el.textContent;
+                var lines = allText.split('\n').map(function(s) { return s.trim(); }).filter(function(s) { return s.length > 0; });
+                for (var l = 0; l < lines.length; l++) {
+                    if (lines[l].length <= 30) { titleText = lines[l]; break; }
+                }
+            }
+
+            return {
+                element: el,
+                height: info.height,
+                titleText: titleText,
+                buttonRects: info.buttonRects
+            };
+        }
+    }
+
+    return null;
+}
+  /**
+   * 获取页面布局信息（浏览器自动调用 + 用户手动调用通用函数）
+   * @param {string} [containerId] - 可选，容器元素ID（不传则自动检测）
+   * @param {string} [titleBarId] - 可选，标题栏元素ID（不传则自动检测）
+   * @returns {{width,height,realWidth,realHeight,titleBar:{height,titleText,buttonRects}}|null}
+   */
+  function getPageLayoutInfo(containerId, titleBarId) {
+    var container;
+    if (containerId) {
+      container = document.getElementById(containerId);
+      if (!container) return null;
+    } else {
+      container = findMainContainer();
+      if (!container) container = document.body;
+    }
+
+    var size = getAllOriginalStyles(container);
+
+    var titleBarData;
+    if (titleBarId) {
+      var titleBarEl = document.getElementById(titleBarId);
+      if (titleBarEl) {
+        var containerRect = container.getBoundingClientRect();
+        var info = analyzeTitleBarElement(titleBarEl, containerRect);
+        // 提取标题文本（与 getTitleBarInfo 内逻辑一致）
+        var titleBarTitleText = '';
+        var elRect = titleBarEl.getBoundingClientRect();
+        var elWidth = elRect.width;
+        var walker = document.createTreeWalker(titleBarEl, NodeFilter.SHOW_TEXT, {
+          acceptNode: function(node) {
+            return node.textContent.trim().length > 0 ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+          }
+        });
+        var textNode = walker.nextNode();
+        while (textNode) {
+          var text = textNode.textContent.trim();
+          if (text.length > 0 && text.length <= 30) {
+            var range = document.createRange();
+            range.selectNode(textNode);
+            var textRect = range.getBoundingClientRect();
+            var relX = (textRect.left + textRect.right) / 2 - elRect.left;
+            if (relX >= elWidth * 0.3 && relX <= elWidth * 0.7) {
+              titleBarTitleText = text;
+              break;
+            }
+          }
+          textNode = walker.nextNode();
+        }
+        if (!titleBarTitleText) {
+          var allText = titleBarEl.textContent || '';
+          var lines = allText.split('\n').map(function(s) { return s.trim(); }).filter(function(s) { return s.length > 0 && s.length <= 30; });
+          if (lines.length > 0) titleBarTitleText = lines[0];
+        }
+        if (info) {
+          titleBarData = { height: info.height, titleText: titleBarTitleText, buttonRects: info.buttonRects };
+        } else {
+          var rect = titleBarEl.getBoundingClientRect();
+          titleBarData = { height: rect.height, titleText: titleBarTitleText, buttonRects: [] };
+        }
+      } else {
+        titleBarData = { height: -1, titleText: '', buttonRects: [] };
+      }
+    } else {
+      var titleInfo = getTitleBarInfo(container);
+      if (titleInfo) {
+        titleBarData = {
+          height: titleInfo.height,
+          titleText: titleInfo.titleText,
+          buttonRects: titleInfo.buttonRects
+        };
+      } else {
+        titleBarData = { height: -1, titleText: '', buttonRects: [] };
+      }
+    }
+
+    return {
+      width: size.width || 0,
+      height: size.height || 0,
+      realWidth: size.realWidth || 0,
+      realHeight: size.realHeight || 0,
+      titleBar: titleBarData
+    };
   }
 
   function init() {
     log('[webviewBridge] 初始化开始');
-    // 注入高亮选中样式（不加 !important，让用户的 #widgetId .item-selected 选择器优先级更高）
-    var style = document.createElement('style');
-    style.textContent =
-      '.item-selected { background-color: #0078d4; color: #ffffff; }' +
-      '.tree-node-content.selected { background-color: #0078d4; color: #ffffff; }' +
-      '.tree-node-content.selected .tree-label { color: #ffffff; }' +
-      '.data-grid-row-focused { background-color: #0078d4; color: #ffffff; }' +
-      '.data-grid-row-focused .data-grid-cell { color: #ffffff; }';
-    document.head.appendChild(style);
     IconManager.parseAll();
     bindEvents();
     listenHostMessages();
@@ -2429,17 +3539,19 @@
     initTooltips();
     initMessageBox();
     initInputBox();
-    
-	var newStyles = getAllOriginalStyles('page_container');
-    var container = document.querySelector('.page-container');
-    send('pageLoaded', 'canvas', 'page_container', {
-      title: document.title || '',
-      url: window.location.href,
-      readyState: document.readyState,
-      width: newStyles.width || container.offsetWidth || container.clientWidth || document.documentElement.scrollWidth,
-      height: newStyles.height || container.offsetHeight || container.clientHeight || document.documentElement.scrollHeight,
-      realWidth: newStyles.realWidth || -1,
-      realHeight: newStyles.realHeight || -1
+    initTitleBar();
+
+    var layout = getPageLayoutInfo();
+
+    send('pageLoaded', 'canvas', 'pageContainer', {
+        title: document.title || '',
+        url: window.location.href,
+        readyState: document.readyState,
+        width: layout.width,
+        height: layout.height,
+        realWidth: layout.realWidth,
+        realHeight: layout.realHeight,
+        titleBar: layout.titleBar
     });
 
     window.__uiRuntimeReady = true;
@@ -2453,6 +3565,7 @@
   window.webviewBridge = {
     send: send,
     api: {
+      public: {
       setValue: function(targetId, value) {
         var el = findTarget(targetId);
         if (!el) return false;
@@ -2561,14 +3674,24 @@
         return blockContextMenu;
       },
       getWindowSize: function() {
-        var newStyles = getAllOriginalStyles('page_container');
+        var layout = getPageLayoutInfo();
         return {
-          width: newStyles.width || container.offsetWidth || container.clientWidth || document.documentElement.scrollWidth,
-          height: newStyles.height || container.offsetHeight || container.clientHeight || document.documentElement.scrollHeight,
-          realWidth: newStyles.realWidth || -1,
-          realHeight: newStyles.realHeight || -1
+          width: layout.width,
+          height: layout.height,
+          realWidth: layout.realWidth,
+          realHeight: layout.realHeight
         };
       },
+      /**
+       * 获取页面布局信息（含容器尺寸 + 标题栏信息）
+       * @param {string} [containerId] - 可选，容器ID（不传自动检测）
+       * @param {string} [titleBarId] - 可选，标题栏ID（不传自动检测）
+       * @returns {object} { width, height, realWidth, realHeight, titleBar: { height, titleText, buttonRects } }
+       */
+      getPageLayoutInfo: function(containerId, titleBarId) {
+        return getPageLayoutInfo(containerId, titleBarId);
+      },
+
       /**
        * 固定画布宽高 — 设置预览页面的画布尺寸是否固定
        * @param {boolean} isFixed - 是否固定画布宽高（true=固定用指定宽高，false=继承body宽高）
@@ -2577,7 +3700,7 @@
        * @returns {boolean} 是否操作成功
        */
       setFixedCanvasSize: function(isFixed, width, height) {
-        var container = document.querySelector('.page-container');
+        var container = document.querySelector('.pageContainer');
         if (!container) return false;
         if (isFixed) {
           var w = (typeof width === 'number' && width > 0) ? width : parseFloat(container.getAttribute('data-original-width') || '800');
@@ -2615,56 +3738,6 @@
           ctrlType: el.getAttribute('data-ctrl-type') || ''
         };
       },
-    /**
-     * 画布操作 API
-     * @namespace canvas
-     */
-    canvas: {
-      /**
-       * 固定画布宽高
-       * @param {boolean} isFixed
-       * @param {number} [width]
-       * @param {number} [height]
-       * @returns {boolean}
-       */
-      setFixedCanvasSize: function(isFixed, width, height) {
-        var container = document.querySelector('.page-container');
-        if (!container) return false;
-        if (isFixed) {
-          var w = (typeof width === 'number' && width > 0) ? width : parseFloat(container.getAttribute('data-original-width') || '800');
-          var h = (typeof height === 'number' && height > 0) ? height : parseFloat(container.getAttribute('data-original-height') || '500');
-          container.style.width = w + 'px';
-          container.style.height = h + 'px';
-        } else {
-          container.style.width = '100%';
-          container.style.height = '100%';
-        }
-        return true;
-      },
-
-      /**
-       * 获取画布标题栏文字
-       * @returns {string} 标题栏文字，若无标题栏返回空字符串
-       */
-      getTitleBarTitle: function() {
-        var titleEl = document.querySelector('.tb-title');
-        if (!titleEl) return '';
-        return titleEl.textContent || '';
-      },
-
-      /**
-       * 设置画布标题栏文字
-       * @param {string} title - 新的标题文字
-       * @returns {boolean} 是否设置成功
-       */
-      setTitleBarTitle: function(title) {
-        var titleEl = document.querySelector('.tb-title');
-        if (!titleEl) return false;
-        titleEl.textContent = title;
-        document.title = title;
-        return true;
-      }
-    },
       showNotification: function(options) {
         if (!options || !options.title || !options.text) return false;
         send('notification', '', '', {
@@ -2753,7 +3826,7 @@
       getPosition: function(targetId) {
         var el = findTarget(targetId);
         if (!el) return { x: 0, y: 0 };
-        var container = document.querySelector('.page-container');
+        var container = document.querySelector('.pageContainer');
         var elRect = el.getBoundingClientRect();
         if (container) {
           var containerRect = container.getBoundingClientRect();
@@ -2787,6 +3860,58 @@
         if (!el) return false;
         el.style.zIndex = String(zIndex);
         return true;
+      }
+
+    },
+      /**
+       * 画布操作 API
+       * @namespace canvas
+       */
+      canvas: {
+        /**
+         * 固定画布宽高
+         * @param {boolean} isFixed
+         * @param {number} [width]
+         * @param {number} [height]
+         * @returns {boolean}
+         */
+        setFixedCanvasSize: function(isFixed, width, height) {
+          var container = document.querySelector('.pageContainer');
+          if (!container) return false;
+          if (isFixed) {
+            var w = (typeof width === 'number' && width > 0) ? width : parseFloat(container.getAttribute('data-original-width') || '800');
+            var h = (typeof height === 'number' && height > 0) ? height : parseFloat(container.getAttribute('data-original-height') || '500');
+            container.style.width = w + 'px';
+            container.style.height = h + 'px';
+          } else {
+            container.style.width = '100%';
+            container.style.height = '100%';
+          }
+          return true;
+        },
+
+        /**
+         * 获取画布标题栏文字
+         * @returns {string} 标题栏文字，若无标题栏返回空字符串
+         */
+        getTitleBarTitle: function() {
+          var titleEl = document.querySelector('.titlebar_center_title');
+          if (!titleEl) return '';
+          return titleEl.textContent || '';
+        },
+
+        /**
+         * 设置画布标题栏文字
+         * @param {string} title - 新的标题文字
+         * @returns {boolean} 是否设置成功
+         */
+        setTitleBarTitle: function(title) {
+          var titleEl = document.querySelector('.titlebar_center_title');
+          if (!titleEl) return false;
+          titleEl.textContent = title;
+          document.title = title;
+          return true;
+        }
       },
 
       button: {
@@ -3020,7 +4145,7 @@
         }
       },
 
-      hyperlink: {
+      hyperLink: {
         getText: function(targetId) {
           var el = findTarget(targetId);
           return el ? getOriginalText(el) : '';
@@ -3096,10 +4221,10 @@
           var el = document.getElementById(groupName);
           if (!el) el = document.querySelector('[data-name="' + groupName + '"]');
           if (!el) return false;
-          var existingLabels = el.querySelectorAll('.radiogroup-item');
+          var existingLabels = el.querySelectorAll('.radioGroup_item');
           var disabled = existingLabels.length > 0 && existingLabels[0].hasAttribute('disabled');
           var label = document.createElement('label');
-          label.className = 'radiogroup-item';
+          label.className = 'radioGroup_item';
           if (disabled) label.setAttribute('disabled', '');
           var input = document.createElement('input');
           input.type = 'radio';
@@ -3119,7 +4244,7 @@
           if (!el) return false;
           var target = null;
           if (typeof valueOrIndex === 'number') {
-            var labels = el.querySelectorAll('.radiogroup-item');
+            var labels = el.querySelectorAll('.radioGroup_item');
             if (valueOrIndex >= 0 && valueOrIndex < labels.length) {
               target = labels[valueOrIndex];
             }
@@ -3144,11 +4269,11 @@
         getValue: function(targetId) {
           var el = findTarget(targetId);
           if (!el) return 0;
-          var fill = el.querySelector('.progress-fill');
+          var fill = el.querySelector('.progressBar_fill');
           if (fill && fill.style.width) {
             return parseFloat(fill.style.width) || 0;
           }
-          var text = el.querySelector('.progress-text');
+          var text = el.querySelector('.progressBar_text');
           return text ? (parseFloat(text.textContent) || 0) : 0;
         },
 
@@ -3156,8 +4281,8 @@
           var el = findTarget(targetId);
           if (!el) return false;
           var pct = Math.max(0, Math.min(100, parseFloat(value) || 0));
-          var fill = el.querySelector('.progress-fill');
-          var text = el.querySelector('.progress-text');
+          var fill = el.querySelector('.progressBar_fill');
+          var text = el.querySelector('.progressBar_text');
           if (fill) fill.style.width = pct + '%';
           if (text) {
             text.setAttribute('data-original-text', pct + '%');
@@ -3210,13 +4335,13 @@
         }
       },
 
-      logBox: {
+      logOutput: {
         addLog: function(targetId, text, color, wrap) {
           var el = findTarget(targetId);
           if (!el) return false;
           var line = document.createElement('div');
-          line.className = 'log-line';
-          line.setAttribute('data-ctrl-type', 'log_item');
+          line.className = 'logOutput_line';
+          line.setAttribute('data-ctrl-type', 'logOutput_item');
           line.style.color = color || '#000000';
           if (wrap === false) {
             line.style.display = 'inline-block';
@@ -3231,7 +4356,7 @@
           var el = findTarget(targetId);
           if (!el) return false;
           var line = document.createElement('div');
-          line.className = 'log-line';
+          line.className = 'logOutput_line';
           line.setAttribute('data-ctrl-type', 'log_html_item');
           line.innerHTML = html;
           el.appendChild(line);
@@ -3248,7 +4373,7 @@
 
         getLogCount: function(targetId) {
           var el = findTarget(targetId);
-          return el ? el.querySelectorAll('.log-line').length : 0;
+          return el ? el.querySelectorAll('.logOutput_line').length : 0;
         }
       },
 
@@ -3380,12 +4505,12 @@
       listBox: {
         _getScroll: function(targetId) {
           var el = findTarget(targetId);
-          return el ? el.querySelector('.list-box-scroll') : null;
+          return el ? el.querySelector('.listBox_scroll') : null;
         },
 
         _getItems: function(targetId) {
           var scroll = this._getScroll(targetId);
-          return scroll ? scroll.querySelectorAll('.list-item') : [];
+          return scroll ? scroll.querySelectorAll('.listBox_item') : [];
         },
 
         _getItem: function(targetId, index) {
@@ -3395,7 +4520,7 @@
 
         _getCheckbox: function(targetId, index) {
           var item = this._getItem(targetId, index);
-          return item ? item.querySelector('.list-item-checkbox') : null;
+          return item ? item.querySelector('.listBox_item-checkbox') : null;
         },
 
         _renderEmpty: function(scroll) {
@@ -3409,14 +4534,14 @@
           var data = [];
           for (var i = 0; i < items.length; i++) {
             var item = items[i];
-            var cb = item.querySelector('.list-item-checkbox');
-            var txt = item.querySelector('.list-item-text');
+            var cb = item.querySelector('.listBox_item-checkbox');
+            var txt = item.querySelector('.listBox_item_text');
             data.push({
               text: txt ? txt.textContent : '',
               selected: cb ? cb.checked : false
             });
           }
-          try { el.setAttribute('data-listbox-items', JSON.stringify(data)); } catch(e) {}
+          try { el.setAttribute('data-listBox-items', JSON.stringify(data)); } catch(e) {}
         },
 
         addItem: function(targetId, text) {
@@ -3428,17 +4553,17 @@
           if (empty) scroll.innerHTML = '';
           var items = this._getItems(targetId);
           var idx = items.length;
-          var cbHtml = showCb ? '<input type="checkbox" class="list-item-checkbox" data-ctrl-type="listbox_item_checkbox" data-item-index="' + idx + '" />' : '';
+          var cbHtml = showCb ? '<input type="checkbox" class="listBox_item-checkbox" data-ctrl-type="listbox_item_checkbox" data-item-index="' + idx + '" />' : '';
           var div = document.createElement('div');
-          div.className = 'list-item';
-          div.setAttribute('data-ctrl-type', 'listbox_item');
+          div.className = 'listBox_item';
+          div.setAttribute('data-ctrl-type', 'listBox_item');
           div.setAttribute('data-item-index', String(idx));
-          div.innerHTML = cbHtml + '<span class="list-item-text">' + text + '</span>';
+          div.innerHTML = cbHtml + '<span class="listBox_item_text">' + text + '</span>';
           scroll.appendChild(div);
-          reindexChildren(scroll, '.list-item', 'data-item-index');
-          reindexChildren(scroll, '.list-item-checkbox', 'data-item-index');
+          reindexChildren(scroll, '.listBox_item', 'data-item-index');
+          reindexChildren(scroll, '.listBox_item-checkbox', 'data-item-index');
           this._syncDataAttr(targetId);
-          try { scroll.dispatchEvent(new CustomEvent('listbox.itemschanged', { detail: { targetId: targetId } })); } catch(e) {}
+          try { scroll.dispatchEvent(new CustomEvent('listBox.itemschanged', { detail: { targetId: targetId } })); } catch(e) {}
           return true;
         },
 
@@ -3451,17 +4576,17 @@
           var idx = items.length;
           var el = findTarget(targetId);
           var showCb = el ? el.getAttribute('data-show-checkbox') === 'true' : false;
-          var cbHtml = showCb ? '<input type="checkbox" class="list-item-checkbox" data-ctrl-type="listbox_item_checkbox" data-item-index="' + idx + '" />' : '';
+          var cbHtml = showCb ? '<input type="checkbox" class="listBox_item-checkbox" data-ctrl-type="listbox_item_checkbox" data-item-index="' + idx + '" />' : '';
           var div = document.createElement('div');
-          div.className = 'list-item';
-          div.setAttribute('data-ctrl-type', 'listbox_item');
+          div.className = 'listBox_item';
+          div.setAttribute('data-ctrl-type', 'listBox_item');
           div.setAttribute('data-item-index', String(idx));
           div.innerHTML = cbHtml + html;
           scroll.appendChild(div);
-          reindexChildren(scroll, '.list-item', 'data-item-index');
-          reindexChildren(scroll, '.list-item-checkbox', 'data-item-index');
+          reindexChildren(scroll, '.listBox_item', 'data-item-index');
+          reindexChildren(scroll, '.listBox_item-checkbox', 'data-item-index');
           this._syncDataAttr(targetId);
-          try { scroll.dispatchEvent(new CustomEvent('listbox.itemschanged', { detail: { targetId: targetId } })); } catch(e) {}
+          try { scroll.dispatchEvent(new CustomEvent('listBox.itemschanged', { detail: { targetId: targetId } })); } catch(e) {}
           return true;
         },
 
@@ -3470,8 +4595,8 @@
           if (!item) return false;
           var scroll = item.parentNode;
           item.parentNode.removeChild(item);
-          reindexChildren(scroll, '.list-item', 'data-item-index');
-          reindexChildren(scroll, '.list-item-checkbox', 'data-item-index');
+          reindexChildren(scroll, '.listBox_item', 'data-item-index');
+          reindexChildren(scroll, '.listBox_item-checkbox', 'data-item-index');
           var items = this._getItems(targetId);
           if (items.length === 0) this._renderEmpty(scroll);
           this._syncDataAttr(targetId);
@@ -3483,7 +4608,7 @@
           if (!scroll) return false;
           this._renderEmpty(scroll);
           var el = findTarget(targetId);
-          if (el) el.setAttribute('data-listbox-items', '[]');
+          if (el) el.setAttribute('data-listBox-items', '[]');
           return true;
         },
 
@@ -3494,7 +4619,7 @@
         setItemText: function(targetId, index, text) {
           var item = this._getItem(targetId, index);
           if (!item) return false;
-          var span = item.querySelector('.list-item-text');
+          var span = item.querySelector('.listBox_item_text');
           if (span) span.textContent = text;
           this._syncDataAttr(targetId);
           return true;
@@ -3503,14 +4628,14 @@
         getItemText: function(targetId, index) {
           var item = this._getItem(targetId, index);
           if (!item) return '';
-          var span = item.querySelector('.list-item-text');
+          var span = item.querySelector('.listBox_item_text');
           return span ? span.textContent : '';
         },
 
         setItemChecked: function(targetId, index, checked) {
           var item = this._getItem(targetId, index);
           if (!item) return false;
-          var cb = item.querySelector('.list-item-checkbox');
+          var cb = item.querySelector('.listBox_item-checkbox');
           if (cb) {
             cb.checked = !!checked;
             cb.dispatchEvent(new Event('change', { bubbles: true }));
@@ -3522,14 +4647,14 @@
         getItemChecked: function(targetId, index) {
           var item = this._getItem(targetId, index);
           if (!item) return false;
-          var cb = item.querySelector('.list-item-checkbox');
+          var cb = item.querySelector('.listBox_item-checkbox');
           return cb ? cb.checked : false;
         },
 
         selectAll: function(targetId) {
           var items = this._getItems(targetId);
           for (var i = 0; i < items.length; i++) {
-            var cb = items[i].querySelector('.list-item-checkbox');
+            var cb = items[i].querySelector('.listBox_item-checkbox');
             if (cb && !cb.checked) { cb.checked = true; cb.dispatchEvent(new Event('change', { bubbles: true })); }
           }
           this._syncDataAttr(targetId);
@@ -3539,7 +4664,7 @@
         toggleAll: function(targetId) {
           var items = this._getItems(targetId);
           for (var i = 0; i < items.length; i++) {
-            var cb = items[i].querySelector('.list-item-checkbox');
+            var cb = items[i].querySelector('.listBox_item-checkbox');
             if (cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change', { bubbles: true })); }
           }
           this._syncDataAttr(targetId);
@@ -3551,15 +4676,15 @@
           var scroll = this._getScroll(targetId);
           var removed = false;
           for (var i = items.length - 1; i >= 0; i--) {
-            var cb = items[i].querySelector('.list-item-checkbox');
+            var cb = items[i].querySelector('.listBox_item-checkbox');
             if (cb && cb.checked) {
               items[i].parentNode.removeChild(items[i]);
               removed = true;
             }
           }
           if (removed) {
-            reindexChildren(scroll, '.list-item', 'data-item-index');
-            reindexChildren(scroll, '.list-item-checkbox', 'data-item-index');
+            reindexChildren(scroll, '.listBox_item', 'data-item-index');
+            reindexChildren(scroll, '.listBox_item-checkbox', 'data-item-index');
             var remaining = this._getItems(targetId);
             if (remaining.length === 0) this._renderEmpty(scroll);
             this._syncDataAttr(targetId);
@@ -3587,7 +4712,7 @@
         getSelectedItemId: function(targetId) {
           var items = this._getItems(targetId);
           for (var i = 0; i < items.length; i++) {
-            var cb = items[i].querySelector('.list-item-checkbox');
+            var cb = items[i].querySelector('.listBox_item-checkbox');
             if (cb && cb.checked) return i;
           }
           return -1;
@@ -3596,12 +4721,12 @@
         getHighlightedItem: function(targetId) {
           var el = findTarget(targetId);
           if (!el) return null;
-          var highlighted = el.querySelector('.list-item.item-selected');
+          var highlighted = el.querySelector('.listBox_item.item-selected');
           if (!highlighted) return null;
-          var allItems = el.querySelectorAll('.list-item');
+          var allItems = el.querySelectorAll('.listBox_item');
           for (var i = 0; i < allItems.length; i++) {
             if (allItems[i] === highlighted) {
-              var textEl = highlighted.querySelector('.list-item-label') || highlighted;
+              var textEl = highlighted.querySelector('.listBox_item-label') || highlighted;
               return { index: i, text: (textEl.textContent || '').trim(), element: highlighted };
             }
           }
@@ -3625,7 +4750,7 @@
           var el = findTarget(targetId);
           if (!el) return false;
           el.setAttribute('data-show-checkbox', show ? 'true' : 'false');
-          var checkboxes = el.querySelectorAll('.list-item-checkbox');
+          var checkboxes = el.querySelectorAll('.listBox_item-checkbox');
           if (!show) {
             for (var i = 0; i < checkboxes.length; i++) {
               checkboxes[i].style.display = 'none';
@@ -3638,11 +4763,11 @@
             }
             return true;
           }
-          var items = el.querySelectorAll('.list-item');
+          var items = el.querySelectorAll('.listBox_item');
           for (var j = 0; j < items.length; j++) {
             var cb = document.createElement('input');
             cb.type = 'checkbox';
-            cb.className = 'list-item-checkbox';
+            cb.className = 'listBox_item-checkbox';
             cb.setAttribute('data-ctrl-type', 'listbox_item_checkbox');
             cb.setAttribute('data-item-index', String(j));
             items[j].insertBefore(cb, items[j].firstChild);
@@ -3679,7 +4804,7 @@
         getCheckedItems: function(targetId) {
           var el = findTarget(targetId);
           if (!el) return [];
-          var checkboxes = el.querySelectorAll('.list-item-checkbox:checked');
+          var checkboxes = el.querySelectorAll('.listBox_item-checkbox:checked');
           var indices = [];
           for (var i = 0; i < checkboxes.length; i++) {
             var idx = parseInt(checkboxes[i].getAttribute('data-item-index'), 10);
@@ -3691,7 +4816,7 @@
         checkAll: function(targetId) {
           var el = findTarget(targetId);
           if (!el) return false;
-          var checkboxes = el.querySelectorAll('.list-item-checkbox');
+          var checkboxes = el.querySelectorAll('.listBox_item-checkbox');
           for (var i = 0; i < checkboxes.length; i++) { checkboxes[i].checked = true; }
           return true;
         },
@@ -3699,7 +4824,7 @@
         uncheckAll: function(targetId) {
           var el = findTarget(targetId);
           if (!el) return false;
-          var checkboxes = el.querySelectorAll('.list-item-checkbox');
+          var checkboxes = el.querySelectorAll('.listBox_item-checkbox');
           for (var i = 0; i < checkboxes.length; i++) { checkboxes[i].checked = false; }
           return true;
         }
@@ -3710,22 +4835,22 @@
         _getNode: function(targetId, nodeId) {
           var el = findTarget(targetId);
           if (!el) return null;
-          return el.querySelector('.tree-node[data-node-id="' + nodeId + '"]');
+          return el.querySelector('.treeView_node[data-node-id="' + nodeId + '"]');
         },
 
         _getNodeLabel: function(targetId, nodeId) {
           var node = this._getNode(targetId, nodeId);
-          return node ? node.querySelector('.tree-label') : null;
+          return node ? node.querySelector('.treeView_label') : null;
         },
 
         _getNodeToggle: function(targetId, nodeId) {
           var node = this._getNode(targetId, nodeId);
-          return node ? node.querySelector('.tree-toggle') : null;
+          return node ? node.querySelector('.treeView_toggle') : null;
         },
 
         _getNodeChildren: function(targetId, nodeId) {
           var node = this._getNode(targetId, nodeId);
-          return node ? node.querySelector('.tree-children') : null;
+          return node ? node.querySelector('.treeView_children') : null;
         },
 
         addNode: function(targetId, parentNodeId, newNode) {
@@ -3738,24 +4863,24 @@
           var nodeId = newNode.id || ('node_' + Date.now());
           var childrenHTML = '';
           if (hasChildren) {
-            childrenHTML = '<div class="tree-children">' + newNode.children.map(function(c) { return ''; }).join('') + '</div>';
+            childrenHTML = '<div class="treeView_children">' + newNode.children.map(function(c) { return ''; }).join('') + '</div>';
           }
           var parentNode = parentNodeId ? this._getNode(targetId, parentNodeId) : null;
           var parentChildren = parentNode ? this._getNodeChildren(targetId, parentNodeId) : null;
           var container = parentChildren || el;
           var level = parentNode ? (parseInt(parentNode.getAttribute('data-level')) + 1) : 0;
           var div = document.createElement('div');
-          div.className = 'tree-node';
+          div.className = 'treeView_node';
           div.setAttribute('data-node-id', nodeId);
           div.setAttribute('data-level', String(level));
           var showCb = el.getAttribute('data-show-checkbox') === 'true';
           var newNodeChecked = newNode.checked ? ' checked' : '';
-          var checkboxHTML = showCb ? '<span class="tree-checkbox"><input type="checkbox" class="tree-node-check" data-ctrl-type="treeview_node_checkbox"' + newNodeChecked + '></span>' : '';
-          div.innerHTML = '<div class="tree-node-content">' +
+          var checkboxHTML = showCb ? '<span class="tree-checkbox"><input type="checkbox" class="treeView_node-check" data-ctrl-type="treeview_node_checkbox"' + newNodeChecked + '></span>' : '';
+          div.innerHTML = '<div class="treeView_node_content">' +
             checkboxHTML +
-            '<span class="tree-toggle' + toggleClass + '" data-ctrl-type="treeview_node_toggle">' + (isExpanded ? '▼' : '▶') + '</span>' +
-            '<span class="tree-icon' + iconClass + '">' + (hasChildren ? '📁' : '📄') + '</span>' +
-            '<span class="tree-label" data-ctrl-type="treeview_node_text">' + (newNode.text || '') + '</span>' +
+            '<span class="treeView_toggle' + toggleClass + '" data-ctrl-type="treeview_node_toggle">▶</span>' +
+            '<span class="treeView_icon' + iconClass + '">' + (hasChildren ? '📁' : '📄') + '</span>' +
+            '<span class="treeView_label" data-ctrl-type="treeview_node_text">' + (newNode.text || '') + '</span>' +
             '<span class="tree-edit-input" style="display:none"></span>' +
             '</div>' + childrenHTML;
           container.appendChild(div);
@@ -3765,15 +4890,14 @@
               // 仅在父节点之前无子节点时才更新 toggle 状态
               // 如果之前是 empty，现在有子节点了，设为 expanded 并显示箭头
               if (toggle.classList.contains('empty')) {
-                toggle.className = 'tree-toggle expanded';
-                toggle.textContent = '▼';
+                toggle.className = 'treeView_toggle expanded';
               }
               // 如果之前已有子节点，保持其原有的 expanded/collapsed 状态不变
             }
-            var icon = parentNode.querySelector('.tree-node-content .tree-icon');
+            var icon = parentNode.querySelector('.treeView_node_content .treeView_icon');
             if (icon) {
               if (icon.classList.contains('file')) {
-                icon.className = 'tree-icon folder';
+                icon.className = 'treeView_icon folder';
                 icon.textContent = '📁';
               }
             }
@@ -3787,14 +4911,14 @@
           var parentNode = node.parentNode;
           parentNode.removeChild(node);
           // 检查父节点是否还有其他子节点，如果没了则更新父级 toggle
-          if (parentNode && parentNode.classList.contains('tree-children')) {
-            var parentTreeNode = parentNode.closest('.tree-node');
+          if (parentNode && parentNode.classList.contains('treeView_children')) {
+            var parentTreeNode = parentNode.closest('.treeView_node');
             if (parentTreeNode) {
-              var parentToggle = parentTreeNode.querySelector(':scope > .tree-node-content .tree-toggle');
-              var remaining = parentNode.querySelectorAll('.tree-node');
+              var parentToggle = parentTreeNode.querySelector(':scope > .treeView_node_content .treeView_toggle');
+              var remaining = parentNode.querySelectorAll('.treeView_node');
               if (remaining.length === 0) {
                 if (parentToggle) {
-                  parentToggle.className = 'tree-toggle empty';
+                  parentToggle.className = 'treeView_toggle empty';
                   parentToggle.textContent = '';
                 }
               }
@@ -3850,12 +4974,12 @@
         expandAll: function(targetId) {
           var el = findTarget(targetId);
           if (!el) return false;
-          var toggles = el.querySelectorAll('.tree-toggle.collapsed');
+          var toggles = el.querySelectorAll('.treeView_toggle.collapsed');
           for (var i = 0; i < toggles.length; i++) {
             toggles[i].classList.remove('collapsed');
             toggles[i].classList.add('expanded');
-            var node = toggles[i].closest('.tree-node');
-            var children = node ? node.querySelector('.tree-children') : null;
+            var node = toggles[i].closest('.treeView_node');
+            var children = node ? node.querySelector('.treeView_children') : null;
             if (children) children.style.display = '';
           }
           return true;
@@ -3864,12 +4988,12 @@
         collapseAll: function(targetId) {
           var el = findTarget(targetId);
           if (!el) return false;
-          var toggles = el.querySelectorAll('.tree-toggle.expanded');
+          var toggles = el.querySelectorAll('.treeView_toggle.expanded');
           for (var i = 0; i < toggles.length; i++) {
             toggles[i].classList.remove('expanded');
             toggles[i].classList.add('collapsed');
-            var node = toggles[i].closest('.tree-node');
-            var children = node ? node.querySelector('.tree-children') : null;
+            var node = toggles[i].closest('.treeView_node');
+            var children = node ? node.querySelector('.treeView_children') : null;
             if (children) children.style.display = 'none';
           }
           return true;
@@ -3878,12 +5002,11 @@
         selectNode: function(targetId, nodeId) {
           var el = findTarget(targetId);
           if (!el) return false;
-          var prev = el.querySelectorAll('.tree-node-content.selected');
+          var prev = el.querySelectorAll('.treeView_node.selected');
           for (var i = 0; i < prev.length; i++) { prev[i].classList.remove('selected'); }
           var node = this._getNode(targetId, nodeId);
           if (!node) return false;
-          var content = node.querySelector('.tree-node-content');
-          if (content) content.classList.add('selected');
+          node.classList.add('selected');
           lastActiveTreeView = el;
           return true;
         },
@@ -3891,17 +5014,16 @@
         deselectNode: function(targetId, nodeId) {
           var node = this._getNode(targetId, nodeId);
           if (!node) return false;
-          var content = node.querySelector('.tree-node-content');
-          if (content) content.classList.remove('selected');
+          node.classList.remove('selected');
           return true;
         },
 
         clearSelection: function(targetId) {
           var el = findTarget(targetId);
           if (!el) return false;
-          var allContents = el.querySelectorAll('.tree-node-content.selected');
-          for (var i = 0; i < allContents.length; i++) {
-            allContents[i].classList.remove('selected');
+          var allSelected = el.querySelectorAll('.treeView_node.selected');
+          for (var i = 0; i < allSelected.length; i++) {
+            allSelected[i].classList.remove('selected');
           }
           return true;
         },
@@ -3909,22 +5031,19 @@
         getSelectedNode: function(targetId) {
           var el = findTarget(targetId);
           if (!el) return '';
-          var sel = el.querySelector('.tree-node-content.selected');
+          var sel = el.querySelector('.treeView_node.selected');
           if (!sel) return '';
-          var node = sel.closest('.tree-node');
-          return node ? (node.getAttribute('data-node-id') || '') : '';
+          return sel.getAttribute('data-node-id') || '';
         },
 
         getHighlightedNode: function(targetId) {
           var el = findTarget(targetId);
           if (!el) return null;
-          var sel = el.querySelector('.tree-node-content.selected');
+          var sel = el.querySelector('.treeView_node.selected');
           if (!sel) return null;
-          var node = sel.closest('.tree-node');
-          if (!node) return null;
-          var textEl = sel.querySelector('.tree-node-text');
+          var textEl = sel.querySelector('.treeView_label') || sel.querySelector('.treeView_node-text');
           return {
-            nodeId: node.getAttribute('data-node-id') || '',
+            nodeId: sel.getAttribute('data-node-id') || '',
             text: textEl ? (textEl.textContent || '').trim() : (sel.textContent || '').trim(),
             element: sel
           };
@@ -3965,7 +5084,7 @@
             return true;
           }
           el.setAttribute('data-editable', 'true');
-          var labels = el.querySelectorAll('.tree-label');
+          var labels = el.querySelectorAll('.treeView_label');
           for (var i = 0; i < labels.length; i++) {
             labels[i].setAttribute('contenteditable', 'true');
           }
@@ -3980,7 +5099,7 @@
             return true;
           }
           el.setAttribute('data-editable', 'false');
-          var labels = el.querySelectorAll('.tree-label');
+          var labels = el.querySelectorAll('.treeView_label');
           for (var i = 0; i < labels.length; i++) {
             labels[i].removeAttribute('contenteditable');
           }
@@ -4007,7 +5126,7 @@
 
         _getNodeCheckbox: function(targetId, nodeId) {
           var node = this._getNode(targetId, nodeId);
-          return node ? node.querySelector('.tree-node-check') : null;
+          return node ? node.querySelector('.treeView_node-check') : null;
         },
 
         showCheckbox: function(targetId, show) {
@@ -4017,7 +5136,7 @@
           if (window.TreeManager && window.TreeManager.showCheckbox) {
             window.TreeManager.showCheckbox(targetId, show);
           }
-          var checkboxes = el.querySelectorAll('.tree-node-check');
+          var checkboxes = el.querySelectorAll('.treeView_node-check');
           if (!show) {
             for (var i = 0; i < checkboxes.length; i++) {
               var cbs = checkboxes[i].closest('.tree-checkbox');
@@ -4032,9 +5151,9 @@
             }
             return true;
           }
-          var nodes = el.querySelectorAll('.tree-node');
+          var nodes = el.querySelectorAll('.treeView_node');
           for (var j = 0; j < nodes.length; j++) {
-            var content = nodes[j].querySelector(':scope > .tree-node-content');
+            var content = nodes[j].querySelector(':scope > .treeView_node_content');
             if (!content) continue;
             var existing = content.querySelector('.tree-checkbox');
             if (existing) { existing.style.display = ''; continue; }
@@ -4042,7 +5161,7 @@
             checkboxSpan.className = 'tree-checkbox';
             var cb = document.createElement('input');
             cb.type = 'checkbox';
-            cb.className = 'tree-node-check';
+            cb.className = 'treeView_node-check';
             cb.setAttribute('data-ctrl-type', 'treeview_node_checkbox');
             checkboxSpan.appendChild(cb);
             content.insertBefore(checkboxSpan, content.firstChild);
@@ -4062,10 +5181,10 @@
           if (window.TreeManager && window.TreeManager.getCheckedNodes) {
             return window.TreeManager.getCheckedNodes(targetId);
           }
-          var checkboxes = el.querySelectorAll('.tree-node-check:checked');
+          var checkboxes = el.querySelectorAll('.treeView_node-check:checked');
           var ids = [];
           for (var i = 0; i < checkboxes.length; i++) {
-            var nodeEl = checkboxes[i].closest('.tree-node');
+            var nodeEl = checkboxes[i].closest('.treeView_node');
             if (nodeEl) {
               ids.push(nodeEl.getAttribute('data-node-id') || '');
             }
@@ -4079,7 +5198,7 @@
           }
           var node = this._getNode(targetId, nodeId);
           if (!node) return false;
-          var cbs = node.querySelectorAll('.tree-node-check');
+          var cbs = node.querySelectorAll('.treeView_node-check');
           for (var i = 0; i < cbs.length; i++) {
             cbs[i].checked = !!checked;
           }
@@ -4100,7 +5219,7 @@
           }
           var el = findTarget(targetId);
           if (!el) return false;
-          var checkboxes = el.querySelectorAll('.tree-node-check');
+          var checkboxes = el.querySelectorAll('.treeView_node-check');
           for (var i = 0; i < checkboxes.length; i++) {
             checkboxes[i].checked = true;
           }
@@ -4113,7 +5232,7 @@
           }
           var el = findTarget(targetId);
           if (!el) return false;
-          var checkboxes = el.querySelectorAll('.tree-node-check');
+          var checkboxes = el.querySelectorAll('.treeView_node-check');
           for (var i = 0; i < checkboxes.length; i++) {
             checkboxes[i].checked = false;
           }
@@ -4124,35 +5243,104 @@
       dataGrid: {
         _getBody: function(targetId) {
           var el = findTarget(targetId);
-          return el ? el.querySelector('.data-grid-body') : null;
+          return el ? el.querySelector('.dataGrid_body') : null;
         },
 
         _getHeader: function(targetId) {
           var el = findTarget(targetId);
-          return el ? el.querySelector('.data-grid-header') : null;
+          return el ? el.querySelector('.dataGrid_header') : null;
         },
 
         _getRows: function(targetId) {
           var body = this._getBody(targetId);
-          return body ? body.querySelectorAll('.data-grid-row') : [];
+          if (body) {
+            var rows = body.querySelectorAll('.dataGrid_row');
+            if (rows.length > 0) return rows;
+          }
+          // 原生 table 支持
+          var el = findTarget(targetId);
+          if (el) {
+            var tbody = el.querySelector('tbody');
+            if (tbody) {
+              return tbody.querySelectorAll('tr');
+            }
+            return el.querySelectorAll('tr');
+          }
+          return [];
         },
 
         _getRow: function(targetId, rowIndex) {
           var rows = this._getRows(targetId);
+          // 对于原生 table，第一行可能是表头，需要跳过
+          var el = findTarget(targetId);
+          if (el && el.tagName === 'TABLE') {
+            var dataRows = [];
+            for (var i = 0; i < rows.length; i++) {
+              // 跳过 thead 里的行
+              var parentTHead = rows[i].closest('thead');
+              if (!parentTHead) {
+                dataRows.push(rows[i]);
+              }
+            }
+            return (rowIndex >= 0 && rowIndex < dataRows.length) ? dataRows[rowIndex] : null;
+          }
           return (rowIndex >= 0 && rowIndex < rows.length) ? rows[rowIndex] : null;
         },
 		
 		_getCellObj: function(row,columnKey){
-		  var cell = row.querySelector('.data-grid-cell[data-col-name="' + columnKey + '"]');
-          if (!cell) return null;
-          var cellkey = cell.getAttribute('data-col-key');
-          if (!cellkey) return null;
-		  cell = row.querySelector('.data-grid-cell[data-col-key="' + cellkey + '"]');
-		  return cell;
+		  // 方式1：按 data-col-name 查找（原逻辑）
+		  var cell = row.querySelector('.dataGrid_cell[data-col-name="' + columnKey + '"]');
+          if (cell) {
+            var cellkey = cell.getAttribute('data-col-key');
+            if (cellkey) {
+		      cell = row.querySelector('.dataGrid_cell[data-col-key="' + cellkey + '"]');
+              if (cell) return cell;
+            }
+          }
+          // 方式2：按 data-col-key 查找
+          cell = row.querySelector('.dataGrid_cell[data-col-key="' + columnKey + '"]');
+          if (cell) return cell;
+          // 方式3：按 col+数字 索引格式（如 col0, col1）
+          if (/^col\d+$/.test(columnKey)) {
+            var colIndex = parseInt(columnKey.substring(3), 10);
+            // 先找 dataGrid 风格的单元格
+            var cells = row.querySelectorAll('.dataGrid_cell:not(.dataGrid_checkbox)');
+            if (cells.length > 0) {
+              if (colIndex >= 0 && colIndex < cells.length) return cells[colIndex];
+            }
+            // 再找原生 table 的 td
+            var tds = row.querySelectorAll('td');
+            if (tds.length > 0) {
+              if (colIndex >= 0 && colIndex < tds.length) return tds[colIndex];
+            }
+          }
+          // 方式4：按表头名称查找（原生 table 或 dataGrid）
+          var tableEl = row.closest ? row.closest('table, .dataGrid') : null;
+          if (tableEl) {
+            var headerRow = null;
+            var thead = tableEl.querySelector('thead');
+            if (thead) headerRow = thead.querySelector('tr');
+            if (!headerRow) headerRow = tableEl.querySelector('tr');
+            if (headerRow) {
+              var headerCells = headerRow.querySelectorAll('th, td, .dataGrid_cell');
+              var foundIndex = -1;
+              for (var i = 0; i < headerCells.length; i++) {
+                if (headerCells[i].textContent.trim() === columnKey) {
+                  foundIndex = i;
+                  break;
+                }
+              }
+              if (foundIndex !== -1) {
+                var rowCells = row.querySelectorAll('td, .dataGrid_cell:not(.dataGrid_checkbox)');
+                if (rowCells[foundIndex]) return rowCells[foundIndex];
+              }
+            }
+          }
+		  return null;
 		},
 		
 		_getCellkey: function(row,columnKey){
-		  var cell = row.querySelector('.data-grid-cell[data-col-name="' + columnKey + '"]');
+		  var cell = row.querySelector('.dataGrid_cell[data-col-name="' + columnKey + '"]');
           if (!cell) return null;
           var cellkey = cell.getAttribute('data-col-key');
 		  return cellkey;
@@ -4164,14 +5352,14 @@
             // fallback: read from first data row
             var row = this._getRow(targetId, 0);
             if (!row) return [];
-            var dataCells = row.querySelectorAll('.data-grid-cell:not(.data-grid-checkbox)');
+            var dataCells = row.querySelectorAll('.dataGrid_cell:not(.dataGrid_checkbox)');
             var cols = [];
             for (var k = 0; k < dataCells.length; k++) {
               cols.push({ field: dataCells[k].getAttribute('data-col-key') || '',header: dataCells[k].getAttribute('data-col-name') || '', index: k });
             }
             return cols;
           }
-          var cells = header.querySelectorAll('.data-grid-header-cell:not(.data-grid-checkbox)');
+          var cells = header.querySelectorAll('.dataGrid_header_cell:not(.dataGrid_checkbox)');
           var cols = [];
           for (var i = 0; i < cells.length; i++) {
             cols.push({ field: cells[i].getAttribute('data-col-key') || '',header: cells[i].getAttribute('data-col-name') || '', index: i });
@@ -4180,7 +5368,7 @@
         },
 
         _reindexRows: function(body) {
-          var rows = body.querySelectorAll('.data-grid-row');
+          var rows = body.querySelectorAll('.dataGrid_row');
           for (var i = 0; i < rows.length; i++) {
             rows[i].setAttribute('data-row-index', String(i));
           }
@@ -4190,17 +5378,21 @@
           var html = '';
           if (showCheckbox) {
             var ck = rowData.selected ? ' checked' : '';
-            html += '<div class="data-grid-cell data-grid-checkbox" style="width:36px;min-width:36px;flex-shrink:0"><input type="checkbox" class="data-grid-row-check" data-ctrl-type="datagrid_row_checkbox"' + ck + '></div>';
+            html += '<div class="dataGrid_cell dataGrid_checkbox" style="width:36px;min-width:36px;flex-shrink:0"><input type="checkbox" class="dataGrid_row_check" data-ctrl-type="dataGrid_row_checkbox"' + ck + '></div>';
           }
           for (var j = 0; j < columns.length; j++) {
             var w = columns[j].width || 100;
             var val = '';
-            if (rowData.cells && (rowData.cells[columns[j].header] !== undefined || rowData.cells[columns[j].field] !== undefined)) {
-              val = String(rowData.cells[columns[j].header]) || String(rowData.cells[columns[j].field]);
+            if (rowData.cells) {
+              if (rowData.cells[columns[j].field] !== undefined) {
+                val = String(rowData.cells[columns[j].field]);
+              } else if (rowData.cells[columns[j].header] !== undefined) {
+                val = String(rowData.cells[columns[j].header]);
+              }
             }
             var displayVal = IconManager.parse(val);
             var escapedVal = val.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            html += '<div class="data-grid-cell" data-ctrl-type="datagrid_cell" data-col-key="' + columns[j].field + '" data-col-name="' + columns[j].header + '" data-original-text="' + escapedVal + '" style="width:' + w + 'px;min-width:' + w + 'px;flex-shrink:0" title="' + displayVal.replace(/"/g, '&quot;') + '">' + displayVal + '</div>';
+            html += '<div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="' + columns[j].field + '" data-col-name="' + columns[j].header + '" data-original-text="' + escapedVal + '" style="width:' + w + 'px;min-width:' + w + 'px;flex-shrink:0" title="' + displayVal.replace(/"/g, '&quot;') + '">' + displayVal + '</div>';
           }
           return html;
         },
@@ -4210,12 +5402,12 @@
           if (!body) return false;
           var el = findTarget(targetId);
           var columns = this._getColumns(targetId);
-          var showCheckbox = body.querySelector('.data-grid-checkbox') !== null;
+          var showCheckbox = body.querySelector('.dataGrid_checkbox') !== null;
           rowData = rowData || { cells: {} };
           var existingRows = this._getRows(targetId);
           var idx = (insertIndex !== undefined && insertIndex >= 0 && insertIndex <= existingRows.length) ? insertIndex : existingRows.length;
           var div = document.createElement('div');
-          div.className = 'data-grid-row';
+          div.className = 'dataGrid_row';
           div.setAttribute('data-row-index', String(idx));
           div.setAttribute('data-row-id', rowData.id || ('row_' + Date.now()));
           div.innerHTML = this._makeRowHtml(idx, rowData, columns, showCheckbox);
@@ -4225,7 +5417,7 @@
             body.appendChild(div);
           }
           this._reindexRows(body);
-          try { body.dispatchEvent(new CustomEvent('datagrid.rowschanged', { detail: { targetId: targetId } })); } catch(e) {}
+          try { body.dispatchEvent(new CustomEvent('dataGrid.rowschanged', { detail: { targetId: targetId } })); } catch(e) {}
           return true;
         },
 
@@ -4261,7 +5453,12 @@
         setCellValueByIndex: function(targetId, rowIndex, colIndex, value) {
           var row = this._getRow(targetId, rowIndex);
           if (!row) return false;
-          var cells = row.querySelectorAll('.data-grid-cell:not(.data-grid-checkbox)');
+          // 先找 dataGrid 风格的单元格
+          var cells = row.querySelectorAll('.dataGrid_cell:not(.dataGrid_checkbox)');
+          if (cells.length === 0) {
+            // 原生 table 支持
+            cells = row.querySelectorAll('td');
+          }
           if (colIndex < 0 || colIndex >= cells.length) return false;
           cells[colIndex].textContent = String(value);
           cells[colIndex].setAttribute('title', String(value));
@@ -4271,7 +5468,12 @@
         getCellValueByIndex: function(targetId, rowIndex, colIndex) {
           var row = this._getRow(targetId, rowIndex);
           if (!row) return '';
-          var cells = row.querySelectorAll('.data-grid-cell:not(.data-grid-checkbox)');
+          // 先找 dataGrid 风格的单元格
+          var cells = row.querySelectorAll('.dataGrid_cell:not(.dataGrid_checkbox)');
+          if (cells.length === 0) {
+            // 原生 table 支持
+            cells = row.querySelectorAll('td');
+          }
           if (colIndex < 0 || colIndex >= cells.length) return '';
           return cells[colIndex].textContent;
         },
@@ -4291,13 +5493,13 @@
         getRowData: function(targetId, rowIndex) {
           var row = this._getRow(targetId, rowIndex);
           if (!row) return {};
-          var cells = row.querySelectorAll('.data-grid-cell[data-col-key]');
+          var cells = row.querySelectorAll('.dataGrid_cell[data-col-key]');
           var data = { id: row.getAttribute('data-row-id') || '', cells: {} };
           for (var i = 0; i < cells.length; i++) {
             var key = cells[i].getAttribute('data-col-key');
             if (key) data.cells[key] = cells[i].textContent;
           }
-          var cb = row.querySelector('.data-grid-row-check');
+          var cb = row.querySelector('.dataGrid_row_check');
           data.selected = cb ? cb.checked : false;
           return data;
         },
@@ -4312,13 +5514,13 @@
         setRowChecked: function(targetId, rowIndex, checked) {
           var row = this._getRow(targetId, rowIndex);
           if (!row) return false;
-          var cb = row.querySelector('.data-grid-row-check');
+          var cb = row.querySelector('.dataGrid_row_check');
           if (!cb) return false;
           cb.checked = !!checked;
           if (checked) {
-            row.classList.add('data-grid-row-focused');
+            row.classList.add('dataGrid_row-focused');
           } else {
-            row.classList.remove('data-grid-row-focused');
+            row.classList.remove('dataGrid_row-focused');
           }
           cb.dispatchEvent(new Event('change', { bubbles: true }));
           return true;
@@ -4327,17 +5529,17 @@
         getRowChecked: function(targetId, rowIndex) {
           var row = this._getRow(targetId, rowIndex);
           if (!row) return false;
-          var cb = row.querySelector('.data-grid-row-check');
+          var cb = row.querySelector('.dataGrid_row_check');
           return cb ? cb.checked : false;
         },
 
         selectAllRows: function(targetId) {
           var rows = this._getRows(targetId);
           for (var i = 0; i < rows.length; i++) {
-            var cb = rows[i].querySelector('.data-grid-row-check');
-            if (cb) { cb.checked = true; rows[i].classList.add('data-grid-row-focused'); }
+            var cb = rows[i].querySelector('.dataGrid_row_check');
+            if (cb) { cb.checked = true; rows[i].classList.add('dataGrid_row-focused'); }
           }
-          var selectAll = document.querySelector('#' + targetId + ' .data-grid-select-all');
+          var selectAll = document.querySelector('#' + targetId + ' .dataGrid_select_all');
           if (selectAll) selectAll.checked = true;
           return true;
         },
@@ -4346,15 +5548,15 @@
           var rows = this._getRows(targetId);
           var allChecked = true;
           for (var i = 0; i < rows.length; i++) {
-            var cb = rows[i].querySelector('.data-grid-row-check');
+            var cb = rows[i].querySelector('.dataGrid_row_check');
             if (cb && !cb.checked) { allChecked = false; break; }
           }
           for (var j = 0; j < rows.length; j++) {
-            var cb2 = rows[j].querySelector('.data-grid-row-check');
+            var cb2 = rows[j].querySelector('.dataGrid_row_check');
             if (cb2) {
               cb2.checked = !allChecked;
-              if (!allChecked) { rows[j].classList.add('data-grid-row-focused'); }
-              else { rows[j].classList.remove('data-grid-row-focused'); }
+              if (!allChecked) { rows[j].classList.add('dataGrid_row-focused'); }
+              else { rows[j].classList.remove('dataGrid_row-focused'); }
             }
           }
           return true;
@@ -4364,7 +5566,7 @@
           var rows = this._getRows(targetId);
           var result = [];
           for (var i = 0; i < rows.length; i++) {
-            var cb = rows[i].querySelector('.data-grid-row-check');
+            var cb = rows[i].querySelector('.dataGrid_row_check');
             if (cb && cb.checked) result.push(i);
           }
           return result;
@@ -4374,7 +5576,7 @@
           var rows = this._getRows(targetId);
           var count = 0;
           for (var i = 0; i < rows.length; i++) {
-            var cb = rows[i].querySelector('.data-grid-row-check');
+            var cb = rows[i].querySelector('.dataGrid_row_check');
             if (cb && cb.checked) count++;
           }
           return count;
@@ -4383,12 +5585,12 @@
         getHighlightedRow: function(targetId) {
           var el = findTarget(targetId);
           if (!el) return null;
-          var highlighted = el.querySelector('.data-grid-row.data-grid-row-focused');
+          var highlighted = el.querySelector('.dataGrid_row.dataGrid_row-focused');
           if (!highlighted) return null;
-          var allRows = el.querySelectorAll('.data-grid-row');
+          var allRows = el.querySelectorAll('.dataGrid_row');
           for (var i = 0; i < allRows.length; i++) {
             if (allRows[i] === highlighted) {
-              var cells = highlighted.querySelectorAll('.data-grid-cell');
+              var cells = highlighted.querySelectorAll('.dataGrid_cell');
               var rowData = { index: i, cells: [], element: highlighted };
               for (var c = 0; c < cells.length; c++) {
                 rowData.cells.push((cells[c].textContent || '').trim());
@@ -4403,16 +5605,16 @@
           var rows = this._getRows(targetId);
           if (rowIndex < 0 || rowIndex >= rows.length) return false;
           for (var i = 0; i < rows.length; i++) {
-            rows[i].classList.remove('data-grid-row-focused');
+            rows[i].classList.remove('dataGrid_row-focused');
           }
-          rows[rowIndex].classList.add('data-grid-row-focused');
+          rows[rowIndex].classList.add('dataGrid_row-focused');
           return true;
         },
 
         deselectRow: function(targetId, rowIndex) {
           var rows = this._getRows(targetId);
           if (rowIndex < 0 || rowIndex >= rows.length) return false;
-          rows[rowIndex].classList.remove('data-grid-row-focused');
+          rows[rowIndex].classList.remove('dataGrid_row-focused');
           return true;
         },
 
@@ -4420,7 +5622,7 @@
           var rows = this._getRows(targetId);
           var body = this._getBody(targetId);
           for (var i = rows.length - 1; i >= 0; i--) {
-            var cb = rows[i].querySelector('.data-grid-row-check');
+            var cb = rows[i].querySelector('.dataGrid_row_check');
             if (cb && cb.checked) {
               body.removeChild(rows[i]);
             }
@@ -4432,12 +5634,12 @@
         enableCellEdit: function(targetId, colIndex) {
           var el = findTarget(targetId);
           if (!el) return false;
-          var headerCells = el.querySelectorAll('.data-grid-header-cell:not(.data-grid-checkbox)');
+          var headerCells = el.querySelectorAll('.dataGrid_header_cell:not(.dataGrid_checkbox)');
           if (colIndex < 0 || colIndex >= headerCells.length) return false;
           headerCells[colIndex].setAttribute('data-editable', 'true');
-          var rows = el.querySelectorAll('.data-grid-row');
+          var rows = el.querySelectorAll('.dataGrid_row');
           for (var r = 0; r < rows.length; r++) {
-            var cells = rows[r].querySelectorAll('.data-grid-cell:not(.data-grid-checkbox)');
+            var cells = rows[r].querySelectorAll('.dataGrid_cell:not(.dataGrid_checkbox)');
             if (colIndex < cells.length) {
               cells[colIndex].setAttribute('data-editable', 'true');
             }
@@ -4448,12 +5650,12 @@
         disableCellEdit: function(targetId, colIndex) {
           var el = findTarget(targetId);
           if (!el) return false;
-          var headerCells = el.querySelectorAll('.data-grid-header-cell:not(.data-grid-checkbox)');
+          var headerCells = el.querySelectorAll('.dataGrid_header_cell:not(.dataGrid_checkbox)');
           if (colIndex < 0 || colIndex >= headerCells.length) return false;
           headerCells[colIndex].setAttribute('data-editable', 'false');
-          var rows = el.querySelectorAll('.data-grid-row');
+          var rows = el.querySelectorAll('.dataGrid_row');
           for (var r = 0; r < rows.length; r++) {
-            var cells = rows[r].querySelectorAll('.data-grid-cell:not(.data-grid-checkbox)');
+            var cells = rows[r].querySelectorAll('.dataGrid_cell:not(.dataGrid_checkbox)');
             if (colIndex < cells.length) {
               cells[colIndex].setAttribute('data-editable', 'false');
             }
@@ -4464,7 +5666,7 @@
         isCellEditable: function(targetId, colIndex) {
           var el = findTarget(targetId);
           if (!el) return false;
-          var headerCells = el.querySelectorAll('.data-grid-header-cell:not(.data-grid-checkbox)');
+          var headerCells = el.querySelectorAll('.dataGrid_header_cell:not(.dataGrid_checkbox)');
           if (colIndex < 0 || colIndex >= headerCells.length) return false;
           return headerCells[colIndex].getAttribute('data-editable') === 'true';
         },
@@ -4520,7 +5722,7 @@
           if (window.DataTableManager && window.DataTableManager.tables && window.DataTableManager.tables[targetId]) {
             window.DataTableManager.tables[targetId].showCheckbox = !!show;
           }
-          var checkboxes = el.querySelectorAll('.data-grid-checkbox');
+          var checkboxes = el.querySelectorAll('.dataGrid_checkbox');
           if (!show) {
             for (var i = 0; i < checkboxes.length; i++) {
               checkboxes[i].style.display = 'none';
@@ -4533,20 +5735,20 @@
             }
             return true;
           }
-          var header = el.querySelector('.data-grid-header');
+          var header = el.querySelector('.dataGrid_header');
           if (header) {
             var headerCb = document.createElement('div');
-            headerCb.className = 'data-grid-header-cell data-grid-checkbox';
+            headerCb.className = 'dataGrid_header_cell dataGrid_checkbox';
             headerCb.style.cssText = 'width:36px;min-width:36px;flex-shrink:0';
-            headerCb.innerHTML = '<input type="checkbox" class="data-grid-select-all">';
+            headerCb.innerHTML = '<input type="checkbox" class="dataGrid_select_all">';
             header.insertBefore(headerCb, header.firstChild);
           }
-          var rows = el.querySelectorAll('.data-grid-row');
+          var rows = el.querySelectorAll('.dataGrid_row');
           for (var r = 0; r < rows.length; r++) {
             var rowCb = document.createElement('div');
-            rowCb.className = 'data-grid-cell data-grid-checkbox';
+            rowCb.className = 'dataGrid_cell dataGrid_checkbox';
             rowCb.style.cssText = 'width:36px;min-width:36px;flex-shrink:0';
-            rowCb.innerHTML = '<input type="checkbox" class="data-grid-row-check" data-ctrl-type="datagrid_row_checkbox">';
+            rowCb.innerHTML = '<input type="checkbox" class="dataGrid_row_check" data-ctrl-type="dataGrid_row_checkbox">';
             rows[r].insertBefore(rowCb, rows[r].firstChild);
           }
           return true;
@@ -4555,9 +5757,9 @@
         _getRowCheckbox: function(targetId, rowIndex) {
           var el = findTarget(targetId);
           if (!el) return null;
-          var rows = el.querySelectorAll('.data-grid-row');
+          var rows = el.querySelectorAll('.dataGrid_row');
           if (rowIndex < 0 || rowIndex >= rows.length) return null;
-          return rows[rowIndex].querySelector('.data-grid-row-check') || null;
+          return rows[rowIndex].querySelector('.dataGrid_row_check') || null;
         },
 
         setRowChecked: function(targetId, rowIndex, checked) {
@@ -4575,10 +5777,10 @@
         getCheckedRows: function(targetId) {
           var el = findTarget(targetId);
           if (!el) return [];
-          var rows = el.querySelectorAll('.data-grid-row');
+          var rows = el.querySelectorAll('.dataGrid_row');
           var indices = [];
           for (var i = 0; i < rows.length; i++) {
-            var cb = rows[i].querySelector('.data-grid-row-check');
+            var cb = rows[i].querySelector('.dataGrid_row_check');
             if (cb && cb.checked) indices.push(i);
           }
           return indices;
@@ -4587,7 +5789,7 @@
         checkAll: function(targetId) {
           var el = findTarget(targetId);
           if (!el) return false;
-          var checkboxes = el.querySelectorAll('.data-grid-row-check');
+          var checkboxes = el.querySelectorAll('.dataGrid_row_check');
           for (var i = 0; i < checkboxes.length; i++) { checkboxes[i].checked = true; }
           return true;
         },
@@ -4595,7 +5797,7 @@
         uncheckAll: function(targetId) {
           var el = findTarget(targetId);
           if (!el) return false;
-          var checkboxes = el.querySelectorAll('.data-grid-row-check');
+          var checkboxes = el.querySelectorAll('.dataGrid_row_check');
           for (var i = 0; i < checkboxes.length; i++) { checkboxes[i].checked = false; }
           return true;
         }
@@ -4605,17 +5807,17 @@
       cardBox: {
         _getHeader: function(targetId) {
           var el = findTarget(targetId);
-          return el ? el.querySelector('.card-header') : null;
+          return el ? el.querySelector('.cardBox_header') : null;
         },
 
         _getTitle: function(targetId) {
           var header = this._getHeader(targetId);
-          return header ? header.querySelector('.card-header-title') : null;
+          return header ? header.querySelector('.cardBox_header_title') : null;
         },
 
         _getCollapseBtn: function(targetId) {
           var header = this._getHeader(targetId);
-          return header ? header.querySelector('.card-collapse-btn') : null;
+          return header ? header.querySelector('.cardBox_collapse_btn') : null;
         },
 
         _updateArrow: function(targetId, collapsed) {
@@ -4709,22 +5911,22 @@
 
         _getTabBtns: function(targetId) {
           var el = this._getContainer(targetId);
-          return el ? el.querySelectorAll('.tab-header-btn') : [];
+          return el ? el.querySelectorAll('.tabsContainer_headerBar_btn') : [];
         },
 
         _getTabPanes: function(targetId) {
           var el = this._getContainer(targetId);
-          return el ? el.querySelectorAll('.tab-content-panel') : [];
+          return el ? el.querySelectorAll('.tabsContainer_contentWrapper_panel') : [];
         },
 
         _findTabBtn: function(targetId, tabId) {
           var el = this._getContainer(targetId);
-          return el ? el.querySelector('.tab-header-btn[data-tab-name="' + tabId + '"]') : null;
+          return el ? el.querySelector('.tabsContainer_headerBar_btn[data-tab-name="' + tabId + '"]') : null;
         },
 
         _findTabPane: function(targetId, tabId) {
           var el = this._getContainer(targetId);
-          return el ? el.querySelector('.tab-content-panel[data-tab-name="' + tabId + '"]') : null;
+          return el ? el.querySelector('.tabsContainer_contentWrapper_panel[data-tab-name="' + tabId + '"]') : null;
         },
 
         _deactivateAll: function(targetId) {
@@ -4753,7 +5955,7 @@
         getActiveTab: function(targetId) {
           var btn = this._getContainer(targetId);
           if (!btn) return '';
-          var active = btn.querySelector('.tab-header-btn.active');
+          var active = btn.querySelector('.tabsContainer_headerBar_btn.active');
           return active ? active.getAttribute('data-tab-name') || '' : '';
         },
 
@@ -4769,20 +5971,20 @@
         addTab: function(targetId, tabId, tabTitle) {
           var el = this._getContainer(targetId);
           if (!el) return false;
-          var tabBar = el.querySelector('.tab-header-bar');
-          var contentWrapper = el.querySelector('.tab-content-wrapper');
+          var tabBar = el.querySelector('.tabsContainer_headerBar');
+          var contentWrapper = el.querySelector('.tabsContainer_contentWrapper');
           if (!tabBar || !contentWrapper) return false;
           if (this._findTabBtn(targetId, tabId)) return false;
           tabId = tabId || ('tab_' + Date.now());
           tabTitle = tabTitle || ('标签' + (this._getTabBtns(targetId).length + 1));
           var btn = document.createElement('button');
-          btn.className = 'tab-header-btn';
-          btn.setAttribute('data-ctrl-type', 'tab_btn');
+          btn.className = 'tabsContainer_headerBar_btn';
+          btn.setAttribute('data-ctrl-type', 'tabsContainer_headerBar_btn');
           btn.setAttribute('data-tab-name', tabId);
           btn.textContent = tabTitle;
           tabBar.appendChild(btn);
           var pane = document.createElement('div');
-          pane.className = 'tab-content-panel';
+          pane.className = 'tabsContainer_contentWrapper_panel';
           pane.setAttribute('data-tab-name', tabId);
           contentWrapper.appendChild(pane);
           return tabId;
@@ -4818,7 +6020,7 @@
         setTabHeaderVisible: function(targetId, visible) {
           var el = findTarget(targetId);
           if (!el) return false;
-          var header = el.querySelector('.tab-header-bar');
+          var header = el.querySelector('.tabsContainer_headerBar');
           if (!header) return false;
           header.style.display = visible ? '' : 'none';
           return true;
@@ -4827,7 +6029,7 @@
         getTabHeaderVisible: function(targetId) {
           var el = findTarget(targetId);
           if (!el) return false;
-          var header = el.querySelector('.tab-header-bar');
+          var header = el.querySelector('.tabsContainer_headerBar');
           if (!header) return true;
           return header.style.display !== 'none';
         }
@@ -4998,45 +6200,6 @@
   };
 
   window.webviewBridge.api = wrapAPIObject(window.webviewBridge.api);
-
-  window.webviewBridge.api.public = {
-    setValue:              window.webviewBridge.api.setValue,
-    getValue:              window.webviewBridge.api.getValue,
-    setChecked:            window.webviewBridge.api.setChecked,
-    getChecked:            window.webviewBridge.api.getChecked,
-    setEnabled:            window.webviewBridge.api.setEnabled,
-    isEnabled:             window.webviewBridge.api.isEnabled,
-    show:                  window.webviewBridge.api.show,
-    hide:                  window.webviewBridge.api.hide,
-    toggle:                window.webviewBridge.api.toggle,
-    isVisible:             window.webviewBridge.api.isVisible,
-    focus:                 window.webviewBridge.api.focus,
-    setStyle:              window.webviewBridge.api.setStyle,
-    setBlockContextMenu:   window.webviewBridge.api.setBlockContextMenu,
-    getBlockContextMenu:   window.webviewBridge.api.getBlockContextMenu,
-    getWindowSize:         window.webviewBridge.api.getWindowSize,
-    setFixedCanvasSize:    window.webviewBridge.api.canvas.setFixedCanvasSize,
-    getIdByName:           window.webviewBridge.api.getIdByName,
-    getInfoById:           window.webviewBridge.api.getInfoById,
-    showNotification:      window.webviewBridge.api.showNotification,
-    sendMessage:           window.webviewBridge.api.sendMessage,
-    testReturn:            window.webviewBridge.api.testReturn,
-    move:                  window.webviewBridge.api.move,
-    setSize:               window.webviewBridge.api.setSize,
-    getPosition:           window.webviewBridge.api.getPosition,
-    getSize:               window.webviewBridge.api.getSize,
-    bringToFront:          window.webviewBridge.api.bringToFront,
-    sendToBack:            window.webviewBridge.api.sendToBack,
-    setZIndex:             window.webviewBridge.api.setZIndex,
-    addMessageListener:    window.webviewBridge.api.addMessageListener,
-    removeMessageListener: window.webviewBridge.api.removeMessageListener
-  };
-
-  window.webviewBridge.api.canvas = {
-    setFixedCanvasSize:    window.webviewBridge.api.canvas.setFixedCanvasSize,
-    getTitleBarTitle:    window.webviewBridge.api.canvas.getTitleBarTitle,
-    setTitleBarTitle:    window.webviewBridge.api.canvas.setTitleBarTitle
-  };
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);

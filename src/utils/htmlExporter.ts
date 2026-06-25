@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿/**
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿/**
  * @file utils/htmlExporter.ts
  * @description HTML 导出工具 - 所有样式使用唯一 #widgetId 选择器，无全局标签/类选择器干扰
  */
@@ -22,25 +22,25 @@ function esc(s: string): string {
 function widgetTypeToCtrlType(type: string): string {
   const map: Record<string, string> = {
     'button': 'button',
-    'input': 'input_text',
+    'input': 'inputText',
     'checkbox': 'checkbox',
-    'toggle': 'switch_toggle',
-    'comboBox': 'combobox',
+    'toggle': 'switchToggle',
+    'comboBox': 'comboBox',
     'label': 'label',
     'divider': 'divider',
-    'hyperlink': 'hyperlink',
+    'hyperLink': 'hyperLink',
     'textarea': 'textarea',
-    'radioGroup': 'radio_group',
-    'progressBar': 'progress_bar',
-    'datetimePicker': 'datetime_picker',
-    'logOutput': 'logbox',
-    'iconButton': 'icon_button',
-    'tabsContainer': 'tab_container',
-    'cardBox': 'cardbox',
-    'listBox': 'listbox',
-    'treeView': 'treeview',
-    'dataGrid': 'datagrid',
-    'imageBox': 'image_box',
+    'radioGroup': 'radioGroup',
+    'progressBar': 'progressBar',
+    'datetimePicker': 'datetimePicker',
+    'logOutput': 'logOutput',
+    'iconButton': 'iconButton',
+    'tabsContainer': 'tabsContainer',
+    'cardBox': 'cardBox',
+    'listBox': 'listBox',
+    'treeView': 'treeView',
+    'dataGrid': 'dataGrid',
+    'imageBox': 'imageBox',
     'contextMenu': 'context_menu',
     'canvas': 'canvas'
   }
@@ -48,7 +48,8 @@ function widgetTypeToCtrlType(type: string): string {
 }
 
 function dataAttrs(widget: Widget): string {
-  let attrs = `id="${esc(widget.id)}" data-type="${esc(widget.type)}" data-ctrl-type="${widgetTypeToCtrlType(widget.type)}" data-ctrl-id="${esc(widget.id)}" data-name="${esc(widget.name || widget.id)}"`
+  const ctrlType = widgetTypeToCtrlType(widget.type)
+  let attrs = `id="${esc(widget.id)}" data-type="${esc(widget.type)}" data-ctrl-type="${ctrlType}" data-drag-type="${ctrlType}" data-ctrl-id="${esc(widget.id)}" data-name="${esc(widget.name || widget.id)}"`
   if (widget.parentId) attrs += ` data-parent="${esc(widget.parentId)}"`
   if (widget.parentTabIndex !== undefined) attrs += ` data-tab="${widget.parentTabIndex}"`
   if (widget.columns) attrs += ` data-columns='${JSON.stringify(widget.columns)}'`
@@ -177,7 +178,8 @@ function genToggle(widget: Widget): string {
 function genComboBox(widget: Widget): string {
   const dAttrs = dataAttrs(widget)
   const disabled = widget.disabled ? ' disabled' : ''
-  const options = widget.options || ['选项1', '选项2', '选项3']
+  const rawOpts = widget.options
+  const options = Array.isArray(rawOpts) ? rawOpts : ['选项1', '选项2', '选项3']
   const selIdx = widget.selectedIndex || 0
   const optsHTML = options.map((opt, i) =>
     `<option value="${esc(opt)}"${i === selIdx ? ' selected' : ''}>${esc(opt)}</option>`
@@ -231,9 +233,9 @@ function genRadioGroup(widget: Widget): string {
   const layoutClass = widget.layout === 'horizontal' ? ' radiogroup-h' : ''
   const disabledAttr = widget.disabled ? ' disabled' : ''
   const optsHTML = options.map((opt, i) =>
-    `<label class="radiogroup-item"${disabledAttr}><input type="radio" data-ctrl-type="radio" name="${radioName}" value="${esc(opt)}"${i === selIdx ? ' checked' : ''}${disabledAttr} />${esc(opt)}</label>`
+    `<label class="radioGroup_item"${disabledAttr}><input type="radio" data-ctrl-type="radio" name="${radioName}" value="${esc(opt)}"${i === selIdx ? ' checked' : ''}${disabledAttr} />${esc(opt)}</label>`
   ).join('')
-  return `<div ${dAttrs} class="radiogroup-container${layoutClass}">${optsHTML}</div>`
+  return `<div ${dAttrs} class="radioGroup_container${layoutClass}">${optsHTML}</div>`
 }
 
 function genProgressBar(widget: Widget): string {
@@ -243,11 +245,11 @@ function genProgressBar(widget: Widget): string {
   const showText = widget.showProgressText !== false
   const isDraggable = !!(widget as any).draggable
   const thumbHtml = isDraggable
-    ? `<div class="progress-thumb" style="position:absolute;left:calc(${pct}% - 11px);top:50%;transform:translateY(-50%);width:22px;height:22px;border-radius:50%;background:#fff;border:2px solid ${barColor};box-shadow:0 1px 6px rgba(0,0,0,0.3);z-index:0;cursor:pointer;"></div>`
+    ? `<div class="progressBar_thumb" style="position:absolute;left:calc(${pct}% - 11px);top:50%;transform:translateY(-50%);width:22px;height:22px;border-radius:50%;background:#fff;border:2px solid ${barColor};box-shadow:0 1px 6px rgba(0,0,0,0.3);z-index:0;cursor:pointer;"></div>`
     : ''
-  const textHtml = showText ? `<span class="progress-text" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:inherit;pointer-events:none;white-space:nowrap;">${pct}%</span>` : ''
+  const textHtml = showText ? `<span class="progressBar_text" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:inherit;pointer-events:none;white-space:nowrap;">${pct}%</span>` : ''
   const draggableAttr = isDraggable ? ` data-draggable="true"` : ''
-  return `<div ${dAttrs} class="progress-bar-container" style="overflow:visible;"${draggableAttr}><div class="progress-track"></div><div class="progress-fill" style="width:${pct}%;height:100%;background:${barColor};border-radius:inherit;transition:width 0.15s;"></div>${thumbHtml}${textHtml}</div>`
+  return `<div ${dAttrs} class="progressBar_container" style="overflow:visible;"${draggableAttr}><div class="progressBar_track"></div><div class="progressBar_fill" style="width:${pct}%;height:100%;background:${barColor};border-radius:inherit;transition:width 0.15s;"></div>${thumbHtml}${textHtml}</div>`
 }
 
 function genCanvas(widget: Widget): string {
@@ -261,9 +263,9 @@ function genLogOutput(widget: Widget): string {
   const dAttrs = dataAttrs(widget)
   const logs = widget.logs || []
   const lines = logs.map(l =>
-    `<div class="log-line" data-ctrl-type="log_item" style="color:${esc(l.color || '#000000')}">${esc(l.text)}</div>`
+    `<div class="logOutput_line" data-ctrl-type="logOutput_item" style="color:${esc(l.color || '#000000')}">${esc(l.text)}</div>`
   ).join('\n')
-  return `<div ${dAttrs} class="log-output-container">${lines}</div>`
+  return `<div ${dAttrs} class="logOutput_container">${lines}</div>`
 }
 
 function genIconButton(widget: Widget): string {
@@ -291,7 +293,7 @@ function genImageBox(widget: Widget): string {
   const src = esc(widget.src || '')
   const disabledClass = widget.disabled ? ' disabled' : ''
   const disabledOverlay = widget.disabled ? '<div class="disabled-overlay"></div>' : ''
-  return `<div ${dAttrs} class="image-box${disabledClass}">${src ? `<img src="${src}" loading="lazy" alt="" />` : ''}${disabledOverlay}</div>`
+  return `<div ${dAttrs} class="imageBox${disabledClass}">${src ? `<img src="${src}" loading="lazy" alt="" />` : ''}${disabledOverlay}</div>`
 }
 
 /**
@@ -306,13 +308,13 @@ function genCardBox(widget: Widget): string {
   const downArrowSVG = `<svg width="12" height="12" viewBox="0 0 12 12"><path d="M3 4.5L6 7.5L9 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`
   const rightArrowSVG = `<svg width="12" height="12" viewBox="0 0 12 12"><path d="M4.5 3L7.5 6L4.5 9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`
   const collapseBtn = (showHeader && widget.collapsible)
-    ? `<span class="card-collapse-btn">${widget.collapsed ? rightArrowSVG : downArrowSVG}</span>`
+    ? `<span class="cardBox_collapse_btn">${widget.collapsed ? rightArrowSVG : downArrowSVG}</span>`
     : ''
   const headerHTML = showHeader
-    ? `<div class="card-header"><span class="card-header-title">${esc(widget.headerTitle || '卡片标题')}</span>${collapseBtn}</div>`
+    ? `<div class="cardBox_header"><span class="cardBox_header_title">${esc(widget.headerTitle || '卡片标题')}</span>${collapseBtn}</div>`
     : ''
   const childrenHTML = (widget.children || []).map(c => generateWidgetHTML(c)).join('\n')
-  return `<div ${dAttrs}${disabledData}${collapseAttr} class="card-box${collapsedClass}">${headerHTML}<div class="card-body" data-ctrl-type="cardbox_body">${childrenHTML}</div></div>`
+  return `<div ${dAttrs}${disabledData}${collapseAttr} class="cardBox${collapsedClass}">${headerHTML}<div class="cardBox_body" data-ctrl-type="cardBox_body">${childrenHTML}</div></div>`
 }
 
 /**
@@ -328,14 +330,14 @@ function genListBox(widget: Widget): string {
   const disabledData = widget.disabled ? ' data-disabled="true" class="disabled"' : ''
   const itemsHTML = items.map((item, idx) => {
     const cb = widget.showCheckbox
-      ? `<input type="checkbox" class="list-item-checkbox" data-ctrl-type="listbox_item_checkbox"${item.selected ? ' checked' : ''} data-item-index="${idx}" />`
+      ? `<input type="checkbox" class="listBox_item-checkbox" data-ctrl-type="listbox_item_checkbox"${item.selected ? ' checked' : ''} data-item-index="${idx}" />`
       : ''
-    return `<div class="list-item" data-ctrl-type="listbox_item" data-item-index="${idx}">${cb}<span class="list-item-text">${esc(item.text)}</span></div>`
+    return `<div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="${idx}">${cb}<span class="listBox_item_text">${esc(item.text)}</span></div>`
   }).join('\n')
   if (items.length === 0) {
-    return `<div ${dAttrs} data-listbox-items='${itemsJSON}'${editable}${showCb}${alwaysShow}${disabledData}><div class="list-box-scroll"><div class="list-empty">暂无数据</div></div>${widget.disabled ? '<div class="disabled-overlay"></div>' : ''}</div>`
+    return `<div ${dAttrs} data-listBox-items='${itemsJSON}'${editable}${showCb}${alwaysShow}${disabledData}><div class="listBox_scroll"><div class="list-empty">暂无数据</div></div>${widget.disabled ? '<div class="disabled-overlay"></div>' : ''}</div>`
   }
-  return `<div ${dAttrs} data-listbox-items='${itemsJSON}'${editable}${showCb}${alwaysShow}${disabledData}><div class="list-box-scroll">${itemsHTML}</div>${widget.disabled ? '<div class="disabled-overlay"></div>' : ''}</div>`
+  return `<div ${dAttrs} data-listBox-items='${itemsJSON}'${editable}${showCb}${alwaysShow}${disabledData}><div class="listBox_scroll">${itemsHTML}</div>${widget.disabled ? '<div class="disabled-overlay"></div>' : ''}</div>`
 }
 
 /**
@@ -361,15 +363,15 @@ function genTreeView(widget: Widget): string {
 
     let childrenHTML = ''
     if (hasChildren) {
-      childrenHTML = '<div class="tree-children">' + node.children.map((child: any) => genTreeNode(child, level + 1)).join('') + '</div>'
+      childrenHTML = '<div class="treeView_children">' + node.children.map((child: any) => genTreeNode(child, level + 1)).join('') + '</div>'
     }
 
-    return `<div class="tree-node" data-node-id="${esc(nodeId)}" data-level="${level}">
-      <div class="tree-node-content">
-        ${widget.treeShowCheckbox ? '<span class="tree-checkbox"><input type="checkbox" class="tree-node-check" data-ctrl-type="treeview_node_checkbox"' + nodeChecked + '></span>' : ''}
-        <span class="tree-toggle${toggleClass}" data-ctrl-type="treeview_node_toggle"></span>
-        <span class="tree-icon${iconClass}">${hasChildren ? '📁' : '📄'}</span>
-        <span class="tree-label" data-ctrl-type="treeview_node_text">${esc(node.text || '')}</span>
+    return `<div class="treeView_node" data-node-id="${esc(nodeId)}" data-level="${level}">
+      <div class="treeView_node_content">
+        ${widget.treeShowCheckbox ? '<span class="tree-checkbox"><input type="checkbox" class="treeView_node-check" data-ctrl-type="treeview_node_checkbox"' + nodeChecked + '></span>' : ''}
+        <span class="treeView_toggle${toggleClass}" data-ctrl-type="treeview_node_toggle">▶</span>
+        <span class="treeView_icon${iconClass}">${hasChildren ? '📁' : '📄'}</span>
+        <span class="treeView_label" data-ctrl-type="treeview_node_text">${esc(node.text || '')}</span>
         <span class="tree-edit-input" style="display:none"></span>
       </div>
       ${childrenHTML}
@@ -393,33 +395,33 @@ function genDataGrid(widget: Widget): string {
 
   let headerHTML = ''
   if (showCheckbox) {
-    headerHTML += `<div class="data-grid-header-cell data-grid-checkbox" style="width:36px;min-width:36px;flex-shrink:0"><input type="checkbox" class="data-grid-select-all"></div>`
+    headerHTML += `<div class="dataGrid_header_cell dataGrid_checkbox" style="width:36px;min-width:36px;flex-shrink:0"><input type="checkbox" class="dataGrid_select_all"></div>`
   }
   columns.forEach(col => {
     const w = col.width || 100
-    headerHTML += `<div class="data-grid-header-cell" data-col-key="${esc(col.field)}" data-ctrl-type="datagrid_cell" data-col-name="${esc(col.header)}" style="width:${w}px;min-width:${w}px;flex-shrink:0">${esc(col.header || col.field)}</div>`
+    headerHTML += `<div class="dataGrid_header_cell" data-col-key="${esc(col.field)}" data-ctrl-type="dataGrid_cell" data-col-name="${esc(col.header)}" style="width:${w}px;min-width:${w}px;flex-shrink:0">${esc(col.header || col.field)}</div>`
   })
 
   let bodyHTML = ''
   rows.forEach((row, ri) => {
-    const rowClass = row.selected ? 'data-grid-row data-grid-row-focused' : 'data-grid-row'
+    const rowClass = row.selected ? 'dataGrid_row dataGrid_row-focused' : 'dataGrid_row'
     bodyHTML += `<div class="${rowClass.trim()}" data-row-index="${ri}" data-row-id="${esc(row.id)}">`
     if (showCheckbox) {
       const checked = row.selected ? ' checked' : ''
-      bodyHTML += `<div class="data-grid-cell data-grid-checkbox" style="width:36px;min-width:36px;flex-shrink:0"><input type="checkbox" class="data-grid-row-check" data-ctrl-type="datagrid_row_checkbox"${checked}></div>`
+      bodyHTML += `<div class="dataGrid_cell dataGrid_checkbox" style="width:36px;min-width:36px;flex-shrink:0"><input type="checkbox" class="dataGrid_row_check" data-ctrl-type="dataGrid_row_checkbox"${checked}></div>`
     }
     columns.forEach(col => {
       const w = col.width || 100
       const val = row.cells ? (row.cells[col.field] !== undefined && row.cells[col.field] !== null ? String(row.cells[col.field]) : '') : ''
-      bodyHTML += `<div class="data-grid-cell" data-ctrl-type="datagrid_cell" data-col-key="${esc(col.field)}" data-col-name="${esc(col.header)}" style="width:${w}px;min-width:${w}px;flex-shrink:0" title="${esc(val)}">${esc(val)}</div>`
+      bodyHTML += `<div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="${esc(col.field)}" data-col-name="${esc(col.header)}" style="width:${w}px;min-width:${w}px;flex-shrink:0" title="${esc(val)}">${esc(val)}</div>`
     })
     bodyHTML += `</div>`
   })
 
   return (
-    `<div ${dAttrs} class="data-grid-container">` +
-    `<div class="data-grid-header">${headerHTML}</div>` +
-    `<div class="data-grid-body">${bodyHTML}</div>` +
+    `<div ${dAttrs} class="dataGrid_container">` +
+    `<div class="dataGrid_header">${headerHTML}</div>` +
+    `<div class="dataGrid_body">${bodyHTML}</div>` +
     `</div>`
   )
 }
@@ -433,20 +435,20 @@ function genTabsContainer(widget: Widget): string {
 
   const tabHeaders = tabs.map((tab) => {
     const activeClass = tab.name === activeName ? ' active' : ''
-    return `<button class="tab-header-btn${activeClass}" data-ctrl-type="tab_btn" data-tab-name="${esc(tab.name)}">${esc(tab.title)}</button>`
+    return `<button class="tabsContainer_headerBar_btn${activeClass}" data-ctrl-type="tabsContainer_headerBar_btn" data-tab-name="${esc(tab.name)}">${esc(tab.title)}</button>`
   }).join('')
 
   const tabPanes = tabs.map((tab, idx) => {
     const activeClass = tab.name === activeName ? ' active' : ''
     const childWidgets = (widget.children || []).filter(c => c.parentTabIndex === idx)
     const childrenDOM = childWidgets.map(c => generateWidgetHTML(c)).join('\n')
-    return `<div class="tab-content-panel${activeClass}" data-tab-name="${esc(tab.name)}" data-parent="${esc(widget.id)}" data-tab="${idx}">${childrenDOM}</div>`
+    return `<div class="tabsContainer_contentWrapper_panel${activeClass}" data-tab-name="${esc(tab.name)}" data-parent="${esc(widget.id)}" data-tab="${idx}">${childrenDOM}</div>`
   }).join('\n')
 
   return (
-    `<div ${dAttrs} class="tabs-container"${disabledData}>` +
-    (hideHeader ? `<div class="tab-header-bar" style="display:none">${tabHeaders}</div>` : `<div class="tab-header-bar">${tabHeaders}</div>`) +
-    `<div class="tab-content-wrapper">${tabPanes}</div>` +
+    `<div ${dAttrs} class="tabsContainer"${disabledData}>` +
+    (hideHeader ? `<div class="tabsContainer_headerBar" style="display:none">${tabHeaders}</div>` : `<div class="tabsContainer_headerBar">${tabHeaders}</div>`) +
+    `<div class="tabsContainer_contentWrapper">${tabPanes}</div>` +
     `</div>`
   )
 }
@@ -466,7 +468,7 @@ function generateWidgetHTML(widget: Widget): string {
     case 'comboBox':      return genComboBox(widget)
     case 'label':         return genLabel(widget)
     case 'divider':       return genDivider(widget)
-    case 'hyperlink':     return genHyperlink(widget)
+    case 'hyperLink':     return genHyperlink(widget)
     case 'textarea':      return genTextarea(widget)
     case 'radioGroup':    return genRadioGroup(widget)
     case 'tabsContainer': return genTabsContainer(widget)
@@ -499,7 +501,7 @@ export const widgetHTMLGenerators: Record<string, (widget: Widget) => string> = 
   comboBox: genComboBox,
   label: genLabel,
   divider: genDivider,
-  hyperlink: genHyperlink,
+  hyperLink: genHyperlink,
   textarea: genTextarea,
   radioGroup: genRadioGroup,
   tabsContainer: genTabsContainer,
@@ -542,28 +544,28 @@ const BRIDGE_SCRIPT = `
   'use strict';
 
   document.addEventListener('click', function(e) {
-    var tabBtn = e.target.closest('.tab-header-btn');
+    var tabBtn = e.target.closest('.tabsContainer_headerBar_btn');
     if (tabBtn) {
-      var container = tabBtn.closest('.tabs-container');
+      var container = tabBtn.closest('.tabsContainer');
       if (!container) return;
 
       if (container.getAttribute('data-disabled') === 'true') return;
 
       var tabName = tabBtn.getAttribute('data-tab-name');
-      var allBtns = container.querySelectorAll('.tab-header-btn');
+      var allBtns = container.querySelectorAll('.tabsContainer_headerBar_btn');
       allBtns.forEach(function(b) { b.classList.remove('active'); });
       tabBtn.classList.add('active');
 
-      var allPanes = container.querySelectorAll('.tab-content-panel');
+      var allPanes = container.querySelectorAll('.tabsContainer_contentWrapper_panel');
       allPanes.forEach(function(p) { p.classList.remove('active'); });
-      var activePane = container.querySelector('.tab-content-panel[data-tab-name="' + tabName + '"]');
+      var activePane = container.querySelector('.tabsContainer_contentWrapper_panel[data-tab-name="' + tabName + '"]');
       if (activePane) activePane.classList.add('active');
       return;
     }
 
-    var collapseBtn = e.target.closest('.card-collapse-btn');
+    var collapseBtn = e.target.closest('.cardBox_collapse_btn');
     if (collapseBtn) {
-      var card = collapseBtn.closest('.card-box');
+      var card = collapseBtn.closest('.cardBox');
       if (!card) return;
       var isCollapsed = card.getAttribute('data-collapsed') === 'true';
       var downArrow = '<svg width="12" height="12" viewBox="0 0 12 12"><path d="M3 4.5L6 7.5L9 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -590,21 +592,21 @@ const PROGRESS_RUNTIME = `
 (function() {
   'use strict';
   function updateProgress(bar, pct) {
-    var fill = bar.querySelector('.progress-fill');
-    var txt = bar.querySelector('.progress-text');
-    var thumb = bar.querySelector('.progress-thumb');
+    var fill = bar.querySelector('.progressBar_fill');
+    var txt = bar.querySelector('.progressBar_text');
+    var thumb = bar.querySelector('.progressBar_thumb');
     if (fill) fill.style.width = pct + '%';
     if (txt) txt.textContent = pct + '%';
     if (thumb) thumb.style.left = 'calc(' + pct + '% - 11px)';
   }
   document.addEventListener('mousedown', function(e) {
-    var bar = e.target.closest('[data-ctrl-type="progress_bar"]');
+    var bar = e.target.closest('[data-ctrl-type="progressBar"]');
     if (!bar) return;
-    var fill = bar.querySelector('.progress-fill');
+    var fill = bar.querySelector('.progressBar_fill');
     if (!fill) return;
     var isEditable = bar.getAttribute('data-editable') === 'true';
     var isDraggable = bar.getAttribute('data-draggable') === 'true';
-    var thumb = bar.querySelector('.progress-thumb');
+    var thumb = bar.querySelector('.progressBar_thumb');
     if (!isEditable) return;
 
     function calcPct(clientX) {
@@ -649,13 +651,13 @@ const LISTBOX_RUNTIME = `
     itemsCache: {},
 
     init: function() {
-      var listBoxes = document.querySelectorAll('[data-listbox-items]');
+      var listBoxes = document.querySelectorAll('[data-listBox-items]');
       for (var i = 0; i < listBoxes.length; i++) {
         var el = listBoxes[i];
         var id = el.id;
         if (!id) continue;
         try {
-          var items = JSON.parse(el.getAttribute('data-listbox-items') || '[]');
+          var items = JSON.parse(el.getAttribute('data-listBox-items') || '[]');
           ListBoxManager.itemsCache[id] = items;
         } catch(e) { ListBoxManager.itemsCache[id] = []; }
         ListBoxManager._bindEvents(el);
@@ -667,7 +669,7 @@ const LISTBOX_RUNTIME = `
       document.addEventListener('mousedown', function(e) {
         if (el.getAttribute('data-always-show-selection') === 'true') return;
         if (!el.contains(e.target)) {
-          var allItems = el.querySelectorAll('.list-item');
+          var allItems = el.querySelectorAll('.listBox_item');
           for (var ai = 0; ai < allItems.length; ai++) {
             allItems[ai].classList.remove('item-selected');
           }
@@ -679,7 +681,7 @@ const LISTBOX_RUNTIME = `
       var id = listBoxEl.id;
       var items = ListBoxManager.itemsCache[id] || [];
       var showCheckbox = listBoxEl.getAttribute('data-show-checkbox') === 'true';
-      var scroll = listBoxEl.querySelector('.list-box-scroll');
+      var scroll = listBoxEl.querySelector('.listBox_scroll');
       if (!scroll) return;
       if (items.length === 0) {
         scroll.innerHTML = '<div class="list-empty">暂无数据</div>';
@@ -688,8 +690,8 @@ const LISTBOX_RUNTIME = `
       var html = '';
       for (var i = 0; i < items.length; i++) {
         var item = items[i];
-        var cb = showCheckbox ? '<input type="checkbox" class="list-item-checkbox" data-ctrl-type="listbox_item_checkbox"' + (item.selected ? ' checked' : '') + ' data-item-index="' + i + '" />' : '';
-        html += '<div class="list-item" data-ctrl-type="listbox_item" data-item-index="' + i + '">' + cb + '<span class="list-item-text">' + ListBoxManager._escHtml(item.text) + '</span></div>';
+        var cb = showCheckbox ? '<input type="checkbox" class="listBox_item-checkbox" data-ctrl-type="listbox_item_checkbox"' + (item.selected ? ' checked' : '') + ' data-item-index="' + i + '" />' : '';
+        html += '<div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="' + i + '">' + cb + '<span class="listBox_item_text">' + ListBoxManager._escHtml(item.text) + '</span></div>';
       }
       scroll.innerHTML = html;
       ListBoxManager._bindEvents(listBoxEl);
@@ -700,29 +702,29 @@ const LISTBOX_RUNTIME = `
     },
 
     _bindEvents: function(el) {
-      var items = el.querySelectorAll('.list-item');
+      var items = el.querySelectorAll('.listBox_item');
       for (var i = 0; i < items.length; i++) {
         (function(itemEl) {
           itemEl.onclick = function(e) {
             if (e.target.tagName === 'INPUT') return;
-            var listBox = itemEl.closest('[data-listbox-items]');
+            var listBox = itemEl.closest('[data-listBox-items]');
             if (!listBox || listBox.getAttribute('data-disabled') === 'true') return;
-            var allItems = listBox.querySelectorAll('.list-item');
+            var allItems = listBox.querySelectorAll('.listBox_item');
             for (var ai = 0; ai < allItems.length; ai++) {
               allItems[ai].classList.remove('item-selected');
             }
             itemEl.classList.add('item-selected');
           };
           itemEl.ondblclick = function(e) {
-            var listBox = itemEl.closest('[data-listbox-items]');
+            var listBox = itemEl.closest('[data-listBox-items]');
             if (!listBox || listBox.getAttribute('data-editable') !== 'true') return;
             if (listBox.getAttribute('data-disabled') === 'true') return;
             ListBoxManager._startEdit(listBox, itemEl);
           };
-          var cb = itemEl.querySelector('.list-item-checkbox');
+          var cb = itemEl.querySelector('.listBox_item-checkbox');
           if (cb) {
             cb.onchange = function(e) {
-              var listBox = cb.closest('[data-listbox-items]');
+              var listBox = cb.closest('[data-listBox-items]');
               if (!listBox) return;
               var idx = parseInt(cb.getAttribute('data-item-index') || '0');
               var cache = ListBoxManager.itemsCache[listBox.id];
@@ -737,12 +739,12 @@ const LISTBOX_RUNTIME = `
       var idx = parseInt(itemEl.getAttribute('data-item-index') || '0');
       var cache = ListBoxManager.itemsCache[listBox.id];
       if (!cache || !cache[idx]) return;
-      var textSpan = itemEl.querySelector('.list-item-text');
+      var textSpan = itemEl.querySelector('.listBox_item_text');
       if (!textSpan) return;
       var oldText = cache[idx].text;
       var input = document.createElement('input');
       input.type = 'text';
-      input.className = 'list-item-edit-input';
+      input.className = 'listBox_item-edit-input';
       input.value = oldText;
       // 逐项设置样式，确保生效
       input.style.border = '1px solid #1890ff';
@@ -765,7 +767,7 @@ const LISTBOX_RUNTIME = `
           ListBoxManager._updateDataAttr(listBox);
         }
         var span = document.createElement('span');
-        span.className = 'list-item-text';
+        span.className = 'listBox_item_text';
         span.textContent = cache[idx].text;
         input.replaceWith(span);
       };
@@ -780,7 +782,7 @@ const LISTBOX_RUNTIME = `
       var id = listBox.id;
       var cache = ListBoxManager.itemsCache[id];
       if (!cache) return;
-      listBox.setAttribute('data-listbox-items', JSON.stringify(cache));
+      listBox.setAttribute('data-listBox-items', JSON.stringify(cache));
     },
 
     add: function(listBoxId, text) {
@@ -820,7 +822,7 @@ const LISTBOX_RUNTIME = `
       cache[index].selected = !!checked;
       var itemEl = el.querySelector('[data-item-index="' + index + '"]');
       if (itemEl) {
-        var cb = itemEl.querySelector('.list-item-checkbox');
+        var cb = itemEl.querySelector('.listBox_item-checkbox');
         if (cb) cb.checked = !!checked;
       }
       ListBoxManager._updateDataAttr(el);
@@ -863,17 +865,28 @@ const TREEVIEW_RUNTIME = `
       var tree = { data: data, editable: editable, el: document.getElementById(id) };
       TreeManager.trees[id] = tree;
       TreeManager._bindEvents(tree);
+      TreeManager._bindBlur(tree);
+    },
+
+    _bindBlur: function(tree) {
+      document.addEventListener('mousedown', function(e) {
+        if (tree.el.getAttribute('data-always-show-selection') === 'true') return;
+        if (!tree.el.contains(e.target)) {
+          var allSelected = tree.el.querySelectorAll('.treeView_node.selected');
+          allSelected.forEach(function(n) { n.classList.remove('selected'); });
+        }
+      });
     },
 
     _bindEvents: function(tree) {
       if (!tree.el) return;
 
       tree.el.addEventListener('click', function(e) {
-        var toggle = e.target.closest('.tree-toggle');
+        var toggle = e.target.closest('.treeView_toggle');
         if (toggle && !toggle.classList.contains('empty')) {
           e.stopPropagation();
-          var nodeEl = toggle.closest('.tree-node');
-          var childrenEl = nodeEl.querySelector(':scope > .tree-children');
+          var nodeEl = toggle.closest('.treeView_node');
+          var childrenEl = nodeEl.querySelector(':scope > .treeView_children');
           var isExpanded = toggle.classList.contains('expanded');
           if (isExpanded) {
             toggle.classList.remove('expanded');
@@ -886,10 +899,10 @@ const TREEVIEW_RUNTIME = `
           }
           return;
         }
-        var content = e.target.closest('.tree-node-content');
+        var content = e.target.closest('.treeView_node_content');
         if (content) {
-          var nodeEl = content.closest('.tree-node');
-          var allNodes = tree.el.querySelectorAll('.tree-node.selected');
+          var nodeEl = content.closest('.treeView_node');
+          var allNodes = tree.el.querySelectorAll('.treeView_node.selected');
           allNodes.forEach(function(n) { n.classList.remove('selected'); });
           nodeEl.classList.add('selected');
         }
@@ -897,9 +910,9 @@ const TREEVIEW_RUNTIME = `
 
       tree.el.addEventListener('dblclick', function(e) {
         if (!tree.editable) return;
-        var label = e.target.closest('.tree-label');
+        var label = e.target.closest('.treeView_label');
         if (!label) return;
-        var nodeEl = label.closest('.tree-node');
+        var nodeEl = label.closest('.treeView_node');
         // 如果已经存在编辑框，不重复创建
         if (nodeEl.querySelector('.tree-edit-input')) return;
 
@@ -961,13 +974,13 @@ const TREE_INIT_SCRIPT = `
     if (treeId && typeof TreeManager !== 'undefined') {
       function buildNodesFromDOM(parentEl) {
         var nodes = [];
-        var childNodes = parentEl.querySelectorAll(':scope > .tree-node');
+        var childNodes = parentEl.querySelectorAll(':scope > .treeView_node');
         childNodes.forEach(function(nodeEl) {
-          var contentEl = nodeEl.querySelector(':scope > .tree-node-content');
-          var labelEl = contentEl ? contentEl.querySelector('.tree-label') : null;
-          var childrenEl = nodeEl.querySelector(':scope > .tree-children');
-          var toggleEl = contentEl ? contentEl.querySelector('.tree-toggle') : null;
-          var checkboxEl = contentEl ? contentEl.querySelector('.tree-node-check') : null;
+          var contentEl = nodeEl.querySelector(':scope > .treeView_node_content');
+          var labelEl = contentEl ? contentEl.querySelector('.treeView_label') : null;
+          var childrenEl = nodeEl.querySelector(':scope > .treeView_children');
+          var toggleEl = contentEl ? contentEl.querySelector('.treeView_toggle') : null;
+          var checkboxEl = contentEl ? contentEl.querySelector('.treeView_node-check') : null;
           var isExpanded = toggleEl && toggleEl.classList.contains('expanded');
           var node = {
             id: nodeEl.getAttribute('data-node-id'),
@@ -1001,7 +1014,7 @@ const TREE_INIT_SCRIPT = `
  */
 const DATA_GRID_INIT_SCRIPT = `
 (function(){
-  document.querySelectorAll('.data-grid-container').forEach(function(container){
+  document.querySelectorAll('.dataGrid_container').forEach(function(container){
     var id = container.getAttribute('data-id') || container.id;
     var columns = JSON.parse(container.getAttribute('data-columns') || '[]');
     var rows = JSON.parse(container.getAttribute('data-rows') || '[]');
@@ -1027,12 +1040,12 @@ const BASE_STYLES = `
 html,body { width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:transparent }
 body { display:flex }
 
-.page-container {
+.pageContainer {
   position:relative;
   overflow:hidden;
   backdrop-filter: blur(24px) !important;
 }
-.page-container::before {
+.pageContainer::before {
   content:'';
   position:absolute;
   inset:0;
@@ -1042,47 +1055,51 @@ body { display:flex }
   opacity: var(--canvas-opacity);
   border-radius: inherit;
 }
-.page-container.show-shadow {
+.pageContainer.show-shadow {
   box-shadow: 0 1px 4px rgba(0,0,0,0.3);
 }
 
-/* 排除所有控件和弹出框的拖拽区域，确保控件可交互 */
-.page-container [data-ctrl-type] {
+/* 排除所有控件的拖拽区域，使用 data-drag-type 独立管理拖拽行为 */
+.pageContainer [data-drag-type] {
   app-region: no-drag;
+  -webkit-app-region: no-drag;
 }
 
 /* 画布标题栏 */
-.canvas-titlebar {
+.titlebar {
   position:absolute;top:0;left:0;right:0;
   display:flex;align-items:center;height:40px;user-select:none;z-index:10;
 }
-.canvas-titlebar .tb-left {
-  width:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+.titlebar .titlebar_left {
+  width:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left: 2px;
 }
-.canvas-titlebar .tb-center {
+.titlebar .titlebar_center {
   flex:1;display:flex;align-items:center;min-width:0;
 }
-.canvas-titlebar .tb-right {
-  display:flex;align-items:center;justify-content:flex-end;gap:2px;padding-right:4px;flex-shrink:0;
+.titlebar .titlebar_right {
+  display:flex;align-items:center;justify-content:flex-end;padding-right:4px;flex-shrink:0;height:100%;width:138px;
 }
-.canvas-titlebar .tb-icon {
-  width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:18px;
+.titlebar .titlebar_left_icon {
+  width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:18px;
 }
-.canvas-titlebar .tb-title {
+.titlebar .titlebar_left_icon img {
+  width:22px !important;height:22px !important;vertical-align:middle;
+}
+.titlebar .titlebar_center_title {
   font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
-.canvas-titlebar .tb-btn {
-  width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:default;border-radius:4px;flex-shrink:0;
+.titlebar .titlebar_rightBtn {
+  width:35px;height:32px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:default;border-radius:4px;flex-shrink:0;
 }
-.canvas-titlebar .tb-btn:hover { background:rgba(0,0,0,0.06) }
-.canvas-titlebar .tb-btn-min:hover,.tb-btn-max:hover { filter: brightness(1.2)}
-.canvas-titlebar .tb-btn-close:hover { background:#e81123;color:#fff }
-.canvas-titlebar .tb-btn-min:active,.tb-btn-max:active,.tb-btn-close:active {filter: brightness(0.7);}
-.canvas-titlebar .tb-btn-disabled { opacity:0.4;cursor:not-allowed;pointer-events:none; }
-.canvas-titlebar .tb-btn-disabled:hover { background:transparent }
+.titlebar .titlebar_rightBtn:hover { background:rgba(0,0,0,0.06) }
+.titlebar .titlebar_rightBtn_min:hover,.titlebar_rightBtn_min:hover { filter: brightness(1.2)}
+.titlebar .titlebar_rightBtn_close:hover { background:#e81123;color:#fff !important }
+.titlebar .titlebar_rightBtn_max:active,.titlebar_rightBtn_max:active,.titlebar_rightBtn_close:active {filter: brightness(0.7);}
+.titlebar .titlebar_rightBtn_disabled { opacity:0.4;cursor:not-allowed;pointer-events:none; }
+.titlebar .titlebar_rightBtn_disabled:hover { background:transparent }
 
 /* 毛玻璃效果 */
-.page-container.glass-effect {
+.pageContainer.glass-effect {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   --shadow-blur: 10px;
@@ -1094,10 +1111,9 @@ body { display:flex }
   box-sizing:border-box;
 }
 
-/* 树形框箭头方向（由CSS控制，避免JS覆盖） */
-.tree-toggle.expanded::before { content: '▼'; }
-.tree-toggle.collapsed::before { content: '▶'; }
-.tree-toggle.empty { visibility: hidden; }
+/* 树形框箭头方向（展开旋转90deg，由.treeView_toggle.expanded的transform控制） */
+.treeView_toggle.expanded { transform: rotate(90deg); }
+.treeView_toggle.empty { visibility: hidden; }
 
 /* 右键菜单默认样式 */
 .ctx-menu-overlay {
@@ -1107,6 +1123,8 @@ body { display:flex }
   width: 100%;
   height: 100%;
   z-index: 99998;
+  app-region: no-drag;
+  -webkit-app-region: no-drag;
 }
 .ctx-menu {
   position: fixed;
@@ -1120,6 +1138,9 @@ body { display:flex }
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   font-size: 13px;
   color: #333333;
+  app-region: no-drag;
+  -webkit-app-region: no-drag;
+	user-select: none;
 }
 .ctx-menu-item {
   padding: 7px 16px;
@@ -1172,6 +1193,8 @@ body { display:flex }
   padding: 4px 0;
   min-width: 160px;
   display: none;
+  app-region: no-drag;
+  -webkit-app-region: no-drag;
 }
 .ctx-sub-menu.left {
   left: auto;
@@ -1182,6 +1205,10 @@ body { display:flex }
 }
 
 /* 气泡框默认样式 */
+.tt-wrapper {
+  app-region: no-drag;
+  -webkit-app-region: no-drag;
+}
 .tt-content {
   background: #333;
   color: #fff;
@@ -1192,6 +1219,7 @@ body { display:flex }
   max-width: 300px;
   word-wrap: break-word;
   box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+	user-select: none;
 }
 .tt-arrow {
   position: absolute;
@@ -1233,6 +1261,215 @@ body { display:flex }
   top: 50%;
   transform: translateY(-50%);
   border-right-color: #333;
+}
+
+/* 全局消息框默认样式 */
+.mb-overlay {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  app-region: no-drag;
+  -webkit-app-region: no-drag;
+}
+.mb-dialog {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  max-width: 90vw;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  app-region: no-drag;
+  -webkit-app-region: no-drag;
+}
+.mb-header {
+  padding: 16px 20px 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  cursor: default;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+}
+.mb-header-title { flex: 1; }
+.mb-header-close {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: #999;
+  font-size: 16px;
+  border-radius: 4px;
+}
+.mb-header-close:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+.mb-body {
+  padding: 8px 20px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.mb-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+.mb-message {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.6;
+  word-wrap: break-word;
+  flex: 1;
+}
+.mb-footer {
+  padding: 12px 20px 16px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.mb-btn {
+  padding: 7px 20px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  background: #ffffff;
+  font-size: 13px;
+  cursor: pointer;
+  min-width: 72px;
+  text-align: center;
+  color: #333;
+}
+.mb-btn:hover {
+  border-color: #409eff;
+  color: #409eff;
+}
+.mb-btn.mb-btn-primary {
+  background: #409eff;
+  color: #fff;
+  border-color: #409eff;
+}
+.mb-btn.mb-btn-primary:hover {
+  background: #66b1ff;
+}
+
+/* 全局输入框默认样式 */
+.ib-overlay {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  app-region: no-drag;
+  -webkit-app-region: no-drag;
+}
+.ib-dialog {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  max-width: 90vw;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  app-region: no-drag;
+  -webkit-app-region: no-drag;
+}
+.ib-header {
+  padding: 16px 20px 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+}
+.ib-header-title { flex: 1; }
+.ib-header-close {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: #999;
+  font-size: 16px;
+  border-radius: 4px;
+}
+.ib-header-close:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+.ib-body {
+  padding: 8px 20px 16px;
+}
+.ib-prompt {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+.ib-input {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #333;
+  outline: none;
+  box-sizing: border-box;
+}
+.ib-input:focus {
+  border-color: #409eff;
+  box-shadow: 0 0 0 2px rgba(64,158,255,0.2);
+}
+.ib-footer {
+  padding: 12px 20px 16px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.ib-btn {
+  padding: 7px 20px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  background: #ffffff;
+  font-size: 13px;
+  cursor: pointer;
+  min-width: 72px;
+  text-align: center;
+  color: #333;
+}
+.ib-btn:hover {
+  border-color: #409eff;
+  color: #409eff;
+}
+.ib-btn.ib-btn-primary {
+  background: #409eff;
+  color: #fff;
+  border-color: #409eff;
+}
+.ib-btn.ib-btn-primary:hover {
+  background: #66b1ff;
 }
 `
 
@@ -1315,6 +1552,24 @@ function collectTooltipConfigs(widgets: Widget[]): any[] {
 }
 
 // ================================================================
+// 全局组件（消息框、输入框）自定义CSS收集
+// ================================================================
+
+function collectGlobalComponentCSS(
+  messageBoxConfig?: MessageBoxConfig,
+  inputBoxConfig?: InputBoxConfig
+): string {
+  const parts: string[] = []
+  if (messageBoxConfig?.customCSS) {
+    parts.push(`/* 全局消息框自定义样式 */\n${messageBoxConfig.customCSS}`)
+  }
+  if (inputBoxConfig?.customCSS) {
+    parts.push(`/* 全局输入框自定义样式 */\n${inputBoxConfig.customCSS}`)
+  }
+  return parts.join('\n\n')
+}
+
+// ================================================================
 // 主导出函数
 // ================================================================
 
@@ -1373,18 +1628,34 @@ function genPageContainerPosition(canvas: CanvasConfig): string {
  * 生成画布标题栏 HTML
  */
 /** 生成最小化/最大化按钮 HTML（根据 disableMinimize + canvasFixedSize 联动） */
-function genMinMaxButtons(canvas: CanvasConfig, btnColor: string): string {
+function genMinMaxButtons(canvas: CanvasConfig, btnColor: string, noIndent: boolean): string {
   const hideBoth = !!(canvas.disableMinimize && canvas.canvasFixedSize)
   const minOnly = !!(canvas.disableMinimize && !canvas.canvasFixedSize)
+  const extraStyle = noIndent ? 'width:46px;border-radius:0;' : ''
 
   let html = ''
   if (!hideBoth) {
-    html += `<button class="tb-btn tb-btn-min${minOnly ? ' tb-btn-disabled' : ''}" id="titlebar_min" data-ctrl-type="titlebar_min" data-name="最小化" style="color:${btnColor};${minOnly ? 'opacity:0.35;cursor:not-allowed;pointer-events:none;' : ''}" title="最小化"${minOnly ? ' disabled' : ''}>`
-    html += `<svg width="10" height="1" viewBox="0 0 10 1"><rect width="10" height="1" fill="currentColor"/></svg></button>`
-    html += `<button class="tb-btn tb-btn-max${canvas.canvasFixedSize ? ' tb-btn-disabled' : ''}" id="titlebar_max" data-ctrl-type="titlebar_max" data-name="最大化" style="color:${btnColor};${canvas.canvasFixedSize ? 'opacity:0.4;cursor:not-allowed;pointer-events:none;' : ''}" title="最大化"${canvas.canvasFixedSize ? ' disabled' : ''}>`
-    html += `<svg width="10" height="10" viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></button>`
+    html += `<button class="titlebar_rightBtn titlebar_rightBtn_min${minOnly ? ' titlebar_rightBtn_disabled' : ''}" id="titlebar_min" data-ctrl-type="titlebar_min" data-name="最小化" style="color:${btnColor};margin-left: auto;${extraStyle}${minOnly ? 'opacity:0.35;cursor:not-allowed;pointer-events:none;' : ''}" title="最小化"${minOnly ? ' disabled' : ''}>`
+    html += `<svg width="12" height="1" viewBox="0 0 10 1"><rect width="10" height="1" fill="currentColor"/></svg></button>`
+    html += `<button class="titlebar_rightBtn titlebar_rightBtn_max${canvas.canvasFixedSize ? ' titlebar_rightBtn_disabled' : ''}" id="titlebar_max" data-ctrl-type="titlebar_max" data-name="最大化" style="color:${btnColor};margin-left: auto;${extraStyle}${canvas.canvasFixedSize ? 'opacity:0.4;cursor:not-allowed;pointer-events:none;' : ''}" title="最大化"${canvas.canvasFixedSize ? ' disabled' : ''}>`
+    html += `<span style="width: 18px;height: 18px;display: flex;align-items: center;justify-content: center;"><svg width="12" height="12" viewBox="0 0 10 10" shape-rendering="crispEdges"><rect x="1" y="1" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1" /></svg></span></button>`
   }
   return html
+}
+
+/** 根据画布固定宽高状态生成标题栏按钮 no-drag 规则 */
+function genTitleBarDragRule(canvas: CanvasConfig): string {
+  // 基础规则：所有 titlebar_ 元素都不可拖拽
+  let rule = `.pageContainer [data-ctrl-type^="titlebar_"] { app-region: no-drag; -webkit-app-region: no-drag;}
+`;
+  
+  if (!canvas.canvasFixedSize) {
+    // 非固定宽高时，额外让最大化按钮内部的 span 不参与拖拽限制（恢复默认）
+    // 注意：app-region: auto 表示不指定拖拽区域，由父元素决定
+    rule += `.pageContainer [data-ctrl-type="titlebar_max"] span { app-region: drag; -webkit-app-region: drag;}`;
+  }
+  
+  return rule;
 }
 
 function genCanvasTitleBarHTML(canvas: CanvasConfig): string {
@@ -1392,7 +1663,8 @@ function genCanvasTitleBarHTML(canvas: CanvasConfig): string {
   const titleAlign = alignMap[canvas.titleBarAlign] || 'flex-start'
   
   const btnColor = canvas.titleBarBtnColor || '#333'
-  
+  const noIndent = !!(canvas.noIndentTitleBar && canvas.showTitleBar)
+
   // 图标 HTML
   let iconHTML = ''
   if (canvas.titleBarIconHtml && canvas.titleBarIconHtml.trim()) {
@@ -1404,23 +1676,17 @@ function genCanvasTitleBarHTML(canvas: CanvasConfig): string {
   }
 
   return `
-<div class="canvas-titlebar" id="titlebar" data-name="标题栏" style="
-  position:absolute;top:0;left:0;right:0;height:40px;
-  background-color:${canvas.titleBarBgColor};
-  opacity:${canvas.titleBarOpacity ?? 1};
-  border-bottom:1px solid rgba(0,0,0,0.08);
-  app-region: drag;
-">
-  <div class="tb-left"  data-ctrl-type="titlebar_icon">
-    <span class="tb-icon" id="titlebar_icon" data-name="图标" style="color:${canvas.titleBarTextColor};">${iconHTML}</span>
+<div class="titlebar" id="titlebar" data-name="标题栏" style="position:absolute;top:0;left:0;right:0;height:${noIndent ? '32' : '40'}px;background-color:${canvas.titleBarBgColor};opacity:${canvas.titleBarOpacity ?? 1};${noIndent ? '' : 'border-bottom:1px solid rgba(0,0,0,0.08);'}app-region: drag;-webkit-app-region: drag;">
+  <div class="titlebar_left"  data-ctrl-type="titlebar_left_icon">
+    <span class="titlebar_left_icon" id="titlebar_left_icon" data-name="图标" style="color:${canvas.titleBarTextColor};">${iconHTML}</span>
   </div>
-  <div class="tb-center" style="justify-content:${titleAlign};">
-    <span class="tb-title" id="titlebar_title" data-name="标题" data-ctrl-type="titlebar_title" style="color:${canvas.titleBarTextColor}">${esc(canvas.titleBarTitle || '我的应用')}</span>
+  <div class="titlebar_center" style="justify-content:${titleAlign};">
+    <span class="titlebar_center_title" id="titlebar_title" data-name="标题" data-ctrl-type="titlebar_title" style="color:${canvas.titleBarTextColor};font-weight:${noIndent ? '500' : '600'}">${esc(canvas.titleBarTitle || '我的应用')}</span>
   </div>
-  <div class="tb-right">
-    ${genMinMaxButtons(canvas, btnColor)}
-    <button class="tb-btn tb-btn-close" id="titlebar_close" data-ctrl-type="titlebar_close" data-name="关闭" style="color:${btnColor};" title="关闭">
-      <svg width="10" height="10" viewBox="0 0 10 10"><line x1="1" y1="1" x2="9" y2="9" stroke="currentColor" stroke-width="1.2"/><line x1="9" y1="1" x2="1" y2="9" stroke="currentColor" stroke-width="1.2"/></svg>
+  <div class="titlebar_right"${noIndent ? ' style="padding-right:0"' : ''}>
+    ${genMinMaxButtons(canvas, btnColor, noIndent)}
+    <button class="titlebar_rightBtn titlebar_rightBtn_close" id="titlebar_close" data-ctrl-type="titlebar_close" data-name="关闭" style="color:${btnColor};margin-left: auto;${noIndent ? 'width:46px;border-radius:0;' : ''}" title="关闭">
+      <svg width="12" height="12" viewBox="0 0 10 10">	  <line x1="1" y1="1" x2="9" y2="9" stroke="currentColor" stroke-width="0.8"/><line x1="9" y1="1" x2="1" y2="9" stroke="currentColor" stroke-width="0.8"/></svg>
     </button>
   </div>
 </div>`
@@ -1472,6 +1738,7 @@ export function generateCompleteHTML(
 
   const allCSS = collectAllCSS(widgets)
   const popupCustomCSS = collectPopupCustomCSS(widgets)
+  const globalComponentCSS = collectGlobalComponentCSS(messageBoxConfig, inputBoxConfig)
   const customWidgetCSS = getAllCustomWidgetCSS()
 
   const contextMenuConfigs = collectContextMenuConfigs(widgets)
@@ -1533,20 +1800,26 @@ ${BASE_STYLES}
 /* === 弹出菜单/气泡框自定义样式（覆盖 BASE_STYLES 默认值） === */
 ${popupCustomCSS || '/* 无自定义弹出样式 */'}
 
+/* === 全局组件（消息框/输入框）自定义样式（覆盖 BASE_STYLES 默认值） === */
+${globalComponentCSS || '/* 无全局组件自定义样式 */'}
+
 /* === 第三方自定义控件样式 === */
 ${customWidgetCSS || '/* 无自定义控件样式 */'}
 
 /* === Body 背景 === */
 ${genBodyBackgroundCSS(canvas)}
 
+/* === 标题栏按钮拖拽规则（根据固定画布宽高动态匹配） === */
+${genTitleBarDragRule(canvas)}
+
 /* === 页面容器 === */
-.page-container {
+.pageContainer {
   width: ${genPageContainerWidth(canvas)};
   height: ${genPageContainerHeight(canvas)};
   background-color: transparent;
   border: ${canvas.borderWidth}px solid ${canvas.borderColor};
   border-radius: ${canvas.borderRadius}px;
-  ${canvas.canvasDraggable ? 'app-region: drag;' : ''}
+  ${canvas.canvasDraggable ? 'app-region: drag;-webkit-app-region: drag;' : ''}
   ${genPageContainerPosition(canvas)}
   box-shadow: 3px 5px 10px rgba(0, 0, 0, 0.1)
 }
@@ -1555,7 +1828,7 @@ ${genBodyBackgroundCSS(canvas)}
 ${canvas.customCSS || ''}
 
 /* === 页面容器 CSS 变量（放在 customCSS 之后，确保不被覆盖） === */
-.page-container {
+.pageContainer {
   --canvas-bg-color: ${canvas.backgroundColor};
   --canvas-opacity: ${canvas.opacity ?? 1};
 }
@@ -1565,7 +1838,7 @@ ${allCSS}
 </style>
 </head>
 <body${(canvas.showShadow || canvas.canvasFixedSize) ? ' style="align-items:center;justify-content:center"' : ''}>
-<div class="page-container${canvas.showShadow ? ' show-shadow' : ''}${canvas.glassEffect ? ' glass-effect' : ''}" id="page_container" data-ctrl-type="page" data-name="canvas" data-original-width="${canvas.width}" data-original-height="${canvas.height}">
+<div class="pageContainer${canvas.showShadow ? ' show-shadow' : ''}${canvas.glassEffect ? ' glass-effect' : ''}" id="pageContainer" data-ctrl-type="pageContainer" data-name="canvas" data-original-width="${canvas.width}" data-original-height="${canvas.height}">
 ${canvas.showTitleBar ? genCanvasTitleBarHTML(canvas) : ''}
 ${domParts.join('\n')}
 </div>

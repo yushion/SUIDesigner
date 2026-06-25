@@ -15,10 +15,10 @@
     <div
       v-for="(log, idx) in widget.logs || []"
       :key="idx"
-      class="log-line"
+      class="logOutput_line"
       :style="{ color: log.color || '#000000' }"
     >{{ log.text }}</div>
-    <div v-if="!(widget.logs || []).length" class="log-line log-empty">（无日志）</div>
+    <div v-if="!(widget.logs || []).length" class="logOutput_line log-empty">（无日志）</div>
   </div>
 </template>
 
@@ -50,7 +50,7 @@ const widgetStyle = computed(() => widgetBaseStyle(props.widget))
   white-space: nowrap;
 }
 
-.log-line {
+.logOutput_line {
   font-size: inherit;
   line-height: 1.5;
   padding: 2px 5px;

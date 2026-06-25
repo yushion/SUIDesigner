@@ -451,7 +451,6 @@
             <!-- ===== 标题栏属性 ===== -->
             <div class="props-section" style="margin-top:8px;">
               <div class="props-section-title" style="display:flex;align-items:center;justify-content:space-between;">
-                <span>标题栏</span>
                 <label class="checkbox-label" style="margin:0;font-weight:normal;font-size:12px;color:#86868b;">
                   <input type="checkbox" :checked="store.canvas.showTitleBar" @change="onCanvasChange('showTitleBar', $event)" style="
                    width:14px; 
@@ -460,7 +459,17 @@
                    vertical-align:middle; 
                    cursor:pointer;
                   "/>
-                  <span style="vertical-align:middle; line-height:1;">显示标题栏</span>
+                  <span style="vertical-align:middle; line-height:1;font-size:14px;font-weight:500;color:#181818">标题栏显示</span>
+                </label>
+                <label v-if="store.canvas.showTitleBar" class="checkbox-label" style="margin:0;font-weight:normal;font-size:12px;color:#86868b;">
+                  <input type="checkbox" :checked="store.canvas.noIndentTitleBar" @change="onCanvasChange('noIndentTitleBar', $event)" style="
+                   width:14px; 
+                   height:14px; 
+                   margin-right:8px; 
+                   vertical-align:middle; 
+                   cursor:pointer;
+                  "/>
+                  <span style="vertical-align:middle; line-height:1;font-size:12px;font-weight:500;color:#666">无缩进</span>
                 </label>
               </div>
               <div v-if="store.canvas.showTitleBar">
@@ -660,7 +669,7 @@
               </div>
 
               <!-- 超链接特有属性 -->
-              <div v-if="store.selectedWidget.type === 'hyperlink'">
+              <div v-if="store.selectedWidget.type === 'hyperLink'">
                 <div class="form-group">
                   <label>链接文字</label>
                   <input type="text" :value="store.selectedWidget.text" @input="onWidgetPropChange('text', $event)" />
@@ -1039,16 +1048,16 @@
                   <div
                     v-for="(item, idx) in store.selectedWidget.items || []"
                     :key="idx"
-                    class="list-item-row"
-                    :class="{ 'list-item-active': listEditIndex === idx }"
+                    class="listBox_item-row"
+                    :class="{ 'listBox_item-active': listEditIndex === idx }"
                     @click="listEditIndex = idx"
                   >
-                    <span class="list-item-idx">{{ idx + 1 }}</span>
+                    <span class="listBox_item-idx">{{ idx + 1 }}</span>
                     <input
                       type="text"
                       :value="item.text"
                       @input="onListItemTextChange(idx, $event)"
-                      class="list-item-inp"
+                      class="listBox_item-inp"
                       placeholder="项文本"
                     />
                     <input
@@ -1260,11 +1269,11 @@
                   <div
                     v-for="(item, idx) in ctxMenuFlatList || []"
                     :key="item.id"
-                    class="list-item-row"
-                    :class="{ 'list-item-active': ctxMenuEditIndex === idx }"
+                    class="listBox_item-row"
+                    :class="{ 'listBox_item-active': ctxMenuEditIndex === idx }"
                     @click="ctxMenuEditIndex = idx"
                   >
-                    <span class="list-item-idx">{{ idx + 1 }}</span>
+                    <span class="listBox_item-idx">{{ idx + 1 }}</span>
                     <span v-if="item.type === 'separator'" style="padding-left:8px;color:#999;flex:1;font-size:11px;">── 分隔线 ──</span>
                     <template v-else>
                       <span :style="{ paddingLeft: (item._level || 0) * 16 + 'px' }" style="flex:1;display:flex;align-items:center;gap:4px;">
@@ -1273,7 +1282,7 @@
                           type="text"
                           :value="item.text"
                           @input="onCtxMenuItemTextChange(idx, $event)"
-                          class="list-item-inp"
+                          class="listBox_item-inp"
                           placeholder="菜单项文本"
                         />
                       </span>
@@ -1496,6 +1505,46 @@
     </div>
   </div>
 
+  <!-- 消息框预览弹窗（左预览 + 右CSS编辑器） -->
+  <div v-if="mbPreviewVisible" class="ctx-live-preview-overlay">
+    <div ref="mbLivePreviewModalRef" class="ctx-live-preview-modal">
+      <div class="ctx-live-preview-header">
+        <span>信息提示框样式编辑器 — 预览</span>
+        <button class="ctx-live-preview-close" @click="closeMBPreview">&times;</button>
+      </div>
+      <div class="ctx-live-preview-body">
+        <div ref="mbPreviewContentEl" class="ctx-live-preview-left"></div>
+        <div class="ctx-live-preview-right">
+          <CssEditor
+            widget-id="messageBoxPreview"
+            :model-value="mbCSS"
+            @change="onMBPreviewCSSChange"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 输入框预览弹窗（左预览 + 右CSS编辑器） -->
+  <div v-if="ibPreviewVisible" class="ctx-live-preview-overlay">
+    <div ref="ibLivePreviewModalRef" class="ctx-live-preview-modal">
+      <div class="ctx-live-preview-header">
+        <span>输入框样式编辑器 — 预览</span>
+        <button class="ctx-live-preview-close" @click="closeIBPreview">&times;</button>
+      </div>
+      <div class="ctx-live-preview-body">
+        <div ref="ibPreviewContentEl" class="ctx-live-preview-left"></div>
+        <div class="ctx-live-preview-right">
+          <CssEditor
+            widget-id="inputBoxPreview"
+            :model-value="ibCSS"
+            @change="onIBPreviewCSSChange"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+
 </template>
 
 <script setup lang="ts">
@@ -1707,7 +1756,7 @@ const widgetTypeLabelMap: Record<string, string> = {
   textarea: '多行文本框属性',
   label: '标签属性',
   divider: '分割线属性',
-  hyperlink: '超链接属性',
+  hyperLink: '超链接属性',
   comboBox: '组合框属性',
   radioGroup: '单选组属性',
   tabsContainer: '标签页容器属性',
@@ -2511,7 +2560,7 @@ function onBarColorInput(event: Event) {
 /** 内置控件类型集合（这些已有专用属性面板，不显示通用自定义属性） */
 const BUILTIN_WIDGET_TYPES = new Set([
   'button', 'input', 'checkbox', 'toggle', 'comboBox', 'label', 'divider',
-  'hyperlink', 'textarea', 'radioGroup', 'tabsContainer', 'progressBar',
+  'hyperLink', 'textarea', 'radioGroup', 'tabsContainer', 'progressBar',
   'datetimePicker', 'logOutput', 'iconButton', 'imageBox', 'cardBox',
   'listBox', 'treeView', 'dataGrid', 'contextMenu', 'tooltip',
   'messageBox', 'inputBox',
@@ -2792,7 +2841,7 @@ function onCtxMenuCSSChange(val: string) {
 /** 右键菜单预览默认CSS */
 const CTX_PREVIEW_DEFAULT_CSS = [
   '.ctx-menu{position:relative;background:#ffffff;border:1px solid #d9d9d9;border-radius:6px;box-shadow:0 3px 12px rgba(0,0,0,0.3);padding:0;min-width:150px;font-family:Segoe UI,Tahoma,sans-serif;font-size:13px;color:#333;}',
-  '.ctx-menu-item{border-radius:2px;margin:4px 4px;padding:7px 16px;cursor:default;display:flex;align-items:center;gap:8px;white-space:nowrap;position:relative;}',
+  '.ctx-menu-item{user-select:none;border-radius:2px;margin:4px 4px;padding:7px 16px;cursor:default;display:flex;align-items:center;gap:8px;white-space:nowrap;position:relative;}',
   '.ctx-menu-item:hover{background:#eeeeeeff;}',
   '.ctx-menu-separator{height:1px;background:#e8e8e8;margin:4px 12px;}',
   '.ctx-menu-item-icon{font-size:14px;width:18px;text-align:center;flex-shrink:0;}',
@@ -3141,7 +3190,7 @@ const ttPreviewContentEl = ref<HTMLElement | null>(null)
 let ttPreviewStyleEl: HTMLStyleElement | null = null
 
 /** 气泡框预览默认CSS */
-const TT_PREVIEW_DEFAULT_CSS = '.tt-content{background:#333;color:#fff;padding:8px 12px;border-radius:6px;font-size:13px;font-family:Segoe UI,Tahoma,Geneva,Verdana,sans-serif;line-height:1.5;max-width:300px;word-wrap:break-word;box-shadow:0 4px 12px rgba(0,0,0,0.3);position:relative;} .tt-arrow{position:absolute;width:0;height:0;border:6px solid transparent;} .tt-arrow.bottom{bottom:-12px;left:50%;transform:translateX(-50%);border-top-color:#333;} .tt-arrow.top{top:-12px;left:50%;transform:translateX(-50%);border-bottom-color:#333;} .tt-arrow.right{right:-12px;top:50%;transform:translateY(-50%);border-left-color:#333;} .tt-arrow.left{left:-12px;top:50%;transform:translateY(-50%);border-right-color:#333;}'
+const TT_PREVIEW_DEFAULT_CSS = '.tt-content{user-select: none;background:#333;color:#fff;padding:8px 12px;border-radius:6px;font-size:13px;font-family:Segoe UI,Tahoma,Geneva,Verdana,sans-serif;line-height:1.5;max-width:300px;word-wrap:break-word;box-shadow:0 4px 12px rgba(0,0,0,0.3);position:relative;} .tt-arrow{position:absolute;width:0;height:0;border:6px solid transparent;} .tt-arrow.bottom{bottom:-12px;left:50%;transform:translateX(-50%);border-top-color:#333;} .tt-arrow.top{top:-12px;left:50%;transform:translateX(-50%);border-bottom-color:#333;} .tt-arrow.right{right:-12px;top:50%;transform:translateY(-50%);border-left-color:#333;} .tt-arrow.left{left:-12px;top:50%;transform:translateY(-50%);border-right-color:#333;}'
 
 /** 当选中控件变化时，加载气泡框的CSS和内容 */
 watch(() => store.selectedWidget, (widget) => {
@@ -3291,6 +3340,199 @@ watch(ibActiveTab, (tabName) => {
 // DEFAULT_MESSAGEBOX_CSS / DEFAULT_INPUTBOX_CSS 已从 config/globalComponentsConfig.ts 导入
 
 /** 信息提示框自定义 CSS 变更（CssEditor @change 回调） */
+// ======================== 消息框预览弹窗 ========================
+const mbCSS = ref('')
+const mbPreviewVisible = ref(false)
+const mbPreviewContentEl = ref<HTMLElement | null>(null)
+const mbLivePreviewModalRef = ref<HTMLElement | null>(null)
+let mbPreviewStyleEl: HTMLStyleElement | null = null
+
+useResizable(mbLivePreviewModalRef, { enabled: mbPreviewVisible, minWidth: 400, minHeight: 300 })
+
+watch(() => store.messageBoxConfig.customCSS, (val) => {
+  mbCSS.value = val || ''
+}, { immediate: true })
+
+function onMBPreviewCSSChange(val: string) {
+  mbCSS.value = val
+  store.messageBoxConfig.customCSS = val
+  store.saveState()
+  if (mbPreviewVisible.value) updateMBPreviewStyle(val)
+}
+
+const MB_PREVIEW_DEFAULT_CSS = `.mb-dialog{background:#fff;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.2);overflow:hidden;display:flex;flex-direction:column;min-width:280px;}
+.mb-header{padding:16px 20px 8px;font-size:16px;font-weight:600;color:#333;cursor:default;display:flex;align-items:center;justify-content:space-between;user-select:none;}
+.mb-header-title{flex:1;}
+.mb-header-close{width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;background:transparent;color:#999;font-size:16px;border-radius:4px;}
+.mb-header-close:hover{background:#f0f0f0;color:#333;}
+.mb-body{padding:8px 20px 16px;display:flex;align-items:flex-start;gap:12px;}
+.mb-icon{font-size:28px;flex-shrink:0;}
+.mb-message{font-size:14px;color:#555;line-height:1.6;word-wrap:break-word;flex:1;}
+.mb-footer{padding:12px 20px 16px;display:flex;justify-content:flex-end;gap:8px;}
+.mb-btn{padding:7px 20px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;font-size:13px;cursor:pointer;min-width:72px;text-align:center;color:#333;}
+.mb-btn:hover{border-color:#409eff;color:#409eff;}
+.mb-btn.mb-btn-primary{background:#409eff;color:#fff;border-color:#409eff;}
+.mb-btn.mb-btn-primary:hover{background:#66b1ff;}`
+
+let mbDragging = false, mbDragStartX = 0, mbDragStartY = 0, mbStartLeft = 0, mbStartTop = 0
+
+function initMBDraggable() {
+  const modal = mbLivePreviewModalRef.value
+  if (!modal) return
+  const header = modal.querySelector('.ctx-live-preview-header') as HTMLElement
+  if (!header) return
+  header.removeEventListener('mousedown', onMBDragStart)
+  header.addEventListener('mousedown', onMBDragStart)
+}
+function onMBDragStart(e: MouseEvent) {
+  if ((e.target as HTMLElement).closest('.ctx-live-preview-close')) return
+  const modal = mbLivePreviewModalRef.value; if (!modal) return
+  e.preventDefault()
+  mbDragging = true; mbDragStartX = e.clientX; mbDragStartY = e.clientY
+  const rect = modal.getBoundingClientRect(); mbStartLeft = rect.left; mbStartTop = rect.top
+  modal.style.position = 'fixed'; modal.style.left = mbStartLeft + 'px'; modal.style.top = mbStartTop + 'px'; modal.style.transform = 'none'
+  document.addEventListener('mousemove', onMBDragMove); document.addEventListener('mouseup', onMBDragEnd); document.body.style.userSelect = 'none'
+}
+function onMBDragMove(e: MouseEvent) { if (!mbDragging) return; const modal = mbLivePreviewModalRef.value; if (!modal) return; modal.style.left = (mbStartLeft + e.clientX - mbDragStartX) + 'px'; modal.style.top = (mbStartTop + e.clientY - mbDragStartY) + 'px' }
+function onMBDragEnd() { mbDragging = false; document.removeEventListener('mousemove', onMBDragMove); document.removeEventListener('mouseup', onMBDragEnd); document.body.style.userSelect = '' }
+
+function openMBPreview() {
+  mbCSS.value = store.messageBoxConfig.customCSS || ''
+  mbPreviewVisible.value = true
+  nextTick(() => {
+    buildMBPreviewDOM()
+    const modal = mbLivePreviewModalRef.value
+    if (modal) { modal.style.left = ''; modal.style.top = ''; modal.style.transform = ''
+      setTimeout(() => { const rect = modal.getBoundingClientRect(); modal.style.position = 'fixed'; modal.style.left = rect.left + 'px'; modal.style.top = rect.top + 'px'; modal.style.transform = 'none' }, 10) }
+    initMBDraggable()
+  })
+}
+function closeMBPreview() {
+  mbPreviewVisible.value = false; mbPreviewStyleEl = null; mbDragging = false
+  document.removeEventListener('mousemove', onMBDragMove); document.removeEventListener('mouseup', onMBDragEnd); document.body.style.userSelect = ''
+}
+function updateMBPreviewStyle(customCSS: string) { if (!mbPreviewStyleEl) return; mbPreviewStyleEl.textContent = MB_PREVIEW_DEFAULT_CSS + '\n' + (customCSS || '') }
+function buildMBPreviewDOM() {
+  if (!mbPreviewContentEl.value) return
+  mbPreviewContentEl.value.innerHTML = ''
+  const cfg = store.messageBoxConfig
+  mbPreviewStyleEl = document.createElement('style')
+  mbPreviewContentEl.value.appendChild(mbPreviewStyleEl)
+  updateMBPreviewStyle(mbCSS.value)
+  const btnDefs: Record<string, Array<{ text: string }>> = { ok: [{ text: '确定' }], okcancel: [{ text: '确定' }, { text: '取消' }], yesno: [{ text: '是' }, { text: '否' }], yesnocancel: [{ text: '是' }, { text: '否' }, { text: '取消' }], retrycancel: [{ text: '重试' }, { text: '取消' }] }
+  const iconMap: Record<string, string> = { none: '', info: '\u2139\uFE0F', warning: '\u26A0\uFE0F', error: '\u274C', question: '\u2753' }
+  const defIdx = typeof cfg.defaultButton === 'number' ? cfg.defaultButton : 0
+  const dialog = document.createElement('div'); dialog.className = 'mb-dialog'
+  if (cfg.width) dialog.style.width = cfg.width + 'px'
+  if (cfg.height && cfg.height > 0) dialog.style.height = cfg.height + 'px'
+  dialog.style.opacity = String(cfg.opacity !== undefined ? cfg.opacity : 1)
+  const header = document.createElement('div'); header.className = 'mb-header'
+  const hTitle = document.createElement('span'); hTitle.className = 'mb-header-title'; hTitle.textContent = cfg.title || '提示'; header.appendChild(hTitle)
+  const closeBtn = document.createElement('button'); closeBtn.className = 'mb-header-close'; closeBtn.textContent = '\u2715'; header.appendChild(closeBtn)
+  dialog.appendChild(header)
+  const body = document.createElement('div'); body.className = 'mb-body'
+  if (cfg.icon === 'custom' && cfg.customIcon) { const icon = document.createElement('span'); icon.className = 'mb-icon'; icon.textContent = cfg.customIcon; body.appendChild(icon) }
+  else if (cfg.icon !== 'none' && iconMap[cfg.icon]) { const icon = document.createElement('span'); icon.className = 'mb-icon'; icon.textContent = iconMap[cfg.icon]; body.appendChild(icon) }
+  const msg = document.createElement('div'); msg.className = 'mb-message'; msg.textContent = cfg.message || ''; body.appendChild(msg)
+  dialog.appendChild(body)
+  const footer = document.createElement('div'); footer.className = 'mb-footer'
+  const btns = btnDefs[cfg.buttons] || btnDefs['ok']
+  btns.forEach((b: any, idx: number) => { const btn = document.createElement('button'); btn.className = 'mb-btn' + (idx === defIdx ? ' mb-btn-primary' : ''); btn.textContent = b.text; footer.appendChild(btn) })
+  dialog.appendChild(footer)
+  mbPreviewContentEl.value.appendChild(dialog)
+}
+
+// ======================== 输入框预览弹窗 ========================
+const ibCSS = ref('')
+const ibPreviewVisible = ref(false)
+const ibPreviewContentEl = ref<HTMLElement | null>(null)
+const ibLivePreviewModalRef = ref<HTMLElement | null>(null)
+let ibPreviewStyleEl: HTMLStyleElement | null = null
+
+useResizable(ibLivePreviewModalRef, { enabled: ibPreviewVisible, minWidth: 400, minHeight: 300 })
+
+watch(() => store.inputBoxConfig.customCSS, (val) => {
+  ibCSS.value = val || ''
+}, { immediate: true })
+
+function onIBPreviewCSSChange(val: string) {
+  ibCSS.value = val
+  store.inputBoxConfig.customCSS = val
+  store.saveState()
+  if (ibPreviewVisible.value) updateIBPreviewStyle(val)
+}
+
+const IB_PREVIEW_DEFAULT_CSS = `.ib-dialog{background:#fff;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.2);overflow:hidden;display:flex;flex-direction:column;min-width:280px;}
+.ib-header{padding:16px 20px 8px;font-size:16px;font-weight:600;color:#333;display:flex;align-items:center;justify-content:space-between;user-select:none;}
+.ib-header-title{flex:1;}
+.ib-header-close{width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;background:transparent;color:#999;font-size:16px;border-radius:4px;}
+.ib-header-close:hover{background:#f0f0f0;color:#333;}
+.ib-body{padding:8px 20px 16px;}
+.ib-prompt{font-size:14px;color:#555;line-height:1.6;margin-bottom:10px;}
+.ib-input{width:100%;padding:7px 10px;border:1px solid #d9d9d9;border-radius:4px;font-size:13px;color:#333;outline:none;box-sizing:border-box;}
+.ib-input:focus{border-color:#409eff;box-shadow:0 0 0 2px rgba(64,158,255,0.2);}
+.ib-footer{padding:12px 20px 16px;display:flex;justify-content:flex-end;gap:8px;}
+.ib-btn{padding:7px 20px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;font-size:13px;cursor:pointer;min-width:72px;text-align:center;color:#333;}
+.ib-btn:hover{border-color:#409eff;color:#409eff;}
+.ib-btn.ib-btn-primary{background:#409eff;color:#fff;border-color:#409eff;}
+.ib-btn.ib-btn-primary:hover{background:#66b1ff;}`
+
+let ibDragging = false, ibDragStartX = 0, ibDragStartY = 0, ibStartLeft = 0, ibStartTop = 0
+
+function initIBDraggable() {
+  const modal = ibLivePreviewModalRef.value
+  if (!modal) return
+  const header = modal.querySelector('.ctx-live-preview-header') as HTMLElement
+  if (!header) return
+  header.removeEventListener('mousedown', onIBDragStart)
+  header.addEventListener('mousedown', onIBDragStart)
+}
+function onIBDragStart(e: MouseEvent) { if ((e.target as HTMLElement).closest('.ctx-live-preview-close')) return; const modal = ibLivePreviewModalRef.value; if (!modal) return; e.preventDefault(); ibDragging = true; ibDragStartX = e.clientX; ibDragStartY = e.clientY; const rect = modal.getBoundingClientRect(); ibStartLeft = rect.left; ibStartTop = rect.top; modal.style.position = 'fixed'; modal.style.left = ibStartLeft + 'px'; modal.style.top = ibStartTop + 'px'; modal.style.transform = 'none'; document.addEventListener('mousemove', onIBDragMove); document.addEventListener('mouseup', onIBDragEnd); document.body.style.userSelect = 'none' }
+function onIBDragMove(e: MouseEvent) { if (!ibDragging) return; const modal = ibLivePreviewModalRef.value; if (!modal) return; modal.style.left = (ibStartLeft + e.clientX - ibDragStartX) + 'px'; modal.style.top = (ibStartTop + e.clientY - ibDragStartY) + 'px' }
+function onIBDragEnd() { ibDragging = false; document.removeEventListener('mousemove', onIBDragMove); document.removeEventListener('mouseup', onIBDragEnd); document.body.style.userSelect = '' }
+
+function openIBPreview() {
+  ibCSS.value = store.inputBoxConfig.customCSS || ''
+  ibPreviewVisible.value = true
+  nextTick(() => {
+    buildIBPreviewDOM()
+    const modal = ibLivePreviewModalRef.value
+    if (modal) { modal.style.left = ''; modal.style.top = ''; modal.style.transform = ''
+      setTimeout(() => { const rect = modal.getBoundingClientRect(); modal.style.position = 'fixed'; modal.style.left = rect.left + 'px'; modal.style.top = rect.top + 'px'; modal.style.transform = 'none' }, 10) }
+    initIBDraggable()
+  })
+}
+function closeIBPreview() { ibPreviewVisible.value = false; ibPreviewStyleEl = null; ibDragging = false; document.removeEventListener('mousemove', onIBDragMove); document.removeEventListener('mouseup', onIBDragEnd); document.body.style.userSelect = '' }
+function updateIBPreviewStyle(customCSS: string) { if (!ibPreviewStyleEl) return; ibPreviewStyleEl.textContent = IB_PREVIEW_DEFAULT_CSS + '\n' + (customCSS || '') }
+function buildIBPreviewDOM() {
+  if (!ibPreviewContentEl.value) return
+  ibPreviewContentEl.value.innerHTML = ''
+  const cfg = store.inputBoxConfig
+  ibPreviewStyleEl = document.createElement('style')
+  ibPreviewContentEl.value.appendChild(ibPreviewStyleEl)
+  updateIBPreviewStyle(ibCSS.value)
+  const btnDefs: Record<string, Array<{ text: string }>> = { ok: [{ text: '确定' }], okcancel: [{ text: '确定' }, { text: '取消' }] }
+  const defIdx = typeof cfg.defaultButton === 'number' ? cfg.defaultButton : 0
+  const dialog = document.createElement('div'); dialog.className = 'ib-dialog'
+  if (cfg.width) dialog.style.width = cfg.width + 'px'
+  if (cfg.height && cfg.height > 0) dialog.style.height = cfg.height + 'px'
+  dialog.style.opacity = String(cfg.opacity !== undefined ? cfg.opacity : 1)
+  const header = document.createElement('div'); header.className = 'ib-header'
+  const hTitle = document.createElement('span'); hTitle.className = 'ib-header-title'; hTitle.textContent = cfg.title || '输入'; header.appendChild(hTitle)
+  const closeBtn = document.createElement('button'); closeBtn.className = 'ib-header-close'; closeBtn.textContent = '\u2715'; header.appendChild(closeBtn)
+  dialog.appendChild(header)
+  const body = document.createElement('div'); body.className = 'ib-body'
+  const prompt = document.createElement('div'); prompt.className = 'ib-prompt'; prompt.textContent = cfg.prompt || ''; body.appendChild(prompt)
+  const input = document.createElement('input'); input.className = 'ib-input'; input.type = cfg.inputType || 'text'; input.value = cfg.defaultValue || ''; input.placeholder = '请输入...'; body.appendChild(input)
+  dialog.appendChild(body)
+  const footer = document.createElement('div'); footer.className = 'ib-footer'
+  const btns = btnDefs[cfg.buttons] || btnDefs['okcancel']
+  btns.forEach((b: any, idx: number) => { const btn = document.createElement('button'); btn.className = 'ib-btn' + (idx === defIdx ? ' ib-btn-primary' : ''); btn.textContent = b.text; footer.appendChild(btn) })
+  dialog.appendChild(footer)
+  ibPreviewContentEl.value.appendChild(dialog)
+}
+
+/** 保留兼容旧的 onMBCssChange/onIBCssChange（标签页内 CssEditor 使用） */
 function onMBCssChange(cssText: string) {
   store.messageBoxConfig.customCSS = cssText
   store.saveState()
@@ -3339,115 +3581,7 @@ function onMBTabChange(tabName: string) {
   }
 }
 
-function messageBoxPreview() {
-  // CSS 已通过 CssEditor @change 自动同步到 store，无需额外保存
-  const existing = document.querySelector('.mb-preview-overlay')
-  if (existing) existing.remove()
-
-  const cfg = store.messageBoxConfig
-
-  const defaultCSS = `
-.mb-preview-overlay{position:fixed;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:99999;display:flex;align-items:center;justify-content:center;}
-.mb-dialog{background:#fff;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.2);max-width:90vw;overflow:hidden;display:flex;flex-direction:column;}
-.mb-header{padding:16px 20px 8px;font-size:16px;font-weight:600;color:#333;cursor:default;display:flex;align-items:center;justify-content:space-between;}
-.mb-header-title{flex:1;}
-.mb-header-close{width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;background:transparent;color:#999;font-size:16px;border-radius:4px;}
-.mb-header-close:hover{background:#f0f0f0;color:#333;}
-.mb-body{padding:8px 20px 16px;display:flex;align-items:flex-start;gap:12px;}
-.mb-icon{font-size:28px;flex-shrink:0;}
-.mb-message{font-size:14px;color:#555;line-height:1.6;word-wrap:break-word;flex:1;}
-.mb-footer{padding:12px 20px 16px;display:flex;justify-content:flex-end;gap:8px;}
-.mb-btn{padding:7px 20px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;font-size:13px;cursor:pointer;}
-.mb-btn:hover{border-color:#409eff;color:#409eff;}
-.mb-btn.mb-btn-primary{background:#409eff;color:#fff;border-color:#409eff;}
-.mb-btn.mb-btn-primary:hover{background:#66b1ff;}
-`.trim()
-
-  const overlay = document.createElement('div')
-  overlay.className = 'mb-preview-overlay'
-  overlay.addEventListener('click', function (e) {
-    if (e.target === overlay && cfg.closeOnOverlayClick !== false) overlay.remove()
-  })
-
-  const combinedStyle = document.createElement('style')
-  combinedStyle.textContent = defaultCSS + '\n' + (cfg.customCSS && cfg.customCSS.trim() ? cfg.customCSS : '')
-  overlay.appendChild(combinedStyle)
-
-  const btnDefs: Record<string, Array<{ text: string; result: string }>> = {
-    ok: [{ text: '确定', result: 'ok' }],
-    okcancel: [{ text: '确定', result: 'ok' }, { text: '取消', result: 'cancel' }],
-    yesno: [{ text: '是', result: 'yes' }, { text: '否', result: 'no' }],
-    yesnocancel: [{ text: '是', result: 'yes' }, { text: '否', result: 'no' }, { text: '取消', result: 'cancel' }],
-    retrycancel: [{ text: '重试', result: 'retry' }, { text: '取消', result: 'cancel' }]
-  }
-
-  const iconMap: Record<string, string> = { none: '', info: 'ℹ️', warning: '⚠️', error: '❌', question: '❓' }
-
-  if (cfg.showOverlay !== false) {
-    overlay.style.background = 'rgba(0,0,0,0.4)'
-  } else {
-    overlay.style.background = 'transparent'
-  }
-
-  const dialog = document.createElement('div')
-  dialog.className = 'mb-dialog'
-  if (cfg.width) dialog.style.width = cfg.width + 'px'
-  if (cfg.height && cfg.height > 0) dialog.style.height = cfg.height + 'px'
-  dialog.style.opacity = (cfg.opacity !== undefined ? cfg.opacity : 1) as any
-
-  let html = '<div class="mb-header"><span class="mb-header-title">' + (cfg.title || '提示') + '</span><button class="mb-header-close" onclick="this.closest(\'.mb-preview-overlay\').remove()">✕</button></div>'
-  html += '<div class="mb-body">'
-  if (cfg.icon === 'custom' && cfg.customIcon) {
-    html += '<span class="mb-icon">' + cfg.customIcon + '</span>'
-  } else if (cfg.icon !== 'none' && iconMap[cfg.icon]) {
-    html += '<span class="mb-icon">' + iconMap[cfg.icon] + '</span>'
-  }
-  html += '<div class="mb-message">' + (cfg.message || '') + '</div>'
-  html += '</div>'
-
-  const btns = btnDefs[cfg.buttons] || btnDefs['ok']
-  const defIdx = typeof cfg.defaultButton === 'number' ? cfg.defaultButton : 0
-  html += '<div class="mb-footer">'
-  btns.forEach(function (b, idx) {
-    html += '<button class="mb-btn' + (idx === defIdx ? ' mb-btn-primary' : '') + '" onclick="this.closest(\'.mb-preview-overlay\').remove()">' + b.text + '</button>'
-  })
-  html += '</div>'
-
-  dialog.innerHTML = html
-  overlay.appendChild(dialog)
-
-  // 可拖动标题栏
-  if (cfg.draggable !== false) {
-    let isDragging = false, startX = 0, startY = 0, origLeft = 0, origTop = 0
-    const header = dialog.querySelector('.mb-header') as HTMLElement
-    if (header) {
-      header.style.cursor = 'move'
-      header.addEventListener('mousedown', function (e) {
-        isDragging = true
-        startX = e.clientX
-        startY = e.clientY
-        const rect = dialog.getBoundingClientRect()
-        origLeft = rect.left
-        origTop = rect.top
-        dialog.style.position = 'fixed'
-        dialog.style.left = origLeft + 'px'
-        dialog.style.top = origTop + 'px'
-        dialog.style.margin = '0'
-        e.preventDefault()
-      })
-      document.addEventListener('mousemove', function (e) {
-        if (!isDragging) return
-        dialog.style.left = (origLeft + e.clientX - startX) + 'px'
-        dialog.style.top = (origTop + e.clientY - startY) + 'px'
-      })
-      document.addEventListener('mouseup', function () {
-        isDragging = false
-      })
-    }
-  }
-
-  document.body.appendChild(overlay)
-}
+function messageBoxPreview() { openMBPreview() }
 
 function onIBPropChange(prop: string, e: Event) {
   const target = e.target as HTMLInputElement
@@ -3474,106 +3608,7 @@ function onIBTabChange(tabName: string) {
   }
 }
 
-function inputBoxPreview() {
-  // CSS 已通过 CssEditor @change 自动同步到 store，无需额外保存
-  const existing = document.querySelector('.ib-preview-overlay')
-  if (existing) existing.remove()
-
-  const cfg = store.inputBoxConfig
-
-  const defaultCSS = `
-.ib-preview-overlay{position:fixed;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:99999;display:flex;align-items:center;justify-content:center;}
-.ib-dialog{background:#fff;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.2);max-width:90vw;overflow:hidden;display:flex;flex-direction:column;}
-.ib-header{padding:16px 20px 8px;font-size:16px;font-weight:600;color:#333;display:flex;align-items:center;justify-content:space-between;}
-.ib-header-title{flex:1;}
-.ib-header-close{width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;background:transparent;color:#999;font-size:16px;border-radius:4px;}
-.ib-header-close:hover{background:#f0f0f0;color:#333;}
-.ib-body{padding:8px 20px 16px;}
-.ib-prompt{font-size:14px;color:#555;line-height:1.6;margin-bottom:10px;}
-.ib-input{width:100%;padding:7px 10px;border:1px solid #d9d9d9;border-radius:4px;font-size:13px;color:#333;outline:none;box-sizing:border-box;}
-.ib-input:focus{border-color:#409eff;box-shadow:0 0 0 2px rgba(64,158,255,0.2);}
-.ib-footer{padding:12px 20px 16px;display:flex;justify-content:flex-end;gap:8px;}
-.ib-btn{padding:7px 20px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;font-size:13px;cursor:pointer;}
-.ib-btn:hover{border-color:#409eff;color:#409eff;}
-.ib-btn.ib-btn-primary{background:#409eff;color:#fff;border-color:#409eff;}
-.ib-btn.ib-btn-primary:hover{background:#66b1ff;}
-`.trim()
-
-  const btnDefs: Record<string, Array<{ text: string; result: string }>> = {
-    ok: [{ text: '确定', result: 'ok' }],
-    okcancel: [{ text: '确定', result: 'ok' }, { text: '取消', result: 'cancel' }]
-  }
-
-  const overlay = document.createElement('div')
-  overlay.className = 'ib-preview-overlay'
-  overlay.addEventListener('click', function (e) {
-    if (e.target === overlay && cfg.closeOnOverlayClick !== false) overlay.remove()
-  })
-
-  const combinedStyle = document.createElement('style')
-  combinedStyle.textContent = defaultCSS + '\n' + (cfg.customCSS && cfg.customCSS.trim() ? cfg.customCSS : '')
-  overlay.appendChild(combinedStyle)
-
-  if (cfg.showOverlay !== false) {
-    overlay.style.background = 'rgba(0,0,0,0.4)'
-  } else {
-    overlay.style.background = 'transparent'
-  }
-
-  const dialog = document.createElement('div')
-  dialog.className = 'ib-dialog'
-  if (cfg.width) dialog.style.width = cfg.width + 'px'
-  if (cfg.height && cfg.height > 0) dialog.style.height = cfg.height + 'px'
-  dialog.style.opacity = (cfg.opacity !== undefined ? cfg.opacity : 1) as any
-
-  let html = '<div class="ib-header"><span class="ib-header-title">' + (cfg.title || '输入') + '</span><button class="ib-header-close" onclick="this.closest(\'.ib-preview-overlay\').remove()">✕</button></div>'
-  html += '<div class="ib-body">'
-  html += '<div class="ib-prompt">' + (cfg.prompt || '') + '</div>'
-  html += '<input class="ib-input" type="' + (cfg.inputType || 'text') + '" value="' + (cfg.defaultValue || '') + '" />'
-  html += '</div>'
-
-  const btns = btnDefs[cfg.buttons] || btnDefs['okcancel']
-  const defIdx = typeof cfg.defaultButton === 'number' ? cfg.defaultButton : 0
-  html += '<div class="ib-footer">'
-  btns.forEach(function (b, idx) {
-    html += '<button class="ib-btn' + (idx === defIdx ? ' ib-btn-primary' : '') + '" onclick="this.closest(\'.ib-preview-overlay\').remove()">' + b.text + '</button>'
-  })
-  html += '</div>'
-
-  dialog.innerHTML = html
-
-  if (cfg.draggable !== false) {
-    const header = dialog.querySelector('.ib-header') as HTMLElement
-    if (header) {
-      header.style.cursor = 'move'
-      let isDragging = false, startX = 0, startY = 0, origLeft = 0, origTop = 0
-      header.addEventListener('mousedown', function (e) {
-        isDragging = true
-        startX = e.clientX
-        startY = e.clientY
-        const rect = dialog.getBoundingClientRect()
-        origLeft = rect.left
-        origTop = rect.top
-        dialog.style.position = 'fixed'
-        dialog.style.left = origLeft + 'px'
-        dialog.style.top = origTop + 'px'
-        dialog.style.margin = '0'
-        e.preventDefault()
-      })
-      document.addEventListener('mousemove', function (e) {
-        if (!isDragging) return
-        dialog.style.left = (origLeft + e.clientX - startX) + 'px'
-        dialog.style.top = (origTop + e.clientY - startY) + 'px'
-      })
-      document.addEventListener('mouseup', function () {
-        isDragging = false
-      })
-    }
-  }
-
-  overlay.appendChild(dialog)
-  document.body.appendChild(overlay)
-}
+function inputBoxPreview() { openIBPreview() }
 </script>
 
 <style scoped>
@@ -3993,7 +4028,7 @@ function inputBoxPreview() {
 }
 
 /* 列表框项编辑器行样式 */
-.list-item-row {
+.listBox_item-row {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -4002,15 +4037,15 @@ function inputBoxPreview() {
   border-bottom: 1px solid #f5f5f5;
 }
 
-.list-item-row:hover {
+.listBox_item-row:hover {
   background: #f5f5f5;
 }
 
-.list-item-row.list-item-active {
+.listBox_item-row.listBox_item-active {
   background: #e6f4ff;
 }
 
-.list-item-idx {
+.listBox_item-idx {
   width: 20px;
   text-align: center;
   font-size: 11px;
@@ -4018,7 +4053,7 @@ function inputBoxPreview() {
   flex-shrink: 0;
 }
 
-.list-item-inp {
+.listBox_item-inp {
   flex: 1;
   height: 24px;
   border: 1px solid transparent;
@@ -4030,7 +4065,7 @@ function inputBoxPreview() {
   border-radius: 3px;
 }
 
-.list-item-inp:focus {
+.listBox_item-inp:focus {
   border-color: #1890ff;
   background: #fff;
 }
@@ -4469,6 +4504,8 @@ function inputBoxPreview() {
   display: flex;
   align-items: center;
   justify-content: center;
+  app-region: no-drag;
+  -webkit-app-region: no-drag;
 }
 .ctx-live-preview-modal {
   width: 60vw;
@@ -4498,7 +4535,7 @@ function inputBoxPreview() {
   cursor: grabbing;
 }
 .ctx-live-preview-close {
-  width: 32px;
+  width: 35px;
   height: 32px;
   border: none;
   background: transparent;
@@ -4530,8 +4567,8 @@ function inputBoxPreview() {
   justify-content: center;
   overflow: auto;
   background-color:transparent;
-  width: 20vw;
-  background-color:rgba(0, 0, 0, 0.6);
+  width: 25vw;
+  background-color:rgba(255, 255, 255, 0.8);
 }
 .ctx-live-preview-right {
   flex: 1;

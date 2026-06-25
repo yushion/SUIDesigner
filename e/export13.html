@@ -12,13 +12,13 @@
 html,body { width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:transparent }
 body { display:flex }
 
-.page-container {
+.pageContainer {
   position:relative;
   overflow:hidden;
   backdrop-filter: var(--canvas-backdrop-filter, none);
   -webkit-backdrop-filter: var(--canvas-backdrop-filter, none);
 }
-.page-container::before {
+.pageContainer::before {
   content:'';
   position:absolute;
   inset:0;
@@ -28,48 +28,48 @@ body { display:flex }
   opacity: var(--canvas-opacity);
   border-radius: inherit;
 }
-.page-container.show-shadow {
+.pageContainer.show-shadow {
   box-shadow: 0 1px 4px rgba(0,0,0,0.3);
 }
 
 /* 排除所有控件和弹出框的拖拽区域，确保控件可交互 */
-.page-container [data-ctrl-type] {
+.pageContainer [data-ctrl-type] {
   app-region: no-drag;
 }
 
 /* 画布标题栏 */
-.canvas-titlebar {
+.titlebar {
   position:absolute;top:0;left:0;right:0;
   display:flex;align-items:center;height:40px;user-select:none;z-index:10;
   app-region: drag;
 }
-.canvas-titlebar .tb-left {
+.titlebar .titlebar_left {
   width:48px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
 }
-.canvas-titlebar .tb-center {
+.titlebar .titlebar_center {
   flex:1;display:flex;align-items:center;min-width:0;
 }
-.canvas-titlebar .tb-right {
+.titlebar .titlebar_right {
   display:flex;align-items:center;justify-content:flex-end;gap:2px;padding-right:4px;flex-shrink:0;
 }
-.canvas-titlebar .tb-icon {
+.titlebar .titlebar_left_icon {
   width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:16px;
 }
-.canvas-titlebar .tb-title {
+.titlebar .titlebar_center_title {
   font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
-.canvas-titlebar .tb-btn {
+.titlebar .titlebar_rightBtn {
   width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;color:#333;cursor:default;border-radius:4px;flex-shrink:0;
 }
-.canvas-titlebar .tb-btn:hover { background:rgba(0,0,0,0.06) }
-.canvas-titlebar .tb-btn-min:hover,.tb-btn-max:hover { filter: brightness(1.2)}
-.canvas-titlebar .tb-btn-close:hover { background:#e81123!important;color:#fff!important }
-.canvas-titlebar .tb-btn-min:active,.tb-btn-max:active,.tb-btn-close:active {filter: brightness(0.7);}
-.canvas-titlebar .tb-btn-disabled { opacity:0.4;cursor:not-allowed;pointer-events:none; }
-.canvas-titlebar .tb-btn-disabled:hover { background:transparent }
+.titlebar .titlebar_rightBtn:hover { background:rgba(0,0,0,0.06) }
+.titlebar .titlebar_rightBtn_min:hover,.titlebar_rightBtn_min:hover { filter: brightness(1.2)}
+.titlebar .titlebar_rightBtn_close:hover { background:#e81123!important;color:#fff!important }
+.titlebar .titlebar_rightBtn_min:active,.titlebar_rightBtn_min:active,.titlebar_rightBtn_close:active {filter: brightness(0.7);}
+.titlebar .titlebar_rightBtn_disabled { opacity:0.4;cursor:not-allowed;pointer-events:none; }
+.titlebar .titlebar_rightBtn_disabled:hover { background:transparent }
 
 /* 毛玻璃效果 */
-.page-container.glass-effect {
+.pageContainer.glass-effect {
   --canvas-backdrop-filter: blur(10px);
 }
 
@@ -175,7 +175,7 @@ body {
 
 
 /* === 页面容器 === */
-.page-container {
+.pageContainer {
   width: 800px;
   height: 500px;
   background-color: transparent;
@@ -186,14 +186,14 @@ body {
 }
 
 /* === 画布自定义样式 === */
-.page-container {
+.pageContainer {
   position: relative;
   overflow: hidden;
   --canvas-bg-color: #ffffff;
   --canvas-opacity: 0.45;
 }
 
-.page-container::before {
+.pageContainer::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -204,12 +204,12 @@ body {
   border-radius: inherit;
 }
 
-.page-container.glass-effect {
+.pageContainer.glass-effect {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
 
-.canvas-titlebar {
+.titlebar {
   position: absolute;
   top: 0;
   left: 0;
@@ -224,7 +224,7 @@ body {
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-.canvas-titlebar .tb-left {
+.titlebar .titlebar_left {
   width: 48px;
   display: flex;
   align-items: center;
@@ -232,14 +232,14 @@ body {
   flex-shrink: 0;
 }
 
-.canvas-titlebar .tb-center {
+.titlebar .titlebar_center {
   flex: 1;
   display: flex;
   align-items: center;
   min-width: 0;
 }
 
-.canvas-titlebar .tb-right {
+.titlebar .titlebar_right {
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -248,7 +248,7 @@ body {
   flex-shrink: 0;
 }
 
-.canvas-titlebar .tb-icon {
+.titlebar .titlebar_left_icon {
   width: 24px;
   height: 24px;
   display: flex;
@@ -257,7 +257,7 @@ body {
   font-size: 16px;
 }
 
-.canvas-titlebar .tb-title {
+.titlebar .titlebar_center_title {
   font-size: 13px;
   font-weight: 600;
   overflow: hidden;
@@ -265,7 +265,7 @@ body {
   white-space: nowrap;
 }
 
-.canvas-titlebar .tb-btn {
+.titlebar .titlebar_rightBtn {
   width: 32px;
   height: 32px;
   display: flex;
@@ -278,13 +278,13 @@ body {
   flex-shrink: 0;
 }
 
-.canvas-titlebar .tb-btn:hover { background: rgba(0, 0, 0, 0.06); }
+.titlebar .titlebar_rightBtn:hover { background: rgba(0, 0, 0, 0.06); }
 
-.canvas-titlebar .tb-btn:active { background: rgba(0, 0, 0, 0.1); }
+.titlebar .titlebar_rightBtn:active { background: rgba(0, 0, 0, 0.1); }
 
-.canvas-titlebar .tb-btn-close:hover { background: #e81123; color: #fff; }
+.titlebar .titlebar_rightBtn_close:hover { background: #e81123; color: #fff; }
 
-.canvas-titlebar .tb-btn-close:active { background: #bf0a1a; color: #fff; }
+.titlebar .titlebar_rightBtn_close:active { background: #bf0a1a; color: #fff; }
 
 /* === 信息框自定义样式 === */
 /* ===== 信息提示框自定义样式 ===== */
@@ -702,7 +702,7 @@ body {
 
 
 /* === 页面容器 CSS 变量（放在 customCSS 之后，确保不被覆盖） === */
-.page-container {
+.pageContainer {
   --canvas-bg-color: #ffffff;
   --canvas-opacity: 0.45;
   --canvas-backdrop-filter: blur(10px);
@@ -713,31 +713,31 @@ body {
 </style>
 </head>
 <body style="align-items:center;justify-content:center">
-<div class="page-container glass-effect" id="page_container" data-ctrl-type="page" data-name="canvas" data-original-width="800" data-original-height="500">
-<div class="canvas-titlebar" style="display:flex;align-items:center;position:absolute;top:0;left:0;right:0;height:40px;background-color:#f5f5f5;opacity:1;user-select:none;z-index:10;">
-  <div class="tb-left" style="display:flex;align-items:center;height:40px;">
-    <span class="tb-icon" style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:16px;color:#1e1e1e;flex-shrink:0;">
+<div class="pageContainer glass-effect" id="pageContainer" data-ctrl-type="pageContainer" data-name="canvas" data-original-width="800" data-original-height="500">
+<div class="titlebar" style="display:flex;align-items:center;position:absolute;top:0;left:0;right:0;height:40px;background-color:#f5f5f5;opacity:1;user-select:none;z-index:10;">
+  <div class="titlebar_left" style="display:flex;align-items:center;height:40px;">
+    <span class="titlebar_left_icon" style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:16px;color:#1e1e1e;flex-shrink:0;">
       <i class="fas fa-star">
       </i>
     </span>
   </div>
-  <div class="tb-center" style="display:flex;align-items:center;height:40px;flex:1;justify-content:flex-start;">
-    <span class="tb-title" style="font-size:13px;font-weight:600;color:#1e1e1e;user-select:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">我的应用</span>
+  <div class="titlebar_center" style="display:flex;align-items:center;height:40px;flex:1;justify-content:flex-start;">
+    <span class="titlebar_center_title" style="font-size:13px;font-weight:600;color:#1e1e1e;user-select:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">我的应用</span>
   </div>
-  <div class="tb-right" style="display:flex;align-items:center;height:40px;">
-    <button id="titlebar_min" class="tb-btn tb-btn-min" data-ctrl-type="titlebar_min" data-name="最小化" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;color:#333;cursor:default;border-radius:4px;flex-shrink:0;" title="最小化">
+  <div class="titlebar_right" style="display:flex;align-items:center;height:40px;">
+    <button id="titlebar_min" class="titlebar_rightBtn titlebar_rightBtn_min" data-ctrl-type="titlebar_min" data-name="最小化" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;color:#333;cursor:default;border-radius:4px;flex-shrink:0;" title="最小化">
       <svg width="10" height="1" viewBox="0 0 10 1">
         <rect width="10" height="1" fill="currentColor">
         </rect>
       </svg>
     </button>
-    <button id="titlebar_max" class="tb-btn tb-btn-max tb-btn-disabled" data-ctrl-type="titlebar_max" data-name="最大化" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;color:#333;cursor:not-allowed;border-radius:4px;flex-shrink:0;opacity:0.4;pointer-events:none;" disabled title="最大化">
+    <button id="titlebar_max" class="titlebar_rightBtn titlebar_rightBtn_min titlebar_rightBtn_disabled" data-ctrl-type="titlebar_max" data-name="最大化" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;color:#333;cursor:not-allowed;border-radius:4px;flex-shrink:0;opacity:0.4;pointer-events:none;" disabled title="最大化">
       <svg width="10" height="10" viewBox="0 0 10 10">
         <rect x="1" y="1" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.2">
         </rect>
       </svg>
     </button>
-    <button id="titlebar_close" class="tb-btn tb-btn-close" data-ctrl-type="titlebar_close" data-name="关闭" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;color:#333;cursor:default;border-radius:4px;flex-shrink:0;" title="关闭">
+    <button id="titlebar_close" class="titlebar_rightBtn titlebar_rightBtn_close" data-ctrl-type="titlebar_close" data-name="关闭" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;color:#333;cursor:default;border-radius:4px;flex-shrink:0;" title="关闭">
       <svg width="10" height="10" viewBox="0 0 10 10">
         <line x1="1" y1="1" x2="9" y2="9" stroke="currentColor" stroke-width="1.2">
         </line>
@@ -777,15 +777,15 @@ body {
   'use strict';
 
   document.addEventListener('click', function(e) {
-    var tabBtn = e.target.closest('.tab-header-btn');
+    var tabBtn = e.target.closest('.tabsContainer_headerBar_btn');
     if (tabBtn) {
-      var container = tabBtn.closest('.tabs-container');
+      var container = tabBtn.closest('.tabsContainer');
       if (!container) return;
 
       if (container.getAttribute('data-disabled') === 'true') return;
 
       var tabName = tabBtn.getAttribute('data-tab-name');
-      var allBtns = container.querySelectorAll('.tab-header-btn');
+      var allBtns = container.querySelectorAll('.tabsContainer_headerBar_btn');
       allBtns.forEach(function(b) { b.classList.remove('active'); });
       tabBtn.classList.add('active');
 
@@ -796,9 +796,9 @@ body {
       return;
     }
 
-    var collapseBtn = e.target.closest('.card-collapse-btn');
+    var collapseBtn = e.target.closest('.cardBox_collapse_btn');
     if (collapseBtn) {
-      var card = collapseBtn.closest('.card-box');
+      var card = collapseBtn.closest('.cardBox');
       if (!card) return;
       var isCollapsed = card.getAttribute('data-collapsed') === 'true';
       var downArrow = '<svg width="12" height="12" viewBox="0 0 12 12"><path d="M3 4.5L6 7.5L9 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -823,13 +823,13 @@ body {
     itemsCache: {},
 
     init: function() {
-      var listBoxes = document.querySelectorAll('[data-listbox-items]');
+      var listBoxes = document.querySelectorAll('[data-listBox-items]');
       for (var i = 0; i < listBoxes.length; i++) {
         var el = listBoxes[i];
         var id = el.id;
         if (!id) continue;
         try {
-          var items = JSON.parse(el.getAttribute('data-listbox-items') || '[]');
+          var items = JSON.parse(el.getAttribute('data-listBox-items') || '[]');
           ListBoxManager.itemsCache[id] = items;
         } catch(e) { ListBoxManager.itemsCache[id] = []; }
         ListBoxManager._bindEvents(el);
@@ -841,7 +841,7 @@ body {
       document.addEventListener('mousedown', function(e) {
         if (el.getAttribute('data-always-show-selection') === 'true') return;
         if (!el.contains(e.target)) {
-          var allItems = el.querySelectorAll('.list-item');
+          var allItems = el.querySelectorAll('.listBox_item');
           for (var ai = 0; ai < allItems.length; ai++) {
             allItems[ai].classList.remove('item-selected');
           }
@@ -853,7 +853,7 @@ body {
       var id = listBoxEl.id;
       var items = ListBoxManager.itemsCache[id] || [];
       var showCheckbox = listBoxEl.getAttribute('data-show-checkbox') === 'true';
-      var scroll = listBoxEl.querySelector('.list-box-scroll');
+      var scroll = listBoxEl.querySelector('.listBox_scroll');
       if (!scroll) return;
       if (items.length === 0) {
         scroll.innerHTML = '<div class="list-empty">暂无数据</div>';
@@ -862,8 +862,8 @@ body {
       var html = '';
       for (var i = 0; i < items.length; i++) {
         var item = items[i];
-        var cb = showCheckbox ? '<input type="checkbox" class="list-item-checkbox" data-ctrl-type="listbox_item_checkbox"' + (item.selected ? ' checked' : '') + ' data-item-index="' + i + '" />' : '';
-        html += '<div class="list-item" data-ctrl-type="listbox_item" data-item-index="' + i + '">' + cb + '<span class="list-item-text">' + ListBoxManager._escHtml(item.text) + '</span></div>';
+        var cb = showCheckbox ? '<input type="checkbox" class="listBox_item-checkbox" data-ctrl-type="listbox_item_checkbox"' + (item.selected ? ' checked' : '') + ' data-item-index="' + i + '" />' : '';
+        html += '<div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="' + i + '">' + cb + '<span class="listBox_item_text">' + ListBoxManager._escHtml(item.text) + '</span></div>';
       }
       scroll.innerHTML = html;
       ListBoxManager._bindEvents(listBoxEl);
@@ -874,29 +874,29 @@ body {
     },
 
     _bindEvents: function(el) {
-      var items = el.querySelectorAll('.list-item');
+      var items = el.querySelectorAll('.listBox_item');
       for (var i = 0; i < items.length; i++) {
         (function(itemEl) {
           itemEl.onclick = function(e) {
             if (e.target.tagName === 'INPUT') return;
-            var listBox = itemEl.closest('[data-listbox-items]');
+            var listBox = itemEl.closest('[data-listBox-items]');
             if (!listBox || listBox.getAttribute('data-disabled') === 'true') return;
-            var allItems = listBox.querySelectorAll('.list-item');
+            var allItems = listBox.querySelectorAll('.listBox_item');
             for (var ai = 0; ai < allItems.length; ai++) {
               allItems[ai].classList.remove('item-selected');
             }
             itemEl.classList.add('item-selected');
           };
           itemEl.ondblclick = function(e) {
-            var listBox = itemEl.closest('[data-listbox-items]');
+            var listBox = itemEl.closest('[data-listBox-items]');
             if (!listBox || listBox.getAttribute('data-editable') !== 'true') return;
             if (listBox.getAttribute('data-disabled') === 'true') return;
             ListBoxManager._startEdit(listBox, itemEl);
           };
-          var cb = itemEl.querySelector('.list-item-checkbox');
+          var cb = itemEl.querySelector('.listBox_item-checkbox');
           if (cb) {
             cb.onchange = function(e) {
-              var listBox = cb.closest('[data-listbox-items]');
+              var listBox = cb.closest('[data-listBox-items]');
               if (!listBox) return;
               var idx = parseInt(cb.getAttribute('data-item-index') || '0');
               var cache = ListBoxManager.itemsCache[listBox.id];
@@ -911,12 +911,12 @@ body {
       var idx = parseInt(itemEl.getAttribute('data-item-index') || '0');
       var cache = ListBoxManager.itemsCache[listBox.id];
       if (!cache || !cache[idx]) return;
-      var textSpan = itemEl.querySelector('.list-item-text');
+      var textSpan = itemEl.querySelector('.listBox_item_text');
       if (!textSpan) return;
       var oldText = cache[idx].text;
       var input = document.createElement('input');
       input.type = 'text';
-      input.className = 'list-item-edit-input';
+      input.className = 'listBox_item-edit-input';
       input.value = oldText;
       textSpan.replaceWith(input);
       input.focus();
@@ -928,7 +928,7 @@ body {
           ListBoxManager._updateDataAttr(listBox);
         }
         var span = document.createElement('span');
-        span.className = 'list-item-text';
+        span.className = 'listBox_item_text';
         span.textContent = cache[idx].text;
         input.replaceWith(span);
       };
@@ -943,7 +943,7 @@ body {
       var id = listBox.id;
       var cache = ListBoxManager.itemsCache[id];
       if (!cache) return;
-      listBox.setAttribute('data-listbox-items', JSON.stringify(cache));
+      listBox.setAttribute('data-listBox-items', JSON.stringify(cache));
     },
 
     add: function(listBoxId, text) {
@@ -983,7 +983,7 @@ body {
       cache[index].selected = !!checked;
       var itemEl = el.querySelector('[data-item-index="' + index + '"]');
       if (itemEl) {
-        var cb = itemEl.querySelector('.list-item-checkbox');
+        var cb = itemEl.querySelector('.listBox_item-checkbox');
         if (cb) cb.checked = !!checked;
       }
       ListBoxManager._updateDataAttr(el);
@@ -1065,7 +1065,7 @@ body {
       if (!config || !node) return null;
 
       var nodeDiv = document.createElement('div');
-      nodeDiv.className = 'tree-node';
+      nodeDiv.className = 'treeView_node';
       nodeDiv.setAttribute('data-tree-id', treeId);
       nodeDiv.setAttribute('data-node-id', node.id);
       nodeDiv.setAttribute('data-level', level);
@@ -1076,14 +1076,14 @@ body {
       }
 
       var contentDiv = document.createElement('div');
-      contentDiv.className = 'tree-node-content';
+      contentDiv.className = 'treeView_node_content';
 
       if (config.showCheckbox) {
         var checkboxSpan = document.createElement('span');
         checkboxSpan.className = 'tree-checkbox';
         var cb = document.createElement('input');
         cb.type = 'checkbox';
-        cb.className = 'tree-node-check';
+        cb.className = 'treeView_node-check';
         cb.checked = !!node.checked;
         cb.setAttribute('data-ctrl-type', 'treeview_node_checkbox');
         checkboxSpan.appendChild(cb);
@@ -1091,7 +1091,7 @@ body {
       }
 
       var toggle = document.createElement('span');
-      toggle.className = 'tree-toggle';
+      toggle.className = 'treeView_toggle';
       toggle.textContent = '▶';
       if (node.children && node.children.length > 0) {
         if (node.expanded === true) {
@@ -1105,7 +1105,7 @@ body {
       contentDiv.appendChild(toggle);
 
       var icon = document.createElement('span');
-      icon.className = 'tree-icon';
+      icon.className = 'treeView_icon';
       var showIcon = config.showIcon !== false;
       if (showIcon) {
         var nodeIcon = node.icon || '';
@@ -1116,7 +1116,7 @@ body {
       }
 
       var label = document.createElement('span');
-      label.className = 'tree-label';
+      label.className = 'treeView_label';
       label.textContent = node.text || '';
 
       contentDiv.appendChild(icon);
@@ -1125,7 +1125,7 @@ body {
 
       if (node.children && node.children.length > 0) {
         var childrenDiv = document.createElement('div');
-        childrenDiv.className = 'tree-children';
+        childrenDiv.className = 'treeView_children';
         if (node.expanded === false) {
           childrenDiv.style.display = 'none';
         }
@@ -1151,8 +1151,8 @@ body {
       var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
       if (!nodeEl) return;
 
-      var toggle = nodeEl.querySelector(':scope > .tree-node-content > .tree-toggle');
-      var children = nodeEl.querySelector(':scope > .tree-children');
+      var toggle = nodeEl.querySelector(':scope > .treeView_node_content > .treeView_toggle');
+      var children = nodeEl.querySelector(':scope > .treeView_children');
       if (!toggle || !children) return;
 
       var node = TreeManager.findNodeData(TreeManager.configs[treeId] ? TreeManager.configs[treeId].data : null, nodeId);
@@ -1180,7 +1180,7 @@ body {
       var container = document.getElementById(treeId);
       if (!container) return;
 
-      var prevSelected = container.querySelector('.tree-node-content.selected');
+      var prevSelected = container.querySelector('.treeView_node_content.selected');
       if (prevSelected) {
         prevSelected.classList.remove('selected');
       }
@@ -1188,7 +1188,7 @@ body {
       var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
       if (!nodeEl) return;
 
-      var content = nodeEl.querySelector(':scope > .tree-node-content');
+      var content = nodeEl.querySelector(':scope > .treeView_node_content');
       if (content) {
         content.classList.add('selected');
       }
@@ -1329,8 +1329,8 @@ body {
       if (!container) return;
       var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
       if (!nodeEl) return;
-      var toggle = nodeEl.querySelector(':scope > .tree-node-content > .tree-toggle');
-      var children = nodeEl.querySelector(':scope > .tree-children');
+      var toggle = nodeEl.querySelector(':scope > .treeView_node_content > .treeView_toggle');
+      var children = nodeEl.querySelector(':scope > .treeView_children');
       if (toggle) {
         toggle.classList.remove('collapsed');
         toggle.classList.add('expanded');
@@ -1357,8 +1357,8 @@ body {
       if (!container) return;
       var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
       if (!nodeEl) return;
-      var toggle = nodeEl.querySelector(':scope > .tree-node-content > .tree-toggle');
-      var children = nodeEl.querySelector(':scope > .tree-children');
+      var toggle = nodeEl.querySelector(':scope > .treeView_node_content > .treeView_toggle');
+      var children = nodeEl.querySelector(':scope > .treeView_children');
       if (toggle) {
         toggle.classList.remove('expanded');
         toggle.classList.add('collapsed');
@@ -1410,7 +1410,7 @@ body {
       if (!container) return false;
       var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
       if (!nodeEl) return false;
-      var cbs = nodeEl.querySelectorAll('.tree-node-check');
+      var cbs = nodeEl.querySelectorAll('.treeView_node-check');
       for (var i = 0; i < cbs.length; i++) {
         cbs[i].checked = !!checked;
       }
@@ -1428,7 +1428,7 @@ body {
       if (!container) return false;
       var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
       if (!nodeEl) return false;
-      var cb = nodeEl.querySelector('.tree-node-check');
+      var cb = nodeEl.querySelector('.treeView_node-check');
       return cb ? cb.checked : false;
     },
 
@@ -1440,10 +1440,10 @@ body {
     getCheckedNodes: function(treeId) {
       var container = document.getElementById(treeId);
       if (!container) return [];
-      var checkboxes = container.querySelectorAll('.tree-node-check:checked');
+      var checkboxes = container.querySelectorAll('.treeView_node-check:checked');
       var ids = [];
       for (var i = 0; i < checkboxes.length; i++) {
-        var nodeEl = checkboxes[i].closest('.tree-node');
+        var nodeEl = checkboxes[i].closest('.treeView_node');
         if (nodeEl) {
           ids.push(nodeEl.getAttribute('data-node-id'));
         }
@@ -1458,7 +1458,7 @@ body {
     checkAll: function(treeId) {
       var container = document.getElementById(treeId);
       if (!container) return false;
-      var checkboxes = container.querySelectorAll('.tree-node-check');
+      var checkboxes = container.querySelectorAll('.treeView_node-check');
       for (var i = 0; i < checkboxes.length; i++) {
         checkboxes[i].checked = true;
       }
@@ -1472,7 +1472,7 @@ body {
     uncheckAll: function(treeId) {
       var container = document.getElementById(treeId);
       if (!container) return false;
-      var checkboxes = container.querySelectorAll('.tree-node-check');
+      var checkboxes = container.querySelectorAll('.treeView_node-check');
       for (var i = 0; i < checkboxes.length; i++) {
         checkboxes[i].checked = false;
       }
@@ -1494,7 +1494,7 @@ body {
       var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
       if (!nodeEl) return;
 
-      var label = nodeEl.querySelector(':scope > .tree-node-content > .tree-label');
+      var label = nodeEl.querySelector(':scope > .treeView_node_content > .treeView_label');
       if (!label) return;
 
       var node = TreeManager.findNodeData(config.data, nodeId);
@@ -1516,14 +1516,14 @@ body {
           node.text = newText;
         }
         var newLabel = document.createElement('span');
-        newLabel.className = 'tree-label';
+        newLabel.className = 'treeView_label';
         newLabel.textContent = node.text;
         input.replaceWith(newLabel);
       };
 
       var cancel = function() {
         var newLabel = document.createElement('span');
-        newLabel.className = 'tree-label';
+        newLabel.className = 'treeView_label';
         newLabel.textContent = oldText;
         input.replaceWith(newLabel);
       };
@@ -1549,14 +1549,14 @@ body {
       if (!config) return;
 
       container.onclick = function(e) {
-        if (e.target.closest('.tree-node-check')) {
+        if (e.target.closest('.treeView_node-check')) {
           return;
         }
 
-        var content = e.target.closest('.tree-node-content');
+        var content = e.target.closest('.treeView_node_content');
         if (!content) return;
 
-        var nodeEl = content.closest('.tree-node');
+        var nodeEl = content.closest('.treeView_node');
         if (!nodeEl) return;
 
         var nodeId = nodeEl.getAttribute('data-node-id');
@@ -1565,7 +1565,7 @@ body {
         var targetTreeId = nodeEl.getAttribute('data-tree-id');
         if (targetTreeId !== treeId) return;
 
-        if (e.target.closest('.tree-toggle')) {
+        if (e.target.closest('.treeView_toggle')) {
           TreeManager.toggleNode(treeId, nodeId);
           return;
         }
@@ -1574,10 +1574,10 @@ body {
       };
 
       container.ondblclick = function(e) {
-        var content = e.target.closest('.tree-node-content');
+        var content = e.target.closest('.treeView_node_content');
         if (!content) return;
 
-        var nodeEl = content.closest('.tree-node');
+        var nodeEl = content.closest('.treeView_node');
         if (!nodeEl) return;
 
         var nodeId = nodeEl.getAttribute('data-node-id');
@@ -1593,13 +1593,13 @@ body {
 
       container.addEventListener('change', function(e) {
         var target = e.target;
-        if (!target || !target.classList.contains('tree-node-check')) return;
-        var nodeEl = target.closest('.tree-node');
+        if (!target || !target.classList.contains('treeView_node-check')) return;
+        var nodeEl = target.closest('.treeView_node');
         if (!nodeEl) return;
         var targetTreeId = nodeEl.getAttribute('data-tree-id');
         if (targetTreeId !== treeId) return;
         var checked = target.checked;
-        var descendants = nodeEl.querySelectorAll('.tree-node-check');
+        var descendants = nodeEl.querySelectorAll('.treeView_node-check');
         for (var i = 0; i < descendants.length; i++) {
           descendants[i].checked = checked;
         }
@@ -1647,7 +1647,7 @@ body {
       var container = store.container;
 
       // 表头全选复选框
-      var selectAll = container.querySelector('.data-grid-select-all');
+      var selectAll = container.querySelector('.dataGrid_select_all');
       if (selectAll) {
         selectAll.addEventListener('change', function(e) {
           self.selectAllRows(store.id, e.target.checked);
@@ -1655,9 +1655,9 @@ body {
       }
 
       // 行复选框
-      container.querySelectorAll('.data-grid-row-check').forEach(function(cb) {
+      container.querySelectorAll('.dataGrid_row_check').forEach(function(cb) {
         cb.addEventListener('change', function(e) {
-          var row = e.target.closest('.data-grid-row');
+          var row = e.target.closest('.dataGrid_row');
           if (row) {
             var idx = parseInt(row.getAttribute('data-row-index'), 10);
             var rowData = self.getRowData(store.id, idx);
@@ -1670,25 +1670,25 @@ body {
       });
 
       // 行点击高亮处理
-      container.querySelectorAll('.data-grid-row').forEach(function(row) {
+      container.querySelectorAll('.dataGrid_row').forEach(function(row) {
         row.addEventListener('click', function(e) {
           if (e.target.tagName === 'INPUT') return;
           // 移除其他行的高亮
-          container.querySelectorAll('.data-grid-row.data-grid-row-focused').forEach(function(r) {
-            r.classList.remove('data-grid-row-focused');
+          container.querySelectorAll('.dataGrid_row.dataGrid_row-focused').forEach(function(r) {
+            r.classList.remove('dataGrid_row-focused');
           });
           // 高亮当前行
-          row.classList.add('data-grid-row-focused');
+          row.classList.add('dataGrid_row-focused');
           store.selectedRowIndex = parseInt(row.getAttribute('data-row-index'), 10);
         });
       });
 
       // 单元格双击编辑
       if (store.editable) {
-        container.querySelectorAll('.data-grid-cell[data-col-key]').forEach(function(cell) {
-          if (cell.closest('.data-grid-checkbox')) return;
+        container.querySelectorAll('.dataGrid_cell[data-col-key]').forEach(function(cell) {
+          if (cell.closest('.dataGrid_checkbox')) return;
           cell.addEventListener('dblclick', function() {
-            var row = cell.closest('.data-grid-row');
+            var row = cell.closest('.dataGrid_row');
             if (!row) return;
             var ri = parseInt(row.getAttribute('data-row-index'), 10);
             var field = cell.getAttribute('data-col-key');
@@ -1701,7 +1701,7 @@ body {
 
     /** 更新全选复选框状态 */
     updateSelectAllState: function(store) {
-      var selectAll = store.container.querySelector('.data-grid-select-all');
+      var selectAll = store.container.querySelector('.dataGrid_select_all');
       if (!selectAll) return;
       var total = store.rows.length;
       var selected = store.rows.filter(function(r) { return r.selected; }).length;
@@ -1716,7 +1716,7 @@ body {
       store.rows.forEach(function(r) {
         r.selected = checked;
       });
-      store.container.querySelectorAll('.data-grid-row-check').forEach(function(cb) {
+      store.container.querySelectorAll('.dataGrid_row_check').forEach(function(cb) {
         cb.checked = checked;
       });
     },
@@ -1799,12 +1799,12 @@ body {
       store.container.setAttribute('data-editable', enabled ? 'true' : 'false');
       if (!enabled) return;
       var self = this;
-      store.container.querySelectorAll('.data-grid-cell[data-col-key]').forEach(function(cell) {
-        if (cell.closest('.data-grid-checkbox')) return;
+      store.container.querySelectorAll('.dataGrid_cell[data-col-key]').forEach(function(cell) {
+        if (cell.closest('.dataGrid_checkbox')) return;
         if (cell._dgEditBound) return;
         cell._dgEditBound = true;
         cell.addEventListener('dblclick', function() {
-          var row = cell.closest('.data-grid-row');
+          var row = cell.closest('.dataGrid_row');
           if (!row) return;
           var ri = parseInt(row.getAttribute('data-row-index'), 10);
           var field = cell.getAttribute('data-col-key');
@@ -1817,21 +1817,21 @@ body {
     /** 刷新 DOM */
     refreshDOM: function(store) {
       var self = this;
-      var body = store.container.querySelector('.data-grid-body');
+      var body = store.container.querySelector('.dataGrid_body');
       if (!body) return;
 
       var html = '';
       store.rows.forEach(function(row, ri) {
-        var rowClass = (store.selectedRowIndex === ri) ? 'data-grid-row data-grid-row-focused' : 'data-grid-row';
+        var rowClass = (store.selectedRowIndex === ri) ? 'dataGrid_row dataGrid_row-focused' : 'dataGrid_row';
         html += '<div class="' + rowClass + '" data-row-index="' + ri + '" data-row-id="' + row.id + '">';
         if (store.showCheckbox) {
           var checked = row.selected ? ' checked' : '';
-          html += '<div class="data-grid-cell data-grid-checkbox" style="width:36px;min-width:36px;flex-shrink:0"><input type="checkbox" class="data-grid-row-check"' + checked + '></div>';
+          html += '<div class="dataGrid_cell dataGrid_checkbox" style="width:36px;min-width:36px;flex-shrink:0"><input type="checkbox" class="dataGrid_row_check"' + checked + '></div>';
         }
         store.columns.forEach(function(col) {
           var w = col.width || 100;
           var val = row.cells && row.cells[col.field] !== undefined && row.cells[col.field] !== null ? String(row.cells[col.field]) : '';
-          html += '<div class="data-grid-cell" data-col-key="' + col.field + '" style="width:' + w + 'px;min-width:' + w + 'px;flex-shrink:0" title="' + val + '">' + val + '</div>';
+          html += '<div class="dataGrid_cell" data-col-key="' + col.field + '" style="width:' + w + 'px;min-width:' + w + 'px;flex-shrink:0" title="' + val + '">' + val + '</div>';
         });
         html += '</div>';
       });
@@ -1851,13 +1851,13 @@ body {
     if (treeId && typeof TreeManager !== 'undefined') {
       function buildNodesFromDOM(parentEl) {
         var nodes = [];
-        var childNodes = parentEl.querySelectorAll(':scope > .tree-node');
+        var childNodes = parentEl.querySelectorAll(':scope > .treeView_node');
         childNodes.forEach(function(nodeEl) {
-          var contentEl = nodeEl.querySelector(':scope > .tree-node-content');
-          var labelEl = contentEl ? contentEl.querySelector('.tree-label') : null;
-          var childrenEl = nodeEl.querySelector(':scope > .tree-children');
-          var toggleEl = contentEl ? contentEl.querySelector('.tree-toggle') : null;
-          var checkboxEl = contentEl ? contentEl.querySelector('.tree-node-check') : null;
+          var contentEl = nodeEl.querySelector(':scope > .treeView_node_content');
+          var labelEl = contentEl ? contentEl.querySelector('.treeView_label') : null;
+          var childrenEl = nodeEl.querySelector(':scope > .treeView_children');
+          var toggleEl = contentEl ? contentEl.querySelector('.treeView_toggle') : null;
+          var checkboxEl = contentEl ? contentEl.querySelector('.treeView_node-check') : null;
           var isExpanded = toggleEl && toggleEl.classList.contains('expanded');
           var node = {
             id: nodeEl.getAttribute('data-node-id'),
@@ -1887,7 +1887,7 @@ body {
 
 
 (function(){
-  document.querySelectorAll('.data-grid-container').forEach(function(container){
+  document.querySelectorAll('.dataGrid_container').forEach(function(container){
     var id = container.getAttribute('data-id') || container.id;
     var columns = JSON.parse(container.getAttribute('data-columns') || '[]');
     var rows = JSON.parse(container.getAttribute('data-rows') || '[]');
@@ -2005,7 +2005,7 @@ body {
     if (!target) {
       // 尝试查找画布
       if (cfg.targetId === '__canvas__') {
-        target = document.querySelector('.page-container') || document.querySelector('[data-type="canvas"]') || document.body;
+        target = document.querySelector('.pageContainer') || document.querySelector('[data-type="canvas"]') || document.body;
       }
     }
     if (!target) return;
@@ -2115,7 +2115,7 @@ body {
     var target = document.getElementById(cfg.targetId);
     if (!target) {
       if (cfg.targetId === '__canvas__') {
-        target = document.querySelector('.page-container') || document.querySelector('[data-type="canvas"]') || document.body;
+        target = document.querySelector('.pageContainer') || document.querySelector('[data-type="canvas"]') || document.body;
       }
     }
     if (!target) {

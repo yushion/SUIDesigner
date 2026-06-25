@@ -5548,7 +5548,7 @@ interface CSPViolationReportBody extends ReportBody {
      */
     readonly originalPolicy: string;
     /**
-     * The **\`referrer\`** read-only property of the CSPViolationReportBody interface is a string that represents the URL of the referring page of the resource who's Content Security Policy (CSP) was violated.
+     * The **\`referrer\`** read-only property of the CSPViolationReportBody interface is a string that represents the URL of the referring pageContainer of the resource who's Content Security Policy (CSP) was violated.
      *
      * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSPViolationReportBody/referrer)
      */
@@ -6356,7 +6356,7 @@ declare var CSSNumericValue: {
 };
 
 /**
- * **\`CSSPageRule\`** represents a single CSS @page rule.
+ * **\`CSSPageRule\`** represents a single CSS @pageContainer rule.
  *
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSPageRule)
  */
@@ -7335,24 +7335,24 @@ interface CSSStyleDeclaration {
     paddingRight: string;
     /** [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/padding-top) */
     paddingTop: string;
-    /** [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/page) */
-    page: string;
+    /** [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/pageContainer) */
+    pageContainer: string;
     /**
      * @deprecated
      *
-     * [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/page-break-after)
+     * [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/pageContainer-break-after)
      */
     pageBreakAfter: string;
     /**
      * @deprecated
      *
-     * [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/page-break-before)
+     * [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/pageContainer-break-before)
      */
     pageBreakBefore: string;
     /**
      * @deprecated
      *
-     * [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/page-break-inside)
+     * [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/pageContainer-break-inside)
      */
     pageBreakInside: string;
     /** [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/paint-order) */
@@ -9196,7 +9196,7 @@ interface CookieStoreEventMap {
 }
 
 /**
- * The **\`CookieStore\`** interface of the Cookie Store API provides methods for getting and setting cookies asynchronously from either a page or a service worker.
+ * The **\`CookieStore\`** interface of the Cookie Store API provides methods for getting and setting cookies asynchronously from either a pageContainer or a service worker.
  * Available only in secure contexts.
  *
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CookieStore)
@@ -10651,7 +10651,7 @@ interface DeviceMotionEventRotationRate {
 }
 
 /**
- * The **\`DeviceOrientationEvent\`** interface of the Device Orientation Events provides web developers with information from the physical orientation of the device running the web page.
+ * The **\`DeviceOrientationEvent\`** interface of the Device Orientation Events provides web developers with information from the physical orientation of the device running the web pageContainer.
  * Available only in secure contexts.
  *
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/DeviceOrientationEvent)
@@ -10699,7 +10699,7 @@ interface DocumentEventMap extends GlobalEventHandlersEventMap {
 }
 
 /**
- * The **\`Document\`** interface represents any web page loaded in the browser and serves as an entry point into the web page's content, which is the DOM tree.
+ * The **\`Document\`** interface represents any web pageContainer loaded in the browser and serves as an entry point into the web pageContainer's content, which is the DOM tree.
  *
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Document)
  */
@@ -10875,7 +10875,7 @@ interface Document extends Node, DocumentOrShadowRoot, FontFaceSource, GlobalEve
      */
     readonly head: HTMLHeadElement;
     /**
-     * The **\`Document.hidden\`** read-only property returns a Boolean value indicating if the page is considered hidden or not.
+     * The **\`Document.hidden\`** read-only property returns a Boolean value indicating if the pageContainer is considered hidden or not.
      *
      * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Document/hidden)
      */
@@ -10956,7 +10956,7 @@ interface Document extends Node, DocumentOrShadowRoot, FontFaceSource, GlobalEve
      */
     readonly readyState: DocumentReadyState;
     /**
-     * The **\`Document.referrer\`** property returns the URI of the page that linked to this page.
+     * The **\`Document.referrer\`** property returns the URI of the pageContainer that linked to this pageContainer.
      *
      * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Document/referrer)
      */
@@ -12540,7 +12540,7 @@ declare var External: {
 };
 
 /**
- * The **\`File\`** interface provides information about files and allows JavaScript in a web page to access their content.
+ * The **\`File\`** interface provides information about files and allows JavaScript in a web pageContainer to access their content.
  *
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/File)
  */
@@ -13941,7 +13941,7 @@ declare var HTMLAllCollection: {
 };
 
 /**
- * The **\`HTMLAnchorElement\`** interface represents hyperlink elements and provides special properties and methods (beyond those of the regular HTMLElement object interface that they inherit from) for manipulating the layout and presentation of such elements.
+ * The **\`HTMLAnchorElement\`** interface represents hyperLink elements and provides special properties and methods (beyond those of the regular HTMLElement object interface that they inherit from) for manipulating the layout and presentation of such elements.
  *
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLAnchorElement)
  */
@@ -14029,7 +14029,7 @@ declare var HTMLAnchorElement: {
  */
 interface HTMLAreaElement extends HTMLElement, HTMLHyperlinkElementUtils {
     /**
-     * The **\`alt\`** property of the HTMLAreaElement interface specifies the text of the hyperlink, defining the textual label for an image map's link.
+     * The **\`alt\`** property of the HTMLAreaElement interface specifies the text of the hyperLink, defining the textual label for an image map's link.
      *
      * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLAreaElement/alt)
      */
@@ -14734,7 +14734,7 @@ interface HTMLElement extends Element, ElementCSSInlineStyle, ElementContentEdit
      */
     title: string;
     /**
-     * The **\`translate\`** property of the HTMLElement interface indicates whether an element's attribute values and the values of its Text node children are to be translated when the page is localized, or whether to leave them unchanged.
+     * The **\`translate\`** property of the HTMLElement interface indicates whether an element's attribute values and the values of its Text node children are to be translated when the pageContainer is localized, or whether to leave them unchanged.
      *
      * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLElement/translate)
      */
@@ -15256,7 +15256,7 @@ declare var HTMLHtmlElement: {
 
 interface HTMLHyperlinkElementUtils {
     /**
-     * Returns the hyperlink's URL's fragment (includes leading "#" if non-empty).
+     * Returns the hyperLink's URL's fragment (includes leading "#" if non-empty).
      *
      * Can be set, to change the URL's fragment (ignores leading "#").
      *
@@ -15264,7 +15264,7 @@ interface HTMLHyperlinkElementUtils {
      */
     hash: string;
     /**
-     * Returns the hyperlink's URL's host and port (if different from the default port for the scheme).
+     * Returns the hyperLink's URL's host and port (if different from the default port for the scheme).
      *
      * Can be set, to change the URL's host and port.
      *
@@ -15272,7 +15272,7 @@ interface HTMLHyperlinkElementUtils {
      */
     host: string;
     /**
-     * Returns the hyperlink's URL's host.
+     * Returns the hyperLink's URL's host.
      *
      * Can be set, to change the URL's host.
      *
@@ -15280,7 +15280,7 @@ interface HTMLHyperlinkElementUtils {
      */
     hostname: string;
     /**
-     * Returns the hyperlink's URL.
+     * Returns the hyperLink's URL.
      *
      * Can be set, to change the URL.
      *
@@ -15289,13 +15289,13 @@ interface HTMLHyperlinkElementUtils {
     href: string;
     toString(): string;
     /**
-     * Returns the hyperlink's URL's origin.
+     * Returns the hyperLink's URL's origin.
      *
      * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLAnchorElement/origin)
      */
     readonly origin: string;
     /**
-     * Returns the hyperlink's URL's password.
+     * Returns the hyperLink's URL's password.
      *
      * Can be set, to change the URL's password.
      *
@@ -15303,7 +15303,7 @@ interface HTMLHyperlinkElementUtils {
      */
     password: string;
     /**
-     * Returns the hyperlink's URL's path.
+     * Returns the hyperLink's URL's path.
      *
      * Can be set, to change the URL's path.
      *
@@ -15311,7 +15311,7 @@ interface HTMLHyperlinkElementUtils {
      */
     pathname: string;
     /**
-     * Returns the hyperlink's URL's port.
+     * Returns the hyperLink's URL's port.
      *
      * Can be set, to change the URL's port.
      *
@@ -15319,7 +15319,7 @@ interface HTMLHyperlinkElementUtils {
      */
     port: string;
     /**
-     * Returns the hyperlink's URL's scheme.
+     * Returns the hyperLink's URL's scheme.
      *
      * Can be set, to change the URL's scheme.
      *
@@ -15327,7 +15327,7 @@ interface HTMLHyperlinkElementUtils {
      */
     protocol: string;
     /**
-     * Returns the hyperlink's URL's query (includes leading "?" if non-empty).
+     * Returns the hyperLink's URL's query (includes leading "?" if non-empty).
      *
      * Can be set, to change the URL's query (ignores leading "?").
      *
@@ -15335,7 +15335,7 @@ interface HTMLHyperlinkElementUtils {
      */
     search: string;
     /**
-     * Returns the hyperlink's URL's username.
+     * Returns the hyperLink's URL's username.
      *
      * Can be set, to change the URL's username.
      *
@@ -15385,7 +15385,7 @@ interface HTMLIFrameElement extends HTMLElement {
      */
     height: string;
     /**
-     * The **\`loading\`** property of the HTMLIFrameElement interface is a string that provides a hint to the user agent indicating whether the iframe should be loaded immediately on page load, or only when it is needed.
+     * The **\`loading\`** property of the HTMLIFrameElement interface is a string that provides a hint to the user agent indicating whether the iframe should be loaded immediately on pageContainer load, or only when it is needed.
      *
      * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLIFrameElement/loading)
      */
@@ -15424,7 +15424,7 @@ interface HTMLIFrameElement extends HTMLElement {
      */
     src: string;
     /**
-     * The **\`srcdoc\`** property of the HTMLIFrameElement specifies the content of the page.
+     * The **\`srcdoc\`** property of the HTMLIFrameElement specifies the content of the pageContainer.
      *
      * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLIFrameElement/srcdoc)
      */
@@ -15515,7 +15515,7 @@ interface HTMLImageElement extends HTMLElement {
      */
     height: number;
     /**
-     * The _obsolete_ **\`hspace\`** property of the space to leave empty on the left and right sides of the img element when laying out the page.
+     * The _obsolete_ **\`hspace\`** property of the space to leave empty on the left and right sides of the img element when laying out the pageContainer.
      * @deprecated
      *
      * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLImageElement/hspace)
@@ -15592,7 +15592,7 @@ interface HTMLImageElement extends HTMLElement {
      */
     useMap: string;
     /**
-     * The _obsolete_ **\`vspace\`** property of the to leave empty on the top and bottom of the img element when laying out the page.
+     * The _obsolete_ **\`vspace\`** property of the to leave empty on the top and bottom of the img element when laying out the pageContainer.
      * @deprecated
      *
      * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLImageElement/vspace)
@@ -16116,7 +16116,7 @@ interface HTMLLinkElement extends HTMLElement, LinkStyle {
      */
     href: string;
     /**
-     * The **\`hreflang\`** property of the HTMLLinkElement interface is used to indicate the language and the geographical targeting of a page.
+     * The **\`hreflang\`** property of the HTMLLinkElement interface is used to indicate the language and the geographical targeting of a pageContainer.
      *
      * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLLinkElement/hreflang)
      */
@@ -18783,13 +18783,13 @@ declare var HighlightRegistry: {
 };
 
 /**
- * The **\`History\`** interface of the History API allows manipulation of the browser _session history_, that is the pages visited in the tab or frame that the current page is loaded in.
+ * The **\`History\`** interface of the History API allows manipulation of the browser _session history_, that is the pages visited in the tab or frame that the current pageContainer is loaded in.
  *
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/History)
  */
 interface History {
     /**
-     * The **\`length\`** read-only property of the History interface returns an integer representing the number of entries in the session history, including the currently loaded page.
+     * The **\`length\`** read-only property of the History interface returns an integer representing the number of entries in the session history, including the currently loaded pageContainer.
      *
      * [MDN Reference](https://developer.mozilla.org/docs/Web/API/History/length)
      */
@@ -18807,19 +18807,19 @@ interface History {
      */
     readonly state: any;
     /**
-     * The **\`back()\`** method of the History interface causes the browser to move back one page in the session history.
+     * The **\`back()\`** method of the History interface causes the browser to move back one pageContainer in the session history.
      *
      * [MDN Reference](https://developer.mozilla.org/docs/Web/API/History/back)
      */
     back(): void;
     /**
-     * The **\`forward()\`** method of the History interface causes the browser to move forward one page in the session history.
+     * The **\`forward()\`** method of the History interface causes the browser to move forward one pageContainer in the session history.
      *
      * [MDN Reference](https://developer.mozilla.org/docs/Web/API/History/forward)
      */
     forward(): void;
     /**
-     * The **\`go()\`** method of the History interface loads a specific page from the session history.
+     * The **\`go()\`** method of the History interface loads a specific pageContainer from the session history.
      *
      * [MDN Reference](https://developer.mozilla.org/docs/Web/API/History/go)
      */
@@ -20160,7 +20160,7 @@ declare var KeyframeEffect: {
 };
 
 /**
- * The \`LargestContentfulPaint\` interface provides timing information about the largest image or text paint before user input on a web page.
+ * The \`LargestContentfulPaint\` interface provides timing information about the largest image or text paint before user input on a web pageContainer.
  *
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/LargestContentfulPaint)
  */
@@ -21062,7 +21062,7 @@ declare var MediaList: {
 };
 
 /**
- * The **\`MediaMetadata\`** interface of the Media Session API allows a web page to provide rich media metadata for display in a platform UI.
+ * The **\`MediaMetadata\`** interface of the Media Session API allows a web pageContainer to provide rich media metadata for display in a platform UI.
  *
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/MediaMetadata)
  */
@@ -21277,7 +21277,7 @@ declare var MediaRecorder: {
 };
 
 /**
- * The **\`MediaSession\`** interface of the Media Session API allows a web page to provide custom behaviors for standard media playback interactions, and to report metadata that can be sent by the user agent to the device or operating system for presentation in standardized user interface elements.
+ * The **\`MediaSession\`** interface of the Media Session API allows a web pageContainer to provide custom behaviors for standard media playback interactions, and to report metadata that can be sent by the user agent to the device or operating system for presentation in standardized user interface elements.
  *
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/MediaSession)
  */
@@ -21885,13 +21885,13 @@ interface MouseEvent extends UIEvent {
      */
     readonly buttons: number;
     /**
-     * The **\`clientX\`** read-only property of the MouseEvent interface provides the horizontal coordinate within the application's viewport at which the event occurred (as opposed to the coordinate within the page).
+     * The **\`clientX\`** read-only property of the MouseEvent interface provides the horizontal coordinate within the application's viewport at which the event occurred (as opposed to the coordinate within the pageContainer).
      *
      * [MDN Reference](https://developer.mozilla.org/docs/Web/API/MouseEvent/clientX)
      */
     readonly clientX: number;
     /**
-     * The **\`clientY\`** read-only property of the MouseEvent interface provides the vertical coordinate within the application's viewport at which the event occurred (as opposed to the coordinate within the page).
+     * The **\`clientY\`** read-only property of the MouseEvent interface provides the vertical coordinate within the application's viewport at which the event occurred (as opposed to the coordinate within the pageContainer).
      *
      * [MDN Reference](https://developer.mozilla.org/docs/Web/API/MouseEvent/clientY)
      */
@@ -23993,7 +23993,7 @@ interface PerformanceEventMap {
 }
 
 /**
- * The **\`Performance\`** interface provides access to performance-related information for the current page.
+ * The **\`Performance\`** interface provides access to performance-related information for the current pageContainer.
  *
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Performance)
  */
@@ -24235,14 +24235,14 @@ declare var PerformanceMeasure: {
  */
 interface PerformanceNavigation {
     /**
-     * The legacy **\`PerformanceNavigation.redirectCount\`** read-only property returns an \`unsigned short\` representing the number of REDIRECTs done before reaching the page.
+     * The legacy **\`PerformanceNavigation.redirectCount\`** read-only property returns an \`unsigned short\` representing the number of REDIRECTs done before reaching the pageContainer.
      * @deprecated
      *
      * [MDN Reference](https://developer.mozilla.org/docs/Web/API/PerformanceNavigation/redirectCount)
      */
     readonly redirectCount: number;
     /**
-     * The legacy **\`PerformanceNavigation.type\`** read-only property returns an \`unsigned short\` containing a constant describing how the navigation to this page was done.
+     * The legacy **\`PerformanceNavigation.type\`** read-only property returns an \`unsigned short\` containing a constant describing how the navigation to this pageContainer was done.
      * @deprecated
      *
      * [MDN Reference](https://developer.mozilla.org/docs/Web/API/PerformanceNavigation/type)
@@ -24419,7 +24419,7 @@ declare var PerformanceObserverEntryList: {
 };
 
 /**
- * The **\`PerformancePaintTiming\`** interface provides timing information about 'paint' (also called 'render') operations during web page construction.
+ * The **\`PerformancePaintTiming\`** interface provides timing information about 'paint' (also called 'render') operations during web pageContainer construction.
  *
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/PerformancePaintTiming)
  */
@@ -24602,7 +24602,7 @@ declare var PerformanceServerTiming: {
 };
 
 /**
- * The **\`PerformanceTiming\`** interface is a legacy interface kept for backwards compatibility and contains properties that offer performance timing information for various events which occur during the loading and use of the current page.
+ * The **\`PerformanceTiming\`** interface is a legacy interface kept for backwards compatibility and contains properties that offer performance timing information for various events which occur during the loading and use of the current pageContainer.
  * @deprecated This interface is deprecated in the Navigation Timing Level 2 specification. Please use the PerformanceNavigationTiming interface instead.
  *
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/PerformanceTiming)
@@ -26923,7 +26923,7 @@ interface RemotePlaybackEventMap {
 }
 
 /**
- * The **\`RemotePlayback\`** interface of the Remote Playback API allows the page to detect availability of remote playback devices, then connect to and control playing on these devices.
+ * The **\`RemotePlayback\`** interface of the Remote Playback API allows the pageContainer to detect availability of remote playback devices, then connect to and control playing on these devices.
  *
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/RemotePlayback)
  */
@@ -27088,7 +27088,7 @@ interface Request extends Body {
      */
     readonly integrity: string;
     /**
-     * The **\`keepalive\`** read-only property of the Request interface contains the request's \`keepalive\` setting (\`true\` or \`false\`), which indicates whether the browser will keep the associated request alive if the page that initiated it is unloaded before the request is complete.
+     * The **\`keepalive\`** read-only property of the Request interface contains the request's \`keepalive\` setting (\`true\` or \`false\`), which indicates whether the browser will keep the associated request alive if the pageContainer that initiated it is unloaded before the request is complete.
      *
      * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/keepalive)
      */
@@ -33754,7 +33754,7 @@ declare var URLSearchParams: {
 };
 
 /**
- * The **\`UserActivation\`** interface provides information about whether a user is currently interacting with the page, or has completed an interaction since page load.
+ * The **\`UserActivation\`** interface provides information about whether a user is currently interacting with the pageContainer, or has completed an interaction since pageContainer load.
  *
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/UserActivation)
  */
@@ -37358,7 +37358,7 @@ interface Window extends EventTarget, AnimationFrameProvider, GlobalEventHandler
      */
     readonly frames: WindowProxy;
     /**
-     * The \`Window.history\` read-only property returns a reference to the History object, which provides an interface for manipulating the browser _session history_ (pages visited in the tab or frame that the current page is loaded in).
+     * The \`Window.history\` read-only property returns a reference to the History object, which provides an interface for manipulating the browser _session history_ (pages visited in the tab or frame that the current pageContainer is loaded in).
      *
      * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/history)
      */
@@ -37661,7 +37661,7 @@ interface Window extends EventTarget, AnimationFrameProvider, GlobalEventHandler
      */
     open(url?: string | URL, target?: string, features?: string): WindowProxy | null;
     /**
-     * The **\`window.postMessage()\`** method safely enables cross-origin communication between Window objects; _e.g.,_ between a page and a pop-up that it spawned, or between a page and an iframe embedded within it.
+     * The **\`window.postMessage()\`** method safely enables cross-origin communication between Window objects; _e.g.,_ between a pageContainer and a pop-up that it spawned, or between a pageContainer and an iframe embedded within it.
      *
      * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/postMessage)
      */
@@ -39394,7 +39394,7 @@ declare var frameElement: Element | null;
  */
 declare var frames: WindowProxy;
 /**
- * The \`Window.history\` read-only property returns a reference to the History object, which provides an interface for manipulating the browser _session history_ (pages visited in the tab or frame that the current page is loaded in).
+ * The \`Window.history\` read-only property returns a reference to the History object, which provides an interface for manipulating the browser _session history_ (pages visited in the tab or frame that the current pageContainer is loaded in).
  *
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/history)
  */
@@ -39697,7 +39697,7 @@ declare function moveTo(x: number, y: number): void;
  */
 declare function open(url?: string | URL, target?: string, features?: string): WindowProxy | null;
 /**
- * The **\`window.postMessage()\`** method safely enables cross-origin communication between Window objects; _e.g.,_ between a page and a pop-up that it spawned, or between a page and an iframe embedded within it.
+ * The **\`window.postMessage()\`** method safely enables cross-origin communication between Window objects; _e.g.,_ between a pageContainer and a pop-up that it spawned, or between a pageContainer and an iframe embedded within it.
  *
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/postMessage)
  */
@@ -44328,7 +44328,7 @@ and limitations under the License.
 
 interface BigIntToLocaleStringOptions {
     /**
-     * The locale matching algorithm to use.The default is "best fit". For information about this option, see the {@link https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_negotiation Intl page}.
+     * The locale matching algorithm to use.The default is "best fit". For information about this option, see the {@link https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_negotiation Intl pageContainer}.
      */
     localeMatcher?: string;
     /**
@@ -45270,7 +45270,7 @@ declare namespace Intl {
      * [MDN](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/RelativeTimeFormat/RelativeTimeFormat#Parameters).
      */
     interface RelativeTimeFormatOptions {
-        /** The locale matching algorithm to use. For information about this option, see [Intl page](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_negotiation). */
+        /** The locale matching algorithm to use. For information about this option, see [Intl pageContainer](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_negotiation). */
         localeMatcher?: RelativeTimeFormatLocaleMatcher;
         /** The format of output message. */
         numeric?: RelativeTimeFormatNumeric;
@@ -45369,7 +45369,7 @@ declare namespace Intl {
          *
          * @param locales - A string with a [BCP 47 language tag](http://tools.ietf.org/html/rfc5646), or an array of such strings.
          *  For the general form and interpretation of the locales argument,
-         *  see the [\`Intl\` page](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_identification_and_negotiation).
+         *  see the [\`Intl\` pageContainer](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_identification_and_negotiation).
          *
          * @param options - An [object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/RelativeTimeFormat/RelativeTimeFormat#Parameters)
          *  with some or all of options of \`RelativeTimeFormatOptions\`.
@@ -45390,7 +45390,7 @@ declare namespace Intl {
          *
          * @param locales - A string with a [BCP 47 language tag](http://tools.ietf.org/html/rfc5646), or an array of such strings.
          *  For the general form and interpretation of the locales argument,
-         *  see the [\`Intl\` page](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_identification_and_negotiation).
+         *  see the [\`Intl\` pageContainer](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_identification_and_negotiation).
          *
          * @param options - An [object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/RelativeTimeFormat/RelativeTimeFormat#Parameters)
          *  with some or all of options of the formatting.
@@ -45507,7 +45507,7 @@ declare namespace Intl {
      *
      * @param tag - A string with a [BCP 47 language tag](http://tools.ietf.org/html/rfc5646).
      *  For the general form and interpretation of the locales argument,
-     *  see the [\`Intl\` page](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_identification_and_negotiation).
+     *  see the [\`Intl\` pageContainer](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_identification_and_negotiation).
      *
      * @param options - An [object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/Locale/Locale#Parameters) with some or all of options of the locale.
      *
@@ -45589,7 +45589,7 @@ declare namespace Intl {
         /**
          * @param locales A string with a BCP 47 language tag, or an array of such strings.
          *   For the general form and interpretation of the \`locales\` argument, see the [Intl](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#locale_identification_and_negotiation)
-         *   page.
+         *   pageContainer.
          *
          * @param options An object for setting up a display name.
          *
@@ -45602,7 +45602,7 @@ declare namespace Intl {
          *
          * @param locales A string with a BCP 47 language tag, or an array of such strings.
          *   For the general form and interpretation of the \`locales\` argument, see the [Intl](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#locale_identification_and_negotiation)
-         *   page.
+         *   pageContainer.
          *
          * @param options An object with a locale matcher.
          *
@@ -46020,7 +46020,7 @@ declare namespace Intl {
      * [MDN](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat/ListFormat#parameters).
      */
     interface ListFormatOptions {
-        /** The locale matching algorithm to use. For information about this option, see [Intl page](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_negotiation). */
+        /** The locale matching algorithm to use. For information about this option, see [Intl pageContainer](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_negotiation). */
         localeMatcher?: ListFormatLocaleMatcher | undefined;
         /** The format of output message. */
         type?: ListFormatType | undefined;
@@ -46080,7 +46080,7 @@ declare namespace Intl {
          *
          * @param locales - A string with a [BCP 47 language tag](http://tools.ietf.org/html/rfc5646), or an array of such strings.
          *  For the general form and interpretation of the \`locales\` argument,
-         *  see the [\`Intl\` page](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_identification_and_negotiation).
+         *  see the [\`Intl\` pageContainer](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_identification_and_negotiation).
          *
          * @param options - An [object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat/ListFormat#parameters)
          *  with some or all options of \`ListFormatOptions\`.
@@ -46097,7 +46097,7 @@ declare namespace Intl {
          *
          * @param locales - A string with a [BCP 47 language tag](http://tools.ietf.org/html/rfc5646), or an array of such strings.
          *  For the general form and interpretation of the \`locales\` argument,
-         *  see the [\`Intl\` page](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_identification_and_negotiation).
+         *  see the [\`Intl\` pageContainer](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_identification_and_negotiation).
          *
          * @param options - An [object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat/supportedLocalesOf#parameters).
          *  with some or all possible options.
@@ -46539,7 +46539,7 @@ declare namespace Intl {
      * [MDN](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/Segmenter/Segmenter#parameters)
      */
     interface SegmenterOptions {
-        /** The locale matching algorithm to use. For information about this option, see [Intl page](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_negotiation). */
+        /** The locale matching algorithm to use. For information about this option, see [Intl pageContainer](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_negotiation). */
         localeMatcher?: "best fit" | "lookup" | undefined;
         /** The type of input to be split */
         granularity?: "grapheme" | "word" | "sentence" | undefined;
@@ -46624,7 +46624,7 @@ declare namespace Intl {
          *
          * @param locales - A string with a [BCP 47 language tag](http://tools.ietf.org/html/rfc5646), or an array of such strings.
          *  For the general form and interpretation of the \`locales\` argument,
-         *  see the [\`Intl\` page](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_identification_and_negotiation).
+         *  see the [\`Intl\` pageContainer](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_identification_and_negotiation).
          *
          * @param options - An [object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/Segmenter/Segmenter#parameters)
          *  with some or all options of \`SegmenterOptions\`.
@@ -46640,7 +46640,7 @@ declare namespace Intl {
          *
          * @param locales - A string with a [BCP 47 language tag](http://tools.ietf.org/html/rfc5646), or an array of such strings.
          *  For the general form and interpretation of the \`locales\` argument,
-         *  see the [\`Intl\` page](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_identification_and_negotiation).
+         *  see the [\`Intl\` pageContainer](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_identification_and_negotiation).
          *
          * @param options An [object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/Segmenter/supportedLocalesOf#parameters).
          *  with some or all possible options.
@@ -56844,7 +56844,7 @@ declare var CompressionStream: {
 };
 
 /**
- * The **\`CookieStore\`** interface of the Cookie Store API provides methods for getting and setting cookies asynchronously from either a page or a service worker.
+ * The **\`CookieStore\`** interface of the Cookie Store API provides methods for getting and setting cookies asynchronously from either a pageContainer or a service worker.
  * Available only in secure contexts.
  *
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CookieStore)
@@ -58384,7 +58384,7 @@ declare var FetchEvent: {
 };
 
 /**
- * The **\`File\`** interface provides information about files and allows JavaScript in a web page to access their content.
+ * The **\`File\`** interface provides information about files and allows JavaScript in a web pageContainer to access their content.
  *
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/File)
  */
@@ -60689,7 +60689,7 @@ interface PerformanceEventMap {
 }
 
 /**
- * The **\`Performance\`** interface provides access to performance-related information for the current page.
+ * The **\`Performance\`** interface provides access to performance-related information for the current pageContainer.
  *
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Performance)
  */
@@ -61979,7 +61979,7 @@ interface Request extends Body {
      */
     readonly integrity: string;
     /**
-     * The **\`keepalive\`** read-only property of the Request interface contains the request's \`keepalive\` setting (\`true\` or \`false\`), which indicates whether the browser will keep the associated request alive if the page that initiated it is unloaded before the request is complete.
+     * The **\`keepalive\`** read-only property of the Request interface contains the request's \`keepalive\` setting (\`true\` or \`false\`), which indicates whether the browser will keep the associated request alive if the pageContainer that initiated it is unloaded before the request is complete.
      *
      * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/keepalive)
      */
@@ -66174,7 +66174,7 @@ interface WindowClient extends Client {
      */
     focus(): Promise<WindowClient>;
     /**
-     * The **\`navigate()\`** method of the WindowClient interface loads a specified URL into a controlled client page then returns a \`\`\`js-nolint navigate(url) \`\`\` - \`url\` - : The location to navigate to.
+     * The **\`navigate()\`** method of the WindowClient interface loads a specified URL into a controlled client pageContainer then returns a \`\`\`js-nolint navigate(url) \`\`\` - \`url\` - : The location to navigate to.
      *
      * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WindowClient/navigate)
      */

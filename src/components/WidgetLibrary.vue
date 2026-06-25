@@ -65,7 +65,7 @@ const widgetItems = computed(() =>
 /** 内置控件类型列表（用于排除自定义控件） */
 const BUILTIN_TYPES = new Set([
   'button', 'input', 'checkbox', 'toggle', 'comboBox', 'label', 'divider',
-  'hyperlink', 'radioGroup', 'progressBar', 'datetimePicker',
+  'hyperLink', 'radioGroup', 'progressBar', 'datetimePicker',
   'iconButton', 'imageBox',
   'listBox', 'treeView', 'textarea', 'dataGrid', 'logOutput',
   'tabsContainer', 'cardBox',
@@ -79,7 +79,7 @@ const categories = computed(() => [
     label: '常用控件',
     items: widgetItems.value.filter(
       (item) => ['button', 'input', 'checkbox', 'toggle', 'comboBox', 'label', 'divider',
-                 'hyperlink', 'radioGroup', 'progressBar', 'datetimePicker', 
+                 'hyperLink', 'radioGroup', 'progressBar', 'datetimePicker', 
                  'iconButton', 'imageBox'].includes(item.type)
     )
   },

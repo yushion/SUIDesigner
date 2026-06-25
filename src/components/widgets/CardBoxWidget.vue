@@ -4,7 +4,7 @@
  */
 <template>
   <div
-    class="ui-widget card-box-widget"
+    class="ui-widget cardBox-widget"
     :class="{ selected: isSelected }"
     :id="widget.id"
     :data-widget-id="widget.id"
@@ -13,13 +13,13 @@
   >
     <div
       v-if="widget.showHeader !== false"
-      class="card-header"
+      class="cardBox_header"
       :style="{ backgroundColor: (widget.style as any).headerColor || widget.headerColor || '#f5f5f5' }"
     >
-      <span class="card-header-title" :style="headerTitleStyle">{{ widget.headerTitle || '卡片标题' }}</span>
+      <span class="cardBox_header_title" :style="headerTitleStyle">{{ widget.headerTitle || '卡片标题' }}</span>
       <span
         v-if="widget.collapsible"
-        class="card-collapse-btn"
+        class="cardBox_collapse_btn"
         :style="collapseBtnStyle"
         @mousedown.stop
         @click.stop="toggleCollapse"
@@ -34,8 +34,8 @@
     </div>
     <div
       v-show="!isCollapsed"
-      class="card-body"
-      :data-container-type="'card-body'"
+      class="cardBox_body"
+      :data-container-type="'cardBox_body'"
       :data-parent-id="widget.id"
       :style="{ height: bodyHeight }"
     >
@@ -113,17 +113,17 @@ function toggleCollapse() {
 </script>
 
 <style scoped>
-.card-box-widget {
+.cardBox-widget {
   position: absolute;
   box-sizing: border-box;
   overflow: hidden;
 }
 
-.card-box-widget:hover:not(.selected) {
+.cardBox-widget:hover:not(.selected) {
   border-color: #b0b0b0;
 }
 
-.card-header {
+.cardBox_header {
   display: flex;
   align-items: center;
   padding: 0 12px;
@@ -133,7 +133,7 @@ function toggleCollapse() {
   user-select: none;
 }
 
-.card-header-title {
+.cardBox_header_title {
   flex: 1;
   min-width: 0;
   font-size: 13px;
@@ -145,7 +145,7 @@ function toggleCollapse() {
   text-overflow: ellipsis;
 }
 
-.card-collapse-btn {
+.cardBox_collapse_btn {
   margin-left: auto;
   cursor: pointer;
   color: #888;
@@ -158,11 +158,11 @@ function toggleCollapse() {
   transition: color 0.2s;
 }
 
-.card-collapse-btn:hover {
+.cardBox_collapse_btn:hover {
   color: #333;
 }
 
-.card-body {
+.cardBox_body {
   position: relative;
   width: 100%;
   overflow: hidden;
@@ -181,7 +181,7 @@ function toggleCollapse() {
   white-space: nowrap;
 }
 
-.card-box-widget :deep(.ui-widget) {
+.cardBox-widget :deep(.ui-widget) {
   cursor: move;
   box-sizing: border-box;
 }

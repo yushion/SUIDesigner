@@ -12,11 +12,11 @@
 html,body { width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:transparent }
 body { display:flex }
 
-.page-container {
+.pageContainer {
   position:relative;
   overflow:hidden;
 }
-.page-container::before {
+.pageContainer::before {
   content:'';
   position:absolute;
   inset:0;
@@ -26,45 +26,45 @@ body { display:flex }
   opacity: var(--canvas-opacity);
   border-radius: inherit;
 }
-.page-container.show-shadow {
+.pageContainer.show-shadow {
   box-shadow: 0 1px 4px rgba(0,0,0,0.3);
 }
 
 /* 排除所有控件和弹出框的拖拽区域，确保控件可交互 */
-.page-container [data-ctrl-type] {
+.pageContainer [data-ctrl-type] {
   app-region: no-drag;
 }
 
 /* 画布标题栏 */
-.canvas-titlebar {
+.titlebar {
   position:absolute;top:0;left:0;right:0;
   display:flex;align-items:center;height:40px;user-select:none;z-index:10;
 }
-.canvas-titlebar .tb-left {
+.titlebar .titlebar_left {
   width:48px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
 }
-.canvas-titlebar .tb-center {
+.titlebar .titlebar_center {
   flex:1;display:flex;align-items:center;min-width:0;
 }
-.canvas-titlebar .tb-right {
+.titlebar .titlebar_right {
   display:flex;align-items:center;justify-content:flex-end;gap:2px;padding-right:4px;flex-shrink:0;
 }
-.canvas-titlebar .tb-icon {
+.titlebar .titlebar_left_icon {
   width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:16px;
 }
-.canvas-titlebar .tb-title {
+.titlebar .titlebar_center_title {
   font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
-.canvas-titlebar .tb-btn {
+.titlebar .titlebar_rightBtn {
   width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:default;border-radius:4px;flex-shrink:0;
 }
-.canvas-titlebar .tb-btn:hover { background:rgba(0,0,0,0.06) }
-.canvas-titlebar .tb-btn-min:hover,.tb-btn-max:hover { filter: brightness(1.2)}
-.canvas-titlebar .tb-btn-close:hover { background:#e81123;color:#fff }
-.canvas-titlebar .tb-btn-min:active,.tb-btn-max:active,.tb-btn-close:active {filter: brightness(0.7);}
+.titlebar .titlebar_rightBtn:hover { background:rgba(0,0,0,0.06) }
+.titlebar .titlebar_rightBtn_min:hover,.titlebar_rightBtn_min:hover { filter: brightness(1.2)}
+.titlebar .titlebar_rightBtn_close:hover { background:#e81123;color:#fff }
+.titlebar .titlebar_rightBtn_min:active,.titlebar_rightBtn_min:active,.titlebar_rightBtn_close:active {filter: brightness(0.7);}
 
 /* 毛玻璃效果 */
-.page-container.glass-effect {
+.pageContainer.glass-effect {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   --shadow-blur: 10px;
@@ -160,7 +160,7 @@ body { display:flex }
 
 
 /* === 页面容器 === */
-.page-container {
+.pageContainer {
   width: 1065px;
   height: 740px;
   background-color: transparent;
@@ -171,7 +171,7 @@ body { display:flex }
 }
 
 /* === 画布自定义样式 === */
-.page-container {
+.pageContainer {
   position: relative;
   overflow: hidden;
   background-color: #ffffff;
@@ -181,7 +181,7 @@ body { display:flex }
   --canvas-opacity: 0.41;
 }
 
-.page-container::before {
+.pageContainer::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -190,12 +190,12 @@ body { display:flex }
   border-radius: inherit;
 }
 
-.page-container.glass-effect {
+.pageContainer.glass-effect {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
 
-.canvas-titlebar {
+.titlebar {
   position: absolute;
   top: 0;
   left: 0;
@@ -210,7 +210,7 @@ body { display:flex }
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-.canvas-titlebar .tb-left {
+.titlebar .titlebar_left {
   width: 48px;
   display: flex;
   align-items: center;
@@ -218,14 +218,14 @@ body { display:flex }
   flex-shrink: 0;
 }
 
-.canvas-titlebar .tb-center {
+.titlebar .titlebar_center {
   flex: 1;
   display: flex;
   align-items: center;
   min-width: 0;
 }
 
-.canvas-titlebar .tb-right {
+.titlebar .titlebar_right {
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -234,7 +234,7 @@ body { display:flex }
   flex-shrink: 0;
 }
 
-.canvas-titlebar .tb-icon {
+.titlebar .titlebar_left_icon {
   width: 24px;
   height: 24px;
   display: flex;
@@ -243,7 +243,7 @@ body { display:flex }
   font-size: 16px;
 }
 
-.canvas-titlebar .tb-title {
+.titlebar .titlebar_center_title {
   font-size: 13px;
   font-weight: 600;
   overflow: hidden;
@@ -251,7 +251,7 @@ body { display:flex }
   white-space: nowrap;
 }
 
-.canvas-titlebar .tb-btn {
+.titlebar .titlebar_rightBtn {
   width: 32px;
   height: 32px;
   display: flex;
@@ -264,12 +264,12 @@ body { display:flex }
   flex-shrink: 0;
 }
 
-.canvas-titlebar .tb-btn:hover { background: rgba(0, 0, 0, 0.06); }
+.titlebar .titlebar_rightBtn:hover { background: rgba(0, 0, 0, 0.06); }
 
-.canvas-titlebar .tb-btn-close:hover { background: #e81123; color: #fff; }
+.titlebar .titlebar_rightBtn_close:hover { background: #e81123; color: #fff; }
 
 /* === 页面容器 CSS 变量（放在 customCSS 之后，确保不被覆盖） === */
-.page-container {
+.pageContainer {
   --canvas-bg-color: #ffffff;
   --canvas-opacity: 0.41;
 }
@@ -523,17 +523,17 @@ body { display:flex }
   font-size: 13px;
   opacity: 1;
 }
-#radioGroup_1 .radiogroup-item { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; font-size: 13px; color: #333333; font-style: normal; }
-#radioGroup_1 .radiogroup-item input[type="radio"] { accent-color: #0078d4; width: 16px; height: 16px; margin: 0; cursor: pointer; }
-#radioGroup_1 .radiogroup-item input:disabled { opacity: 0.5; cursor: not-allowed; }
-#radioGroup_1 .radiogroup-item { display: inline-flex;
+#radioGroup_1 .radioGroup_item { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; font-size: 13px; color: #333333; font-style: normal; }
+#radioGroup_1 .radioGroup_item input[type="radio"] { accent-color: #0078d4; width: 16px; height: 16px; margin: 0; cursor: pointer; }
+#radioGroup_1 .radioGroup_item input:disabled { opacity: 0.5; cursor: not-allowed; }
+#radioGroup_1 .radioGroup_item { display: inline-flex;
   align-items: center;
   gap: 4px;
   cursor: pointer;
   font-size: 13px;
   color: #333333; }
-#radioGroup_1 .radiogroup-item input[type="radio"] { cursor: pointer; }
-#radioGroup_1 .radiogroup-item input:disabled { opacity: 0.5;
+#radioGroup_1 .radioGroup_item input[type="radio"] { cursor: pointer; }
+#radioGroup_1 .radioGroup_item input:disabled { opacity: 0.5;
   cursor: not-allowed; }
 
 #progressBar_1 {
@@ -551,16 +551,16 @@ body { display:flex }
   opacity: 1;
   background-color: #E0E0E0;
 }
-#progressBar_1 .progress-fill { position: absolute; left: 0; top: 0; height: 100%; background: #0078D4; width: 60%; transition: width 0.2s; }
-#progressBar_1 .progress-text { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: inherit; color: #fff; text-shadow: 0 0 2px rgba(0, 0, 0, 0.5); pointer-events: none; }
-#progressBar_1 .progress-fill { position: absolute;
+#progressBar_1 .progressBar_fill { position: absolute; left: 0; top: 0; height: 100%; background: #0078D4; width: 60%; transition: width 0.2s; }
+#progressBar_1 .progressBar_text { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: inherit; color: #fff; text-shadow: 0 0 2px rgba(0, 0, 0, 0.5); pointer-events: none; }
+#progressBar_1 .progressBar_fill { position: absolute;
   left: 0;
   top: 0;
   height: 100%;
   background: #0078D4;
   width: 60%;
   transition: width 0.2s; }
-#progressBar_1 .progress-text { position: absolute;
+#progressBar_1 .progressBar_text { position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
@@ -725,8 +725,8 @@ body { display:flex }
   opacity: 1;
   background-color: #f8f8f8;
 }
-#logOutput_1 .log-line { line-height: 1.5; padding: 2px 5px; }
-#logOutput_1 .log-line { line-height: 1.5;
+#logOutput_1 .logOutput_line { line-height: 1.5; padding: 2px 5px; }
+#logOutput_1 .logOutput_line { line-height: 1.5;
   padding: 2px 5px; }
 
 #listBox_1 {
@@ -749,21 +749,21 @@ body { display:flex }
   border-style: solid;
   opacity: 1;
 }
-#listBox_1 .list-box-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; }
-#listBox_1 .list-item { display: flex; align-items: center; height: 32px; padding: 0 10px; cursor: pointer; user-select: none; font-size: 13px; color: #333; border-bottom: 1px solid #f0f0f0; gap: 8px; }
-#listBox_1 .list-item:last-child { border-bottom: none; }
-#listBox_1 .list-item:hover { background-color: #f5f5f5; }
-#listBox_1 .list-item.item-selected { background-color: #e6f4ff; }
-#listBox_1 .list-item-checkbox { margin: 0; flex-shrink: 0; accent-color: #1890ff; }
-#listBox_1 .list-item-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: inherit; color: inherit; }
-#listBox_1 .list-item-edit-input { flex: 1; height: 24px; border: 1px solid #1890ff; border-radius: 3px; padding: 0 6px; font-size: 13px; font-family: inherit; outline: none; box-shadow: 0 0 0 2px rgba(24,144,255,0.2); }
+#listBox_1 .listBox_scroll { flex: 1; overflow-y: auto; overflow-x: hidden; }
+#listBox_1 .listBox_item { display: flex; align-items: center; height: 32px; padding: 0 10px; cursor: pointer; user-select: none; font-size: 13px; color: #333; border-bottom: 1px solid #f0f0f0; gap: 8px; }
+#listBox_1 .listBox_item:last-child { border-bottom: none; }
+#listBox_1 .listBox_item:hover { background-color: #f5f5f5; }
+#listBox_1 .listBox_item.item-selected { background-color: #e6f4ff; }
+#listBox_1 .listBox_item-checkbox { margin: 0; flex-shrink: 0; accent-color: #1890ff; }
+#listBox_1 .listBox_item_text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: inherit; color: inherit; }
+#listBox_1 .listBox_item-edit-input { flex: 1; height: 24px; border: 1px solid #1890ff; border-radius: 3px; padding: 0 6px; font-size: 13px; font-family: inherit; outline: none; box-shadow: 0 0 0 2px rgba(24,144,255,0.2); }
 #listBox_1 .list-empty { display: flex; align-items: center; justify-content: center; height: 100%; color: #ccc; font-size: 13px; }
 #listBox_1.disabled { cursor: not-allowed; opacity: 0.6; }
 #listBox_1 .disabled-overlay { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.5); pointer-events: none; }
-#listBox_1 .list-box-scroll { flex: 1;
+#listBox_1 .listBox_scroll { flex: 1;
   overflow-y: auto;
   overflow-x: hidden; }
-#listBox_1 .list-item { display: flex;
+#listBox_1 .listBox_item { display: flex;
   align-items: center;
   height: 32px;
   padding: 0 10px;
@@ -773,17 +773,17 @@ body { display:flex }
   color: #333333;
   border-bottom: 1px solid #f0f0f0;
   gap: 8px; }
-#listBox_1 .list-item:last-child { border-bottom: none; }
-#listBox_1 .list-item:hover { background-color: #f5f5f5; }
-#listBox_1 .list-item.item-selected { background-color: #e6f4ff; }
-#listBox_1 .list-item-checkbox { margin: 0;
+#listBox_1 .listBox_item:last-child { border-bottom: none; }
+#listBox_1 .listBox_item:hover { background-color: #f5f5f5; }
+#listBox_1 .listBox_item.item-selected { background-color: #e6f4ff; }
+#listBox_1 .listBox_item-checkbox { margin: 0;
   flex-shrink: 0;
   accent-color: #1890ff; }
-#listBox_1 .list-item-text { flex: 1;
+#listBox_1 .listBox_item_text { flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
-#listBox_1 .list-item-edit-input { flex: 1;
+#listBox_1 .listBox_item-edit-input { flex: 1;
   height: 24px;
   border: 1px solid #1890ff;
   border-radius: 3px;
@@ -829,27 +829,27 @@ body { display:flex }
   display: flex;
   flex-direction: column;
 }
-#treeView_1 .tree-node { position: relative; user-select: none; }
-#treeView_1 .tree-node-content { display: flex; align-items: center; padding: 3px 6px; cursor: pointer; border-radius: 4px; gap: 4px; font-size: 13px; }
-#treeView_1 .tree-node-content:hover { background: #f3f3f3; }
-#treeView_1 .tree-node.selected > .tree-node-content { background: #e0edff; color: #005499; }
-#treeView_1 .tree-toggle { width: 16px; height: 16px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 10px; color: #666; transition: transform 0.15s; }
-#treeView_1 .tree-toggle.expanded { transform: rotate(90deg); }
-#treeView_1 .tree-toggle.empty { visibility: hidden; }
-#treeView_1 .tree-icon { width: 16px; height: 16px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px; }
-#treeView_1 .tree-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-#treeView_1 .tree-children { padding-left: 20px; }
+#treeView_1 .treeView_node { position: relative; user-select: none; }
+#treeView_1 .treeView_node_content { display: flex; align-items: center; padding: 3px 6px; cursor: pointer; border-radius: 4px; gap: 4px; font-size: 13px; }
+#treeView_1 .treeView_node_content:hover { background: #f3f3f3; }
+#treeView_1 .treeView_node.selected > .treeView_node_content { background: #e0edff; color: #005499; }
+#treeView_1 .treeView_toggle { width: 16px; height: 16px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 10px; color: #666; transition: transform 0.15s; }
+#treeView_1 .treeView_toggle.expanded { transform: rotate(90deg); }
+#treeView_1 .treeView_toggle.empty { visibility: hidden; }
+#treeView_1 .treeView_icon { width: 16px; height: 16px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px; }
+#treeView_1 .treeView_label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#treeView_1 .treeView_children { padding-left: 20px; }
 #treeView_1.collapsed { height: auto; }
 #treeView_1.disabled { cursor: not-allowed; opacity: 0.6; }
-#treeView_1 .tree-node-content { display: flex;
+#treeView_1 .treeView_node_content { display: flex;
   align-items: center;
   padding: 4px 8px;
   cursor: pointer;
   border-radius: 4px;
   gap: 4px; }
-#treeView_1 .tree-node-content:hover { background-color: #f5f5f5; }
-#treeView_1 .tree-node-content.selected { background: #e0edff; }
-#treeView_1 .tree-toggle { width: 16px;
+#treeView_1 .treeView_node_content:hover { background-color: #f5f5f5; }
+#treeView_1 .treeView_node_content.selected { background: #e0edff; }
+#treeView_1 .treeView_toggle { width: 16px;
   height: 16px;
   display: inline-flex;
   align-items: center;
@@ -858,30 +858,30 @@ body { display:flex }
   font-size: 10px;
   color: #666666;
   transition: transform 0.2s; }
-#treeView_1 .tree-toggle.expanded { transform: rotate(90deg); }
-#treeView_1 .tree-toggle.empty { visibility: hidden; }
+#treeView_1 .treeView_toggle.expanded { transform: rotate(90deg); }
+#treeView_1 .treeView_toggle.empty { visibility: hidden; }
 #treeView_1 .tree-checkbox { display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 16px;
   height: 16px;
   flex-shrink: 0; }
-#treeView_1 .tree-node-check { width: 14px;
+#treeView_1 .treeView_node-check { width: 14px;
   height: 14px;
   margin: 0;
   cursor: pointer;
   accent-color: #0078D4; }
-#treeView_1 .tree-icon { width: 16px;
+#treeView_1 .treeView_icon { width: 16px;
   height: 16px;
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center; }
-#treeView_1 .tree-label { flex: 1;
+#treeView_1 .treeView_label { flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
-#treeView_1 .tree-children { padding-left: 20px; }
+#treeView_1 .treeView_children { padding-left: 20px; }
 #treeView_1.disabled { cursor: not-allowed;
   opacity: 0.6; }
 #treeView_1 .tree-edit-input { flex: 1;
@@ -917,44 +917,44 @@ body { display:flex }
   font-size: 13px;
   opacity: 1;
 }
-#dataGrid_1 .data-grid-header { display: flex; background: #f0f0f0; border-bottom: 1px solid #d9d9d9; flex-shrink: 0; }
-#dataGrid_1 .data-grid-header-cell { padding: 6px 10px; font-weight: 600; border-right: 1px solid #d9d9d9; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
-#dataGrid_1 .data-grid-body { flex: 1; overflow-y: auto; }
-#dataGrid_1 .data-grid-row { display: flex; border-bottom: 1px solid #e8e8e8; }
-#dataGrid_1 .data-grid-row:nth-child(even) { background: #fafafa; }
-#dataGrid_1 .data-grid-row:hover { background: #e6f7ff; }
-#dataGrid_1 .data-grid-row-focused { background: #d6e4ff !important; }
-#dataGrid_1 .data-grid-cell { padding: 5px 10px; border-right: 1px solid #e8e8e8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; cursor: default; }
-#dataGrid_1 .data-grid-checkbox { display: flex; align-items: center; justify-content: center; }
-#dataGrid_1 .data-grid-checkbox input[type="checkbox"] { margin: 0; width: 14px; height: 14px; cursor: pointer; }
-#dataGrid_1 .data-grid-header { display: flex;
+#dataGrid_1 .dataGrid_header { display: flex; background: #f0f0f0; border-bottom: 1px solid #d9d9d9; flex-shrink: 0; }
+#dataGrid_1 .dataGrid_header_cell { padding: 6px 10px; font-weight: 600; border-right: 1px solid #d9d9d9; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
+#dataGrid_1 .dataGrid_body { flex: 1; overflow-y: auto; }
+#dataGrid_1 .dataGrid_row { display: flex; border-bottom: 1px solid #e8e8e8; }
+#dataGrid_1 .dataGrid_row:nth-child(even) { background: #fafafa; }
+#dataGrid_1 .dataGrid_row:hover { background: #e6f7ff; }
+#dataGrid_1 .dataGrid_row-focused { background: #d6e4ff !important; }
+#dataGrid_1 .dataGrid_cell { padding: 5px 10px; border-right: 1px solid #e8e8e8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; cursor: default; }
+#dataGrid_1 .dataGrid_checkbox { display: flex; align-items: center; justify-content: center; }
+#dataGrid_1 .dataGrid_checkbox input[type="checkbox"] { margin: 0; width: 14px; height: 14px; cursor: pointer; }
+#dataGrid_1 .dataGrid_header { display: flex;
   background: #f0f0f0;
   border-bottom: 1px solid #d9d9d9; }
-#dataGrid_1 .data-grid-header-cell { padding: 6px 10px;
+#dataGrid_1 .dataGrid_header_cell { padding: 6px 10px;
   font-weight: 600;
   border-right: 1px solid #d9d9d9;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   box-sizing: border-box; }
-#dataGrid_1 .data-grid-body { flex: 1;
+#dataGrid_1 .dataGrid_body { flex: 1;
   overflow-y: auto; }
-#dataGrid_1 .data-grid-row { display: flex;
+#dataGrid_1 .dataGrid_row { display: flex;
   border-bottom: 1px solid #e8e8e8; }
-#dataGrid_1 .data-grid-row:nth-child(even) { background: #fafafa; }
-#dataGrid_1 .data-grid-row:hover { background: #e6f7ff; }
-#dataGrid_1 .data-grid-row-focused { background: #d6e4ff !important; }
-#dataGrid_1 .data-grid-cell { padding: 5px 10px;
+#dataGrid_1 .dataGrid_row:nth-child(even) { background: #fafafa; }
+#dataGrid_1 .dataGrid_row:hover { background: #e6f7ff; }
+#dataGrid_1 .dataGrid_row-focused { background: #d6e4ff !important; }
+#dataGrid_1 .dataGrid_cell { padding: 5px 10px;
   border-right: 1px solid #e8e8e8;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   box-sizing: border-box;
   cursor: default; }
-#dataGrid_1 .data-grid-checkbox { display: flex;
+#dataGrid_1 .dataGrid_checkbox { display: flex;
   align-items: center;
   justify-content: center; }
-#dataGrid_1 .data-grid-checkbox input[type="checkbox"] { margin: 0;
+#dataGrid_1 .dataGrid_checkbox input[type="checkbox"] { margin: 0;
   width: 14px;
   height: 14px;
   cursor: pointer; }
@@ -981,18 +981,18 @@ body { display:flex }
   font-size: 13px;
   opacity: 1;
 }
-#tabsContainer_1 .tab-header-bar { display: flex; flex-shrink: 0; background: #f5f5f5; border-bottom: 1px solid #d9d9d9; }
-#tabsContainer_1 .tab-header-btn { padding: 0 12px; height: 34px; line-height: 34px; border: none; border-right: 1px solid #d9d9d9; cursor: pointer; font-size: inherit; font-family: inherit; background: #f5f5f5; color: inherit; font-style: normal; }
-#tabsContainer_1 .tab-header-btn.active { background: #fff; color: inherit; border-bottom: 2px solid #1890ff; }
-#tabsContainer_1 .tab-header-btn:hover { background: #e8e8e8; }
-#tabsContainer_1 .tab-content-wrapper { flex: 1; position: relative; overflow: hidden; }
+#tabsContainer_1 .tabsContainer_headerBar { display: flex; flex-shrink: 0; background: #f5f5f5; border-bottom: 1px solid #d9d9d9; }
+#tabsContainer_1 .tabsContainer_headerBar_btn { padding: 0 12px; height: 34px; line-height: 34px; border: none; border-right: 1px solid #d9d9d9; cursor: pointer; font-size: inherit; font-family: inherit; background: #f5f5f5; color: inherit; font-style: normal; }
+#tabsContainer_1 .tabsContainer_headerBar_btn.active { background: #fff; color: inherit; border-bottom: 2px solid #1890ff; }
+#tabsContainer_1 .tabsContainer_headerBar_btn:hover { background: #e8e8e8; }
+#tabsContainer_1 .tabsContainer_contentWrapper { flex: 1; position: relative; overflow: hidden; }
 #tabsContainer_1 .tab-pane { display: none; position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: hidden; }
 #tabsContainer_1 .tab-pane.active { display: block; }
-#tabsContainer_1 .tab-header-bar { display: flex;
+#tabsContainer_1 .tabsContainer_headerBar { display: flex;
   flex-shrink: 0;
   background: #f5f5f5;
   border-bottom: 1px solid #d9d9d9; }
-#tabsContainer_1 .tab-header-btn { padding: 0 12px;
+#tabsContainer_1 .tabsContainer_headerBar_btn { padding: 0 12px;
   height: 34px;
   line-height: 34px;
   border: none;
@@ -1002,11 +1002,11 @@ body { display:flex }
   font-family: inherit;
   background: #f5f5f5;
   color: inherit; }
-#tabsContainer_1 .tab-header-btn.active { background: #ffffff;
+#tabsContainer_1 .tabsContainer_headerBar_btn.active { background: #ffffff;
   color: inherit;
   border-bottom: 2px solid #1890ff; }
-#tabsContainer_1 .tab-header-btn:hover { background: #e8e8e8; }
-#tabsContainer_1 .tab-content-wrapper { flex: 1;
+#tabsContainer_1 .tabsContainer_headerBar_btn:hover { background: #e8e8e8; }
+#tabsContainer_1 .tabsContainer_contentWrapper { flex: 1;
   position: relative;
   overflow: hidden; }
 #tabsContainer_1 .tab-pane { display: none;
@@ -1039,24 +1039,24 @@ body { display:flex }
   border-style: solid;
   opacity: 1;
 }
-#cardBox_1 .card-header { display: flex; align-items: center; padding: 0 12px; height: 32px; background-color: #f5f5f5; border-bottom: 1px solid #e8e8e8; flex-shrink: 0; }
-#cardBox_1 .card-header-title { flex: 1; min-width: 0; font-size: 13px; font-weight: 600; color: #333; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-#cardBox_1 .card-body { position: relative; width: 100%; height: calc(100% - 32px); overflow: hidden; }
+#cardBox_1 .cardBox_header { display: flex; align-items: center; padding: 0 12px; height: 32px; background-color: #f5f5f5; border-bottom: 1px solid #e8e8e8; flex-shrink: 0; }
+#cardBox_1 .cardBox_header_title { flex: 1; min-width: 0; font-size: 13px; font-weight: 600; color: #333; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#cardBox_1 .cardBox_body { position: relative; width: 100%; height: calc(100% - 32px); overflow: hidden; }
 #cardBox_1.disabled { opacity: 0.6; }
-#cardBox_1 .card-header { display: flex;
+#cardBox_1 .cardBox_header { display: flex;
   align-items: center;
   padding: 0 12px;
   height: 32px;
   background-color: #f5f5f5;
   border-bottom: 1px solid #e8e8e8;
   flex-shrink: 0; }
-#cardBox_1 .card-header-title { font-size: 13px;
+#cardBox_1 .cardBox_header_title { font-size: 13px;
   font-weight: 600;
   color: #333333;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis; }
-#cardBox_1 .card-body { position: relative;
+#cardBox_1 .cardBox_body { position: relative;
   width: 100%;
   height: calc(100% - 32px);
   overflow: hidden; }
@@ -1133,94 +1133,94 @@ body { display:flex }
 </style>
 </head>
 <body style="align-items:center;justify-content:center">
-<div class="page-container" id="page_container" data-ctrl-type="page" data-name="canvas" data-original-width="1065" data-original-height="740">
+<div class="pageContainer" id="pageContainer" data-ctrl-type="pageContainer" data-name="canvas" data-original-width="1065" data-original-height="740">
 
-<div class="canvas-titlebar" id="titlebar" data-name="标题栏" style="
+<div class="titlebar" id="titlebar" data-name="标题栏" style="
   position:absolute;top:0;left:0;right:0;height:40px;
   background-color:#f5f5f5;
   opacity:1;
   border-bottom:1px solid rgba(0,0,0,0.08);
   app-region: drag;
 ">
-  <div class="tb-left">
-    <span class="tb-icon" id="titlebar_icon" data-ctrl-type="titlebar_icon" data-name="图标" style="color:#333333;"><i class="fas fa-star"></i></span>
+  <div class="titlebar_left">
+    <span class="titlebar_left_icon" id="titlebar_left_icon" data-ctrl-type="titlebar_left_icon" data-name="图标" style="color:#333333;"><i class="fas fa-star"></i></span>
   </div>
-  <div class="tb-center" style="justify-content:flex-start;">
-    <span class="tb-title" id="titlebar_title" data-ctrl-type="titlebar_title" data-name="标题" style="color:#333333">我的应用</span>
+  <div class="titlebar_center" style="justify-content:flex-start;">
+    <span class="titlebar_center_title" id="titlebar_title" data-ctrl-type="titlebar_title" data-name="标题" style="color:#333333">我的应用</span>
   </div>
-  <div class="tb-right">
-    <button class="tb-btn tb-btn-min" id="titlebar_min" data-ctrl-type="titlebar_min" data-name="最小化" style="color:#333333;" title="最小化">
+  <div class="titlebar_right">
+    <button class="titlebar_rightBtn titlebar_rightBtn_min" id="titlebar_min" data-ctrl-type="titlebar_min" data-name="最小化" style="color:#333333;" title="最小化">
       <svg width="10" height="1" viewBox="0 0 10 1"><rect width="10" height="1" fill="currentColor"/></svg>
     </button>
-    <button class="tb-btn tb-btn-max" id="titlebar_max" data-ctrl-type="titlebar_max" data-name="最大化" style="color:#333333;" title="最大化">
+    <button class="titlebar_rightBtn titlebar_rightBtn_min" id="titlebar_max" data-ctrl-type="titlebar_max" data-name="最大化" style="color:#333333;" title="最大化">
       <svg width="10" height="10" viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
     </button>
-    <button class="tb-btn tb-btn-close" id="titlebar_close" data-ctrl-type="titlebar_close" data-name="关闭" style="color:#333333;" title="关闭">
+    <button class="titlebar_rightBtn titlebar_rightBtn_close" id="titlebar_close" data-ctrl-type="titlebar_close" data-name="关闭" style="color:#333333;" title="关闭">
       <svg width="10" height="10" viewBox="0 0 10 10"><line x1="1" y1="1" x2="9" y2="9" stroke="currentColor" stroke-width="1.2"/><line x1="9" y1="1" x2="1" y2="9" stroke="currentColor" stroke-width="1.2"/></svg>
     </button>
   </div>
 </div>
 <button id="button_1" data-type="button" data-ctrl-type="button" data-name="按钮_1">按钮</button>
-<input type="text" id="input_1" data-type="input" data-ctrl-type="input_text" data-name="编辑框_1" placeholder="请输入..." value="" />
+<input type="text" id="input_1" data-type="input" data-ctrl-type="inputText" data-name="编辑框_1" placeholder="请输入..." value="" />
 <label id="checkbox_1" data-type="checkbox" data-ctrl-type="checkbox" data-name="选择框_1"><input type="checkbox" /><span>选项</span></label>
-<label id="toggle_1" data-type="toggle" data-ctrl-type="switch_toggle" data-name="开关按钮_1"><input type="checkbox" /><span class="toggle-slider"></span></label>
-<select id="comboBox_1" data-type="comboBox" data-ctrl-type="combobox" data-name="组合框_1"><option value="选项1" selected>选项1</option><option value="选项2">选项2</option><option value="选项3">选项3</option></select>
+<label id="toggle_1" data-type="toggle" data-ctrl-type="switchToggle" data-name="开关按钮_1"><input type="checkbox" /><span class="toggle-slider"></span></label>
+<select id="comboBox_1" data-type="comboBox" data-ctrl-type="comboBox" data-name="组合框_1"><option value="选项1" selected>选项1</option><option value="选项2">选项2</option><option value="选项3">选项3</option></select>
 <span id="label_1" data-type="label" data-ctrl-type="label" data-name="文本标签_1">标签</span>
 <div id="divider_1" data-type="divider" data-ctrl-type="divider" data-name="分割线_1"></div>
-<a id="hyperlink_1" data-type="hyperlink" data-ctrl-type="hyperlink" data-name="超链接_1" href="javascript:void(0)" data-href="#">超链接</a>
-<div id="radioGroup_1" data-type="radioGroup" data-ctrl-type="radio_group" data-name="单选框_1" class="radiogroup-container"><label class="radiogroup-item"><input type="radio" data-ctrl-type="radio" name="单选框_1" value="选项1" checked />选项1</label><label class="radiogroup-item"><input type="radio" data-ctrl-type="radio" name="单选框_1" value="选项2" />选项2</label></div>
-<div id="progressBar_1" data-type="progressBar" data-ctrl-type="progress_bar" data-name="进度条_1" class="progress-bar-container"><div class="progress-track"></div><div class="progress-fill" style="width:60%"></div><span class="progress-text">60%</span></div>
-<input type="datetime-local" id="datetimePicker_1" data-type="datetimePicker" data-ctrl-type="datetime_picker" data-name="时间框_1" value="2026-05-24T00:00" />
-<button id="iconButton_1" data-type="iconButton" data-ctrl-type="icon_button" data-name="图标按钮_1"><i class="fas fa-star"></i><span>按钮</span></button>
-<div id="imageBox_1" data-type="imageBox" data-ctrl-type="image_box" data-name="图片框_1" class="image-box"></div>
+<a id="hyperlink_1" data-type="hyperLink" data-ctrl-type="hyperLink" data-name="超链接_1" href="javascript:void(0)" data-href="#">超链接</a>
+<div id="radioGroup_1" data-type="radioGroup" data-ctrl-type="radioGroup" data-name="单选框_1" class="radioGroup_container"><label class="radioGroup_item"><input type="radio" data-ctrl-type="radio" name="单选框_1" value="选项1" checked />选项1</label><label class="radioGroup_item"><input type="radio" data-ctrl-type="radio" name="单选框_1" value="选项2" />选项2</label></div>
+<div id="progressBar_1" data-type="progressBar" data-ctrl-type="progressBar" data-name="进度条_1" class="progressBar_container"><div class="progressBar_track"></div><div class="progressBar_fill" style="width:60%"></div><span class="progressBar_text">60%</span></div>
+<input type="datetime-local" id="datetimePicker_1" data-type="datetimePicker" data-ctrl-type="datetimePicker" data-name="时间框_1" value="2026-05-24T00:00" />
+<button id="iconButton_1" data-type="iconButton" data-ctrl-type="iconButton" data-name="图标按钮_1"><i class="fas fa-star"></i><span>按钮</span></button>
+<div id="imageBox_1" data-type="imageBox" data-ctrl-type="imageBox" data-name="图片框_1" class="imageBox"></div>
 <textarea id="textarea_1" data-type="textarea" data-ctrl-type="textarea" data-name="文本域_1" data-rows='4' placeholder="请输入..." rows="4"></textarea>
-<div id="logOutput_1" data-type="logOutput" data-ctrl-type="logbox" data-name="日志框_1" class="log-output-container"><div class="log-line" data-ctrl-type="log_item" style="color:#333333">日志输出已就绪。</div></div>
-<div id="listBox_1" data-type="listBox" data-ctrl-type="listbox" data-name="列表框_1" data-editable="false" data-always-show-selection="true" data-listbox-items='[{"id":"","text":"列表项一","selected":false},{"id":"","text":"列表项二","selected":false},{"id":"","text":"列表项三","selected":false}]' data-always-show-selection="true"><div class="list-box-scroll"><div class="list-item" data-ctrl-type="listbox_item" data-item-index="0"><span class="list-item-text">列表项一</span></div>
-<div class="list-item" data-ctrl-type="listbox_item" data-item-index="1"><span class="list-item-text">列表项二</span></div>
-<div class="list-item" data-ctrl-type="listbox_item" data-item-index="2"><span class="list-item-text">列表项三</span></div></div></div>
-<div id="treeView_1" data-type="treeView" data-ctrl-type="treeview" data-name="树形框_1" data-type="treeView" data-tree-id="treeView_1" data-editable="false" data-show-icon="true" data-always-show-selection="true"><div class="tree-node" data-node-id="node_1" data-level="0">
-      <div class="tree-node-content">
+<div id="logOutput_1" data-type="logOutput" data-ctrl-type="logOutput" data-name="日志框_1" class="logOutput_container"><div class="logOutput_line" data-ctrl-type="logOutput_item" style="color:#333333">日志输出已就绪。</div></div>
+<div id="listBox_1" data-type="listBox" data-ctrl-type="listBox" data-name="列表框_1" data-editable="false" data-always-show-selection="true" data-listBox-items='[{"id":"","text":"列表项一","selected":false},{"id":"","text":"列表项二","selected":false},{"id":"","text":"列表项三","selected":false}]' data-always-show-selection="true"><div class="listBox_scroll"><div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="0"><span class="listBox_item_text">列表项一</span></div>
+<div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="1"><span class="listBox_item_text">列表项二</span></div>
+<div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="2"><span class="listBox_item_text">列表项三</span></div></div></div>
+<div id="treeView_1" data-type="treeView" data-ctrl-type="treeView" data-name="树形框_1" data-type="treeView" data-tree-id="treeView_1" data-editable="false" data-show-icon="true" data-always-show-selection="true"><div class="treeView_node" data-node-id="node_1" data-level="0">
+      <div class="treeView_node_content">
         
-        <span class="tree-toggle expanded" data-ctrl-type="treeview_node_toggle">▶</span>
-        <span class="tree-icon folder">📁</span>
-        <span class="tree-label" data-ctrl-type="treeview_node_text">根节点</span>
+        <span class="treeView_toggle expanded" data-ctrl-type="treeview_node_toggle">▶</span>
+        <span class="treeView_icon folder">📁</span>
+        <span class="treeView_label" data-ctrl-type="treeview_node_text">根节点</span>
         <span class="tree-edit-input" style="display:none"></span>
       </div>
-      <div class="tree-children"><div class="tree-node" data-node-id="node_2" data-level="1">
-      <div class="tree-node-content">
+      <div class="treeView_children"><div class="treeView_node" data-node-id="node_2" data-level="1">
+      <div class="treeView_node_content">
         
-        <span class="tree-toggle empty" data-ctrl-type="treeview_node_toggle">▶</span>
-        <span class="tree-icon file">📄</span>
-        <span class="tree-label" data-ctrl-type="treeview_node_text">子节点1</span>
-        <span class="tree-edit-input" style="display:none"></span>
-      </div>
-      
-    </div><div class="tree-node" data-node-id="node_3" data-level="1">
-      <div class="tree-node-content">
-        
-        <span class="tree-toggle collapsed" data-ctrl-type="treeview_node_toggle">▶</span>
-        <span class="tree-icon folder">📁</span>
-        <span class="tree-label" data-ctrl-type="treeview_node_text">子节点2</span>
-        <span class="tree-edit-input" style="display:none"></span>
-      </div>
-      <div class="tree-children"><div class="tree-node" data-node-id="node_4" data-level="2">
-      <div class="tree-node-content">
-        
-        <span class="tree-toggle empty" data-ctrl-type="treeview_node_toggle">▶</span>
-        <span class="tree-icon file">📄</span>
-        <span class="tree-label" data-ctrl-type="treeview_node_text">子节点2-1</span>
+        <span class="treeView_toggle empty" data-ctrl-type="treeview_node_toggle">▶</span>
+        <span class="treeView_icon file">📄</span>
+        <span class="treeView_label" data-ctrl-type="treeview_node_text">子节点1</span>
         <span class="tree-edit-input" style="display:none"></span>
       </div>
       
+    </div><div class="treeView_node" data-node-id="node_3" data-level="1">
+      <div class="treeView_node_content">
+        
+        <span class="treeView_toggle collapsed" data-ctrl-type="treeview_node_toggle">▶</span>
+        <span class="treeView_icon folder">📁</span>
+        <span class="treeView_label" data-ctrl-type="treeview_node_text">子节点2</span>
+        <span class="tree-edit-input" style="display:none"></span>
+      </div>
+      <div class="treeView_children"><div class="treeView_node" data-node-id="node_4" data-level="2">
+      <div class="treeView_node_content">
+        
+        <span class="treeView_toggle empty" data-ctrl-type="treeview_node_toggle">▶</span>
+        <span class="treeView_icon file">📄</span>
+        <span class="treeView_label" data-ctrl-type="treeview_node_text">子节点2-1</span>
+        <span class="tree-edit-input" style="display:none"></span>
+      </div>
+      
     </div></div>
     </div></div>
     </div></div>
-<div id="dataGrid_1" data-type="dataGrid" data-ctrl-type="datagrid" data-name="多项表格_1" data-columns='[{"field":"col1","header":"列A","editable":false},{"field":"col2","header":"列B","editable":false},{"field":"col3","header":"列C","editable":false}]' data-rows='[{"id":"dataGrid_1_row_1","cells":{"col1":"数据A1","col2":"数据B1","col3":"数据C1"},"selected":false},{"id":"dataGrid_1_row_2","cells":{"col1":"数据A2","col2":"数据B2","col3":"数据C2"},"selected":false},{"id":"dataGrid_1_row_3","cells":{"col1":"数据A3","col2":"数据B3","col3":"数据C3"},"selected":false}]' data-show-checkbox="true" data-allow-add="false" data-allow-delete="false" data-editable="false" data-always-show-selection="false" class="data-grid-container"><div class="data-grid-header"><div class="data-grid-header-cell data-grid-checkbox" style="width:36px;min-width:36px;flex-shrink:0"><input type="checkbox" class="data-grid-select-all"></div><div class="data-grid-header-cell" data-col-key="col1" data-ctrl-type="datagrid_cell" style="width:100px;min-width:100px;flex-shrink:0">列A</div><div class="data-grid-header-cell" data-col-key="col2" data-ctrl-type="datagrid_cell" style="width:100px;min-width:100px;flex-shrink:0">列B</div><div class="data-grid-header-cell" data-col-key="col3" data-ctrl-type="datagrid_cell" style="width:100px;min-width:100px;flex-shrink:0">列C</div></div><div class="data-grid-body"><div class="data-grid-row" data-row-index="0" data-row-id="dataGrid_1_row_1"><div class="data-grid-cell data-grid-checkbox" style="width:36px;min-width:36px;flex-shrink:0"><input type="checkbox" class="data-grid-row-check" data-ctrl-type="datagrid_row_checkbox"></div><div class="data-grid-cell" data-ctrl-type="datagrid_cell" data-col-key="col1" style="width:100px;min-width:100px;flex-shrink:0" title="数据A1">数据A1</div><div class="data-grid-cell" data-ctrl-type="datagrid_cell" data-col-key="col2" style="width:100px;min-width:100px;flex-shrink:0" title="数据B1">数据B1</div><div class="data-grid-cell" data-ctrl-type="datagrid_cell" data-col-key="col3" style="width:100px;min-width:100px;flex-shrink:0" title="数据C1">数据C1</div></div><div class="data-grid-row" data-row-index="1" data-row-id="dataGrid_1_row_2"><div class="data-grid-cell data-grid-checkbox" style="width:36px;min-width:36px;flex-shrink:0"><input type="checkbox" class="data-grid-row-check" data-ctrl-type="datagrid_row_checkbox"></div><div class="data-grid-cell" data-ctrl-type="datagrid_cell" data-col-key="col1" style="width:100px;min-width:100px;flex-shrink:0" title="数据A2">数据A2</div><div class="data-grid-cell" data-ctrl-type="datagrid_cell" data-col-key="col2" style="width:100px;min-width:100px;flex-shrink:0" title="数据B2">数据B2</div><div class="data-grid-cell" data-ctrl-type="datagrid_cell" data-col-key="col3" style="width:100px;min-width:100px;flex-shrink:0" title="数据C2">数据C2</div></div><div class="data-grid-row" data-row-index="2" data-row-id="dataGrid_1_row_3"><div class="data-grid-cell data-grid-checkbox" style="width:36px;min-width:36px;flex-shrink:0"><input type="checkbox" class="data-grid-row-check" data-ctrl-type="datagrid_row_checkbox"></div><div class="data-grid-cell" data-ctrl-type="datagrid_cell" data-col-key="col1" style="width:100px;min-width:100px;flex-shrink:0" title="数据A3">数据A3</div><div class="data-grid-cell" data-ctrl-type="datagrid_cell" data-col-key="col2" style="width:100px;min-width:100px;flex-shrink:0" title="数据B3">数据B3</div><div class="data-grid-cell" data-ctrl-type="datagrid_cell" data-col-key="col3" style="width:100px;min-width:100px;flex-shrink:0" title="数据C3">数据C3</div></div></div></div>
-<div id="tabsContainer_1" data-type="tabsContainer" data-ctrl-type="tab_container" data-name="标签页_1" class="tabs-container"><div class="tab-header-bar"><button class="tab-header-btn active" data-ctrl-type="tab_btn" data-tab-name="tab1">标签页1</button><button class="tab-header-btn" data-ctrl-type="tab_btn" data-tab-name="tab2">标签页2</button></div><div class="tab-content-wrapper"><div class="tab-pane active" data-tab-name="tab1" data-parent="tabsContainer_1" data-tab="0"></div>
+<div id="dataGrid_1" data-type="dataGrid" data-ctrl-type="dataGrid" data-name="多项表格_1" data-columns='[{"field":"col1","header":"列A","editable":false},{"field":"col2","header":"列B","editable":false},{"field":"col3","header":"列C","editable":false}]' data-rows='[{"id":"dataGrid_1_row_1","cells":{"col1":"数据A1","col2":"数据B1","col3":"数据C1"},"selected":false},{"id":"dataGrid_1_row_2","cells":{"col1":"数据A2","col2":"数据B2","col3":"数据C2"},"selected":false},{"id":"dataGrid_1_row_3","cells":{"col1":"数据A3","col2":"数据B3","col3":"数据C3"},"selected":false}]' data-show-checkbox="true" data-allow-add="false" data-allow-delete="false" data-editable="false" data-always-show-selection="false" class="dataGrid_container"><div class="dataGrid_header"><div class="dataGrid_header_cell dataGrid_checkbox" style="width:36px;min-width:36px;flex-shrink:0"><input type="checkbox" class="dataGrid_select_all"></div><div class="dataGrid_header_cell" data-col-key="col1" data-ctrl-type="dataGrid_cell" style="width:100px;min-width:100px;flex-shrink:0">列A</div><div class="dataGrid_header_cell" data-col-key="col2" data-ctrl-type="dataGrid_cell" style="width:100px;min-width:100px;flex-shrink:0">列B</div><div class="dataGrid_header_cell" data-col-key="col3" data-ctrl-type="dataGrid_cell" style="width:100px;min-width:100px;flex-shrink:0">列C</div></div><div class="dataGrid_body"><div class="dataGrid_row" data-row-index="0" data-row-id="dataGrid_1_row_1"><div class="dataGrid_cell dataGrid_checkbox" style="width:36px;min-width:36px;flex-shrink:0"><input type="checkbox" class="dataGrid_row_check" data-ctrl-type="dataGrid_row_checkbox"></div><div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="col1" style="width:100px;min-width:100px;flex-shrink:0" title="数据A1">数据A1</div><div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="col2" style="width:100px;min-width:100px;flex-shrink:0" title="数据B1">数据B1</div><div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="col3" style="width:100px;min-width:100px;flex-shrink:0" title="数据C1">数据C1</div></div><div class="dataGrid_row" data-row-index="1" data-row-id="dataGrid_1_row_2"><div class="dataGrid_cell dataGrid_checkbox" style="width:36px;min-width:36px;flex-shrink:0"><input type="checkbox" class="dataGrid_row_check" data-ctrl-type="dataGrid_row_checkbox"></div><div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="col1" style="width:100px;min-width:100px;flex-shrink:0" title="数据A2">数据A2</div><div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="col2" style="width:100px;min-width:100px;flex-shrink:0" title="数据B2">数据B2</div><div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="col3" style="width:100px;min-width:100px;flex-shrink:0" title="数据C2">数据C2</div></div><div class="dataGrid_row" data-row-index="2" data-row-id="dataGrid_1_row_3"><div class="dataGrid_cell dataGrid_checkbox" style="width:36px;min-width:36px;flex-shrink:0"><input type="checkbox" class="dataGrid_row_check" data-ctrl-type="dataGrid_row_checkbox"></div><div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="col1" style="width:100px;min-width:100px;flex-shrink:0" title="数据A3">数据A3</div><div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="col2" style="width:100px;min-width:100px;flex-shrink:0" title="数据B3">数据B3</div><div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="col3" style="width:100px;min-width:100px;flex-shrink:0" title="数据C3">数据C3</div></div></div></div>
+<div id="tabsContainer_1" data-type="tabsContainer" data-ctrl-type="tabsContainer" data-name="标签页_1" class="tabsContainer"><div class="tabsContainer_headerBar"><button class="tabsContainer_headerBar_btn active" data-ctrl-type="tabsContainer_headerBar_btn" data-tab-name="tab1">标签页1</button><button class="tabsContainer_headerBar_btn" data-ctrl-type="tabsContainer_headerBar_btn" data-tab-name="tab2">标签页2</button></div><div class="tabsContainer_contentWrapper"><div class="tab-pane active" data-tab-name="tab1" data-parent="tabsContainer_1" data-tab="0"></div>
 <div class="tab-pane" data-tab-name="tab2" data-parent="tabsContainer_1" data-tab="1"></div></div></div>
-<div id="cardBox_1" data-type="cardBox" data-ctrl-type="cardbox" data-name="卡片框_1" class="card-box"><div class="card-header"><span class="card-header-title">卡片标题</span></div><div class="card-body" data-ctrl-type="cardbox_body"></div></div>
+<div id="cardBox_1" data-type="cardBox" data-ctrl-type="cardBox" data-name="卡片框_1" class="cardBox"><div class="cardBox_header"><span class="cardBox_header_title">卡片标题</span></div><div class="cardBox_body" data-ctrl-type="cardBox_body"></div></div>
 <div id="divider_2" data-type="divider" data-ctrl-type="divider" data-name="分割线_2"></div>
-<input type="datetime-local" id="datetimePicker_2" data-type="datetimePicker" data-ctrl-type="datetime_picker" data-name="时间框_2" value="2026-05-24T00:00" />
+<input type="datetime-local" id="datetimePicker_2" data-type="datetimePicker" data-ctrl-type="datetimePicker" data-name="时间框_2" value="2026-05-24T00:00" />
 </div>
 
 <script>
@@ -1229,15 +1229,15 @@ body { display:flex }
   'use strict';
 
   document.addEventListener('click', function(e) {
-    var tabBtn = e.target.closest('.tab-header-btn');
+    var tabBtn = e.target.closest('.tabsContainer_headerBar_btn');
     if (tabBtn) {
-      var container = tabBtn.closest('.tabs-container');
+      var container = tabBtn.closest('.tabsContainer');
       if (!container) return;
 
       if (container.getAttribute('data-disabled') === 'true') return;
 
       var tabName = tabBtn.getAttribute('data-tab-name');
-      var allBtns = container.querySelectorAll('.tab-header-btn');
+      var allBtns = container.querySelectorAll('.tabsContainer_headerBar_btn');
       allBtns.forEach(function(b) { b.classList.remove('active'); });
       tabBtn.classList.add('active');
 
@@ -1248,9 +1248,9 @@ body { display:flex }
       return;
     }
 
-    var collapseBtn = e.target.closest('.card-collapse-btn');
+    var collapseBtn = e.target.closest('.cardBox_collapse_btn');
     if (collapseBtn) {
-      var card = collapseBtn.closest('.card-box');
+      var card = collapseBtn.closest('.cardBox');
       if (!card) return;
       var isCollapsed = card.getAttribute('data-collapsed') === 'true';
       var downArrow = '<svg width="12" height="12" viewBox="0 0 12 12"><path d="M3 4.5L6 7.5L9 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -1275,13 +1275,13 @@ body { display:flex }
     itemsCache: {},
 
     init: function() {
-      var listBoxes = document.querySelectorAll('[data-listbox-items]');
+      var listBoxes = document.querySelectorAll('[data-listBox-items]');
       for (var i = 0; i < listBoxes.length; i++) {
         var el = listBoxes[i];
         var id = el.id;
         if (!id) continue;
         try {
-          var items = JSON.parse(el.getAttribute('data-listbox-items') || '[]');
+          var items = JSON.parse(el.getAttribute('data-listBox-items') || '[]');
           ListBoxManager.itemsCache[id] = items;
         } catch(e) { ListBoxManager.itemsCache[id] = []; }
         ListBoxManager._bindEvents(el);
@@ -1293,7 +1293,7 @@ body { display:flex }
       document.addEventListener('mousedown', function(e) {
         if (el.getAttribute('data-always-show-selection') === 'true') return;
         if (!el.contains(e.target)) {
-          var allItems = el.querySelectorAll('.list-item');
+          var allItems = el.querySelectorAll('.listBox_item');
           for (var ai = 0; ai < allItems.length; ai++) {
             allItems[ai].classList.remove('item-selected');
           }
@@ -1305,7 +1305,7 @@ body { display:flex }
       var id = listBoxEl.id;
       var items = ListBoxManager.itemsCache[id] || [];
       var showCheckbox = listBoxEl.getAttribute('data-show-checkbox') === 'true';
-      var scroll = listBoxEl.querySelector('.list-box-scroll');
+      var scroll = listBoxEl.querySelector('.listBox_scroll');
       if (!scroll) return;
       if (items.length === 0) {
         scroll.innerHTML = '<div class="list-empty">暂无数据</div>';
@@ -1314,8 +1314,8 @@ body { display:flex }
       var html = '';
       for (var i = 0; i < items.length; i++) {
         var item = items[i];
-        var cb = showCheckbox ? '<input type="checkbox" class="list-item-checkbox" data-ctrl-type="listbox_item_checkbox"' + (item.selected ? ' checked' : '') + ' data-item-index="' + i + '" />' : '';
-        html += '<div class="list-item" data-ctrl-type="listbox_item" data-item-index="' + i + '">' + cb + '<span class="list-item-text">' + ListBoxManager._escHtml(item.text) + '</span></div>';
+        var cb = showCheckbox ? '<input type="checkbox" class="listBox_item-checkbox" data-ctrl-type="listbox_item_checkbox"' + (item.selected ? ' checked' : '') + ' data-item-index="' + i + '" />' : '';
+        html += '<div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="' + i + '">' + cb + '<span class="listBox_item_text">' + ListBoxManager._escHtml(item.text) + '</span></div>';
       }
       scroll.innerHTML = html;
       ListBoxManager._bindEvents(listBoxEl);
@@ -1326,29 +1326,29 @@ body { display:flex }
     },
 
     _bindEvents: function(el) {
-      var items = el.querySelectorAll('.list-item');
+      var items = el.querySelectorAll('.listBox_item');
       for (var i = 0; i < items.length; i++) {
         (function(itemEl) {
           itemEl.onclick = function(e) {
             if (e.target.tagName === 'INPUT') return;
-            var listBox = itemEl.closest('[data-listbox-items]');
+            var listBox = itemEl.closest('[data-listBox-items]');
             if (!listBox || listBox.getAttribute('data-disabled') === 'true') return;
-            var allItems = listBox.querySelectorAll('.list-item');
+            var allItems = listBox.querySelectorAll('.listBox_item');
             for (var ai = 0; ai < allItems.length; ai++) {
               allItems[ai].classList.remove('item-selected');
             }
             itemEl.classList.add('item-selected');
           };
           itemEl.ondblclick = function(e) {
-            var listBox = itemEl.closest('[data-listbox-items]');
+            var listBox = itemEl.closest('[data-listBox-items]');
             if (!listBox || listBox.getAttribute('data-editable') !== 'true') return;
             if (listBox.getAttribute('data-disabled') === 'true') return;
             ListBoxManager._startEdit(listBox, itemEl);
           };
-          var cb = itemEl.querySelector('.list-item-checkbox');
+          var cb = itemEl.querySelector('.listBox_item-checkbox');
           if (cb) {
             cb.onchange = function(e) {
-              var listBox = cb.closest('[data-listbox-items]');
+              var listBox = cb.closest('[data-listBox-items]');
               if (!listBox) return;
               var idx = parseInt(cb.getAttribute('data-item-index') || '0');
               var cache = ListBoxManager.itemsCache[listBox.id];
@@ -1363,12 +1363,12 @@ body { display:flex }
       var idx = parseInt(itemEl.getAttribute('data-item-index') || '0');
       var cache = ListBoxManager.itemsCache[listBox.id];
       if (!cache || !cache[idx]) return;
-      var textSpan = itemEl.querySelector('.list-item-text');
+      var textSpan = itemEl.querySelector('.listBox_item_text');
       if (!textSpan) return;
       var oldText = cache[idx].text;
       var input = document.createElement('input');
       input.type = 'text';
-      input.className = 'list-item-edit-input';
+      input.className = 'listBox_item-edit-input';
       input.value = oldText;
       textSpan.replaceWith(input);
       input.focus();
@@ -1380,7 +1380,7 @@ body { display:flex }
           ListBoxManager._updateDataAttr(listBox);
         }
         var span = document.createElement('span');
-        span.className = 'list-item-text';
+        span.className = 'listBox_item_text';
         span.textContent = cache[idx].text;
         input.replaceWith(span);
       };
@@ -1395,7 +1395,7 @@ body { display:flex }
       var id = listBox.id;
       var cache = ListBoxManager.itemsCache[id];
       if (!cache) return;
-      listBox.setAttribute('data-listbox-items', JSON.stringify(cache));
+      listBox.setAttribute('data-listBox-items', JSON.stringify(cache));
     },
 
     add: function(listBoxId, text) {
@@ -1435,7 +1435,7 @@ body { display:flex }
       cache[index].selected = !!checked;
       var itemEl = el.querySelector('[data-item-index="' + index + '"]');
       if (itemEl) {
-        var cb = itemEl.querySelector('.list-item-checkbox');
+        var cb = itemEl.querySelector('.listBox_item-checkbox');
         if (cb) cb.checked = !!checked;
       }
       ListBoxManager._updateDataAttr(el);
@@ -1517,7 +1517,7 @@ body { display:flex }
       if (!config || !node) return null;
 
       var nodeDiv = document.createElement('div');
-      nodeDiv.className = 'tree-node';
+      nodeDiv.className = 'treeView_node';
       nodeDiv.setAttribute('data-tree-id', treeId);
       nodeDiv.setAttribute('data-node-id', node.id);
       nodeDiv.setAttribute('data-level', level);
@@ -1528,14 +1528,14 @@ body { display:flex }
       }
 
       var contentDiv = document.createElement('div');
-      contentDiv.className = 'tree-node-content';
+      contentDiv.className = 'treeView_node_content';
 
       if (config.showCheckbox) {
         var checkboxSpan = document.createElement('span');
         checkboxSpan.className = 'tree-checkbox';
         var cb = document.createElement('input');
         cb.type = 'checkbox';
-        cb.className = 'tree-node-check';
+        cb.className = 'treeView_node-check';
         cb.checked = !!node.checked;
         cb.setAttribute('data-ctrl-type', 'treeview_node_checkbox');
         checkboxSpan.appendChild(cb);
@@ -1543,7 +1543,7 @@ body { display:flex }
       }
 
       var toggle = document.createElement('span');
-      toggle.className = 'tree-toggle';
+      toggle.className = 'treeView_toggle';
       toggle.textContent = '▶';
       if (node.children && node.children.length > 0) {
         if (node.expanded === true) {
@@ -1557,7 +1557,7 @@ body { display:flex }
       contentDiv.appendChild(toggle);
 
       var icon = document.createElement('span');
-      icon.className = 'tree-icon';
+      icon.className = 'treeView_icon';
       var showIcon = config.showIcon !== false;
       if (showIcon) {
         var nodeIcon = node.icon || '';
@@ -1568,7 +1568,7 @@ body { display:flex }
       }
 
       var label = document.createElement('span');
-      label.className = 'tree-label';
+      label.className = 'treeView_label';
       label.textContent = node.text || '';
 
       contentDiv.appendChild(icon);
@@ -1577,7 +1577,7 @@ body { display:flex }
 
       if (node.children && node.children.length > 0) {
         var childrenDiv = document.createElement('div');
-        childrenDiv.className = 'tree-children';
+        childrenDiv.className = 'treeView_children';
         if (node.expanded === false) {
           childrenDiv.style.display = 'none';
         }
@@ -1603,8 +1603,8 @@ body { display:flex }
       var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
       if (!nodeEl) return;
 
-      var toggle = nodeEl.querySelector(':scope > .tree-node-content > .tree-toggle');
-      var children = nodeEl.querySelector(':scope > .tree-children');
+      var toggle = nodeEl.querySelector(':scope > .treeView_node_content > .treeView_toggle');
+      var children = nodeEl.querySelector(':scope > .treeView_children');
       if (!toggle || !children) return;
 
       var node = TreeManager.findNodeData(TreeManager.configs[treeId] ? TreeManager.configs[treeId].data : null, nodeId);
@@ -1632,7 +1632,7 @@ body { display:flex }
       var container = document.getElementById(treeId);
       if (!container) return;
 
-      var prevSelected = container.querySelector('.tree-node-content.selected');
+      var prevSelected = container.querySelector('.treeView_node_content.selected');
       if (prevSelected) {
         prevSelected.classList.remove('selected');
       }
@@ -1640,7 +1640,7 @@ body { display:flex }
       var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
       if (!nodeEl) return;
 
-      var content = nodeEl.querySelector(':scope > .tree-node-content');
+      var content = nodeEl.querySelector(':scope > .treeView_node_content');
       if (content) {
         content.classList.add('selected');
       }
@@ -1781,8 +1781,8 @@ body { display:flex }
       if (!container) return;
       var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
       if (!nodeEl) return;
-      var toggle = nodeEl.querySelector(':scope > .tree-node-content > .tree-toggle');
-      var children = nodeEl.querySelector(':scope > .tree-children');
+      var toggle = nodeEl.querySelector(':scope > .treeView_node_content > .treeView_toggle');
+      var children = nodeEl.querySelector(':scope > .treeView_children');
       if (toggle) {
         toggle.classList.remove('collapsed');
         toggle.classList.add('expanded');
@@ -1809,8 +1809,8 @@ body { display:flex }
       if (!container) return;
       var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
       if (!nodeEl) return;
-      var toggle = nodeEl.querySelector(':scope > .tree-node-content > .tree-toggle');
-      var children = nodeEl.querySelector(':scope > .tree-children');
+      var toggle = nodeEl.querySelector(':scope > .treeView_node_content > .treeView_toggle');
+      var children = nodeEl.querySelector(':scope > .treeView_children');
       if (toggle) {
         toggle.classList.remove('expanded');
         toggle.classList.add('collapsed');
@@ -1862,7 +1862,7 @@ body { display:flex }
       if (!container) return false;
       var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
       if (!nodeEl) return false;
-      var cbs = nodeEl.querySelectorAll('.tree-node-check');
+      var cbs = nodeEl.querySelectorAll('.treeView_node-check');
       for (var i = 0; i < cbs.length; i++) {
         cbs[i].checked = !!checked;
       }
@@ -1880,7 +1880,7 @@ body { display:flex }
       if (!container) return false;
       var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
       if (!nodeEl) return false;
-      var cb = nodeEl.querySelector('.tree-node-check');
+      var cb = nodeEl.querySelector('.treeView_node-check');
       return cb ? cb.checked : false;
     },
 
@@ -1892,10 +1892,10 @@ body { display:flex }
     getCheckedNodes: function(treeId) {
       var container = document.getElementById(treeId);
       if (!container) return [];
-      var checkboxes = container.querySelectorAll('.tree-node-check:checked');
+      var checkboxes = container.querySelectorAll('.treeView_node-check:checked');
       var ids = [];
       for (var i = 0; i < checkboxes.length; i++) {
-        var nodeEl = checkboxes[i].closest('.tree-node');
+        var nodeEl = checkboxes[i].closest('.treeView_node');
         if (nodeEl) {
           ids.push(nodeEl.getAttribute('data-node-id'));
         }
@@ -1910,7 +1910,7 @@ body { display:flex }
     checkAll: function(treeId) {
       var container = document.getElementById(treeId);
       if (!container) return false;
-      var checkboxes = container.querySelectorAll('.tree-node-check');
+      var checkboxes = container.querySelectorAll('.treeView_node-check');
       for (var i = 0; i < checkboxes.length; i++) {
         checkboxes[i].checked = true;
       }
@@ -1924,7 +1924,7 @@ body { display:flex }
     uncheckAll: function(treeId) {
       var container = document.getElementById(treeId);
       if (!container) return false;
-      var checkboxes = container.querySelectorAll('.tree-node-check');
+      var checkboxes = container.querySelectorAll('.treeView_node-check');
       for (var i = 0; i < checkboxes.length; i++) {
         checkboxes[i].checked = false;
       }
@@ -1946,7 +1946,7 @@ body { display:flex }
       var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
       if (!nodeEl) return;
 
-      var label = nodeEl.querySelector(':scope > .tree-node-content > .tree-label');
+      var label = nodeEl.querySelector(':scope > .treeView_node_content > .treeView_label');
       if (!label) return;
 
       var node = TreeManager.findNodeData(config.data, nodeId);
@@ -1968,14 +1968,14 @@ body { display:flex }
           node.text = newText;
         }
         var newLabel = document.createElement('span');
-        newLabel.className = 'tree-label';
+        newLabel.className = 'treeView_label';
         newLabel.textContent = node.text;
         input.replaceWith(newLabel);
       };
 
       var cancel = function() {
         var newLabel = document.createElement('span');
-        newLabel.className = 'tree-label';
+        newLabel.className = 'treeView_label';
         newLabel.textContent = oldText;
         input.replaceWith(newLabel);
       };
@@ -2001,14 +2001,14 @@ body { display:flex }
       if (!config) return;
 
       container.onclick = function(e) {
-        if (e.target.closest('.tree-node-check')) {
+        if (e.target.closest('.treeView_node-check')) {
           return;
         }
 
-        var content = e.target.closest('.tree-node-content');
+        var content = e.target.closest('.treeView_node_content');
         if (!content) return;
 
-        var nodeEl = content.closest('.tree-node');
+        var nodeEl = content.closest('.treeView_node');
         if (!nodeEl) return;
 
         var nodeId = nodeEl.getAttribute('data-node-id');
@@ -2017,7 +2017,7 @@ body { display:flex }
         var targetTreeId = nodeEl.getAttribute('data-tree-id');
         if (targetTreeId !== treeId) return;
 
-        if (e.target.closest('.tree-toggle')) {
+        if (e.target.closest('.treeView_toggle')) {
           TreeManager.toggleNode(treeId, nodeId);
           return;
         }
@@ -2026,10 +2026,10 @@ body { display:flex }
       };
 
       container.ondblclick = function(e) {
-        var content = e.target.closest('.tree-node-content');
+        var content = e.target.closest('.treeView_node_content');
         if (!content) return;
 
-        var nodeEl = content.closest('.tree-node');
+        var nodeEl = content.closest('.treeView_node');
         if (!nodeEl) return;
 
         var nodeId = nodeEl.getAttribute('data-node-id');
@@ -2045,13 +2045,13 @@ body { display:flex }
 
       container.addEventListener('change', function(e) {
         var target = e.target;
-        if (!target || !target.classList.contains('tree-node-check')) return;
-        var nodeEl = target.closest('.tree-node');
+        if (!target || !target.classList.contains('treeView_node-check')) return;
+        var nodeEl = target.closest('.treeView_node');
         if (!nodeEl) return;
         var targetTreeId = nodeEl.getAttribute('data-tree-id');
         if (targetTreeId !== treeId) return;
         var checked = target.checked;
-        var descendants = nodeEl.querySelectorAll('.tree-node-check');
+        var descendants = nodeEl.querySelectorAll('.treeView_node-check');
         for (var i = 0; i < descendants.length; i++) {
           descendants[i].checked = checked;
         }
@@ -2099,7 +2099,7 @@ body { display:flex }
       var container = store.container;
 
       // 表头全选复选框
-      var selectAll = container.querySelector('.data-grid-select-all');
+      var selectAll = container.querySelector('.dataGrid_select_all');
       if (selectAll) {
         selectAll.addEventListener('change', function(e) {
           self.selectAllRows(store.id, e.target.checked);
@@ -2107,9 +2107,9 @@ body { display:flex }
       }
 
       // 行复选框
-      container.querySelectorAll('.data-grid-row-check').forEach(function(cb) {
+      container.querySelectorAll('.dataGrid_row_check').forEach(function(cb) {
         cb.addEventListener('change', function(e) {
-          var row = e.target.closest('.data-grid-row');
+          var row = e.target.closest('.dataGrid_row');
           if (row) {
             var idx = parseInt(row.getAttribute('data-row-index'), 10);
             var rowData = self.getRowData(store.id, idx);
@@ -2122,25 +2122,25 @@ body { display:flex }
       });
 
       // 行点击高亮处理
-      container.querySelectorAll('.data-grid-row').forEach(function(row) {
+      container.querySelectorAll('.dataGrid_row').forEach(function(row) {
         row.addEventListener('click', function(e) {
           if (e.target.tagName === 'INPUT') return;
           // 移除其他行的高亮
-          container.querySelectorAll('.data-grid-row.data-grid-row-focused').forEach(function(r) {
-            r.classList.remove('data-grid-row-focused');
+          container.querySelectorAll('.dataGrid_row.dataGrid_row-focused').forEach(function(r) {
+            r.classList.remove('dataGrid_row-focused');
           });
           // 高亮当前行
-          row.classList.add('data-grid-row-focused');
+          row.classList.add('dataGrid_row-focused');
           store.selectedRowIndex = parseInt(row.getAttribute('data-row-index'), 10);
         });
       });
 
       // 单元格双击编辑
       if (store.editable) {
-        container.querySelectorAll('.data-grid-cell[data-col-key]').forEach(function(cell) {
-          if (cell.closest('.data-grid-checkbox')) return;
+        container.querySelectorAll('.dataGrid_cell[data-col-key]').forEach(function(cell) {
+          if (cell.closest('.dataGrid_checkbox')) return;
           cell.addEventListener('dblclick', function() {
-            var row = cell.closest('.data-grid-row');
+            var row = cell.closest('.dataGrid_row');
             if (!row) return;
             var ri = parseInt(row.getAttribute('data-row-index'), 10);
             var field = cell.getAttribute('data-col-key');
@@ -2153,7 +2153,7 @@ body { display:flex }
 
     /** 更新全选复选框状态 */
     updateSelectAllState: function(store) {
-      var selectAll = store.container.querySelector('.data-grid-select-all');
+      var selectAll = store.container.querySelector('.dataGrid_select_all');
       if (!selectAll) return;
       var total = store.rows.length;
       var selected = store.rows.filter(function(r) { return r.selected; }).length;
@@ -2168,7 +2168,7 @@ body { display:flex }
       store.rows.forEach(function(r) {
         r.selected = checked;
       });
-      store.container.querySelectorAll('.data-grid-row-check').forEach(function(cb) {
+      store.container.querySelectorAll('.dataGrid_row_check').forEach(function(cb) {
         cb.checked = checked;
       });
     },
@@ -2251,12 +2251,12 @@ body { display:flex }
       store.container.setAttribute('data-editable', enabled ? 'true' : 'false');
       if (!enabled) return;
       var self = this;
-      store.container.querySelectorAll('.data-grid-cell[data-col-key]').forEach(function(cell) {
-        if (cell.closest('.data-grid-checkbox')) return;
+      store.container.querySelectorAll('.dataGrid_cell[data-col-key]').forEach(function(cell) {
+        if (cell.closest('.dataGrid_checkbox')) return;
         if (cell._dgEditBound) return;
         cell._dgEditBound = true;
         cell.addEventListener('dblclick', function() {
-          var row = cell.closest('.data-grid-row');
+          var row = cell.closest('.dataGrid_row');
           if (!row) return;
           var ri = parseInt(row.getAttribute('data-row-index'), 10);
           var field = cell.getAttribute('data-col-key');
@@ -2269,21 +2269,21 @@ body { display:flex }
     /** 刷新 DOM */
     refreshDOM: function(store) {
       var self = this;
-      var body = store.container.querySelector('.data-grid-body');
+      var body = store.container.querySelector('.dataGrid_body');
       if (!body) return;
 
       var html = '';
       store.rows.forEach(function(row, ri) {
-        var rowClass = (store.selectedRowIndex === ri) ? 'data-grid-row data-grid-row-focused' : 'data-grid-row';
+        var rowClass = (store.selectedRowIndex === ri) ? 'dataGrid_row dataGrid_row-focused' : 'dataGrid_row';
         html += '<div class="' + rowClass + '" data-row-index="' + ri + '" data-row-id="' + row.id + '">';
         if (store.showCheckbox) {
           var checked = row.selected ? ' checked' : '';
-          html += '<div class="data-grid-cell data-grid-checkbox" style="width:36px;min-width:36px;flex-shrink:0"><input type="checkbox" class="data-grid-row-check"' + checked + '></div>';
+          html += '<div class="dataGrid_cell dataGrid_checkbox" style="width:36px;min-width:36px;flex-shrink:0"><input type="checkbox" class="dataGrid_row_check"' + checked + '></div>';
         }
         store.columns.forEach(function(col) {
           var w = col.width || 100;
           var val = row.cells && row.cells[col.field] !== undefined && row.cells[col.field] !== null ? String(row.cells[col.field]) : '';
-          html += '<div class="data-grid-cell" data-col-key="' + col.field + '" style="width:' + w + 'px;min-width:' + w + 'px;flex-shrink:0" title="' + val + '">' + val + '</div>';
+          html += '<div class="dataGrid_cell" data-col-key="' + col.field + '" style="width:' + w + 'px;min-width:' + w + 'px;flex-shrink:0" title="' + val + '">' + val + '</div>';
         });
         html += '</div>';
       });
@@ -2303,13 +2303,13 @@ body { display:flex }
     if (treeId && typeof TreeManager !== 'undefined') {
       function buildNodesFromDOM(parentEl) {
         var nodes = [];
-        var childNodes = parentEl.querySelectorAll(':scope > .tree-node');
+        var childNodes = parentEl.querySelectorAll(':scope > .treeView_node');
         childNodes.forEach(function(nodeEl) {
-          var contentEl = nodeEl.querySelector(':scope > .tree-node-content');
-          var labelEl = contentEl ? contentEl.querySelector('.tree-label') : null;
-          var childrenEl = nodeEl.querySelector(':scope > .tree-children');
-          var toggleEl = contentEl ? contentEl.querySelector('.tree-toggle') : null;
-          var checkboxEl = contentEl ? contentEl.querySelector('.tree-node-check') : null;
+          var contentEl = nodeEl.querySelector(':scope > .treeView_node_content');
+          var labelEl = contentEl ? contentEl.querySelector('.treeView_label') : null;
+          var childrenEl = nodeEl.querySelector(':scope > .treeView_children');
+          var toggleEl = contentEl ? contentEl.querySelector('.treeView_toggle') : null;
+          var checkboxEl = contentEl ? contentEl.querySelector('.treeView_node-check') : null;
           var isExpanded = toggleEl && toggleEl.classList.contains('expanded');
           var node = {
             id: nodeEl.getAttribute('data-node-id'),
@@ -2339,7 +2339,7 @@ body { display:flex }
 
 
 (function(){
-  document.querySelectorAll('.data-grid-container').forEach(function(container){
+  document.querySelectorAll('.dataGrid_container').forEach(function(container){
     var id = container.getAttribute('data-id') || container.id;
     var columns = JSON.parse(container.getAttribute('data-columns') || '[]');
     var rows = JSON.parse(container.getAttribute('data-rows') || '[]');

@@ -322,7 +322,7 @@ export function generateAllWidgetCSS(widgets: Widget[], configs: Record<string, 
 
 /**
  * 生成画布 CSS（从 canvas 配置）
- * 注意：画布 CSS 涉及 .page-container 等选择器，与控件模式不同，保留原有逻辑
+ * 注意：画布 CSS 涉及 .pageContainer 等选择器，与控件模式不同，保留原有逻辑
  */
 export function generateCanvasCSS(canvasCSS: string): string {
   return canvasCSS

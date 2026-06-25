@@ -11,7 +11,7 @@
       "alignItems": "center",
       "fontFamily": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
       "cursor": "pointer",
-      "lineHeight": "14px",
+      "lineHeight": "15px",
       "userSelect": "none"
     },
     "pseudo": {

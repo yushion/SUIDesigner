@@ -1,0 +1,5 @@
+window.__apiDocs = window.__apiDocs || {};
+window.__apiDocs['icon-helpers'] = [
+  {sig:'将文本中的图标占位符（[NAME] 或 {NAME}）替换为对应 emoji', desc:'<span class="desctile"><span class="status-badge">ƒ :</span>icon.parse(text)</b></span>',params:[{n:'text',t:'string',d:'包含占位符的文本，如 "[OK] 操作成功"'},{n:'返回值',t:'string',d:'替换后的文本，如 "✅ 操作成功"'}],ret:'string — 替换后的文本',exApi:"// 解析图标占位符\nvar html = webviewBridge.api.icon.parse('[OK] 保存成功 [USER] 管理员');\n// 结果: '✅ 保存成功 👤 管理员'\ndocument.getElementById('label_1').innerHTML = html;",exCmd:'{\n  "command": "iconParse",\n  "text": "[OK] 保存成功"\n}'},
+  {sig:'将包含 emoji 的 HTML 文本转换回图标占位符格式', desc:'<span class="desctile"><span class="status-badge">ƒ :</span>icon.toText(html)</b></span>',params:[{n:'html',t:'string',d:'包含 emoji 的 HTML 字符串'},{n:'返回值',t:'string',d:'转换后的占位符文本'}],ret:'string — 占位符文本',exApi:"// 将 emoji 转回占位符\nvar text = webviewBridge.api.icon.toText('✅ 保存成功 👤 管理员');\n// 结果: '[OK] 保存成功 [USER] 管理员'",exCmd:'{\n  "command": "iconToText",\n  "html": "✅ 保存成功"\n}'}
+];

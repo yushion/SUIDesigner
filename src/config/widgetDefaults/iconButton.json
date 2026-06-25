@@ -4,7 +4,8 @@
   "defaultStyleData": {
     "base": {
       "width": 80,
-      "height": 32,
+      "height": 30,
+	  "lineHeight": "30px",
       "backgroundColor": "#0078d4",
       "color": "#ffffff",
       "fontSize": 13,
@@ -21,7 +22,8 @@
       "whiteSpace": "nowrap",
       "outline": "none",
       "fontFamily": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-      "padding": "6px 12px"
+      "padding": "6px 12px",
+	  "userSelect": "none"
     },
     "pseudo": {
       ":hover": {

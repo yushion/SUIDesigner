@@ -2,25 +2,25 @@
   PreviewCanvas.vue - SSR 预览画布组件
   渲染画布容器（含标题栏）和所有控件
   Props 驱动，无交互逻辑，专供 SSR 渲染
-  外层 div 会被 htmlExporter 剥离，内部内容注入 page-container
+  外层 div 会被 htmlExporter 剥离，内部内容注入 pageContainer
 -->
 <template>
   <div class="ssr-canvas-content">
     <div
       v-if="canvasConfig.showTitleBar"
-      class="canvas-titlebar"
+      class="titlebar"
       :style="titleBarStyle"
     >
-      <div class="tb-left" :style="titleBarCellStyle">
-        <span class="tb-icon" :style="titleBarIconStyle" v-html="titleBarSafeIcon"></span>
+      <div class="titlebar_left" :style="titleBarCellStyle">
+        <span class="titlebar_left_icon" :style="titleBarIconStyle" v-html="titleBarSafeIcon"></span>
       </div>
-      <div class="tb-center" :style="titleBarCenterStyle">
-        <span class="tb-title" :style="titleBarTitleStyle">{{ canvasConfig.titleBarTitle || '我的应用' }}</span>
+      <div class="titlebar_center" :style="titleBarCenterStyle">
+        <span class="titlebar_center_title" :style="titleBarTitleStyle">{{ canvasConfig.titleBarTitle || '我的应用' }}</span>
       </div>
-      <div class="tb-right" :style="titleBarCellStyle">
+      <div class="titlebar_right" :style="titleBarCellStyle">
         <button
           id="titlebar_min"
-          class="tb-btn tb-btn-min"
+          class="titlebar_rightBtn titlebar_rightBtn_min"
           data-ctrl-type="titlebar_min"
           data-name="最小化"
           :style="titleBarBtnStyle"
@@ -30,8 +30,8 @@
         </button>
         <button
           id="titlebar_max"
-          class="tb-btn tb-btn-max"
-          :class="{ 'tb-btn-disabled': canvasConfig.canvasFixedSize }"
+          class="titlebar_rightBtn titlebar_rightBtn_max"
+          :class="{ 'titlebar_rightBtn_disabled': canvasConfig.canvasFixedSize }"
           data-ctrl-type="titlebar_max"
           data-name="最大化"
           :style="canvasConfig.canvasFixedSize ? titleBarBtnDisabledStyle : titleBarBtnStyle"
@@ -42,7 +42,7 @@
         </button>
         <button
           id="titlebar_close"
-          class="tb-btn tb-btn-close"
+          class="titlebar_rightBtn titlebar_rightBtn_close"
           data-ctrl-type="titlebar_close"
           data-name="关闭"
           :style="titleBarCloseBtnStyle"
@@ -138,7 +138,7 @@ const titleBarCenterStyle = computed(() => {
 })
 
 const titleBarBtnStyle = computed(() => ({
-  width: '32px',
+  width: '35px',
   height: '32px',
   display: 'flex',
   alignItems: 'center',
@@ -159,7 +159,7 @@ const titleBarBtnDisabledStyle = computed(() => ({
 }))
 
 const titleBarCloseBtnStyle = computed(() => ({
-  width: '32px',
+  width: '35px',
   height: '32px',
   display: 'flex',
   alignItems: 'center',

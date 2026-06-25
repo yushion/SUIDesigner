@@ -5,6 +5,7 @@
     "base": {
       "width": 80,
       "height": 30,
+	  "lineHeight": "30px",
       "backgroundColor": "#0078d4",
       "color": "#ffffff",
       "fontSize": 13,

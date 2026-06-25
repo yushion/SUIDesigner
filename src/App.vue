@@ -305,6 +305,7 @@ function saveGlobalConfigs() {
         borderRadius: store.canvas.borderRadius,
         showTitleBar: store.canvas.showTitleBar,
         titleBarAlign: store.canvas.titleBarAlign,
+        noIndentTitleBar: store.canvas.noIndentTitleBar,
       },
       contextMenuDefaultCSS: store.contextMenuDefaultCSS,
       tooltipDefaultCSS: store.tooltipDefaultCSS,
@@ -336,6 +337,7 @@ function loadGlobalConfigs() {
       if (canvasGlobals.borderRadius !== undefined) store.canvas.borderRadius = canvasGlobals.borderRadius
       if (canvasGlobals.showTitleBar !== undefined) store.canvas.showTitleBar = canvasGlobals.showTitleBar
       if (canvasGlobals.titleBarAlign !== undefined) store.canvas.titleBarAlign = canvasGlobals.titleBarAlign
+      if (canvasGlobals.noIndentTitleBar !== undefined) store.canvas.noIndentTitleBar = canvasGlobals.noIndentTitleBar
     }
     if (data.contextMenuDefaultCSS !== undefined) {
       store.contextMenuDefaultCSS = data.contextMenuDefaultCSS
@@ -444,7 +446,7 @@ const DEFAULT_CANVAS = {
   width: 800,
   height: 500,
   backgroundColor: '#ffffff',
-  borderColor: '#e5e5e5',
+  borderColor: '#D6D6D6',
   borderWidth: 1,
   borderRadius: 8,
   title: '标题'
@@ -515,7 +517,8 @@ watch(
       borderWidth: store.canvas.borderWidth,
       borderRadius: store.canvas.borderRadius,
       showTitleBar: store.canvas.showTitleBar,
-      titleBarAlign: store.canvas.titleBarAlign
+      titleBarAlign: store.canvas.titleBarAlign,
+      noIndentTitleBar: store.canvas.noIndentTitleBar
     },
     ctxCSS: store.contextMenuDefaultCSS,
     ttCSS: store.tooltipDefaultCSS

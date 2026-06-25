@@ -22,7 +22,7 @@ import toggleConfig             from './widgetDefaults/toggle.json'
 import comboBoxConfig           from './widgetDefaults/comboBox.json'
 import labelConfig              from './widgetDefaults/label.json'
 import dividerConfig            from './widgetDefaults/divider.json'
-import hyperlinkConfig          from './widgetDefaults/hyperlink.json'
+import hyperlinkConfig          from './widgetDefaults/hyperLink.json'
 import textareaConfig           from './widgetDefaults/textarea.json'
 import radioGroupConfig         from './widgetDefaults/radioGroup.json'
 import tabsContainerConfig      from './widgetDefaults/tabsContainer.json'
@@ -79,7 +79,7 @@ const BUILTIN_WIDGETS: RegistryEntry[] = [
   { type: 'comboBox',         config: comboBoxConfig as WidgetJSONConfig,         component: ComboBoxWidget },
   { type: 'label',            config: labelConfig as WidgetJSONConfig,            component: LabelWidget },
   { type: 'divider',          config: dividerConfig as WidgetJSONConfig,          component: DividerWidget },
-  { type: 'hyperlink',        config: hyperlinkConfig as WidgetJSONConfig,        component: HyperlinkWidget },
+  { type: 'hyperLink',        config: hyperlinkConfig as WidgetJSONConfig,        component: HyperlinkWidget },
   { type: 'textarea',         config: textareaConfig as WidgetJSONConfig,         component: TextareaWidget },
   { type: 'radioGroup',       config: radioGroupConfig as WidgetJSONConfig,       component: RadioGroupWidget },
   { type: 'tabsContainer',    config: tabsContainerConfig as WidgetJSONConfig,    component: TabsContainer },

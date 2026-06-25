@@ -5,7 +5,7 @@
 <template>
   <div
     ref="containerRef"
-    class="ui-widget tabs-container-widget"
+    class="ui-widget tabsContainer-widget"
     :class="{ selected: isSelected }"
     :id="widget.id"
     :data-widget-id="widget.id"
@@ -15,7 +15,7 @@
     <el-tabs
       v-model="activeTabName"
       type="card"
-      class="tabs-container-tabs"
+      class="tabsContainer-tabs"
       @tab-click="onTabClick"
     >
       <el-tab-pane
@@ -149,7 +149,7 @@ watch(() => props.widget.tabs?.length, () => {
 </script>
 
 <style scoped>
-.tabs-container-widget {
+.tabsContainer-widget {
   position: absolute;
   box-sizing: border-box;
   overflow: hidden;
@@ -157,14 +157,14 @@ watch(() => props.widget.tabs?.length, () => {
   flex-direction: column;
 }
 
-.tabs-container-tabs {
+.tabsContainer-tabs {
   flex: 1;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
-.tabs-container-tabs :deep(.el-tabs__header) {
+.tabsContainer-tabs :deep(.el-tabs__header) {
   margin: 0;
   height: 32px;
   background-color: var(--tab-header-bg, #f5f5f5);
@@ -173,15 +173,15 @@ watch(() => props.widget.tabs?.length, () => {
   display: var(--tab-header-display, flex);
 }
 
-.tabs-container-tabs :deep(.el-tabs__nav) {
+.tabsContainer-tabs :deep(.el-tabs__nav) {
   border: none;
 }
 
-.tabs-container-tabs :deep(.el-tabs__nav-wrap) {
+.tabsContainer-tabs :deep(.el-tabs__nav-wrap) {
   padding: 0;
 }
 
-.tabs-container-tabs :deep(.el-tabs__item) {
+.tabsContainer-tabs :deep(.el-tabs__item) {
   font-size: inherit;
   padding: 0 12px;
   height: 32px;
@@ -192,19 +192,19 @@ watch(() => props.widget.tabs?.length, () => {
   color: inherit;
 }
 
-.tabs-container-tabs :deep(.el-tabs__item.is-active) {
+.tabsContainer-tabs :deep(.el-tabs__item.is-active) {
   background-color: var(--tab-active-bg, #ffffff);
   color: inherit;
   border-bottom: 2px solid var(--tab-active-border-color, #1890ff);
 }
 
-.tabs-container-tabs :deep(.el-tabs__content) {
+.tabsContainer-tabs :deep(.el-tabs__content) {
   flex: 1;
   padding: 0;
   overflow: hidden;
 }
 
-.tabs-container-tabs :deep(.el-tab-pane) {
+.tabsContainer-tabs :deep(.el-tab-pane) {
   height: 100%;
 }
 
@@ -227,7 +227,7 @@ watch(() => props.widget.tabs?.length, () => {
   white-space: nowrap;
 }
 
-.tabs-container-widget :deep(.ui-widget) {
+.tabsContainer-widget :deep(.ui-widget) {
   cursor: move;
   box-sizing: border-box;
 }

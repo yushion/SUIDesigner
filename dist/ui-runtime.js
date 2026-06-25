@@ -4,7 +4,7 @@
  *
  * 依赖标准 DOM 属性（与具体控件类型无关）：
  *   id                - 控件唯一标识（同时也是 HTML id 属性）
- *   data-type         - 控件类型 (button/input/checkbox/toggle/comboBox/label/hyperlink/textarea/radioGroup/tabsContainer)
+ *   data-type         - 控件类型 (button/input/checkbox/toggle/comboBox/label/hyperLink/textarea/radioGroup/tabsContainer)
  *   data-name         - 控件名称
  *   data-parent       - 父容器ID（可选）
  *   data-tab          - 所属标签页索引（可选）
@@ -152,14 +152,14 @@
 
   /**
    * click 事件委托
-   * - 处理标签页按钮切换（.tab-header-btn）
+   * - 处理标签页按钮切换（.tabsContainer_headerBar_btn）
    * - 处理普通控件点击
    */
   document.addEventListener('click', function(e) {
     // 优先处理标签页按钮
-    var tabBtn = e.target.closest('.tab-header-btn');
+    var tabBtn = e.target.closest('.tabsContainer_headerBar_btn');
     if (tabBtn) {
-      var container = tabBtn.closest('.tabs-container');
+      var container = tabBtn.closest('.tabsContainer');
       if (!container) return;
 
       // 禁用状态下不处理标签切换
@@ -168,7 +168,7 @@
       var tabName = tabBtn.getAttribute('data-tab-name');
 
       // 切换标签头 active 状态
-      var allBtns = container.querySelectorAll('.tab-header-btn');
+      var allBtns = container.querySelectorAll('.tabsContainer_headerBar_btn');
       for (var b = 0; b < allBtns.length; b++) {
         allBtns[b].classList.remove('active');
       }

@@ -11,7 +11,7 @@ export type WidgetType =
   | 'toggle'
   | 'comboBox'
   | 'label'
-  | 'hyperlink'
+  | 'hyperLink'
   | 'textarea'
   | 'radioGroup'
   | 'tabsContainer'
@@ -113,7 +113,7 @@ export interface WidgetStyle {
   cursor?: string
   minWidth?: number
   minHeight?: number
-  /** 子选择器样式映射（如 { '.progress-fill': { background: '#0078D4' } }） */
+  /** 子选择器样式映射（如 { '.progressBar_fill': { background: '#0078D4' } }） */
   subStyles?: Record<string, Record<string, any>>
   /** 伪类样式映射（如 { ':hover': { filter: 'brightness(1.1)' } }） */
   pseudoStyles?: Record<string, Record<string, any>>
@@ -124,7 +124,7 @@ export interface WidgetStyle {
 export interface WidgetStyleData {
   /** 控件自身样式属性（camelCase） */
   base: Record<string, any>
-  /** 子选择器样式（key 为选择器字符串如 '.progress-fill'，value 为属性对象） */
+  /** 子选择器样式（key 为选择器字符串如 '.progressBar_fill'，value 为属性对象） */
   sub: Record<string, Record<string, any>>
   /** 伪类样式（key 为伪类字符串如 ':hover'，value 为属性对象） */
   pseudo: Record<string, Record<string, any>>
@@ -375,6 +375,8 @@ export interface CanvasConfig {
   glassEffect: boolean
   /** 显示画布外边框阴影 */
   showShadow: boolean
+  /** 无缩进标题栏：勾选后标题栏高度32px，按钮无上下右边距，标题font-weight:500 */
+  noIndentTitleBar: boolean
   /** 画布区可否拖拽（仅总预览生成页，app-region） */
   canvasDraggable: boolean
 

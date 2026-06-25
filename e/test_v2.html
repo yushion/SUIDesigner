@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>webviewBridge_v2 新方案测试</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+<style>
+* { margin:0;padding:0;box-sizing:border-box }
+html,body { width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#f0f2f5 }
+body { display:flex;flex-direction:column }
+
+/* 顶部标题栏 */
+.test-header {
+  background:#1a1a2e;color:#fff;padding:0 20px;height:48px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
+}
+.test-header h1 { font-size:16px }
+.test-header .badge { background:#4CAF50;padding:2px 8px;border-radius:4px;font-size:12px;margin-left:8px }
+
+/* 主内容 */
+.main-content { flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:20px }
+
+/* 面板 */
+.panel { background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.1);overflow:hidden }
+.panel-header { padding:12px 16px;background:#fafafa;border-bottom:1px solid #eee;font-weight:600;font-size:14px;color:#333;display:flex;align-items:center;gap:8px }
+.panel-header .icon { font-size:16px }
+.panel-body { padding:16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center }
+
+/* 控件组 */
+.ctrl-group { display:flex;flex-direction:column;gap:4px }
+.ctrl-label { font-size:11px;color:#888 }
+.ctrl-group input, .ctrl-group select, .ctrl-group textarea, .ctrl-group button {
+  padding:6px 10px;border:1px solid #d9d9d9;border-radius:4px;font-size:13px;outline:none
+}
+.ctrl-group input:focus, .ctrl-group select:focus, .ctrl-group textarea:focus { border-color:#409EFF }
+.ctrl-group button { background:#409EFF;color:#fff;border:none;cursor:pointer;white-space:nowrap }
+.ctrl-group button:hover { background:#66b1ff }
+.ctrl-group button.danger { background:#f56c6c }
+.ctrl-group button.danger:hover { background:#f78989 }
+.ctrl-group button.success { background:#67c23a }
+.ctrl-group button.success:hover { background:#85ce61 }
+.ctrl-group a { color:#409EFF;text-decoration:none;font-size:13px }
+.ctrl-group a:hover { text-decoration:underline }
+.ctrl-group textarea { resize:vertical;min-height:60px }
+
+/* 复选框和单选框 */
+.ctrl-group label { display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer }
+
+/* 开关 */
+.ctrl-group .switch { position:relative;display:inline-flex;align-items:center;gap:8px;font-size:13px }
+.ctrl-group .switch input { display:none }
+.ctrl-group .switch .slider {
+  width:40px;height:22px;background:#ccc;border-radius:11px;position:relative;cursor:pointer;transition:0.3s
+}
+.ctrl-group .switch .slider::after {
+  content:'';position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:2px;left:2px;transition:0.3s
+}
+.ctrl-group .switch input:checked + .slider { background:#409EFF }
+.ctrl-group .switch input:checked + .slider::after { left:20px }
+
+/* 事件日志 */
+.event-log { max-height:200px;overflow-y:auto;background:#1e1e1e;color:#d4d4d4;font-family:Consolas,monospace;font-size:12px;padding:10px;border-radius:4px }
+.event-log .log-entry { padding:2px 0;border-bottom:1px solid #333 }
+.event-log .log-entry .action { color:#4ec9b0 }
+.event-log .log-entry .type { color:#ce9178 }
+.event-log .log-entry .id { color:#9cdcfe }
+.event-log .log-entry .source { color:#6a9955 }
+
+/* 复杂控件 */
+.complex-container { min-height:200px;border:1px dashed #d9d9d9;border-radius:4px;padding:8px;background:#fafafa }
+
+/* 列表样式 */
+.listBox_scroll { max-height:150px;overflow-y:auto;border:1px solid #e0e0e0;border-radius:4px }
+.listBox_item { padding:8px 12px;cursor:pointer;border-bottom:1px solid #f0f0f0;font-size:13px }
+.listBox_item:hover { background:#f5f5f5 }
+.listBox_item.item-selected { background:#e6f7ff;color:#1890ff }
+.listBox_item_text { pointer-events:none }
+
+/* 表格样式 */
+.dataGrid_container { border:1px solid #e0e0e0;border-radius:4px;overflow:hidden;font-size:13px }
+.dataGrid_header { display:flex;background:#fafafa;border-bottom:1px solid #e0e0e0;font-weight:600 }
+.dataGrid_header_cell { padding:8px 12px;border-right:1px solid #e0e0e0 }
+.dataGrid_body { max-height:150px;overflow-y:auto }
+.dataGrid_row { display:flex;border-bottom:1px solid #f0f0f0 }
+.dataGrid_row:hover { background:#f5f5f5 }
+.dataGrid_row.dataGrid_row-focused { background:#e6f7ff;color:#1890ff }
+.dataGrid_cell { padding:8px 12px;border-right:1px solid #f0f0f0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap }
+.dataGrid_checkbox { display:flex;align-items:center;justify-content:center }
+
+/* 树形框 */
+.treeView_node_content { display:flex;align-items:center;padding:4px 8px;cursor:pointer;font-size:13px;gap:4px }
+.treeView_node_content:hover { background:#f5f5f5 }
+.treeView_node_content.selected { background:#e6f7ff;color:#1890ff }
+.treeView_toggle { font-size:10px;width:16px;text-align:center;transition:transform 0.2s;cursor:pointer;flex-shrink:0 }
+.treeView_toggle.expanded { transform:rotate(90deg) }
+.treeView_toggle.collapsed { transform:rotate(0deg) }
+.treeView_toggle.empty { visibility:hidden }
+.treeView_children { padding-left:20px }
+.treeView_label { pointer-events:none }
+
+/* 标签页 */
+.tabsContainer_headerBar { display:flex;border-bottom:2px solid #e0e0e0;margin-bottom:8px }
+.tabsContainer_headerBar_btn { padding:8px 16px;background:none;border:none;cursor:pointer;font-size:13px;color:#666;border-bottom:2px solid transparent;margin-bottom:-2px }
+.tabsContainer_headerBar_btn:hover { color:#409EFF }
+.tabsContainer_headerBar_btn.active { color:#409EFF;border-bottom-color:#409EFF }
+.tabsContainer_contentWrapper_panel { display:none;padding:8px;min-height:100px;font-size:13px }
+.tabsContainer_contentWrapper_panel.active { display:block }
+
+/* 命令测试按钮 */
+.cmd-panel { display:flex;flex-wrap:wrap;gap:8px;align-items:center }
+.cmd-panel input { padding:4px 8px;border:1px solid #d9d9d9;border-radius:4px;font-size:12px;width:120px }
+</style>
+</head>
+<body>
+
+<!-- 顶部 -->
+<div class="test-header">
+  <div><h1>webviewBridge_v2 测试页面<span class="badge">v2.0</span></h1></div>
+  <div style="font-size:12px;opacity:0.7">source 标记: e=explicit n=native c=container</div>
+</div>
+
+<!-- 主内容 -->
+<div class="main-content">
+
+  <!-- ========== 一、简单控件（零配置，仅标准HTML） ========== -->
+  <div class="panel">
+    <div class="panel-header"><span class="icon">📋</span> 一、简单控件 — 零配置（标准HTML标签，无需data-*属性）</div>
+    <div class="panel-body">
+      <div class="ctrl-group">
+        <span class="ctrl-label">按钮</span>
+        <button id="btnSimple">点击按钮</button>
+      </div>
+      <div class="ctrl-group">
+        <span class="ctrl-label">文本输入框</span>
+        <input type="text" id="txtName" placeholder="请输入姓名" />
+      </div>
+      <div class="ctrl-group">
+        <span class="ctrl-label">密码框</span>
+        <input type="password" id="txtPwd" placeholder="请输入密码" />
+      </div>
+      <div class="ctrl-group">
+        <span class="ctrl-label">数字框</span>
+        <input type="number" id="txtAge" value="25" />
+      </div>
+      <div class="ctrl-group">
+        <span class="ctrl-label">文本域</span>
+        <textarea id="txtDesc" placeholder="请输入描述"></textarea>
+      </div>
+      <div class="ctrl-group">
+        <span class="ctrl-label">复选框</span>
+        <label><input type="checkbox" id="chkAgree" /> 同意协议</label>
+      </div>
+      <div class="ctrl-group">
+        <span class="ctrl-label">单选框</span>
+        <label><input type="radio" id="rdoMale" name="gender" value="male" /> 男</label>
+        <label><input type="radio" id="rdoFemale" name="gender" value="female" /> 女</label>
+      </div>
+      <div class="ctrl-group">
+        <span class="ctrl-label">下拉框</span>
+        <select id="selCity">
+          <option value="bj">北京</option>
+          <option value="sh">上海</option>
+          <option value="gz">广州</option>
+          <option value="sz">深圳</option>
+        </select>
+      </div>
+      <div class="ctrl-group">
+        <span class="ctrl-label">超链接</span>
+        <a href="#" id="linkMore">查看更多 →</a>
+      </div>
+      <div class="ctrl-group">
+        <span class="ctrl-label">进度条</span>
+        <input type="range" id="progressBar_1" min="0" max="100" value="60" />
+      </div>
+      <div class="ctrl-group">
+        <span class="ctrl-label">日期时间</span>
+        <input type="datetime-local" id="dtPicker_1" />
+      </div>
+      <div class="ctrl-group">
+        <span class="ctrl-label">开关</span>
+        <label class="switch" id="switch_1">
+          <input type="checkbox" /><span class="slider"></span> 开启通知
+        </label>
+      </div>
+      <div class="ctrl-group">
+        <span class="ctrl-label">图标按钮</span>
+        <button id="iconBtn_1"><i class="fas fa-star"></i> 收藏</button>
+      </div>
+      <div class="ctrl-group">
+        <span class="ctrl-label">文本标签</span>
+        <span id="label_1" style="padding:6px 10px;background:#f0f0f0;border-radius:4px;font-size:13px">状态：运行中</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 二、复杂控件（data-ctrl声明式） ========== -->
+  <div class="panel">
+    <div class="panel-header"><span class="icon">📊</span> 二、复杂控件 — data-ctrl 声明式配置</div>
+    <div class="panel-body" style="flex-direction:column;align-items:stretch">
+      
+      <!-- 列表框 -->
+      <div class="ctrl-group">
+        <span class="ctrl-label">列表框（data-ctrl="listBox"）</span>
+        <div class="complex-container">
+          <div data-ctrl="listBox" id="listBox_1"
+               data-items='["项目一","项目二","项目三","项目四","项目五"]'>
+          </div>
+        </div>
+      </div>
+
+      <!-- 表格 -->
+      <div class="ctrl-group">
+        <span class="ctrl-label">多项表格（data-ctrl="dataGrid"）</span>
+        <div class="complex-container">
+          <div data-ctrl="dataGrid" id="dataGrid_1"
+               data-columns='["姓名","年龄","城市","职业"]'
+               data-rows='[["张三","25","北京","工程师"],["李四","30","上海","设计师"],["王五","28","广州","产品经理"]]'
+               data-show-checkbox="true">
+          </div>
+        </div>
+      </div>
+
+      <!-- 树形框 -->
+      <div class="ctrl-group">
+        <span class="ctrl-label">树形框（data-ctrl="treeView"）</span>
+        <div class="complex-container">
+          <div data-ctrl="treeView" id="treeView_1"
+               data-tree='[
+                 {"text":"根节点","children":[
+                   {"text":"子节点1"},
+                   {"text":"子节点2","children":[
+                     {"text":"孙节点1"},
+                     {"text":"孙节点2"}
+                   ]},
+                   {"text":"子节点3"}
+                 ]}
+               ]'>
+          </div>
+        </div>
+      </div>
+
+      <!-- 标签页 -->
+      <div class="ctrl-group">
+        <span class="ctrl-label">标签页（data-ctrl="tabs"）</span>
+        <div class="complex-container">
+          <div data-ctrl="tabs" id="tabsContainer_1"
+               data-tabs='[
+                 {"title":"基本信息","content":"<p>这里是基本信息标签页的内容。</p><input type=\"text\" id=\"txtTab1\" placeholder=\"标签页内输入框\" />"},
+                 {"title":"详细资料","content":"<p>这里是详细资料标签页的内容。</p><button id=\"btnTab2\">标签页内按钮</button>"},
+                 {"title":"设置","content":"<p>这里是设置标签页的内容。</p><label><input type=\"checkbox\" id=\"chkTab3\" /> 启用高级选项</label>"}
+               ]'>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========== 三、命令执行测试（控件ID.方法名） ========== -->
+  <div class="panel">
+    <div class="panel-header"><span class="icon">🔧</span> 三、命令执行测试 — 控件ID.方法名 + needResult</div>
+    <div class="panel-body" style="flex-direction:column;align-items:stretch">
+      <div class="cmd-panel">
+        <button class="success" onclick="testCmd('btnSimple.getValue')">getValue(按钮)</button>
+        <button class="success" onclick="testCmd('txtName.getValue')">getValue(输入框)</button>
+        <button class="success" onclick="testCmd('txtName.setValue', {value:'自动设置的值'})">setValue(输入框)</button>
+        <button class="success" onclick="testCmd('chkAgree.getValue')">getValue(复选框)</button>
+        <button class="success" onclick="testCmd('selCity.getValue')">getValue(下拉框)</button>
+        <button class="success" onclick="testCmd('progressBar_1.getValue')">getValue(进度条)</button>
+        <button class="success" onclick="testCmd('listBox_1.getValue')">getValue(列表框)</button>
+        <button class="success" onclick="testCmd('dataGrid_1.getValue')">getValue(表格)</button>
+        <button class="success" onclick="testCmd('treeView_1.getValue')">getValue(树形框)</button>
+      </div>
+      <div class="cmd-panel" style="margin-top:8px">
+        <button onclick="testCmd('listBox_1.addItem', {value:'新增项目'})">addItem(列表框)</button>
+        <button onclick="testCmd('listBox_1.removeItem', {index:0})">removeItem(列表框)</button>
+        <button class="danger" onclick="testCmd('listBox_1.clear')">clear(列表框)</button>
+        <button onclick="testCmd('dataGrid_1.addRow', {row:['新增','0','未知','-']})">addRow(表格)</button>
+        <button onclick="testCmd('dataGrid_1.removeRow', {index:0})">removeRow(表格)</button>
+        <button class="danger" onclick="testCmd('dataGrid_1.clear')">clear(表格)</button>
+        <button onclick="testCmd('tabsContainer_1.selectTab', {index:1})">selectTab(标签页 index=1)</button>
+        <button onclick="testCmd('tabsContainer_1.selectTab', {index:2})">selectTab(标签页 index=2)</button>
+        <button onclick="testCmd('tabsContainer_1.selectTab', {index:0})">selectTab(标签页 index=0)</button>
+      </div>
+      <div class="cmd-panel" style="margin-top:8px">
+        <button onclick="testCmd('txtName.disable')">disable(输入框)</button>
+        <button onclick="testCmd('txtName.enable')">enable(输入框)</button>
+        <button onclick="testCmd('btnSimple.hide')">hide(按钮)</button>
+        <button onclick="testCmd('btnSimple.show')">show(按钮)</button>
+        <button onclick="testCmd('label_1.setValue', {value:'状态：已更新'})">setValue(标签)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 四、事件日志 ========== -->
+  <div class="panel">
+    <div class="panel-header">
+      <span class="icon">📡</span> 四、事件上报日志（webviewBridge.postMessage）
+      <button onclick="clearLog()" style="margin-left:auto;padding:2px 8px;font-size:11px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;cursor:pointer">清空</button>
+    </div>
+    <div class="panel-body">
+      <div class="event-log" id="eventLog">
+        <div class="log-entry" style="color:#6a9955">等待事件上报...</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 引入 v2 桥接脚本 -->
+<script src="webviewBridge_v2.js"></script>
+
+<!-- 测试辅助脚本 -->
+<script>
+// 拦截 postMessage 显示在日志中
+(function() {
+  var origPostMessage = window.chrome && window.chrome.webview && window.chrome.webview.postMessage;
+  if (origPostMessage) {
+    window.chrome.webview.postMessage = function(msg) {
+      addLogEntry(msg);
+      origPostMessage.call(window.chrome.webview, msg);
+    };
+  } else {
+    // 模拟 WebView2 环境用于测试
+    if (!window.chrome) window.chrome = {};
+    if (!window.chrome.webview) window.chrome.webview = {};
+    window.chrome.webview.postMessage = function(msg) {
+      addLogEntry(msg);
+    };
+    window.chrome.webview.addEventListener = function(event, callback) {
+      // 模拟监听
+    };
+    console.log('[TEST] 模拟 WebView2 环境已创建');
+  }
+})();
+
+function addLogEntry(msg) {
+  var log = document.getElementById('eventLog');
+  if (!log) return;
+  var entry = document.createElement('div');
+  entry.className = 'log-entry';
+  var sourceTag = msg.source === 'native' ? '<span class="source">[n]</span>' :
+                  msg.source === 'explicit' ? '<span class="source">[e]</span>' :
+                  msg.source === 'container' ? '<span class="source">[c]</span>' : '';
+  var action = msg.action || '?';
+  var ctrlType = msg.ctrlType || '';
+  var targetId = msg.targetId || '';
+  var dataStr = msg.data ? JSON.stringify(msg.data).substring(0, 80) : '{}';
+  entry.innerHTML = sourceTag + ' <span class="action">' + action + '</span> <span class="type">' + ctrlType + '</span> <span class="id">' + targetId + '</span> ' + dataStr;
+  log.appendChild(entry);
+  log.scrollTop = log.scrollHeight;
+}
+
+function clearLog() {
+  var log = document.getElementById('eventLog');
+  log.innerHTML = '<div class="log-entry" style="color:#6a9955">日志已清空，等待事件上报...</div>';
+}
+
+// 命令测试
+function testCmd(command, params) {
+  params = params || {};
+  params.command = command;
+  params.needResult = true;
+  console.log('[TEST] 发送命令:', JSON.stringify(params));
+  
+  // 模拟宿主发送命令
+  if (window.webviewBridge && window.webviewBridge.api && window.webviewBridge.api.sendMessage) {
+    // 直接调用 dispatchCommand（通过内部机制）
+    var cmd = { command: command, needResult: true };
+    for (var k in params) {
+      if (k !== 'command' && k !== 'needResult') cmd[k] = params[k];
+    }
+    // 通过消息监听机制触发
+    var event = { data: JSON.stringify(cmd) };
+    if (window.chrome && window.chrome.webview && window.chrome.webview._listeners) {
+      for (var i = 0; i < window.chrome.webview._listeners.length; i++) {
+        window.chrome.webview._listeners[i](event);
+      }
+    }
+  }
+}
+
+// 拦截 addEventListener 以追踪监听器
+(function() {
+  if (window.chrome && window.chrome.webview && !window.chrome.webview._listeners) {
+    window.chrome.webview._listeners = [];
+    var origAddEventListener = window.chrome.webview.addEventListener;
+    window.chrome.webview.addEventListener = function(event, callback) {
+      if (event === 'message') {
+        window.chrome.webview._listeners.push(callback);
+      }
+      if (origAddEventListener) origAddEventListener.call(this, event, callback);
+    };
+  }
+})();
+
+// 页面就绪后显示状态
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('[TEST] 测试页面就绪，webviewBridge_v2 已加载');
+  console.log('[TEST] 简单控件：' + document.querySelectorAll('button:not(.tabsContainer_headerBar_btn),input,select,textarea,a').length + ' 个');
+  console.log('[TEST] 复杂控件容器：' + document.querySelectorAll('[data-ctrl]').length + ' 个');
+});
+</script>
+
+</body>
+</html>

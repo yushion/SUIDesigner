@@ -4,7 +4,7 @@
  */
 <template>
   <a
-    class="ui-widget hyperlink-widget"
+    class="ui-widget hyperLink-widget"
     :class="{ selected: isSelected }"
     :id="widget.id"
     :data-widget-id="widget.id"
@@ -35,7 +35,7 @@ const widgetStyle = computed(() => widgetHyperlinkStyle(props.widget))
 </script>
 
 <style scoped>
-.hyperlink-widget {
+.hyperLink-widget {
   position: absolute;
   cursor: move;
   user-select: none;

@@ -413,6 +413,7 @@ export const TreeNodeItem = defineComponent({
 
 .tree-toggle.expanded {
   color: #333;
+  transform: rotate(90deg);
 }
 
 .tree-node-text {

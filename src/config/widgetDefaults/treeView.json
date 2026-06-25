@@ -47,7 +47,7 @@
         "color": "#666666"
       },
       ".tree-toggle.expanded": {
-        "transform": "rotate(0deg)"
+        "transform": "rotate(90deg)"
       },
       ".tree-toggle.empty": {
         "visibility": "hidden"
@@ -155,7 +155,6 @@
       "transition: transform 0.2s"
     ],
     ".tree-toggle.expanded": [
-      "transform: rotate(90deg)"
     ],
     ".tree-toggle.empty": [
       "visibility: hidden"

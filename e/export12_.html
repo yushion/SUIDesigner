@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>±êÌâ</title>
+<title>ï¿½ï¿½ï¿½ï¿½</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 <style data-preview-id="main">
-/* === È«¾Ö»ù´¡ÑùÊ½ === */
+/* === È«ï¿½Ö»ï¿½ï¿½ï¿½ï¿½ï¿½Ê½ === */
 
 * { margin:0;padding:0;box-sizing:border-box }
 html,body { width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:transparent }
 body { display:flex }
 
-.page-container {
+.pageContainer {
   position:relative;
   overflow:hidden;
   backdrop-filter: blur(24px) !important;
 }
-.page-container::before {
+.pageContainer::before {
   content:'';
   position:absolute;
   inset:0;
@@ -27,57 +27,57 @@ body { display:flex }
   opacity: var(--canvas-opacity);
   border-radius: inherit;
 }
-.page-container.show-shadow {
+.pageContainer.show-shadow {
   box-shadow: 0 1px 4px rgba(0,0,0,0.3);
 }
 
-/* ÅÅ³ýËùÓÐ¿Ø¼þºÍµ¯³ö¿òµÄÍÏ×§ÇøÓò£¬È·±£¿Ø¼þ¿É½»»¥ */
-.page-container [data-ctrl-type] {
+/* ï¿½Å³ï¿½ï¿½ï¿½ï¿½Ð¿Ø¼ï¿½ï¿½Íµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×§ï¿½ï¿½ï¿½ï¿½È·ï¿½ï¿½ï¿½Ø¼ï¿½ï¿½É½ï¿½ï¿½ï¿½ */
+.pageContainer [data-ctrl-type] {
   app-region: no-drag;
 }
 
-/* »­²¼±êÌâÀ¸ */
-.canvas-titlebar {
+/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+.titlebar {
   position:absolute;top:0;left:0;right:0;
   display:flex;align-items:center;height:40px;user-select:none;z-index:10;
 }
-.canvas-titlebar .tb-left {
+.titlebar .titlebar_left {
   width:48px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
 }
-.canvas-titlebar .tb-center {
+.titlebar .titlebar_center {
   flex:1;display:flex;align-items:center;min-width:0;
 }
-.canvas-titlebar .tb-right {
+.titlebar .titlebar_right {
   display:flex;align-items:center;justify-content:flex-end;gap:2px;padding-right:4px;flex-shrink:0;
 }
-.canvas-titlebar .tb-icon {
+.titlebar .titlebar_left_icon {
   width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:16px;
 }
-.canvas-titlebar .tb-title {
+.titlebar .titlebar_center_title {
   font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
-.canvas-titlebar .tb-btn {
+.titlebar .titlebar_rightBtn {
   width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:default;border-radius:4px;flex-shrink:0;
 }
-.canvas-titlebar .tb-btn:hover { background:rgba(0,0,0,0.06) }
-.canvas-titlebar .tb-btn-min:hover,.tb-btn-max:hover { filter: brightness(1.2)}
-.canvas-titlebar .tb-btn-close:hover { background:#e81123;color:#fff }
-.canvas-titlebar .tb-btn-min:active,.tb-btn-max:active,.tb-btn-close:active {filter: brightness(0.7);}
+.titlebar .titlebar_rightBtn:hover { background:rgba(0,0,0,0.06) }
+.titlebar .titlebar_rightBtn_min:hover,.titlebar_rightBtn_min:hover { filter: brightness(1.2)}
+.titlebar .titlebar_rightBtn_close:hover { background:#e81123;color:#fff }
+.titlebar .titlebar_rightBtn_min:active,.titlebar_rightBtn_min:active,.titlebar_rightBtn_close:active {filter: brightness(0.7);}
 
-/* Ã«²£Á§Ð§¹û */
-.page-container.glass-effect {
+/* Ã«ï¿½ï¿½ï¿½ï¿½Ð§ï¿½ï¿½ */
+.pageContainer.glass-effect {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   --shadow-blur: 10px;
 }
 
-/* ËùÓÐ¿Ø¼þµÄ»ù´¡¶¨Î»£¨¾ßÌå left/top/width/height ÔÚ¸÷ #id ¿éÖÐ£© */
+/* ï¿½ï¿½ï¿½Ð¿Ø¼ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ left/top/width/height ï¿½Ú¸ï¿½ #id ï¿½ï¿½ï¿½Ð£ï¿½ */
 [data-type] {
   position:absolute;
   box-sizing:border-box;
 }
 
-/* ÓÒ¼ü²Ëµ¥Ä¬ÈÏÑùÊ½ */
+/* ï¿½Ò¼ï¿½ï¿½Ëµï¿½Ä¬ï¿½ï¿½ï¿½ï¿½Ê½ */
 .ctx-menu-overlay {
   position: fixed;
   left: 0;
@@ -160,8 +160,8 @@ body { display:flex }
 }
 
 
-/* === Ò³ÃæÈÝÆ÷ === */
-.page-container {
+/* === Ò³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ === */
+.pageContainer {
   width: 800px;
   height: 555px;
   background-color: transparent;
@@ -171,8 +171,8 @@ body { display:flex }
   
 }
 
-/* === »­²¼×Ô¶¨ÒåÑùÊ½ === */
-.page-container {
+/* === ï¿½ï¿½ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½Ê½ === */
+.pageContainer {
   position: relative;
   overflow: hidden;
   --canvas-bg-color: #cccccc;
@@ -181,7 +181,7 @@ body { display:flex }
   --canvas-opacity: 0.1;
 }
 
-.page-container::before {
+.pageContainer::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -192,12 +192,12 @@ body { display:flex }
   border-radius: inherit;
 }
 
-.page-container.glass-effect {
+.pageContainer.glass-effect {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
 
-.canvas-titlebar {
+.titlebar {
   position: absolute;
   top: 0;
   left: 0;
@@ -212,7 +212,7 @@ body { display:flex }
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-.canvas-titlebar .tb-left {
+.titlebar .titlebar_left {
   width: 48px;
   display: flex;
   align-items: center;
@@ -220,14 +220,14 @@ body { display:flex }
   flex-shrink: 0;
 }
 
-.canvas-titlebar .tb-center {
+.titlebar .titlebar_center {
   flex: 1;
   display: flex;
   align-items: center;
   min-width: 0;
 }
 
-.canvas-titlebar .tb-right {
+.titlebar .titlebar_right {
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -236,7 +236,7 @@ body { display:flex }
   flex-shrink: 0;
 }
 
-.canvas-titlebar .tb-icon {
+.titlebar .titlebar_left_icon {
   width: 24px;
   height: 24px;
   display: flex;
@@ -245,7 +245,7 @@ body { display:flex }
   font-size: 16px;
 }
 
-.canvas-titlebar .tb-title {
+.titlebar .titlebar_center_title {
   font-size: 13px;
   font-weight: 600;
   overflow: hidden;
@@ -253,7 +253,7 @@ body { display:flex }
   white-space: nowrap;
 }
 
-.canvas-titlebar .tb-btn {
+.titlebar .titlebar_rightBtn {
   width: 32px;
   height: 32px;
   display: flex;
@@ -266,17 +266,17 @@ body { display:flex }
   flex-shrink: 0;
 }
 
-.canvas-titlebar .tb-btn:hover { background: rgba(0, 0, 0, 0.06); }
+.titlebar .titlebar_rightBtn:hover { background: rgba(0, 0, 0, 0.06); }
 
-.canvas-titlebar .tb-btn-close:hover { background: #e81123; color: #fff; }
+.titlebar .titlebar_rightBtn_close:hover { background: #e81123; color: #fff; }
 
-/* === Ò³ÃæÈÝÆ÷ CSS ±äÁ¿£¨·ÅÔÚ customCSS Ö®ºó£¬È·±£²»±»¸²¸Ç£© === */
-.page-container {
+/* === Ò³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ CSS ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ customCSS Ö®ï¿½ï¿½È·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç£ï¿½ === */
+.pageContainer {
   --canvas-bg-color: #cccccc;
   --canvas-opacity: 0.1;
 }
 
-/* === ¿Ø¼þ¶ÀÁ¢ÑùÊ½£¨Ã¿¿Ø¼þÍêÕû #id { ... }£¬»¥²»¸ÉÈÅ£© === */
+/* === ï¿½Ø¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½ï¿½ï¿½Ã¿ï¿½Ø¼ï¿½ï¿½ï¿½ï¿½ï¿½ #id { ... }ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å£ï¿½ === */
 #button_1 {
   position: absolute;
   left: 46px;
@@ -467,17 +467,17 @@ body { display:flex }
   color: #333333;
   font-size: 13px;
 }
-#radioGroup_1 .radiogroup-item { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; font-size: 13px; color: #333333; font-style: normal; }
-#radioGroup_1 .radiogroup-item input[type="radio"] { accent-color: #0078d4; width: 16px; height: 16px; margin: 0; cursor: pointer; }
-#radioGroup_1 .radiogroup-item input:disabled { opacity: 0.5; cursor: not-allowed; }
-#radioGroup_1 .radiogroup-item { display: inline-flex;
+#radioGroup_1 .radioGroup_item { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; font-size: 13px; color: #333333; font-style: normal; }
+#radioGroup_1 .radioGroup_item input[type="radio"] { accent-color: #0078d4; width: 16px; height: 16px; margin: 0; cursor: pointer; }
+#radioGroup_1 .radioGroup_item input:disabled { opacity: 0.5; cursor: not-allowed; }
+#radioGroup_1 .radioGroup_item { display: inline-flex;
   align-items: center;
   gap: 4px;
   cursor: pointer;
   font-size: 13px;
   color: #333333; }
-#radioGroup_1 .radiogroup-item input[type="radio"] { cursor: pointer; }
-#radioGroup_1 .radiogroup-item input:disabled { opacity: 0.5;
+#radioGroup_1 .radioGroup_item input[type="radio"] { cursor: pointer; }
+#radioGroup_1 .radioGroup_item input:disabled { opacity: 0.5;
   cursor: not-allowed; }
 
 #progressBar_1 {
@@ -494,16 +494,16 @@ body { display:flex }
   font-size: 12px;
   background-color: #E0E0E0;
 }
-#progressBar_1 .progress-fill { position: absolute; left: 0; top: 0; height: 100%; background: #0078D4; width: 60%; transition: width 0.2s; }
-#progressBar_1 .progress-text { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: inherit; color: #fff; text-shadow: 0 0 2px rgba(0, 0, 0, 0.5); pointer-events: none; }
-#progressBar_1 .progress-fill { position: absolute;
+#progressBar_1 .progressBar_fill { position: absolute; left: 0; top: 0; height: 100%; background: #0078D4; width: 60%; transition: width 0.2s; }
+#progressBar_1 .progressBar_text { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: inherit; color: #fff; text-shadow: 0 0 2px rgba(0, 0, 0, 0.5); pointer-events: none; }
+#progressBar_1 .progressBar_fill { position: absolute;
   left: 0;
   top: 0;
   height: 100%;
   background: #0078D4;
   width: 60%;
   transition: width 0.2s; }
-#progressBar_1 .progress-text { position: absolute;
+#progressBar_1 .progressBar_text { position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
@@ -663,8 +663,8 @@ body { display:flex }
   border-radius: 4px;
   background-color: #f8f8f8;
 }
-#logOutput_1 .log-line { line-height: 1.5; padding: 2px 5px; }
-#logOutput_1 .log-line { line-height: 1.5;
+#logOutput_1 .logOutput_line { line-height: 1.5; padding: 2px 5px; }
+#logOutput_1 .logOutput_line { line-height: 1.5;
   padding: 2px 5px; }
 
 #listBox_1 {
@@ -686,21 +686,21 @@ body { display:flex }
   border-width: 1px;
   border-style: solid;
 }
-#listBox_1 .list-box-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; }
-#listBox_1 .list-item { display: flex; align-items: center; height: 32px; padding: 0 10px; cursor: pointer; user-select: none; font-size: 13px; color: #333; border-bottom: 1px solid #f0f0f0; gap: 8px; }
-#listBox_1 .list-item:last-child { border-bottom: none; }
-#listBox_1 .list-item:hover { background-color: #f5f5f5; }
-#listBox_1 .list-item.item-selected { background-color: #e6f4ff; }
-#listBox_1 .list-item-checkbox { margin: 0; flex-shrink: 0; accent-color: #1890ff; }
-#listBox_1 .list-item-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: inherit; color: inherit; }
-#listBox_1 .list-item-edit-input { flex: 1; height: 24px; border: 1px solid #1890ff; border-radius: 3px; padding: 0 6px; font-size: 13px; font-family: inherit; outline: none; box-shadow: 0 0 0 2px rgba(24,144,255,0.2); }
+#listBox_1 .listBox_scroll { flex: 1; overflow-y: auto; overflow-x: hidden; }
+#listBox_1 .listBox_item { display: flex; align-items: center; height: 32px; padding: 0 10px; cursor: pointer; user-select: none; font-size: 13px; color: #333; border-bottom: 1px solid #f0f0f0; gap: 8px; }
+#listBox_1 .listBox_item:last-child { border-bottom: none; }
+#listBox_1 .listBox_item:hover { background-color: #f5f5f5; }
+#listBox_1 .listBox_item.item-selected { background-color: #e6f4ff; }
+#listBox_1 .listBox_item-checkbox { margin: 0; flex-shrink: 0; accent-color: #1890ff; }
+#listBox_1 .listBox_item_text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: inherit; color: inherit; }
+#listBox_1 .listBox_item-edit-input { flex: 1; height: 24px; border: 1px solid #1890ff; border-radius: 3px; padding: 0 6px; font-size: 13px; font-family: inherit; outline: none; box-shadow: 0 0 0 2px rgba(24,144,255,0.2); }
 #listBox_1 .list-empty { display: flex; align-items: center; justify-content: center; height: 100%; color: #ccc; font-size: 13px; }
 #listBox_1.disabled { cursor: not-allowed; opacity: 0.6; }
 #listBox_1 .disabled-overlay { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.5); pointer-events: none; }
-#listBox_1 .list-box-scroll { flex: 1;
+#listBox_1 .listBox_scroll { flex: 1;
   overflow-y: auto;
   overflow-x: hidden; }
-#listBox_1 .list-item { display: flex;
+#listBox_1 .listBox_item { display: flex;
   align-items: center;
   height: 32px;
   padding: 0 10px;
@@ -710,17 +710,17 @@ body { display:flex }
   color: #333333;
   border-bottom: 1px solid #f0f0f0;
   gap: 8px; }
-#listBox_1 .list-item:last-child { border-bottom: none; }
-#listBox_1 .list-item:hover { background-color: #f5f5f5; }
-#listBox_1 .list-item.item-selected { background-color: #e6f4ff; }
-#listBox_1 .list-item-checkbox { margin: 0;
+#listBox_1 .listBox_item:last-child { border-bottom: none; }
+#listBox_1 .listBox_item:hover { background-color: #f5f5f5; }
+#listBox_1 .listBox_item.item-selected { background-color: #e6f4ff; }
+#listBox_1 .listBox_item-checkbox { margin: 0;
   flex-shrink: 0;
   accent-color: #1890ff; }
-#listBox_1 .list-item-text { flex: 1;
+#listBox_1 .listBox_item_text { flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
-#listBox_1 .list-item-edit-input { flex: 1;
+#listBox_1 .listBox_item-edit-input { flex: 1;
   height: 24px;
   border: 1px solid #1890ff;
   border-radius: 3px;
@@ -749,50 +749,50 @@ body { display:flex }
 </style>
 </head>
 <body style="align-items:center;justify-content:center">
-<div class="page-container" id="page_container" data-ctrl-type="page" data-name="canvas" data-original-width="800" data-original-height="555">
+<div class="pageContainer" id="pageContainer" data-ctrl-type="pageContainer" data-name="canvas" data-original-width="800" data-original-height="555">
 
-<div class="canvas-titlebar" id="titlebar" data-name="±êÌâÀ¸" style="
+<div class="titlebar" id="titlebar" data-name="ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½" style="
   position:absolute;top:0;left:0;right:0;height:40px;
   background-color:#ffffff;
   opacity:1;
   border-bottom:1px solid rgba(0,0,0,0.08);
   app-region: drag;
 ">
-  <div class="tb-left"  data-ctrl-type="titlebar_icon">
-    <span class="tb-icon" id="titlebar_icon" data-name="Í¼±ê" style="color:#333333;"><i class="fas fa-star"></i></span>
+  <div class="titlebar_left"  data-ctrl-type="titlebar_left_icon">
+    <span class="titlebar_left_icon" id="titlebar_left_icon" data-name="Í¼ï¿½ï¿½" style="color:#333333;"><i class="fas fa-star"></i></span>
   </div>
-  <div class="tb-center" style="justify-content:flex-start;">
-    <span class="tb-title" id="titlebar_title" data-name="±êÌâ" data-ctrl-type="titlebar_title" style="color:#333333">ÎÒµÄÓ¦ÓÃ</span>
+  <div class="titlebar_center" style="justify-content:flex-start;">
+    <span class="titlebar_center_title" id="titlebar_title" data-name="ï¿½ï¿½ï¿½ï¿½" data-ctrl-type="titlebar_title" style="color:#333333">ï¿½Òµï¿½Ó¦ï¿½ï¿½</span>
   </div>
-  <div class="tb-right">
-    <button class="tb-btn tb-btn-min" id="titlebar_min" data-ctrl-type="titlebar_min" data-name="×îÐ¡»¯" style="color:#333333;" title="×îÐ¡»¯">
+  <div class="titlebar_right">
+    <button class="titlebar_rightBtn titlebar_rightBtn_min" id="titlebar_min" data-ctrl-type="titlebar_min" data-name="ï¿½ï¿½Ð¡ï¿½ï¿½" style="color:#333333;" title="ï¿½ï¿½Ð¡ï¿½ï¿½">
       <svg width="10" height="1" viewBox="0 0 10 1"><rect width="10" height="1" fill="currentColor"/></svg>
     </button>
-    <button class="tb-btn tb-btn-max" id="titlebar_max" data-ctrl-type="titlebar_max" data-name="×î´ó»¯" style="color:#333333;" title="×î´ó»¯">
+    <button class="titlebar_rightBtn titlebar_rightBtn_min" id="titlebar_max" data-ctrl-type="titlebar_max" data-name="ï¿½ï¿½ï¿½" style="color:#333333;" title="ï¿½ï¿½ï¿½">
       <svg width="10" height="10" viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
     </button>
-    <button class="tb-btn tb-btn-close" id="titlebar_close" data-ctrl-type="titlebar_close" data-name="¹Ø±Õ" style="color:#333333;" title="¹Ø±Õ">
+    <button class="titlebar_rightBtn titlebar_rightBtn_close" id="titlebar_close" data-ctrl-type="titlebar_close" data-name="ï¿½Ø±ï¿½" style="color:#333333;" title="ï¿½Ø±ï¿½">
       <svg width="10" height="10" viewBox="0 0 10 10"><line x1="1" y1="1" x2="9" y2="9" stroke="currentColor" stroke-width="1.2"/><line x1="9" y1="1" x2="1" y2="9" stroke="currentColor" stroke-width="1.2"/></svg>
     </button>
   </div>
 </div>
-<button id="button_1" data-type="button" data-ctrl-type="button" data-name="°´Å¥_1">°´Å¥</button>
-<input type="text" id="input_1" data-type="input" data-ctrl-type="input_text" data-name="±à¼­¿ò_1" placeholder="ÇëÊäÈë..." value="" />
-<label id="checkbox_1" data-type="checkbox" data-ctrl-type="checkbox" data-name="Ñ¡Ôñ¿ò_1"><input type="checkbox" /><span>Ñ¡Ïî</span></label>
-<select id="comboBox_1" data-type="comboBox" data-ctrl-type="combobox" data-name="×éºÏ¿ò_1"><option value="Ñ¡Ïî1" selected>Ñ¡Ïî1</option><option value="Ñ¡Ïî2">Ñ¡Ïî2</option><option value="Ñ¡Ïî3">Ñ¡Ïî3</option></select>
-<span id="label_1" data-type="label" data-ctrl-type="label" data-name="ÎÄ±¾±êÇ©_1">±êÇ©</span>
-<div id="divider_1" data-type="divider" data-ctrl-type="divider" data-name="·Ö¸îÏß_1"></div>
-<a id="hyperlink_1" data-type="hyperlink" data-ctrl-type="hyperlink" data-name="³¬Á´½Ó_1" href="javascript:void(0)" data-href="#">³¬Á´½Ó</a>
-<div id="radioGroup_1" data-type="radioGroup" data-ctrl-type="radio_group" data-name="µ¥Ñ¡¿ò_1" class="radiogroup-container"><label class="radiogroup-item"><input type="radio" data-ctrl-type="radio" name="µ¥Ñ¡¿ò_1" value="Ñ¡Ïî1" checked />Ñ¡Ïî1</label><label class="radiogroup-item"><input type="radio" data-ctrl-type="radio" name="µ¥Ñ¡¿ò_1" value="Ñ¡Ïî2" />Ñ¡Ïî2</label></div>
-<div id="progressBar_1" data-type="progressBar" data-ctrl-type="progress_bar" data-name="½ø¶ÈÌõ_1" class="progress-bar-container"><div class="progress-track"></div><div class="progress-fill" style="width:60%"></div><span class="progress-text">60%</span></div>
-<input type="datetime-local" id="datetimePicker_1" data-type="datetimePicker" data-ctrl-type="datetime_picker" data-name="Ê±¼ä¿ò_1" value="2026-05-24T00:00" />
-<button id="iconButton_1" data-type="iconButton" data-ctrl-type="icon_button" data-name="Í¼±ê°´Å¥_1"><i class="fas fa-star"></i><span>°´Å¥</span></button>
-<div id="imageBox_1" data-type="imageBox" data-ctrl-type="image_box" data-name="Í¼Æ¬¿ò_1" class="image-box"></div>
-<textarea id="textarea_1" data-type="textarea" data-ctrl-type="textarea" data-name="ÎÄ±¾Óò_1" data-rows='4' placeholder="ÇëÊäÈë..." rows="4"></textarea>
-<div id="logOutput_1" data-type="logOutput" data-ctrl-type="logbox" data-name="ÈÕÖ¾¿ò_1" class="log-output-container"><div class="log-line" data-ctrl-type="log_item" style="color:#333333">ÈÕÖ¾Êä³öÒÑ¾ÍÐ÷¡£</div></div>
-<div id="listBox_1" data-type="listBox" data-ctrl-type="listbox" data-name="ÁÐ±í¿ò_1" data-editable="false" data-always-show-selection="true" data-listbox-items='[{"id":"","text":"ÁÐ±íÏîÒ»","selected":false},{"id":"","text":"ÁÐ±íÏî¶þ","selected":false},{"id":"","text":"ÁÐ±íÏîÈý","selected":false}]' data-always-show-selection="true"><div class="list-box-scroll"><div class="list-item" data-ctrl-type="listbox_item" data-item-index="0"><span class="list-item-text">ÁÐ±íÏîÒ»</span></div>
-<div class="list-item" data-ctrl-type="listbox_item" data-item-index="1"><span class="list-item-text">ÁÐ±íÏî¶þ</span></div>
-<div class="list-item" data-ctrl-type="listbox_item" data-item-index="2"><span class="list-item-text">ÁÐ±íÏîÈý</span></div></div></div>
+<button id="button_1" data-type="button" data-ctrl-type="button" data-name="ï¿½ï¿½Å¥_1">ï¿½ï¿½Å¥</button>
+<input type="text" id="input_1" data-type="input" data-ctrl-type="inputText" data-name="ï¿½à¼­ï¿½ï¿½_1" placeholder="ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½..." value="" />
+<label id="checkbox_1" data-type="checkbox" data-ctrl-type="checkbox" data-name="Ñ¡ï¿½ï¿½ï¿½_1"><input type="checkbox" /><span>Ñ¡ï¿½ï¿½</span></label>
+<select id="comboBox_1" data-type="comboBox" data-ctrl-type="comboBox" data-name="ï¿½ï¿½Ï¿ï¿½_1"><option value="Ñ¡ï¿½ï¿½1" selected>Ñ¡ï¿½ï¿½1</option><option value="Ñ¡ï¿½ï¿½2">Ñ¡ï¿½ï¿½2</option><option value="Ñ¡ï¿½ï¿½3">Ñ¡ï¿½ï¿½3</option></select>
+<span id="label_1" data-type="label" data-ctrl-type="label" data-name="ï¿½Ä±ï¿½ï¿½ï¿½Ç©_1">ï¿½ï¿½Ç©</span>
+<div id="divider_1" data-type="divider" data-ctrl-type="divider" data-name="ï¿½Ö¸ï¿½ï¿½ï¿½_1"></div>
+<a id="hyperlink_1" data-type="hyperLink" data-ctrl-type="hyperLink" data-name="ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½_1" href="javascript:void(0)" data-href="#">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</a>
+<div id="radioGroup_1" data-type="radioGroup" data-ctrl-type="radioGroup" data-name="ï¿½ï¿½Ñ¡ï¿½ï¿½_1" class="radioGroup_container"><label class="radioGroup_item"><input type="radio" data-ctrl-type="radio" name="ï¿½ï¿½Ñ¡ï¿½ï¿½_1" value="Ñ¡ï¿½ï¿½1" checked />Ñ¡ï¿½ï¿½1</label><label class="radioGroup_item"><input type="radio" data-ctrl-type="radio" name="ï¿½ï¿½Ñ¡ï¿½ï¿½_1" value="Ñ¡ï¿½ï¿½2" />Ñ¡ï¿½ï¿½2</label></div>
+<div id="progressBar_1" data-type="progressBar" data-ctrl-type="progressBar" data-name="ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½_1" class="progressBar_container"><div class="progressBar_track"></div><div class="progressBar_fill" style="width:60%"></div><span class="progressBar_text">60%</span></div>
+<input type="datetime-local" id="datetimePicker_1" data-type="datetimePicker" data-ctrl-type="datetimePicker" data-name="Ê±ï¿½ï¿½ï¿½_1" value="2026-05-24T00:00" />
+<button id="iconButton_1" data-type="iconButton" data-ctrl-type="iconButton" data-name="Í¼ï¿½ê°´Å¥_1"><i class="fas fa-star"></i><span>ï¿½ï¿½Å¥</span></button>
+<div id="imageBox_1" data-type="imageBox" data-ctrl-type="imageBox" data-name="Í¼Æ¬ï¿½ï¿½_1" class="imageBox"></div>
+<textarea id="textarea_1" data-type="textarea" data-ctrl-type="textarea" data-name="ï¿½Ä±ï¿½ï¿½ï¿½_1" data-rows='4' placeholder="ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½..." rows="4"></textarea>
+<div id="logOutput_1" data-type="logOutput" data-ctrl-type="logOutput" data-name="ï¿½ï¿½Ö¾ï¿½ï¿½_1" class="logOutput_container"><div class="logOutput_line" data-ctrl-type="logOutput_item" style="color:#333333">ï¿½ï¿½Ö¾ï¿½ï¿½ï¿½ï¿½Ñ¾ï¿½ï¿½ï¿½ï¿½ï¿½</div></div>
+<div id="listBox_1" data-type="listBox" data-ctrl-type="listBox" data-name="ï¿½Ð±ï¿½ï¿½ï¿½_1" data-editable="false" data-always-show-selection="true" data-listBox-items='[{"id":"","text":"ï¿½Ð±ï¿½ï¿½ï¿½Ò»","selected":false},{"id":"","text":"ï¿½Ð±ï¿½ï¿½ï¿½ï¿½","selected":false},{"id":"","text":"ï¿½Ð±ï¿½ï¿½ï¿½ï¿½ï¿½","selected":false}]' data-always-show-selection="true"><div class="listBox_scroll"><div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="0"><span class="listBox_item_text">ï¿½Ð±ï¿½ï¿½ï¿½Ò»</span></div>
+<div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="1"><span class="listBox_item_text">ï¿½Ð±ï¿½ï¿½ï¿½ï¿½</span></div>
+<div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="2"><span class="listBox_item_text">ï¿½Ð±ï¿½ï¿½ï¿½ï¿½ï¿½</span></div></div></div>
 </div>
 
 <script>
@@ -801,15 +801,15 @@ body { display:flex }
   'use strict';
 
   document.addEventListener('click', function(e) {
-    var tabBtn = e.target.closest('.tab-header-btn');
+    var tabBtn = e.target.closest('.tabsContainer_headerBar_btn');
     if (tabBtn) {
-      var container = tabBtn.closest('.tabs-container');
+      var container = tabBtn.closest('.tabsContainer');
       if (!container) return;
 
       if (container.getAttribute('data-disabled') === 'true') return;
 
       var tabName = tabBtn.getAttribute('data-tab-name');
-      var allBtns = container.querySelectorAll('.tab-header-btn');
+      var allBtns = container.querySelectorAll('.tabsContainer_headerBar_btn');
       allBtns.forEach(function(b) { b.classList.remove('active'); });
       tabBtn.classList.add('active');
 
@@ -820,9 +820,9 @@ body { display:flex }
       return;
     }
 
-    var collapseBtn = e.target.closest('.card-collapse-btn');
+    var collapseBtn = e.target.closest('.cardBox_collapse_btn');
     if (collapseBtn) {
-      var card = collapseBtn.closest('.card-box');
+      var card = collapseBtn.closest('.cardBox');
       if (!card) return;
       var isCollapsed = card.getAttribute('data-collapsed') === 'true';
       var downArrow = '<svg width="12" height="12" viewBox="0 0 12 12"><path d="M3 4.5L6 7.5L9 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -847,13 +847,13 @@ body { display:flex }
     itemsCache: {},
 
     init: function() {
-      var listBoxes = document.querySelectorAll('[data-listbox-items]');
+      var listBoxes = document.querySelectorAll('[data-listBox-items]');
       for (var i = 0; i < listBoxes.length; i++) {
         var el = listBoxes[i];
         var id = el.id;
         if (!id) continue;
         try {
-          var items = JSON.parse(el.getAttribute('data-listbox-items') || '[]');
+          var items = JSON.parse(el.getAttribute('data-listBox-items') || '[]');
           ListBoxManager.itemsCache[id] = items;
         } catch(e) { ListBoxManager.itemsCache[id] = []; }
         ListBoxManager._bindEvents(el);
@@ -865,7 +865,7 @@ body { display:flex }
       document.addEventListener('mousedown', function(e) {
         if (el.getAttribute('data-always-show-selection') === 'true') return;
         if (!el.contains(e.target)) {
-          var allItems = el.querySelectorAll('.list-item');
+          var allItems = el.querySelectorAll('.listBox_item');
           for (var ai = 0; ai < allItems.length; ai++) {
             allItems[ai].classList.remove('item-selected');
           }
@@ -877,17 +877,17 @@ body { display:flex }
       var id = listBoxEl.id;
       var items = ListBoxManager.itemsCache[id] || [];
       var showCheckbox = listBoxEl.getAttribute('data-show-checkbox') === 'true';
-      var scroll = listBoxEl.querySelector('.list-box-scroll');
+      var scroll = listBoxEl.querySelector('.listBox_scroll');
       if (!scroll) return;
       if (items.length === 0) {
-        scroll.innerHTML = '<div class="list-empty">ÔÝÎÞÊý¾Ý</div>';
+        scroll.innerHTML = '<div class="list-empty">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</div>';
         return;
       }
       var html = '';
       for (var i = 0; i < items.length; i++) {
         var item = items[i];
-        var cb = showCheckbox ? '<input type="checkbox" class="list-item-checkbox" data-ctrl-type="listbox_item_checkbox"' + (item.selected ? ' checked' : '') + ' data-item-index="' + i + '" />' : '';
-        html += '<div class="list-item" data-ctrl-type="listbox_item" data-item-index="' + i + '">' + cb + '<span class="list-item-text">' + ListBoxManager._escHtml(item.text) + '</span></div>';
+        var cb = showCheckbox ? '<input type="checkbox" class="listBox_item-checkbox" data-ctrl-type="listbox_item_checkbox"' + (item.selected ? ' checked' : '') + ' data-item-index="' + i + '" />' : '';
+        html += '<div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="' + i + '">' + cb + '<span class="listBox_item_text">' + ListBoxManager._escHtml(item.text) + '</span></div>';
       }
       scroll.innerHTML = html;
       ListBoxManager._bindEvents(listBoxEl);
@@ -898,29 +898,29 @@ body { display:flex }
     },
 
     _bindEvents: function(el) {
-      var items = el.querySelectorAll('.list-item');
+      var items = el.querySelectorAll('.listBox_item');
       for (var i = 0; i < items.length; i++) {
         (function(itemEl) {
           itemEl.onclick = function(e) {
             if (e.target.tagName === 'INPUT') return;
-            var listBox = itemEl.closest('[data-listbox-items]');
+            var listBox = itemEl.closest('[data-listBox-items]');
             if (!listBox || listBox.getAttribute('data-disabled') === 'true') return;
-            var allItems = listBox.querySelectorAll('.list-item');
+            var allItems = listBox.querySelectorAll('.listBox_item');
             for (var ai = 0; ai < allItems.length; ai++) {
               allItems[ai].classList.remove('item-selected');
             }
             itemEl.classList.add('item-selected');
           };
           itemEl.ondblclick = function(e) {
-            var listBox = itemEl.closest('[data-listbox-items]');
+            var listBox = itemEl.closest('[data-listBox-items]');
             if (!listBox || listBox.getAttribute('data-editable') !== 'true') return;
             if (listBox.getAttribute('data-disabled') === 'true') return;
             ListBoxManager._startEdit(listBox, itemEl);
           };
-          var cb = itemEl.querySelector('.list-item-checkbox');
+          var cb = itemEl.querySelector('.listBox_item-checkbox');
           if (cb) {
             cb.onchange = function(e) {
-              var listBox = cb.closest('[data-listbox-items]');
+              var listBox = cb.closest('[data-listBox-items]');
               if (!listBox) return;
               var idx = parseInt(cb.getAttribute('data-item-index') || '0');
               var cache = ListBoxManager.itemsCache[listBox.id];
@@ -935,12 +935,12 @@ body { display:flex }
       var idx = parseInt(itemEl.getAttribute('data-item-index') || '0');
       var cache = ListBoxManager.itemsCache[listBox.id];
       if (!cache || !cache[idx]) return;
-      var textSpan = itemEl.querySelector('.list-item-text');
+      var textSpan = itemEl.querySelector('.listBox_item_text');
       if (!textSpan) return;
       var oldText = cache[idx].text;
       var input = document.createElement('input');
       input.type = 'text';
-      input.className = 'list-item-edit-input';
+      input.className = 'listBox_item-edit-input';
       input.value = oldText;
       textSpan.replaceWith(input);
       input.focus();
@@ -952,7 +952,7 @@ body { display:flex }
           ListBoxManager._updateDataAttr(listBox);
         }
         var span = document.createElement('span');
-        span.className = 'list-item-text';
+        span.className = 'listBox_item_text';
         span.textContent = cache[idx].text;
         input.replaceWith(span);
       };
@@ -967,7 +967,7 @@ body { display:flex }
       var id = listBox.id;
       var cache = ListBoxManager.itemsCache[id];
       if (!cache) return;
-      listBox.setAttribute('data-listbox-items', JSON.stringify(cache));
+      listBox.setAttribute('data-listBox-items', JSON.stringify(cache));
     },
 
     add: function(listBoxId, text) {
@@ -1007,7 +1007,7 @@ body { display:flex }
       cache[index].selected = !!checked;
       var itemEl = el.querySelector('[data-item-index="' + index + '"]');
       if (itemEl) {
-        var cb = itemEl.querySelector('.list-item-checkbox');
+        var cb = itemEl.querySelector('.listBox_item-checkbox');
         if (cb) cb.checked = !!checked;
       }
       ListBoxManager._updateDataAttr(el);
@@ -1046,7 +1046,7 @@ body { display:flex }
     selectedNodes: {},
 
     /**
-     * ³õÊ¼»¯Ê÷ÐÎ¿Ø¼þ
+     * ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½Î¿Ø¼ï¿½
      * @param {Object} config - { id: string, data: TreeNode[], editable: boolean, showIcon: boolean }
      */
     init: function(config) {
@@ -1078,10 +1078,10 @@ body { display:flex }
     },
 
     /**
-     * µÝ¹é´´½¨½Úµã DOM ÔªËØ
-     * @param {string} treeId - Ê÷¿Ø¼þ ID
-     * @param {Object} node - ½ÚµãÊý¾Ý { id, text, expanded, children }
-     * @param {number} level - ²ã¼¶Éî¶È
+     * ï¿½Ý¹é´´ï¿½ï¿½ï¿½Úµï¿½ DOM Ôªï¿½ï¿½
+     * @param {string} treeId - ï¿½ï¿½ï¿½Ø¼ï¿½ ID
+     * @param {Object} node - ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½ { id, text, expanded, children }
+     * @param {number} level - ï¿½ã¼¶ï¿½ï¿½ï¿½
      * @returns {HTMLElement}
      */
     createNodeElement: function(treeId, node, level) {
@@ -1089,7 +1089,7 @@ body { display:flex }
       if (!config || !node) return null;
 
       var nodeDiv = document.createElement('div');
-      nodeDiv.className = 'tree-node';
+      nodeDiv.className = 'treeView_node';
       nodeDiv.setAttribute('data-tree-id', treeId);
       nodeDiv.setAttribute('data-node-id', node.id);
       nodeDiv.setAttribute('data-level', level);
@@ -1100,14 +1100,14 @@ body { display:flex }
       }
 
       var contentDiv = document.createElement('div');
-      contentDiv.className = 'tree-node-content';
+      contentDiv.className = 'treeView_node_content';
 
       if (config.showCheckbox) {
         var checkboxSpan = document.createElement('span');
         checkboxSpan.className = 'tree-checkbox';
         var cb = document.createElement('input');
         cb.type = 'checkbox';
-        cb.className = 'tree-node-check';
+        cb.className = 'treeView_node-check';
         cb.checked = !!node.checked;
         cb.setAttribute('data-ctrl-type', 'treeview_node_checkbox');
         checkboxSpan.appendChild(cb);
@@ -1115,7 +1115,7 @@ body { display:flex }
       }
 
       var toggle = document.createElement('span');
-      toggle.className = 'tree-toggle';
+      toggle.className = 'treeView_toggle';
       toggle.textContent = '?';
       if (node.children && node.children.length > 0) {
         if (node.expanded === true) {
@@ -1129,7 +1129,7 @@ body { display:flex }
       contentDiv.appendChild(toggle);
 
       var icon = document.createElement('span');
-      icon.className = 'tree-icon';
+      icon.className = 'treeView_icon';
       var showIcon = config.showIcon !== false;
       if (showIcon) {
         var nodeIcon = node.icon || '';
@@ -1140,7 +1140,7 @@ body { display:flex }
       }
 
       var label = document.createElement('span');
-      label.className = 'tree-label';
+      label.className = 'treeView_label';
       label.textContent = node.text || '';
 
       contentDiv.appendChild(icon);
@@ -1149,7 +1149,7 @@ body { display:flex }
 
       if (node.children && node.children.length > 0) {
         var childrenDiv = document.createElement('div');
-        childrenDiv.className = 'tree-children';
+        childrenDiv.className = 'treeView_children';
         if (node.expanded === false) {
           childrenDiv.style.display = 'none';
         }
@@ -1164,9 +1164,9 @@ body { display:flex }
     },
 
     /**
-     * Õ¹¿ª/ÕÛµþ½Úµã
-     * @param {string} treeId - Ê÷¿Ø¼þ ID
-     * @param {string} nodeId - ½Úµã ID
+     * Õ¹ï¿½ï¿½/ï¿½Ûµï¿½ï¿½Úµï¿½
+     * @param {string} treeId - ï¿½ï¿½ï¿½Ø¼ï¿½ ID
+     * @param {string} nodeId - ï¿½Úµï¿½ ID
      */
     toggleNode: function(treeId, nodeId) {
       var container = document.getElementById(treeId);
@@ -1175,8 +1175,8 @@ body { display:flex }
       var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
       if (!nodeEl) return;
 
-      var toggle = nodeEl.querySelector(':scope > .tree-node-content > .tree-toggle');
-      var children = nodeEl.querySelector(':scope > .tree-children');
+      var toggle = nodeEl.querySelector(':scope > .treeView_node_content > .treeView_toggle');
+      var children = nodeEl.querySelector(':scope > .treeView_children');
       if (!toggle || !children) return;
 
       var node = TreeManager.findNodeData(TreeManager.configs[treeId] ? TreeManager.configs[treeId].data : null, nodeId);
@@ -1196,15 +1196,15 @@ body { display:flex }
     },
 
     /**
-     * Ñ¡ÖÐ½Úµã£¨¸ßÁÁÑ¡ÖÐ£¬È¡ÏûÖ®Ç°µÄÑ¡ÖÐ£©
-     * @param {string} treeId - Ê÷¿Ø¼þ ID
-     * @param {string} nodeId - ½Úµã ID
+     * Ñ¡ï¿½Ð½Úµã£¨ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½Ð£ï¿½È¡ï¿½ï¿½Ö®Ç°ï¿½ï¿½Ñ¡ï¿½Ð£ï¿½
+     * @param {string} treeId - ï¿½ï¿½ï¿½Ø¼ï¿½ ID
+     * @param {string} nodeId - ï¿½Úµï¿½ ID
      */
     selectNode: function(treeId, nodeId) {
       var container = document.getElementById(treeId);
       if (!container) return;
 
-      var prevSelected = container.querySelector('.tree-node-content.selected');
+      var prevSelected = container.querySelector('.treeView_node_content.selected');
       if (prevSelected) {
         prevSelected.classList.remove('selected');
       }
@@ -1212,7 +1212,7 @@ body { display:flex }
       var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
       if (!nodeEl) return;
 
-      var content = nodeEl.querySelector(':scope > .tree-node-content');
+      var content = nodeEl.querySelector(':scope > .treeView_node_content');
       if (content) {
         content.classList.add('selected');
       }
@@ -1221,8 +1221,8 @@ body { display:flex }
     },
 
     /**
-     * »ñÈ¡µ±Ç°Ñ¡ÖÐµÄ½ÚµãÊý¾Ý
-     * @param {string} treeId - Ê÷¿Ø¼þ ID
+     * ï¿½ï¿½È¡ï¿½ï¿½Ç°Ñ¡ï¿½ÐµÄ½Úµï¿½ï¿½ï¿½ï¿½ï¿½
+     * @param {string} treeId - ï¿½ï¿½ï¿½Ø¼ï¿½ ID
      * @returns {Object|null}
      */
     getSelectedNode: function(treeId) {
@@ -1234,9 +1234,9 @@ body { display:flex }
     },
 
     /**
-     * µÝ¹é²éÕÒ½ÚµãÊý¾Ý
-     * @param {Object[]} nodes - ½ÚµãÊý×é
-     * @param {string} nodeId - ½Úµã ID
+     * ï¿½Ý¹ï¿½ï¿½ï¿½Ò½Úµï¿½ï¿½ï¿½ï¿½ï¿½
+     * @param {Object[]} nodes - ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½
+     * @param {string} nodeId - ï¿½Úµï¿½ ID
      * @returns {Object|null}
      */
     findNodeData: function(nodes, nodeId) {
@@ -1252,10 +1252,10 @@ body { display:flex }
     },
 
     /**
-     * Ìí¼Ó×Ó½Úµã²¢ÖØÐÂäÖÈ¾
-     * @param {string} treeId - Ê÷¿Ø¼þ ID
-     * @param {string} parentNodeId - ¸¸½Úµã ID£¨¸¸½Úµã±ØÐë´æÔÚ children£©
-     * @param {Object} newNodeData - ÐÂ½ÚµãÊý¾Ý { id, text, children }
+     * ï¿½ï¿½ï¿½ï¿½ï¿½Ó½Úµã²¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¾
+     * @param {string} treeId - ï¿½ï¿½ï¿½Ø¼ï¿½ ID
+     * @param {string} parentNodeId - ï¿½ï¿½ï¿½Úµï¿½ IDï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ childrenï¿½ï¿½
+     * @param {Object} newNodeData - ï¿½Â½Úµï¿½ï¿½ï¿½ï¿½ï¿½ { id, text, children }
      */
     addNode: function(treeId, parentNodeId, newNodeData) {
       var config = TreeManager.configs[treeId];
@@ -1270,7 +1270,7 @@ body { display:flex }
 
       parent.children.push({
         id: newNodeData.id || ('node_' + Date.now()),
-        text: newNodeData.text || 'ÐÂ½Úµã',
+        text: newNodeData.text || 'ï¿½Â½Úµï¿½',
         expanded: newNodeData.expanded !== undefined ? newNodeData.expanded : false,
         children: newNodeData.children || undefined
       });
@@ -1280,9 +1280,9 @@ body { display:flex }
     },
 
     /**
-     * É¾³ý½Úµã²¢ÖØÐÂäÖÈ¾
-     * @param {string} treeId - Ê÷¿Ø¼þ ID
-     * @param {string} nodeId - ½Úµã ID
+     * É¾ï¿½ï¿½ï¿½Úµã²¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¾
+     * @param {string} treeId - ï¿½ï¿½ï¿½Ø¼ï¿½ ID
+     * @param {string} nodeId - ï¿½Úµï¿½ ID
      */
     removeNode: function(treeId, nodeId) {
       var config = TreeManager.configs[treeId];
@@ -1297,9 +1297,9 @@ body { display:flex }
     },
 
     /**
-     * ´ÓÊý¾ÝÖÐµÝ¹éÉ¾³ý½Úµã
-     * @param {Object[]} nodes - ½ÚµãÊý×é
-     * @param {string} nodeId - ½Úµã ID
+     * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÐµÝ¹ï¿½É¾ï¿½ï¿½ï¿½Úµï¿½
+     * @param {Object[]} nodes - ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½
+     * @param {string} nodeId - ï¿½Úµï¿½ ID
      * @returns {boolean}
      */
     _removeNodeFromData: function(nodes, nodeId) {
@@ -1319,10 +1319,10 @@ body { display:flex }
     },
 
     /**
-     * ¸üÐÂ½ÚµãÎÄ±¾²¢ÖØÐÂäÖÈ¾
-     * @param {string} treeId - Ê÷¿Ø¼þ ID
-     * @param {string} nodeId - ½Úµã ID
-     * @param {string} text - ÐÂÎÄ±¾
+     * ï¿½ï¿½ï¿½Â½Úµï¿½ï¿½Ä±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¾
+     * @param {string} treeId - ï¿½ï¿½ï¿½Ø¼ï¿½ ID
+     * @param {string} nodeId - ï¿½Úµï¿½ ID
+     * @param {string} text - ï¿½ï¿½ï¿½Ä±ï¿½
      */
     updateNode: function(treeId, nodeId, text) {
       var config = TreeManager.configs[treeId];
@@ -1337,9 +1337,9 @@ body { display:flex }
     },
 
     /**
-     * Õ¹¿ª½Úµã
-     * @param {string} treeId - Ê÷¿Ø¼þ ID
-     * @param {string} nodeId - ½Úµã ID
+     * Õ¹ï¿½ï¿½ï¿½Úµï¿½
+     * @param {string} treeId - ï¿½ï¿½ï¿½Ø¼ï¿½ ID
+     * @param {string} nodeId - ï¿½Úµï¿½ ID
      */
     expandNode: function(treeId, nodeId) {
       var node = TreeManager.findNodeData(
@@ -1353,8 +1353,8 @@ body { display:flex }
       if (!container) return;
       var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
       if (!nodeEl) return;
-      var toggle = nodeEl.querySelector(':scope > .tree-node-content > .tree-toggle');
-      var children = nodeEl.querySelector(':scope > .tree-children');
+      var toggle = nodeEl.querySelector(':scope > .treeView_node_content > .treeView_toggle');
+      var children = nodeEl.querySelector(':scope > .treeView_children');
       if (toggle) {
         toggle.classList.remove('collapsed');
         toggle.classList.add('expanded');
@@ -1365,9 +1365,9 @@ body { display:flex }
     },
 
     /**
-     * ÕÛµþ½Úµã
-     * @param {string} treeId - Ê÷¿Ø¼þ ID
-     * @param {string} nodeId - ½Úµã ID
+     * ï¿½Ûµï¿½ï¿½Úµï¿½
+     * @param {string} treeId - ï¿½ï¿½ï¿½Ø¼ï¿½ ID
+     * @param {string} nodeId - ï¿½Úµï¿½ ID
      */
     collapseNode: function(treeId, nodeId) {
       var node = TreeManager.findNodeData(
@@ -1381,8 +1381,8 @@ body { display:flex }
       if (!container) return;
       var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
       if (!nodeEl) return;
-      var toggle = nodeEl.querySelector(':scope > .tree-node-content > .tree-toggle');
-      var children = nodeEl.querySelector(':scope > .tree-children');
+      var toggle = nodeEl.querySelector(':scope > .treeView_node_content > .treeView_toggle');
+      var children = nodeEl.querySelector(':scope > .treeView_children');
       if (toggle) {
         toggle.classList.remove('expanded');
         toggle.classList.add('collapsed');
@@ -1393,9 +1393,9 @@ body { display:flex }
     },
 
     /**
-     * ¶¯Ì¬ÉèÖÃÊ÷¿Ø¼þµÄ±à¼­×´Ì¬
-     * @param {string} treeId - Ê÷¿Ø¼þ ID
-     * @param {boolean} enabled - ÊÇ·ñÔÊÐí±à¼­
+     * ï¿½ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø¼ï¿½ï¿½Ä±à¼­×´Ì¬
+     * @param {string} treeId - ï¿½ï¿½ï¿½Ø¼ï¿½ ID
+     * @param {boolean} enabled - ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½à¼­
      */
     setEditable: function(treeId, enabled) {
       var config = TreeManager.configs[treeId];
@@ -1408,9 +1408,9 @@ body { display:flex }
     },
 
     /**
-     * ¶¯Ì¬ÉèÖÃÊ÷¿Ø¼þµÄ¸´Ñ¡¿òÏÔÊ¾×´Ì¬
-     * @param {string} treeId - Ê÷¿Ø¼þ ID
-     * @param {boolean} show - ÊÇ·ñÏÔÊ¾¸´Ñ¡¿ò
+     * ï¿½ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø¼ï¿½ï¿½Ä¸ï¿½Ñ¡ï¿½ï¿½ï¿½ï¿½Ê¾×´Ì¬
+     * @param {string} treeId - ï¿½ï¿½ï¿½Ø¼ï¿½ ID
+     * @param {boolean} show - ï¿½Ç·ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Ñ¡ï¿½ï¿½
      */
     showCheckbox: function(treeId, show) {
       var config = TreeManager.configs[treeId];
@@ -1424,17 +1424,17 @@ body { display:flex }
     },
 
     /**
-     * ÉèÖÃÖ¸¶¨½ÚµãµÄ¹´Ñ¡×´Ì¬
-     * @param {string} treeId - Ê÷¿Ø¼þ ID
-     * @param {string} nodeId - ½Úµã ID
-     * @param {boolean} checked - ÊÇ·ñ¹´Ñ¡
+     * ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Úµï¿½Ä¹ï¿½Ñ¡×´Ì¬
+     * @param {string} treeId - ï¿½ï¿½ï¿½Ø¼ï¿½ ID
+     * @param {string} nodeId - ï¿½Úµï¿½ ID
+     * @param {boolean} checked - ï¿½Ç·ï¿½Ñ¡
      */
     setNodeChecked: function(treeId, nodeId, checked) {
       var container = document.getElementById(treeId);
       if (!container) return false;
       var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
       if (!nodeEl) return false;
-      var cbs = nodeEl.querySelectorAll('.tree-node-check');
+      var cbs = nodeEl.querySelectorAll('.treeView_node-check');
       for (var i = 0; i < cbs.length; i++) {
         cbs[i].checked = !!checked;
       }
@@ -1442,32 +1442,32 @@ body { display:flex }
     },
 
     /**
-     * »ñÈ¡Ö¸¶¨½ÚµãµÄ¹´Ñ¡×´Ì¬
-     * @param {string} treeId - Ê÷¿Ø¼þ ID
-     * @param {string} nodeId - ½Úµã ID
-     * @returns {boolean} ÊÇ·ñ¹´Ñ¡
+     * ï¿½ï¿½È¡Ö¸ï¿½ï¿½ï¿½Úµï¿½Ä¹ï¿½Ñ¡×´Ì¬
+     * @param {string} treeId - ï¿½ï¿½ï¿½Ø¼ï¿½ ID
+     * @param {string} nodeId - ï¿½Úµï¿½ ID
+     * @returns {boolean} ï¿½Ç·ï¿½Ñ¡
      */
     isNodeChecked: function(treeId, nodeId) {
       var container = document.getElementById(treeId);
       if (!container) return false;
       var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
       if (!nodeEl) return false;
-      var cb = nodeEl.querySelector('.tree-node-check');
+      var cb = nodeEl.querySelector('.treeView_node-check');
       return cb ? cb.checked : false;
     },
 
     /**
-     * »ñÈ¡ËùÓÐÒÑ¹´Ñ¡µÄ½Úµã ID Êý×é
-     * @param {string} treeId - Ê÷¿Ø¼þ ID
-     * @returns {string[]} ÒÑ¹´Ñ¡½Úµã ID Êý×é
+     * ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¹ï¿½Ñ¡ï¿½Ä½Úµï¿½ ID ï¿½ï¿½ï¿½ï¿½
+     * @param {string} treeId - ï¿½ï¿½ï¿½Ø¼ï¿½ ID
+     * @returns {string[]} ï¿½Ñ¹ï¿½Ñ¡ï¿½Úµï¿½ ID ï¿½ï¿½ï¿½ï¿½
      */
     getCheckedNodes: function(treeId) {
       var container = document.getElementById(treeId);
       if (!container) return [];
-      var checkboxes = container.querySelectorAll('.tree-node-check:checked');
+      var checkboxes = container.querySelectorAll('.treeView_node-check:checked');
       var ids = [];
       for (var i = 0; i < checkboxes.length; i++) {
-        var nodeEl = checkboxes[i].closest('.tree-node');
+        var nodeEl = checkboxes[i].closest('.treeView_node');
         if (nodeEl) {
           ids.push(nodeEl.getAttribute('data-node-id'));
         }
@@ -1476,13 +1476,13 @@ body { display:flex }
     },
 
     /**
-     * È«Ñ¡ËùÓÐ½ÚµãµÄ¸´Ñ¡¿ò
-     * @param {string} treeId - Ê÷¿Ø¼þ ID
+     * È«Ñ¡ï¿½ï¿½ï¿½Ð½Úµï¿½Ä¸ï¿½Ñ¡ï¿½ï¿½
+     * @param {string} treeId - ï¿½ï¿½ï¿½Ø¼ï¿½ ID
      */
     checkAll: function(treeId) {
       var container = document.getElementById(treeId);
       if (!container) return false;
-      var checkboxes = container.querySelectorAll('.tree-node-check');
+      var checkboxes = container.querySelectorAll('.treeView_node-check');
       for (var i = 0; i < checkboxes.length; i++) {
         checkboxes[i].checked = true;
       }
@@ -1490,13 +1490,13 @@ body { display:flex }
     },
 
     /**
-     * È¡ÏûÈ«Ñ¡ËùÓÐ½ÚµãµÄ¸´Ñ¡¿ò
-     * @param {string} treeId - Ê÷¿Ø¼þ ID
+     * È¡ï¿½ï¿½È«Ñ¡ï¿½ï¿½ï¿½Ð½Úµï¿½Ä¸ï¿½Ñ¡ï¿½ï¿½
+     * @param {string} treeId - ï¿½ï¿½ï¿½Ø¼ï¿½ ID
      */
     uncheckAll: function(treeId) {
       var container = document.getElementById(treeId);
       if (!container) return false;
-      var checkboxes = container.querySelectorAll('.tree-node-check');
+      var checkboxes = container.querySelectorAll('.treeView_node-check');
       for (var i = 0; i < checkboxes.length; i++) {
         checkboxes[i].checked = false;
       }
@@ -1504,9 +1504,9 @@ body { display:flex }
     },
 
     /**
-     * ±à¼­½Úµã±êÇ©£¨ÄÚÁª±à¼­£©
-     * @param {string} treeId - Ê÷¿Ø¼þ ID
-     * @param {string} nodeId - ½Úµã ID
+     * ï¿½à¼­ï¿½Úµï¿½ï¿½Ç©ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½à¼­ï¿½ï¿½
+     * @param {string} treeId - ï¿½ï¿½ï¿½Ø¼ï¿½ ID
+     * @param {string} nodeId - ï¿½Úµï¿½ ID
      */
     editNodeLabel: function(treeId, nodeId) {
       var config = TreeManager.configs[treeId];
@@ -1518,7 +1518,7 @@ body { display:flex }
       var nodeEl = container.querySelector('[data-node-id="' + nodeId + '"]');
       if (!nodeEl) return;
 
-      var label = nodeEl.querySelector(':scope > .tree-node-content > .tree-label');
+      var label = nodeEl.querySelector(':scope > .treeView_node_content > .treeView_label');
       if (!label) return;
 
       var node = TreeManager.findNodeData(config.data, nodeId);
@@ -1540,14 +1540,14 @@ body { display:flex }
           node.text = newText;
         }
         var newLabel = document.createElement('span');
-        newLabel.className = 'tree-label';
+        newLabel.className = 'treeView_label';
         newLabel.textContent = node.text;
         input.replaceWith(newLabel);
       };
 
       var cancel = function() {
         var newLabel = document.createElement('span');
-        newLabel.className = 'tree-label';
+        newLabel.className = 'treeView_label';
         newLabel.textContent = oldText;
         input.replaceWith(newLabel);
       };
@@ -1564,23 +1564,23 @@ body { display:flex }
     },
 
     /**
-     * °ó¶¨È«¾ÖÊÂ¼þÎ¯ÍÐµ½Ê÷ÈÝÆ÷
-     * @param {HTMLElement} container - Ê÷ÈÝÆ÷ÔªËØ
-     * @param {string} treeId - Ê÷¿Ø¼þ ID
+     * ï¿½ï¿½È«ï¿½ï¿½ï¿½Â¼ï¿½Î¯ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+     * @param {HTMLElement} container - ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ôªï¿½ï¿½
+     * @param {string} treeId - ï¿½ï¿½ï¿½Ø¼ï¿½ ID
      */
     _bindGlobalEvents: function(container, treeId) {
       var config = TreeManager.configs[treeId];
       if (!config) return;
 
       container.onclick = function(e) {
-        if (e.target.closest('.tree-node-check')) {
+        if (e.target.closest('.treeView_node-check')) {
           return;
         }
 
-        var content = e.target.closest('.tree-node-content');
+        var content = e.target.closest('.treeView_node_content');
         if (!content) return;
 
-        var nodeEl = content.closest('.tree-node');
+        var nodeEl = content.closest('.treeView_node');
         if (!nodeEl) return;
 
         var nodeId = nodeEl.getAttribute('data-node-id');
@@ -1589,7 +1589,7 @@ body { display:flex }
         var targetTreeId = nodeEl.getAttribute('data-tree-id');
         if (targetTreeId !== treeId) return;
 
-        if (e.target.closest('.tree-toggle')) {
+        if (e.target.closest('.treeView_toggle')) {
           TreeManager.toggleNode(treeId, nodeId);
           return;
         }
@@ -1598,10 +1598,10 @@ body { display:flex }
       };
 
       container.ondblclick = function(e) {
-        var content = e.target.closest('.tree-node-content');
+        var content = e.target.closest('.treeView_node_content');
         if (!content) return;
 
-        var nodeEl = content.closest('.tree-node');
+        var nodeEl = content.closest('.treeView_node');
         if (!nodeEl) return;
 
         var nodeId = nodeEl.getAttribute('data-node-id');
@@ -1617,13 +1617,13 @@ body { display:flex }
 
       container.addEventListener('change', function(e) {
         var target = e.target;
-        if (!target || !target.classList.contains('tree-node-check')) return;
-        var nodeEl = target.closest('.tree-node');
+        if (!target || !target.classList.contains('treeView_node-check')) return;
+        var nodeEl = target.closest('.treeView_node');
         if (!nodeEl) return;
         var targetTreeId = nodeEl.getAttribute('data-tree-id');
         if (targetTreeId !== treeId) return;
         var checked = target.checked;
-        var descendants = nodeEl.querySelectorAll('.tree-node-check');
+        var descendants = nodeEl.querySelectorAll('.treeView_node-check');
         for (var i = 0; i < descendants.length; i++) {
           descendants[i].checked = checked;
         }
@@ -1640,7 +1640,7 @@ body { display:flex }
     tables: {},
 
     /**
-     * ³õÊ¼»¯±í¸ñ
+     * ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
      */
     init: function(tableId, config) {
       var container = document.getElementById(tableId);
@@ -1664,24 +1664,24 @@ body { display:flex }
     },
 
     /**
-     * °ó¶¨±í¸ñÊÂ¼þ
+     * ï¿½ó¶¨±ï¿½ï¿½ï¿½ï¿½Â¼ï¿½
      */
     bindEvents: function(store) {
       var self = this;
       var container = store.container;
 
-      // ±íÍ·È«Ñ¡¸´Ñ¡¿ò
-      var selectAll = container.querySelector('.data-grid-select-all');
+      // ï¿½ï¿½Í·È«Ñ¡ï¿½ï¿½Ñ¡ï¿½ï¿½
+      var selectAll = container.querySelector('.dataGrid_select_all');
       if (selectAll) {
         selectAll.addEventListener('change', function(e) {
           self.selectAllRows(store.id, e.target.checked);
         });
       }
 
-      // ÐÐ¸´Ñ¡¿ò
-      container.querySelectorAll('.data-grid-row-check').forEach(function(cb) {
+      // ï¿½Ð¸ï¿½Ñ¡ï¿½ï¿½
+      container.querySelectorAll('.dataGrid_row_check').forEach(function(cb) {
         cb.addEventListener('change', function(e) {
-          var row = e.target.closest('.data-grid-row');
+          var row = e.target.closest('.dataGrid_row');
           if (row) {
             var idx = parseInt(row.getAttribute('data-row-index'), 10);
             var rowData = self.getRowData(store.id, idx);
@@ -1693,26 +1693,26 @@ body { display:flex }
         });
       });
 
-      // ÐÐµã»÷¸ßÁÁ´¦Àí
-      container.querySelectorAll('.data-grid-row').forEach(function(row) {
+      // ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+      container.querySelectorAll('.dataGrid_row').forEach(function(row) {
         row.addEventListener('click', function(e) {
           if (e.target.tagName === 'INPUT') return;
-          // ÒÆ³ýÆäËûÐÐµÄ¸ßÁÁ
-          container.querySelectorAll('.data-grid-row.data-grid-row-focused').forEach(function(r) {
-            r.classList.remove('data-grid-row-focused');
+          // ï¿½Æ³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÐµÄ¸ï¿½ï¿½ï¿½
+          container.querySelectorAll('.dataGrid_row.dataGrid_row-focused').forEach(function(r) {
+            r.classList.remove('dataGrid_row-focused');
           });
-          // ¸ßÁÁµ±Ç°ÐÐ
-          row.classList.add('data-grid-row-focused');
+          // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½
+          row.classList.add('dataGrid_row-focused');
           store.selectedRowIndex = parseInt(row.getAttribute('data-row-index'), 10);
         });
       });
 
-      // µ¥Ôª¸ñË«»÷±à¼­
+      // ï¿½ï¿½Ôªï¿½ï¿½Ë«ï¿½ï¿½ï¿½à¼­
       if (store.editable) {
-        container.querySelectorAll('.data-grid-cell[data-col-key]').forEach(function(cell) {
-          if (cell.closest('.data-grid-checkbox')) return;
+        container.querySelectorAll('.dataGrid_cell[data-col-key]').forEach(function(cell) {
+          if (cell.closest('.dataGrid_checkbox')) return;
           cell.addEventListener('dblclick', function() {
-            var row = cell.closest('.data-grid-row');
+            var row = cell.closest('.dataGrid_row');
             if (!row) return;
             var ri = parseInt(row.getAttribute('data-row-index'), 10);
             var field = cell.getAttribute('data-col-key');
@@ -1723,9 +1723,9 @@ body { display:flex }
       }
     },
 
-    /** ¸üÐÂÈ«Ñ¡¸´Ñ¡¿ò×´Ì¬ */
+    /** ï¿½ï¿½ï¿½ï¿½È«Ñ¡ï¿½ï¿½Ñ¡ï¿½ï¿½×´Ì¬ */
     updateSelectAllState: function(store) {
-      var selectAll = store.container.querySelector('.data-grid-select-all');
+      var selectAll = store.container.querySelector('.dataGrid_select_all');
       if (!selectAll) return;
       var total = store.rows.length;
       var selected = store.rows.filter(function(r) { return r.selected; }).length;
@@ -1733,19 +1733,19 @@ body { display:flex }
       selectAll.indeterminate = (selected > 0 && selected < total);
     },
 
-    /** È«Ñ¡/È¡ÏûÈ«Ñ¡ */
+    /** È«Ñ¡/È¡ï¿½ï¿½È«Ñ¡ */
     selectAllRows: function(tableId, checked) {
       var store = this.tables[tableId];
       if (!store) return;
       store.rows.forEach(function(r) {
         r.selected = checked;
       });
-      store.container.querySelectorAll('.data-grid-row-check').forEach(function(cb) {
+      store.container.querySelectorAll('.dataGrid_row_check').forEach(function(cb) {
         cb.checked = checked;
       });
     },
 
-    /** ¿ªÊ¼±à¼­µ¥Ôª¸ñ */
+    /** ï¿½ï¿½Ê¼ï¿½à¼­ï¿½ï¿½Ôªï¿½ï¿½ */
     startEditCell: function(store, cell, ri, field) {
       var self = this;
       if (!store.editable) return;
@@ -1777,21 +1777,21 @@ body { display:flex }
       });
     },
 
-    /** ÉèÖÃµ¥Ôª¸ñÖµ */
+    /** ï¿½ï¿½ï¿½Ãµï¿½Ôªï¿½ï¿½Öµ */
     setCellValue: function(tableId, rowIndex, field, value) {
       var store = this.tables[tableId];
       if (!store || !store.rows[rowIndex]) return;
       store.rows[rowIndex].cells[field] = value;
     },
 
-    /** »ñÈ¡ÐÐÊý¾Ý */
+    /** ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
     getRowData: function(tableId, rowIndex) {
       var store = this.tables[tableId];
       if (!store || !store.rows[rowIndex]) return null;
       return store.rows[rowIndex];
     },
 
-    /** Ìí¼ÓÐÐ */
+    /** ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
     addRow: function(tableId, rowData) {
       var store = this.tables[tableId];
       if (!store) return;
@@ -1807,7 +1807,7 @@ body { display:flex }
       this.refreshDOM(store);
     },
 
-    /** É¾³ýÐÐ */
+    /** É¾ï¿½ï¿½ï¿½ï¿½ */
     removeRow: function(tableId, rowIndex) {
       var store = this.tables[tableId];
       if (!store || !store.rows[rowIndex]) return;
@@ -1815,7 +1815,7 @@ body { display:flex }
       this.refreshDOM(store);
     },
 
-    /** ¶¯Ì¬ÉèÖÃ±í¸ñµÄ±à¼­×´Ì¬ */
+    /** ï¿½ï¿½Ì¬ï¿½ï¿½ï¿½Ã±ï¿½ï¿½ï¿½Ä±à¼­×´Ì¬ */
     setEditable: function(tableId, enabled) {
       var store = this.tables[tableId];
       if (!store) return;
@@ -1823,12 +1823,12 @@ body { display:flex }
       store.container.setAttribute('data-editable', enabled ? 'true' : 'false');
       if (!enabled) return;
       var self = this;
-      store.container.querySelectorAll('.data-grid-cell[data-col-key]').forEach(function(cell) {
-        if (cell.closest('.data-grid-checkbox')) return;
+      store.container.querySelectorAll('.dataGrid_cell[data-col-key]').forEach(function(cell) {
+        if (cell.closest('.dataGrid_checkbox')) return;
         if (cell._dgEditBound) return;
         cell._dgEditBound = true;
         cell.addEventListener('dblclick', function() {
-          var row = cell.closest('.data-grid-row');
+          var row = cell.closest('.dataGrid_row');
           if (!row) return;
           var ri = parseInt(row.getAttribute('data-row-index'), 10);
           var field = cell.getAttribute('data-col-key');
@@ -1838,24 +1838,24 @@ body { display:flex }
       });
     },
 
-    /** Ë¢ÐÂ DOM */
+    /** Ë¢ï¿½ï¿½ DOM */
     refreshDOM: function(store) {
       var self = this;
-      var body = store.container.querySelector('.data-grid-body');
+      var body = store.container.querySelector('.dataGrid_body');
       if (!body) return;
 
       var html = '';
       store.rows.forEach(function(row, ri) {
-        var rowClass = (store.selectedRowIndex === ri) ? 'data-grid-row data-grid-row-focused' : 'data-grid-row';
+        var rowClass = (store.selectedRowIndex === ri) ? 'dataGrid_row dataGrid_row-focused' : 'dataGrid_row';
         html += '<div class="' + rowClass + '" data-row-index="' + ri + '" data-row-id="' + row.id + '">';
         if (store.showCheckbox) {
           var checked = row.selected ? ' checked' : '';
-          html += '<div class="data-grid-cell data-grid-checkbox" style="width:36px;min-width:36px;flex-shrink:0"><input type="checkbox" class="data-grid-row-check"' + checked + '></div>';
+          html += '<div class="dataGrid_cell dataGrid_checkbox" style="width:36px;min-width:36px;flex-shrink:0"><input type="checkbox" class="dataGrid_row_check"' + checked + '></div>';
         }
         store.columns.forEach(function(col) {
           var w = col.width || 100;
           var val = row.cells && row.cells[col.field] !== undefined && row.cells[col.field] !== null ? String(row.cells[col.field]) : '';
-          html += '<div class="data-grid-cell" data-col-key="' + col.field + '" style="width:' + w + 'px;min-width:' + w + 'px;flex-shrink:0" title="' + val + '">' + val + '</div>';
+          html += '<div class="dataGrid_cell" data-col-key="' + col.field + '" style="width:' + w + 'px;min-width:' + w + 'px;flex-shrink:0" title="' + val + '">' + val + '</div>';
         });
         html += '</div>';
       });
@@ -1875,13 +1875,13 @@ body { display:flex }
     if (treeId && typeof TreeManager !== 'undefined') {
       function buildNodesFromDOM(parentEl) {
         var nodes = [];
-        var childNodes = parentEl.querySelectorAll(':scope > .tree-node');
+        var childNodes = parentEl.querySelectorAll(':scope > .treeView_node');
         childNodes.forEach(function(nodeEl) {
-          var contentEl = nodeEl.querySelector(':scope > .tree-node-content');
-          var labelEl = contentEl ? contentEl.querySelector('.tree-label') : null;
-          var childrenEl = nodeEl.querySelector(':scope > .tree-children');
-          var toggleEl = contentEl ? contentEl.querySelector('.tree-toggle') : null;
-          var checkboxEl = contentEl ? contentEl.querySelector('.tree-node-check') : null;
+          var contentEl = nodeEl.querySelector(':scope > .treeView_node_content');
+          var labelEl = contentEl ? contentEl.querySelector('.treeView_label') : null;
+          var childrenEl = nodeEl.querySelector(':scope > .treeView_children');
+          var toggleEl = contentEl ? contentEl.querySelector('.treeView_toggle') : null;
+          var checkboxEl = contentEl ? contentEl.querySelector('.treeView_node-check') : null;
           var isExpanded = toggleEl && toggleEl.classList.contains('expanded');
           var node = {
             id: nodeEl.getAttribute('data-node-id'),
@@ -1911,7 +1911,7 @@ body { display:flex }
 
 
 (function(){
-  document.querySelectorAll('.data-grid-container').forEach(function(container){
+  document.querySelectorAll('.dataGrid_container').forEach(function(container){
     var id = container.getAttribute('data-id') || container.id;
     var columns = JSON.parse(container.getAttribute('data-columns') || '[]');
     var rows = JSON.parse(container.getAttribute('data-rows') || '[]');
@@ -1930,10 +1930,10 @@ body { display:flex }
 
 
 <script>
-window.__messageBoxConfig = {"title":"ÌáÊ¾","message":"ÕâÊÇÒ»ÌõÏûÏ¢","icon":"error","customIcon":"","buttons":"okcancel","defaultButton":0,"width":432,"height":"200","showOverlay":false,"closeOnOverlayClick":false,"draggable":true,"opacity":1,"customCSS":"/* ===== ÐÅÏ¢ÌáÊ¾¿ò×Ô¶¨ÒåÑùÊ½ ===== */\n/* ÃÉ°æ²ã - °ëÍ¸Ã÷ºÚÉ«±³¾°¸²¸ÇÈ«ÆÁ */\n.mb-overlay {\n  background: rgba(0, 0, 0, 0.4);\n}\n/* ¶Ô»°¿òÈÝÆ÷ - °×É«Ô²½Ç¿¨Æ¬ */\n.mb-dialog {\n  background: #491b1b;\n  border-radius: 8px;\n  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);\n}\n/* ±êÌâÀ¸ */\n.mb-header {\n  padding: 16px 20px 8px;\n  font-size: 16px;\n  font-weight: 600;\n  color: #ffffff;\n}\n/* ¹Ø±Õ°´Å¥ (?) */\n.mb-header-close {\n  color: #ff0000;\n}\n.mb-header-close:hover {\n  background: #f0f0f0;\n  color: #333;\n}\n/* ÄÚÈÝÇøÓò£¨Í¼±ê+ÏûÏ¢£© */\n.mb-body {\n  padding: 8px 20px 16px;\n}\n/* Í¼±ê */\n.mb-icon {\n  font-size: 28px;\n}\n/* ÏûÏ¢ÎÄ×Ö */\n.mb-message {\n  font-size: 14px;\n  color: #555;\n  line-height: 1.6;\n}\n/* µ×²¿°´Å¥À¸ */\n.mb-footer {\n  padding: 12px 20px 16px;\n}\n/* ÆÕÍ¨°´Å¥ */\n.mb-btn {\n  padding: 7px 20px;\n  border: 1px solid #d9d9d9;\n  border-radius: 4px;\n  background: #fff;\n  font-size: 13px;\n}\n.mb-btn:hover {\n  border-color: #409eff;\n  color: #409eff;\n}\n/* Ö÷°´Å¥£¨È·¶¨/ÊÇ/ÖØÊÔ£© */\n.mb-btn.mb-btn-primary {\n  background: #409eff;\n  color: #fff;\n  border-color: #409eff;\n}\n.mb-btn.mb-btn-primary:hover {\n  background: #66b1ff;\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n/* [auto:opacity] */\n.mb-dialog { opacity: 0.73; }\n"};
+window.__messageBoxConfig = {"title":"ï¿½ï¿½Ê¾","message":"ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ï¢","icon":"error","customIcon":"","buttons":"okcancel","defaultButton":0,"width":432,"height":"200","showOverlay":false,"closeOnOverlayClick":false,"draggable":true,"opacity":1,"customCSS":"/* ===== ï¿½ï¿½Ï¢ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½Ê½ ===== */\n/* ï¿½É°ï¿½ï¿½ - ï¿½ï¿½Í¸ï¿½ï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È«ï¿½ï¿½ */\n.mb-overlay {\n  background: rgba(0, 0, 0, 0.4);\n}\n/* ï¿½Ô»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ - ï¿½ï¿½É«Ô²ï¿½Ç¿ï¿½Æ¬ */\n.mb-dialog {\n  background: #491b1b;\n  border-radius: 8px;\n  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);\n}\n/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */\n.mb-header {\n  padding: 16px 20px 8px;\n  font-size: 16px;\n  font-weight: 600;\n  color: #ffffff;\n}\n/* ï¿½Ø±Õ°ï¿½Å¥ (?) */\n.mb-header-close {\n  color: #ff0000;\n}\n.mb-header-close:hover {\n  background: #f0f0f0;\n  color: #333;\n}\n/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½+ï¿½ï¿½Ï¢ï¿½ï¿½ */\n.mb-body {\n  padding: 8px 20px 16px;\n}\n/* Í¼ï¿½ï¿½ */\n.mb-icon {\n  font-size: 28px;\n}\n/* ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ */\n.mb-message {\n  font-size: 14px;\n  color: #555;\n  line-height: 1.6;\n}\n/* ï¿½×²ï¿½ï¿½ï¿½Å¥ï¿½ï¿½ */\n.mb-footer {\n  padding: 12px 20px 16px;\n}\n/* ï¿½ï¿½Í¨ï¿½ï¿½Å¥ */\n.mb-btn {\n  padding: 7px 20px;\n  border: 1px solid #d9d9d9;\n  border-radius: 4px;\n  background: #fff;\n  font-size: 13px;\n}\n.mb-btn:hover {\n  border-color: #409eff;\n  color: #409eff;\n}\n/* ï¿½ï¿½ï¿½ï¿½Å¥ï¿½ï¿½È·ï¿½ï¿½/ï¿½ï¿½/ï¿½ï¿½ï¿½Ô£ï¿½ */\n.mb-btn.mb-btn-primary {\n  background: #409eff;\n  color: #fff;\n  border-color: #409eff;\n}\n.mb-btn.mb-btn-primary:hover {\n  background: #66b1ff;\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n/* [auto:opacity] */\n.mb-dialog { opacity: 0.73; }\n"};
 </script>
 <script>
-window.__inputBoxConfig = {"title":"ÊäÈë","prompt":"ÇëÊäÈëÄÚÈÝ","defaultValue":"","inputType":"number","buttons":"okcancel","defaultButton":0,"width":400,"height":0,"showOverlay":true,"closeOnOverlayClick":false,"draggable":true,"opacity":1,"customCSS":"/* ===== ÊäÈë¿ò×Ô¶¨ÒåÑùÊ½ ===== */\n/* ÃÉ°æ²ã - °ëÍ¸Ã÷ºÚÉ«±³¾°¸²¸ÇÈ«ÆÁ */\n.ib-overlay {\n  background: rgba(0, 0, 0, 0.4);\n}\n/* ¶Ô»°¿òÈÝÆ÷ - °×É«Ô²½Ç¿¨Æ¬ */\n.ib-dialog {\n  background: #4e4848;\n  border-radius: 8px;\n  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);\n}\n/* ±êÌâÀ¸ */\n.ib-header {\n  padding: 16px 20px 8px;\n  font-size: 16px;\n  font-weight: 600;\n  color: #333;\n}\n/* ¹Ø±Õ°´Å¥ (?) */\n.ib-header-close {\n  color: #eb0000;\n}\n.ib-header-close:hover {\n  background: #f0f0f0;\n  color: #333;\n}\n/* ÄÚÈÝÇøÓò£¨ÌáÊ¾ÎÄ×Ö+ÊäÈë¿ò£© */\n.ib-body {\n  padding: 8px 20px 16px;\n}\n/* ÌáÊ¾ÎÄ×Ö */\n.ib-prompt {\n  font-size: 14px;\n  color: #555;\n  line-height: 1.6;\n  margin-bottom: 10px;\n}\n/* ÊäÈë¿ò */\n.ib-input {\n  width: 100%;\n  padding: 7px 10px;\n  border: 1px solid #d9d9d9;\n  border-radius: 4px;\n  font-size: 13px;\n  color: #333;\n  outline: none;\n  box-sizing: border-box;\n}\n.ib-input:focus {\n  border-color: #409eff;\n  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);\n}\n/* µ×²¿°´Å¥À¸ */\n.ib-footer {\n  padding: 12px 20px 16px;\n  display: flex;\n  justify-content: flex-end;\n  gap: 8px;\n}\n/* ÆÕÍ¨°´Å¥ */\n.ib-btn {\n  padding: 7px 20px;\n  border: 1px solid #d9d9d9;\n  border-radius: 4px;\n  background: #fff;\n  font-size: 13px;\n  cursor: pointer;\n}\n.ib-btn:hover {\n  border-color: #409eff;\n  color: #409eff;\n}\n/* Ö÷°´Å¥£¨È·¶¨£© */\n.ib-btn.ib-btn-primary {\n  background: #409eff;\n  color: #fff;\n  border-color: #409eff;\n}\n.ib-btn.ib-btn-primary:hover {\n  background: #66b1ff;\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n/* [auto:opacity] */\n.ib-dialog { opacity: 0.32; }\n"};
+window.__inputBoxConfig = {"title":"ï¿½ï¿½ï¿½ï¿½","prompt":"ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½","defaultValue":"","inputType":"number","buttons":"okcancel","defaultButton":0,"width":400,"height":0,"showOverlay":true,"closeOnOverlayClick":false,"draggable":true,"opacity":1,"customCSS":"/* ===== ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½Ê½ ===== */\n/* ï¿½É°ï¿½ï¿½ - ï¿½ï¿½Í¸ï¿½ï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È«ï¿½ï¿½ */\n.ib-overlay {\n  background: rgba(0, 0, 0, 0.4);\n}\n/* ï¿½Ô»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ - ï¿½ï¿½É«Ô²ï¿½Ç¿ï¿½Æ¬ */\n.ib-dialog {\n  background: #4e4848;\n  border-radius: 8px;\n  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);\n}\n/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */\n.ib-header {\n  padding: 16px 20px 8px;\n  font-size: 16px;\n  font-weight: 600;\n  color: #333;\n}\n/* ï¿½Ø±Õ°ï¿½Å¥ (?) */\n.ib-header-close {\n  color: #eb0000;\n}\n.ib-header-close:hover {\n  background: #f0f0f0;\n  color: #333;\n}\n/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½+ï¿½ï¿½ï¿½ï¿½ï¿½ */\n.ib-body {\n  padding: 8px 20px 16px;\n}\n/* ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ */\n.ib-prompt {\n  font-size: 14px;\n  color: #555;\n  line-height: 1.6;\n  margin-bottom: 10px;\n}\n/* ï¿½ï¿½ï¿½ï¿½ï¿½ */\n.ib-input {\n  width: 100%;\n  padding: 7px 10px;\n  border: 1px solid #d9d9d9;\n  border-radius: 4px;\n  font-size: 13px;\n  color: #333;\n  outline: none;\n  box-sizing: border-box;\n}\n.ib-input:focus {\n  border-color: #409eff;\n  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);\n}\n/* ï¿½×²ï¿½ï¿½ï¿½Å¥ï¿½ï¿½ */\n.ib-footer {\n  padding: 12px 20px 16px;\n  display: flex;\n  justify-content: flex-end;\n  gap: 8px;\n}\n/* ï¿½ï¿½Í¨ï¿½ï¿½Å¥ */\n.ib-btn {\n  padding: 7px 20px;\n  border: 1px solid #d9d9d9;\n  border-radius: 4px;\n  background: #fff;\n  font-size: 13px;\n  cursor: pointer;\n}\n.ib-btn:hover {\n  border-color: #409eff;\n  color: #409eff;\n}\n/* ï¿½ï¿½ï¿½ï¿½Å¥ï¿½ï¿½È·ï¿½ï¿½ï¿½ï¿½ */\n.ib-btn.ib-btn-primary {\n  background: #409eff;\n  color: #fff;\n  border-color: #409eff;\n}\n.ib-btn.ib-btn-primary:hover {\n  background: #66b1ff;\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n}\n\n/* [auto:opacity] */\n.ib-dialog { opacity: 0.32; }\n"};
 </script>
 <script>
 const el = document.getElementById('titlebar_max');
@@ -1944,14 +1944,14 @@ el.addEventListener('mouseenter', () => {
   hasStayed = false;
   timer = setTimeout(() => {
     hasStayed = true;
-    console.log('Í£Áô³¬¹ý1500ms');
+    console.log('Í£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½1500ms');
   }, 1500);
 });
 
 el.addEventListener('mouseleave', () => {
   clearTimeout(timer);
   if (hasStayed) {
-    console.log('Àë¿ª');
+    console.log('ï¿½ë¿ª');
   }
 });
 </script>

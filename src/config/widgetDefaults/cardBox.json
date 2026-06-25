@@ -23,7 +23,7 @@
     },
     "pseudo": {},
     "sub": {
-      ".card-header": {
+      ".cardBox_header": {
         "height": "32px",
         "display": "flex",
         "align-items": "center",
@@ -35,15 +35,15 @@
         "color": "#1E1F22",
         "padding": "0 12px"
       },
-      ".card-header:hover": {
+      ".cardBox_header:hover": {
         "filter": "brightness(1)"
       },
-      ".card-header-title": {
+      ".cardBox_header_title": {
         "font-weight": "600",
         "font-size": "13px",
         "line-height": "32px"
       },
-      ".card-collapse-btn": {
+      ".cardBox_collapse_btn": {
         "width": "24px",
         "height": "24px",
         "display": "flex",
@@ -60,18 +60,18 @@
         "color": "#666666",
         "margin-left": "auto"
       },
-      ".card-collapse-btn.collapsed": {
+      ".cardBox_collapse_btn.collapsed": {
         "transform": "rotate(-90deg)"
       },
-      ".card-body": {
+      ".cardBox_body": {
         "flex": "1",
         "position": "relative",
         "overflow": "hidden"
       },
-      "#id.collapsed .card-body": {
+      "#id.collapsed .cardBox_body": {
         "display": "none"
       },
-      ".card-collapse-btn:hover": {
+      ".cardBox_collapse_btn:hover": {
         "color": "#333"
       },
       ".card-drop-hint": {
@@ -117,7 +117,7 @@
     "sub": {}
   },
   "structuralCSS": {
-    ".card-header": [
+    ".cardBox_header": [
       "display: flex",
       "align-items: center",
       "justify-content: space-between",
@@ -125,15 +125,15 @@
       "user-select: none",
       "transition: background-color 0.2s"
     ],
-    ".card-header:hover": [
+    ".cardBox_header:hover": [
       "filter: brightness(0.95)"
     ],
-    ".card-header-title": [
+    ".cardBox_header_title": [
       "font-weight: 600",
       "font-size: 13px",
       "line-height: 1"
     ],
-    ".card-collapse-btn": [
+    ".cardBox_collapse_btn": [
       "width: 24px",
       "height: 24px",
       "display: flex",
@@ -149,21 +149,21 @@
       "flex-shrink: 0",
       "margin-left: auto"
     ],
-    ".card-collapse-btn.collapsed": [
+    ".cardBox_collapse_btn.collapsed": [
       "transform: rotate(-90deg)"
     ],
-    ".card-body": [
+    ".cardBox_body": [
       "flex: 1",
       "position: relative",
       "overflow: hidden"
     ],
-    "#id.collapsed .card-body": [
+    "#id.collapsed .cardBox_body": [
       "display: none"
     ],
     "#id.collapsed": [
       "height: 32px"
     ],
-    ".card-collapse-btn:hover": [
+    ".cardBox_collapse_btn:hover": [
       "color: #333"
     ],
     ".card-drop-hint": [
@@ -179,7 +179,7 @@
   },
   "mappedProps": [
     {
-      "selector": ".card-header",
+      "selector": ".cardBox_header",
       "base": {
         "backgroundColor": "#f5f5f5",
         "color": "#1E1F22"
@@ -191,14 +191,14 @@
       }
     },
     {
-      "selector": ".card-header-title",
+      "selector": ".cardBox_header_title",
       "base": {
         "fontSize": 13
       },
       "pseudo": {}
     },
     {
-      "selector": ".card-collapse-btn",
+      "selector": ".cardBox_collapse_btn",
       "base": {
         "color": "#666666"
       },
@@ -207,25 +207,25 @@
   ],
   "computedProps": [
     {
-      "selector": ".card-header",
+      "selector": ".cardBox_header",
       "jsonKey": "height",
       "cssProp": "height",
       "template": "{{headerHeight}}px"
     },
     {
-      "selector": ".card-header",
+      "selector": ".cardBox_header",
       "jsonKey": "padding",
       "cssProp": "padding",
       "template": "{{headerPadding}}"
     },
     {
-      "selector": ".card-header",
+      "selector": ".cardBox_header",
       "jsonKey": "background-color",
       "cssProp": "background-color",
       "template": "{{headerColor}}"
     },
     {
-      "selector": ".card-header-title",
+      "selector": ".cardBox_header_title",
       "jsonKey": "color",
       "cssProp": "color",
       "template": "{{headerTitleColor}}"

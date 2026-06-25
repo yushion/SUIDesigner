@@ -19,10 +19,10 @@
       "fontFamily": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
     },
     "pseudo": {
-      ".log-line:hover": {
+      ".logOutput_line:hover": {
         "background-color": "rgba(0,120,212,0.08)"
       },
-      ".log-line:nth-child(even)": {
+      ".logOutput_line:nth-child(even)": {
         "background-color": "rgba(0,0,0,0.02)"
       }
     },
@@ -55,7 +55,7 @@
     "sub": {}
   },
   "structuralCSS": {
-    ".log-line": [
+    ".logOutput_line": [
       "line-height: 1.5",
       "padding: 2px 5px"
     ]
