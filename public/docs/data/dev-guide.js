@@ -1,5 +1,4 @@
-window.__devGuideHTML = `
-<div class="section-header">
+window.__devGuideHTML = `<div class="section-header">
   <h2>🚀 快速开发指南（设计器完美匹配版）</h2>
   <div class="h2-meta">
     <span class="ctrl-badge">必读</span>
@@ -8,7 +7,7 @@ window.__devGuideHTML = `
 
 <style>
   /* 此样式块仅用于本指南内部，不影响业务页面 */
-  .dev-step { background:#fff;padding:20px; margin-bottom:16px; border:1px solid #c8d6e5;border-radius:8px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,0.07);}
+  .dev-step { font-weight: normal;background:#fff;padding:20px; margin-bottom:16px; border:1px solid #c8d6e5;border-radius:8px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,0.07);}
   .dev-step h3 { border-bottom:2px solid #409EFF; padding-bottom:8px; margin-bottom:12px; color:#1a1a2e; font-size:17px; }
   .dev-step h3 .step-num { display:inline-block; background:#409EFF; color:#fff; width:28px; height:28px; line-height:28px; text-align:center; border-radius:50%; margin-right:8px; font-size:14px; }
   .dev-step h4 { font-size:14px; color:#333; margin:14px 0 6px; }
@@ -20,7 +19,7 @@ window.__devGuideHTML = `
   .dev-step table { width:100%; border-collapse:collapse; font-size:13px; margin:10px 0; }
   .dev-step table th { background:#f5f5f5; padding:8px 12px; text-align:left; border:1px solid #e0e0e0; font-weight:600; font-size:12px; }
   .dev-step table td { padding:8px 12px; border:1px solid #e8eaed; }
-  .dev-step code { background:#f0f4f8; padding:2px 6px; border-radius:3px; font-size:13px; color:#409EFF; }
+  .dev-step code { font-weight: background:#f0f4f8; padding:2px 6px; border-radius:3px; font-size:13px; color:#409EFF;}
   .dev-step pre { margin:0; }
   .tag { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; margin-right:4px; font-weight:600; }
   .tag-required { background:#fce4ec; color:#c62828; }
@@ -50,7 +49,9 @@ window.__devGuideHTML = `
   <h3><span class="step-num">1</span> 快速开始（3 步上手）</h3>
 
   <h4>第 1 步：引入桥接脚本</h4>
-  <p>在页面 <code>&lt;body&gt;</code> 末尾引入：</p>
+  <ul>
+    <li>在页面 <code>&lt;body&gt;</code> 末尾引入：</li>
+  </ul>
   <div class="code-block">
     <div class="code-block-header">
       <span class="lang-label">HTML</span>
@@ -60,111 +61,142 @@ window.__devGuideHTML = `
   </div>
 
   <h4>第 2 步：创建页面容器</h4>
-  <p>页面容器需设置 <code>app-region: drag</code> 使整个窗口可拖拽。</p>
+  <ul>
+    <li>创建页面容器 <code>pageContainer</code></li>
+    <li>页面容器需设置 <code>app-region:drag;-webkit-app-region:drag;</code> 使整个窗口可拖拽。</li>
+    <li>页面容器的高宽仅允许使用百分比和固定值，不允许使用 <code>auto</code> 或 <code>100vw</code>、<code>100vh</code> 等动态值。</li>
+  </ul>
   <div class="code-block">
     <div class="code-block-header">
       <span class="lang-label">HTML + CSS</span>
       <button class="copy-btn" onclick="copyCodeFromBlock(this)">复制</button>
     </div>
     <pre><code>&lt;div class="pageContainer glass-effect" id="pageContainer"
-     data-ctrl-type="pageContainer"
-     data-name="canvas"
-     data-original-width="1065"
-     data-original-height="695"
-     style="position:relative; app-region: drag; -webkit-app-region: drag;"&gt;
+     data-ctrl-type="pageContainer"  &lt;!-- 控件类型，见第 4 步详解 --&gt;
+     data-name="canvas"   &lt;!-- 中文名，见第 4 步详解 --&gt;
+     style="position:relative;
+      app-region:drag;-webkit-app-region:drag; /* 使整个窗口可拖拽 */
+      padding-top: 40px;  /* 留出标题栏高度，防止内容被遮挡。 */"
+      &gt;
   &lt;!-- 所有控件放在这里 --&gt;
 &lt;/div&gt;
 
 &lt;style&gt;
-  /* ⚠️ 只有【可交互控件】才需要 data-drag-type（按钮、输入框、菜单项等） */
-  /* 纯布局容器（侧边栏、内容区、卡片容器等）【不需要】添加 data-drag-type */
-  [data-drag-type] { app-region: no-drag; -webkit-app-region: no-drag; }
-  /* 最大化按钮内部 span 允许拖拽（支持 Windows 11 Snap Layout） */
-  [data-ctrl-type="titlebar_max"] span { app-region: drag; -webkit-app-region: drag; }
+  /* 见第 4 步详解：⚠️ 添加【可交互控件】需要的不可拖拽属性：<strong>data-drag-type</strong>（按钮、输入框、菜单项等） */
+  [data-drag-type] {app-region:no-drag;-webkit-app-region:no-drag;}
 &lt;/style&gt;</code></pre>
   </div>
 
-  <div class="info-box">
-    <strong>🪟 Windows 11 贴靠布局（Snap Layout）兼容说明</strong><br/>
+  <h4>第 3 步：定义标题栏</h4>
+  <ul>
+    <li>创建标题栏 <code>titlebar</code></li>
+    <li>💡 需定位于页面容器顶部 ，高度自定义。建议标题栏使用绝对定位脱离文档流，且页面容器使用 <code>padding-top</code>（或内容区 <code>margin-top</code>）≥ 标题栏高度（如 40px），防止内容区顶部被遮挡。其他布局方案（如标题栏不用绝对定位）无需此设置。</li>
+    <li>标题栏<code>titlebar</code>需设置 <code>app-region:drag;-webkit-app-region:drag;</code> 确保使整个标题栏可拖拽。</li>
+    <li>三分布局：左侧图标区 <code>titlebar_left</code> ，中间标题文本区 <code>titlebar_center</code> ，右侧控制按钮区 <code>titlebar_right</code> </li>
+    <li>-- 控制按钮区 <code>titlebar_right</code> 三分布局：最小化 <code>titlebar_min</code> ，最大化 <code>titlebar_max</code> ，关闭 <code>titlebar_close</code> </li>
+    <li>-- 最大化按钮 <code>titlebar_max</code> 实现 Windows 11 贴靠布局（Snap Layout）兼容说明：
+      <div class="info-box">
     在 Windows 11 中，鼠标悬停最大化按钮时会弹出贴靠布局菜单。要触发此功能，<strong>最大化按钮所在的区域必须被系统识别为“标题栏可拖拽区域”</strong>。
     <ul style="margin:8px 0 0 20px;line-height:1.8;">
-      <li><strong>按钮自身</strong>：必须设为 <code>app-region: no-drag</code>（保证点击响应）。</li>
-      <li><strong>按钮内部的 <code>&lt;span&gt;</code>（或 <code>&lt;div&gt;</code>）</strong>：必须设为 <code>app-region: drag</code>，让系统认为该区域属于标题栏，从而激活悬停时的贴靠布局。</li>
-      <li><strong>固定宽高 18px</strong>：与 Windows 11 默认标题栏按钮尺寸一致，确保悬停热区准确。</li>
+      <li>按钮自身：必须设为<code>app-region:no-drag</code>（保证点击响应），可交互控件的<code>[data-drag-type]</code>已实现。</li>
+      <li>按钮内部的 <code>&lt;span&gt;</code>（或 <code>&lt;div&gt;</code>）：必须设为 <code>app-region:drag</code>，让系统认为该区域属于标题栏，从而激活悬停时的贴靠布局。</li>
+      <li>固定宽高 18px</li>
     </ul>
     <div style="margin-top:8px;padding:8px;background:#f5f5f5;border-radius:4px;font-size:12px;color:#333;">
       <strong>正确示例：</strong><br/>
-      <code>&lt;button id="titlebar_max" data-ctrl-type="titlebar_max"&gt;<br/>
-      &nbsp;&nbsp;&lt;span style="width:18px;height:18px;display:flex;align-items:center;justify-content:center;"&gt;☐&lt;/span&gt;<br/>
+      <code>&lt;button id="titlebar_max" data-ctrl-type="titlebar_max" data-drag-type="titlebar_max" title="最大化"&gt;<br/>
+      &nbsp;&nbsp;&lt;span style="width:18px;height:18px;display:flex;align-items:center;justify-content:center;app-region:drag;-webkit-app-region:drag;"&gt;☐&lt;/span&gt;<br/>
       &lt;/button&gt;</code><br/>
-      <code>/* CSS */</code><br/>
-      <code>[data-ctrl-type="titlebar_max"] { app-region: no-drag; }</code><br/>
-      <code>[data-ctrl-type="titlebar_max"] span { app-region: drag; }</code>
     </div>
     <p style="margin-top:6px;"><strong>⚠️ 如果缺少此设置</strong>，最大化按钮在 Windows 11 中悬停时将不会弹出贴靠布局菜单，影响用户体验。</p>
   </div>
-
-  <h4>第 3 步：控件属性规范（重要！细节看下面第 4 步）</h4>
-  <p>每个控件必须设置<code>id</code>（唯一标识）、<code>data-ctrl-type</code>（控件类型）、<code>data-drag-type</code>（防拖拽标记）、<code>data-name</code>（中文名，推荐），与桥接脚本配合使用。</p>
-
-  <h4>第 4 步：添加控件</h4>
-  <p>所有控件模板都已包含 <strong>完整属性</strong>，直接复制使用即可。</p>
-
-  <!-- ========== 修改点 ①：核心原则（区分可交互控件与布局容器） ========== -->
-  <div class="warn-box">
-    <strong>⚠️ 核心原则（必须遵守）：</strong>
-    <ul style="margin:6px 0 0 20px;">
-      <li><strong>可交互控件</strong>（按钮、输入框、下拉框、菜单项等）必须设置 <strong>4 个必要属性</strong>：<code>id</code>（唯一）、<code>data-ctrl-type</code>（控件类型）、<code>data-drag-type</code>（防拖拽标记）、<code>data-name</code>（中文名，推荐）。</li>
-      <li><strong>纯布局容器</strong>（侧边栏 <code>.sidebar</code>、内容区 <code>.main-content</code>、卡片容器 <code>.card-panel</code> 等）<strong>不需要</strong>添加 <code>data-drag-type</code>，它们应保持可拖拽，让用户能通过拖拽空白区域移动窗口。</li>
-      <li><strong>判断规则：用户能“点击”或“输入”的元素 → 需要 <code>data-drag-type</code>；仅用于“承载/布局”的元素 → 不需要。</strong></li>
-      <li><strong>对于标准原生标签</strong>（如 <code>&lt;button&gt;</code>、<code>&lt;input&gt;</code>、<code>&lt;select&gt;</code>），<code>data-ctrl-type</code> 可以省略（脚本会自动识别）。</li>
-      <li><strong>但对于自定义标签或布局元素</strong>（如导航菜单项 <code>&lt;div class="nav-item"&gt;</code>、自定义按钮等），<strong>必须显式添加 <code>data-ctrl-type</code></strong>（通常设为 <code>button</code> 或 <code>listBox_item</code>），否则事件会被错误地归并到父容器。</li>
-      <li><strong>不要依赖自动推断</strong>，对于自定义元素，显式填写所有属性可确保 100% 上报正确。</li>
-      <li>开关（SwitchToggle）必须使用 <code>data-ctrl-type="switchToggle"</code>。</li>
-    </ul>
-  </div>
-
-  <!-- ========== 修改点 ②：新增判断规则速查表 ========== -->
-  <div class="tip-box">
-    <strong>📋 快速判断：哪些元素需要 <code>data-drag-type</code>？</strong>
-    <table style="margin-top:6px;font-size:12px;">
-      <thead>
-        <tr><th style="width:45%;">元素类型</th><th style="width:20%;">需要 data-drag-type</th><th style="width:35%;">示例</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>按钮、输入框、下拉框、复选框、单选框、开关、超链接</td><td style="color:#2e7d32;font-weight:600;">✅ 是</td><td><code>&lt;button&gt;</code>、<code>&lt;input&gt;</code>、<code>&lt;select&gt;</code></td></tr>
-        <tr><td>导航菜单项、自定义按钮、列表项、树节点（可点击部分）</td><td style="color:#2e7d32;font-weight:600;">✅ 是</td><td><code>&lt;div class="nav-item"&gt;</code>、<code>.listBox_item</code></td></tr>
-        <tr><td>侧边栏、内容区、卡片容器、标签页容器、弹窗背景</td><td style="color:#c62828;font-weight:600;">❌ 否</td><td><code>.sidebar</code>、<code>.main-content</code>等控件</td></tr>
-        <tr><td>页面容器本身（<code>#pageContainer</code>）</td><td style="color:#c62828;font-weight:600;">❌ 否</td><td><code>#pageContainer</code>（已由 <code>app-region: drag</code> 控制）</td></tr>
-      </tbody>
-    </table>
-    <p style="margin-top:6px;">记忆口诀：<strong>"能点能输入"</strong>就需要，<strong>"纯放东西"</strong>不需要。</p>
-  </div>
-</div>
-
-<!-- ==================== 2. 图标占位符处理 ==================== -->
-<div class="dev-step">
-  <h3><span class="step-num">2</span> 图标占位符处理（IconManager）</h3>
-  <p>桥接脚本内置了 <strong>图标管理器（IconManager）</strong>，支持将 <code>[OK]</code>、<code>{ERROR}</code> 等占位符自动转换为对应的 Emoji 图标。</p>
-  <ul>
-    <li><strong>解析（页面显示）</strong>：<code>IconManager.parse(text)</code> 将占位符转为图标，通常无需手动调用，脚本会自动处理。</li>
-    <li><strong>转义（上报数据）</strong>：<code>IconManager.toText(html)</code> 将图标转为占位符或 <code>[U+XXXX]</code>，所有事件上报和 API 返回值均会自动执行此操作。</li>
+  </li>
   </ul>
-  <div class="tip-box">
-    <strong>💡 开发建议：</strong>在控件文本中直接使用占位符，如 <code>&lt;button&gt;[OK] 确定&lt;/button&gt;</code>，即可显示为“✅ 确定”。无需额外处理，桥接脚本会自动完成双向转换。
+  <div class="code-block">
+    <div class="code-block-header">
+      <span class="lang-label">HTML</span>
+      <button class="copy-btn" onclick="copyCodeFromBlock(this)">复制</button>
+    </div>
+    <pre><code>&lt;div class="titlebar" id="titlebar" data-name="标题栏" style="position:absolute;top:0;left:0;right:0;height:40px;background:#F8F8F8;border-bottom:1px solid rgba(0,0,0,0.08);app-region:drag;-webkit-app-region:drag;"&gt;
+  &lt;div class="titlebar_left"&gt;
+    &lt;span class="titlebar_left_icon" id="titlebar_left_icon" data-ctrl-type="titlebar_left_icon" data-drag-type="titlebar_left_icon" data-name="图标" style="color:#333;"&gt;&lt;i class="fas fa-star"&gt;&lt;/i&gt;&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div class="titlebar_center" style="justify-content:flex-start;"&gt;
+    &lt;span class="titlebar_center_title" id="titlebar_title" data-ctrl-type="titlebar_title" data-drag-type="titlebar_title" data-name="标题" style="color:#333;font-weight:600;"&gt;我的应用&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div class="titlebar_right"&gt;
+    &lt;button id="titlebar_min" data-ctrl-type="titlebar_min" data-drag-type="titlebar_min" style="color:#333;" class="titlebar_rightBtn" title="最小化"&gt;
+      &lt;svg width="12" height="1" viewBox="0 0 10 1"&gt;&lt;rect width="10" height="1" fill="currentColor"/&gt;&lt;/svg&gt;
+    &lt;/button&gt;
+    &lt;button id="titlebar_max" data-ctrl-type="titlebar_max" data-drag-type="titlebar_max" style="color:#333;" class="titlebar_rightBtn" title="最大化"&gt;
+      &lt;span style="width:18px;height:18px;display:flex;align-items:center;justify-content:center;app-region:drag;-webkit-app-region:drag;"&gt;
+        &lt;svg width="12" height="12" viewBox="0 0 10 10" shape-rendering="crispEdges"&gt;
+          &lt;rect x="1" y="1" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1"/&gt;
+        &lt;/svg&gt;
+      &lt;/span&gt;
+    &lt;/button&gt;
+    &lt;button id="titlebar_close" data-ctrl-type="titlebar_close" data-drag-type="titlebar_close" style="color:#333;" class="titlebar_rightBtn titlebar_rightBtn_close" title="关闭"&gt;
+      &lt;svg width="12" height="12" viewBox="0 0 10 10"&gt;
+        &lt;line x1="1" y1="1" x2="9" y2="9" stroke="currentColor" stroke-width="1"/&gt;
+        &lt;line x1="9" y1="1" x2="1" y2="9" stroke="currentColor" stroke-width="1"/&gt;
+      &lt;/svg&gt;
+    &lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;style&gt;
+  .titlebar_rightBtn {
+    width:35px; height:32px; border:none; background:transparent; cursor:default; border-radius:4px; display:flex; align-items:center; justify-content:center;
+  }
+  .titlebar_rightBtn:hover { background:rgba(0,0,0,0.06); }
+  .titlebar_rightBtn_close:hover { background:#e81123; color:#fff; }
+&lt;/style&gt;</code></pre>
   </div>
+
+  <h4> 第 4 步：控件属性规范: <strong style="color:rgb(240, 0, 0);font-size: 14px;">⚠️ 重要核心原则（必须遵守）</strong></h4>
+      <ul>
+      <li>所有控件必须设置<code>id</code>（唯一标识）、<code>data-ctrl-type</code>（控件类型）、<code>data-name</code>（中文名，推荐），与桥接脚本配合使用。</li>
+      <li>防拖拽标记 <code>data-drag-type</code> : </li>
+      <li>-- 所有可交互控件（用户可点击或输入:按钮、输入框、下拉框、菜单项 等）<strong style="color:rgb(240, 0, 0);font-size: 13px;">必须设置</strong><code>data-drag-type</code></li>
+      <li>-- 纯布局容器（侧边栏、内容区、卡片容器 等）<strong style="color:rgb(240, 0, 0);font-size: 13px;">不需要添加</strong> <code>data-drag-type</code>，它们应保持可拖拽，让用户能通过拖拽空白区域移动窗口。</li>
+      <li>-- 判断规则：用户<strong style="color:rgb(240, 0, 0);font-size: 13px;">能“点击”或“输入”</strong>的元素 → <strong style="color:rgb(240, 0, 0);font-size: 13px;">需要</strong> <code>data-drag-type</code>；仅用于“承载/布局”的元素 → <strong style="color:rgb(240, 0, 0);font-size: 13px;">不需要</strong>。</li>
+      <li>控件类型 <code>data-ctrl-type</code>：</li>
+      <li>-- 对于标准原生标签（如 <code>&lt;button&gt;</code>、<code>&lt;input&gt;</code>、<code>&lt;select&gt;</code>），<code>data-ctrl-type</code> 可以省略（脚本会自动识别，但建议添加）。</li>
+      <li>-- 但对于自定义标签或布局元素（如导航菜单项 <code>&lt;div class="nav-item"&gt;</code>、自定义按钮等），<strong style="color:rgb(240, 0, 0);font-size: 13px;">必须显式添加 <code>data-ctrl-type</code></strong>（通常设为 <code>button</code> 或 <code>listBox_item</code>），否则事件会被错误地归并到父容器。</li>
+      <li>-- 不要依赖自动推断，对于自定义元素，显式填写所有属性可确保 100% 上报正确。</li>
+      <li>-- 开关（SwitchToggle）<strong style="color:rgb(240, 0, 0);font-size: 13px;">必须使用</strong> <code>data-ctrl-type="switchToggle"</code>。</li>
+      <!-- ========== 修改点 ②：新增判断规则速查表 ========== -->
+      <div class="tip-box">
+        <strong>📋 快速判断：哪些元素需要 <code>data-drag-type</code>？</strong>
+        <table style="margin-top:6px;font-size:12px;">
+          <thead>
+            <tr><th style="width:45%;">元素类型</th><th style="width:20%;">需要 data-drag-type</th><th style="width:35%;">示例</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>按钮、输入框、下拉框、复选框、单选框、开关、超链接</td><td style="color:#2e7d32;font-weight:600;">✅ 是</td><td><code>&lt;button&gt;</code>、<code>&lt;input&gt;</code>、<code>&lt;select&gt;</code></td></tr>
+            <tr><td>导航菜单项、自定义按钮、列表项、树节点（可点击部分）</td><td style="color:#2e7d32;font-weight:600;">✅ 是</td><td><code>&lt;div class="nav-item"&gt;</code>、<code>.listBox_item</code></td></tr>
+            <tr><td>侧边栏、内容区、卡片容器、标签页容器、弹窗背景</td><td style="color:#c62828;font-weight:600;">❌ 否</td><td><code>.sidebar</code>、<code>.main-content</code>等控件</td></tr>
+            <tr><td>页面容器本身（<code>#pageContainer</code>）</td><td style="color:#c62828;font-weight:600;">❌ 否</td><td><code>#pageContainer</code>（已由 <code>app-region: drag</code> 控制）</td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top:6px;">记忆口诀：<strong>"能点能输入"</strong>就需要，<strong>"纯放东西"</strong>不需要。</p>
+      </div>
+    </ul>
+  
 </div>
 
-<!-- ==================== 3. 基础控件完整模板 ==================== -->
+<!-- ==================== 2. 基础控件完整模板 ==================== -->
 <div class="dev-step">
-  <h3><span class="step-num">3</span> 基础控件完整模板</h3>
+  <h3><span class="step-num">2</span> 基础控件完整模板</h3>
   <p>以下每个模板都包含 <strong>全部必要属性</strong>，直接复制到页面中即可。</p>
 
   <!-- ========== 修改点 ③：表格上方增加 data-drag-type 适用范围说明 ========== -->
   <div class="info-box">
     <strong>📌 关于 <code>data-drag-type</code> 的适用范围：</strong><br/>
-    下表列出的 <strong>所有控件都是可交互控件</strong>（用户可点击或输入），因此每个模板都包含 <code>data-drag-type</code> 属性。<br/>
-    <strong>纯布局容器</strong>（如侧边栏 <code>.sidebar</code>、内容区 <code>.main-content</code>、卡片容器 <code>.card-panel</code>）<strong>不要添加</strong> <code>data-drag-type</code>，以保持窗口拖拽能力。
+    <ul>
+      <li>下表列出的 <strong>所有控件都是可交互控件</strong>（用户可点击或输入），因此每个模板都包含 <code>data-drag-type</code> 属性。<br/></li>
+      <li><strong>纯布局容器</strong>（如侧边栏 <code>.sidebar</code>、内容区 <code>.main-content</code>、卡片容器 <code>.card-panel</code>）<strong>不要添加</strong> <code>data-drag-type</code>，以保持窗口拖拽能力。</li>
+    </ul>
   </div>
 
   <table>
@@ -255,119 +287,99 @@ window.__devGuideHTML = `
   </div>
 </div>
 
-<!-- ==================== 4. 复杂控件完整模板（含完整类名） ==================== -->
+<!-- ==================== 3. 复杂控件完整模板（与设计器导出完全一致） ==================== -->
 <div class="dev-step">
-  <h3><span class="step-num">4</span> 复杂控件完整模板</h3>
-  <p>以下模板展示了每个复杂控件的 <strong>完整 DOM 结构</strong>，包括设计器导出的标准类名（含 <code>_container</code> 后缀）和必需的数据属性。</p>
+  <h3><span class="step-num">3</span> 复杂控件完整模板</h3>
+  <p>以下模板严格匹配桥接脚本 <code>webviewBridge.js</code> 的 <strong>完整 DOM 结构</strong>和必需的数据属性。每个控件的类名、层级、data 属性均不可省略或变更。</p>
 
-  <div class="warn-box">
-    <strong>⚠️ 类名说明：</strong>设计器导出的容器类名统一使用 <code>_container</code> 后缀（如 <code>dataGrid_container</code>、<code>logOutput_container</code>、<code>progressBar_container</code>），这与桥接脚本的 CSS 层级识别完全兼容，建议沿用此规范。
+  <div class="info-box">
+    <strong>📌 复杂控件的通用规则：</strong>
+    <ul style="margin:6px 0 0 16px;font-size:12px;line-height:1.8;">
+      <li>容器必须设置 <code>id</code>、<code>data-ctrl-type</code>、<code>data-drag-type</code>、<code>data-name</code></li>
+      <li>子元素需要 <code>data-ctrl-type</code> 的必须精确设置（如 <code>listBox_item</code>、<code>dataGrid_cell</code>、<code>treeview_node_toggle</code> 等）</li>
+      <li>数据属性（<code>data-listBox-items</code>、<code>data-columns</code>、<code>data-rows</code> 等）使用 <strong>单引号 JSON</strong>，与设计器导出格式一致</li>
+    </ul>
   </div>
 
-  <h4>4.1 标题栏（TitleBar） — 完整结构</h4>
+  <h4>3.1 列表框（ListBox）</h4>
+  <ul>
+    <li><strong>关键属性：</strong><code>data-listBox-items</code>（JSON 数组）。</li>
+    <li><strong>关键子元素类名：</strong><code>.listBox_scroll</code> → <code>.listBox_item</code> → <code>.listBox_item_text</code>。</li>
+  </ul>
   <div class="code-block">
     <div class="code-block-header">
       <span class="lang-label">HTML</span>
       <button class="copy-btn" onclick="copyCodeFromBlock(this)">复制</button>
     </div>
-    <pre><code>&lt;div class="titlebar" id="titlebar" data-name="标题栏" style="position:absolute;top:0;left:0;right:0;height:40px;background:#F8F8F8;border-bottom:1px solid rgba(0,0,0,0.08);app-region: drag;-webkit-app-region: drag;"&gt;
-  &lt;div class="titlebar_left"&gt;
-    &lt;span class="titlebar_left_icon" id="titlebar_left_icon" data-ctrl-type="titlebar_left_icon" data-drag-type="titlebar_left_icon" data-name="图标" style="color:#333;"&gt;&lt;i class="fas fa-star"&gt;&lt;/i&gt;&lt;/span&gt;
-  &lt;/div&gt;
-  &lt;div class="titlebar_center" style="justify-content:flex-start;"&gt;
-    &lt;span class="titlebar_center_title" id="titlebar_title" data-ctrl-type="titlebar_title" data-drag-type="titlebar_title" data-name="标题" style="color:#333;font-weight:600;"&gt;我的应用&lt;/span&gt;
-  &lt;/div&gt;
-  &lt;div class="titlebar_right"&gt;
-    &lt;button id="titlebar_min" data-ctrl-type="titlebar_min" data-drag-type="titlebar_min" style="color:#333;" class="titlebar_rightBtn" title="最小化"&gt;
-      &lt;svg width="12" height="1" viewBox="0 0 10 1"&gt;&lt;rect width="10" height="1" fill="currentColor"/&gt;&lt;/svg&gt;
-    &lt;/button&gt;
-    &lt;button id="titlebar_max" data-ctrl-type="titlebar_max" data-drag-type="titlebar_max" style="color:#333;" class="titlebar_rightBtn" title="最大化"&gt;
-      &lt;span style="width:18px;height:18px;display:flex;align-items:center;justify-content:center;"&gt;
-        &lt;svg width="12" height="12" viewBox="0 0 10 10" shape-rendering="crispEdges"&gt;
-          &lt;rect x="1" y="1" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1"/&gt;
-        &lt;/svg&gt;
-      &lt;/span&gt;
-    &lt;/button&gt;
-    &lt;button id="titlebar_close" data-ctrl-type="titlebar_close" data-drag-type="titlebar_close" style="color:#333;" class="titlebar_rightBtn titlebar_rightBtn_close" title="关闭"&gt;
-      &lt;svg width="12" height="12" viewBox="0 0 10 10"&gt;
-        &lt;line x1="1" y1="1" x2="9" y2="9" stroke="currentColor" stroke-width="1"/&gt;
-        &lt;line x1="9" y1="1" x2="1" y2="9" stroke="currentColor" stroke-width="1"/&gt;
-      &lt;/svg&gt;
-    &lt;/button&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-
-&lt;style&gt;
-  .titlebar_rightBtn {
-    width:35px; height:32px; border:none; background:transparent; cursor:default; border-radius:4px; display:flex; align-items:center; justify-content:center;
-  }
-  .titlebar_rightBtn:hover { background:rgba(0,0,0,0.06); }
-  .titlebar_rightBtn_close:hover { background:#e81123; color:#fff; }
-  .titlebar_left_icon, .titlebar_center_title { app-region: no-drag; -webkit-app-region: no-drag; }
-&lt;/style&gt;</code></pre>
-  </div>
-
-  <h4>4.2 列表框（ListBox） — 需设置 data-listBox-items</h4>
-  <div class="code-block">
-    <div class="code-block-header">
-      <span class="lang-label">HTML</span>
-      <button class="copy-btn" onclick="copyCodeFromBlock(this)">复制</button>
-    </div>
-    <pre><code>&lt;div id="list_xxx" class="listBox" data-ctrl-type="listBox" data-drag-type="listBox" data-name="列表名"
-     data-listBox-items='[{"id":"1","text":"项目1","selected":false},{"id":"2","text":"项目2","selected":false}]'
-     data-editable="false" data-always-show-selection="false"
-     style="width:200px;height:200px;"&gt;
+    <pre><code>&lt;div id="listBox_1" data-type="listBox" data-ctrl-type="listBox" data-drag-type="listBox" data-ctrl-id="listBox_1" data-name="列表框"
+     data-listBox-items='[{"id":"1","text":"列表项1","selected":false},{"id":"2","text":"列表项2","selected":false},{"id":"3","text":"列表项3","selected":false}]'
+     data-editable="false" data-always-show-selection="false" style="width:200px;height:200px;"&gt;
   &lt;div class="listBox_scroll"&gt;
     &lt;div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="0"&gt;
-      &lt;span class="listBox_item_text"&gt;项目1&lt;/span&gt;
+      &lt;span class="listBox_item_text"&gt;列表项1&lt;/span&gt;
     &lt;/div&gt;
     &lt;div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="1"&gt;
-      &lt;span class="listBox_item_text"&gt;项目2&lt;/span&gt;
+      &lt;span class="listBox_item_text"&gt;列表项2&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="2"&gt;
+      &lt;span class="listBox_item_text"&gt;列表项3&lt;/span&gt;
     &lt;/div&gt;
   &lt;/div&gt;
 &lt;/div&gt;</code></pre>
   </div>
 
-  <h4>4.3 数据表格（DataGrid） — 需设置 data-columns 和 data-rows</h4>
+  <h4>3.2 多项表格（DataGrid）</h4>
+  <ul>
+    <li><strong>关键属性：</strong><code>data-columns</code> + <code>data-rows</code>（均 JSON 数组）。</li>
+    <li><strong>关键结构：</strong>头部 <code>.dataGrid_header</code> → 单元格 <code>.dataGrid_header_cell</code>，数据体 <code>.dataGrid_body</code> → 行 <code>.dataGrid_row</code> → 单元格 <code>.dataGrid_cell</code>。<strong>头部和数据单元格均需</strong> <code>data-ctrl-type="dataGrid_cell"</code>。</li>
+  </ul>
   <div class="code-block">
     <div class="code-block-header">
       <span class="lang-label">HTML</span>
       <button class="copy-btn" onclick="copyCodeFromBlock(this)">复制</button>
     </div>
-    <pre><code>&lt;div id="grid_xxx" class="dataGrid_container" data-ctrl-type="dataGrid" data-drag-type="dataGrid" data-name="表格名"
-     data-columns='[{"field":"col1","header":"列A"},{"field":"col2","header":"列B"}]'
-     data-rows='[{"id":"row1","cells":{"col1":"数据A1","col2":"数据B1"}}]'
+    <pre><code>&lt;div id="dataGrid_1" data-type="dataGrid" data-ctrl-type="dataGrid" data-drag-type="dataGrid" data-ctrl-id="dataGrid_1" data-name="多项表格"
+     data-columns='[{"field":"col1","header":"列A"},{"field":"col2","header":"列B"},{"field":"col3","header":"列C"}]'
+     data-rows='[{"id":"dataGrid_1_row_1","cells":{"col1":"数据A1","col2":"数据B1","col3":"数据C1"}},{"id":"dataGrid_1_row_2","cells":{"col1":"数据A2","col2":"数据B2","col3":"数据C2"}},{"id":"dataGrid_1_row_3","cells":{"col1":"数据A3","col2":"数据B3","col3":"数据C3"}}]'
      data-show-checkbox="true" data-editable="false" data-always-show-selection="false"
-     style="width:400px;height:250px;"&gt;
+     class="dataGrid_container" style="width:500px;height:300px;"&gt;
   &lt;div class="dataGrid_header"&gt;
     &lt;div class="dataGrid_header_cell dataGrid_checkbox" style="width:36px;min-width:36px;flex-shrink:0"&gt;
       &lt;input type="checkbox" class="dataGrid_select_all"&gt;
     &lt;/div&gt;
-    &lt;div class="dataGrid_header_cell" data-col-key="col1" data-col-name="列A" style="width:100px;min-width:100px;flex-shrink:0"&gt;列A&lt;/div&gt;
-    &lt;div class="dataGrid_header_cell" data-col-key="col2" data-col-name="列B" style="width:100px;min-width:100px;flex-shrink:0"&gt;列B&lt;/div&gt;
+    &lt;div class="dataGrid_header_cell" data-ctrl-type="dataGrid_cell" data-col-key="col1" data-col-name="列A" style="width:100px;min-width:100px;flex-shrink:0"&gt;列A&lt;/div&gt;
+    &lt;div class="dataGrid_header_cell" data-ctrl-type="dataGrid_cell" data-col-key="col2" data-col-name="列B" style="width:100px;min-width:100px;flex-shrink:0"&gt;列B&lt;/div&gt;
+    &lt;div class="dataGrid_header_cell" data-ctrl-type="dataGrid_cell" data-col-key="col3" data-col-name="列C" style="width:100px;min-width:100px;flex-shrink:0"&gt;列C&lt;/div&gt;
   &lt;/div&gt;
   &lt;div class="dataGrid_body"&gt;
-    &lt;div class="dataGrid_row" data-row-index="0" data-row-id="row1"&gt;
+    &lt;div class="dataGrid_row" data-row-index="0" data-row-id="dataGrid_1_row_1"&gt;
       &lt;div class="dataGrid_cell dataGrid_checkbox" style="width:36px;min-width:36px;flex-shrink:0"&gt;
         &lt;input type="checkbox" class="dataGrid_row_check" data-ctrl-type="dataGrid_row_checkbox"&gt;
       &lt;/div&gt;
       &lt;div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="col1" data-col-name="列A" style="width:100px;min-width:100px;flex-shrink:0" title="数据A1"&gt;数据A1&lt;/div&gt;
       &lt;div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="col2" data-col-name="列B" style="width:100px;min-width:100px;flex-shrink:0" title="数据B1"&gt;数据B1&lt;/div&gt;
+      &lt;div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="col3" data-col-name="列C" style="width:100px;min-width:100px;flex-shrink:0" title="数据C1"&gt;数据C1&lt;/div&gt;
     &lt;/div&gt;
+    &lt;!-- ... 更多行 ... --&gt;
   &lt;/div&gt;
 &lt;/div&gt;</code></pre>
   </div>
 
-  <h4>4.4 树形框（TreeView） — 需设置 data-tree-id</h4>
+  <h4>3.3 树形框（TreeView）</h4>
+  <ul>
+    <li><strong>关键属性：</strong><code>data-tree-id</code>（唯一标识）。</li>
+    <li><strong>关键结构：</strong>节点 <code>.treeView_node</code> → 内容区 <code>.treeView_node_content</code> → 三角 <code>.treeView_toggle</code> + 图标 <code>.treeView_icon</code> + 文本 <code>.treeView_label</code>。<strong>每个节点都必须有</strong> <code>.tree-edit-input</code>（初始隐藏）。展开状态由 <code>.treeView_toggle</code> 的 class（<code>expanded</code>/<code>collapsed</code>/<code>empty</code>）决定，子节点容器为 <code>.treeView_children</code>。</li>
+  </ul>
   <div class="code-block">
     <div class="code-block-header">
       <span class="lang-label">HTML</span>
       <button class="copy-btn" onclick="copyCodeFromBlock(this)">复制</button>
     </div>
-    <pre><code>&lt;div id="tree_xxx" class="treeView" data-ctrl-type="treeView" data-drag-type="treeView" data-name="树形名"
-     data-tree-id="tree_xxx" data-editable="false" data-show-icon="true" data-always-show-selection="true"
-     style="width:220px;height:280px;"&gt;
-  &lt;div class="treeView_node" data-node-id="node1" data-level="0"&gt;
+    <pre><code>&lt;div id="treeView_1" data-type="treeView" data-ctrl-type="treeView" data-drag-type="treeView" data-ctrl-id="treeView_1" data-name="树形框"
+     data-tree-id="treeView_1" data-editable="false" data-show-icon="true" data-always-show-selection="true"
+     style="width:220px;height:320px;"&gt;
+  &lt;!-- 根节点（expanded = 展开可见子节点） --&gt;
+  &lt;div class="treeView_node" data-node-id="node_1" data-level="0"&gt;
     &lt;div class="treeView_node_content"&gt;
       &lt;span class="treeView_toggle expanded" data-ctrl-type="treeview_node_toggle"&gt;▶&lt;/span&gt;
       &lt;span class="treeView_icon folder"&gt;📁&lt;/span&gt;
@@ -375,11 +387,32 @@ window.__devGuideHTML = `
       &lt;span class="tree-edit-input" style="display:none"&gt;&lt;/span&gt;
     &lt;/div&gt;
     &lt;div class="treeView_children"&gt;
-      &lt;div class="treeView_node" data-node-id="node2" data-level="1"&gt;
+      &lt;!-- 叶子节点（empty = 没有子节点，三角隐藏） --&gt;
+      &lt;div class="treeView_node" data-node-id="node_2" data-level="1"&gt;
         &lt;div class="treeView_node_content"&gt;
           &lt;span class="treeView_toggle empty" data-ctrl-type="treeview_node_toggle"&gt;▶&lt;/span&gt;
           &lt;span class="treeView_icon file"&gt;📄&lt;/span&gt;
-          &lt;span class="treeView_label" data-ctrl-type="treeview_node_text"&gt;子节点&lt;/span&gt;
+          &lt;span class="treeView_label" data-ctrl-type="treeview_node_text"&gt;子节点1（叶子）&lt;/span&gt;
+          &lt;span class="tree-edit-input" style="display:none"&gt;&lt;/span&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;!-- 子节点（collapsed = 有子节点但折叠，三角可点击展开） --&gt;
+      &lt;div class="treeView_node" data-node-id="node_3" data-level="1"&gt;
+        &lt;div class="treeView_node_content"&gt;
+          &lt;span class="treeView_toggle collapsed" data-ctrl-type="treeview_node_toggle"&gt;▶&lt;/span&gt;
+          &lt;span class="treeView_icon folder"&gt;📁&lt;/span&gt;
+          &lt;span class="treeView_label" data-ctrl-type="treeview_node_text"&gt;子节点2（含子节点）&lt;/span&gt;
+          &lt;span class="tree-edit-input" style="display:none"&gt;&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;div class="treeView_children"&gt;
+          &lt;div class="treeView_node" data-node-id="node_4" data-level="2"&gt;
+            &lt;div class="treeView_node_content"&gt;
+              &lt;span class="treeView_toggle empty" data-ctrl-type="treeview_node_toggle"&gt;▶&lt;/span&gt;
+              &lt;span class="treeView_icon file"&gt;📄&lt;/span&gt;
+              &lt;span class="treeView_label" data-ctrl-type="treeview_node_text"&gt;子节点2-1&lt;/span&gt;
+              &lt;span class="tree-edit-input" style="display:none"&gt;&lt;/span&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -387,92 +420,110 @@ window.__devGuideHTML = `
 &lt;/div&gt;</code></pre>
   </div>
 
-  <h4>4.5 标签页（TabContainer） — 按钮与面板通过 data-tab-name 关联</h4>
+  <h4>3.4 标签页（TabContainer）</h4>
+  <ul>
+    <li><strong>关键结构：</strong>头部栏 <code>.tabsContainer_headerBar</code> → 按钮 <code>.tabsContainer_headerBar_btn</code>（通过 <code>data-tab-name</code> 关联面板），内容区 <code>.tabsContainer_contentWrapper</code> → 面板 <code>.tabsContainer_contentWrapper_panel</code>。面板需设置 <code>data-parent</code> 指向容器 ID。</li>
+  </ul>
   <div class="code-block">
     <div class="code-block-header">
       <span class="lang-label">HTML</span>
       <button class="copy-btn" onclick="copyCodeFromBlock(this)">复制</button>
     </div>
-    <pre><code>&lt;div id="tabs_xxx" class="tabsContainer" data-ctrl-type="tabsContainer" data-drag-type="tabsContainer" data-name="标签页名"
-     style="width:300px;height:200px;"&gt;
+    <pre><code>&lt;div id="tabsContainer_1" data-type="tabsContainer" data-ctrl-type="tabsContainer" data-drag-type="tabsContainer" data-ctrl-id="tabsContainer_1" data-name="标签页容器"
+     class="tabsContainer" style="width:300px;height:200px;"&gt;
   &lt;div class="tabsContainer_headerBar"&gt;
-    &lt;button class="tabsContainer_headerBar_btn active" data-tab-name="tab1" data-ctrl-type="tabsContainer_headerBar_btn" data-name="标签1" data-drag-type="tabs_btn"&gt;标签1&lt;/button&gt;
-    &lt;button class="tabsContainer_headerBar_btn" data-tab-name="tab2" data-ctrl-type="tabsContainer_headerBar_btn" data-name="标签2" data-drag-type="tabs_btn"&gt;标签2&lt;/button&gt;
+    &lt;button class="tabsContainer_headerBar_btn active" data-ctrl-type="tabsContainer_headerBar_btn" data-tab-name="tab1"&gt;标签1&lt;/button&gt;
+    &lt;button class="tabsContainer_headerBar_btn" data-ctrl-type="tabsContainer_headerBar_btn" data-tab-name="tab2"&gt;标签2&lt;/button&gt;
+    &lt;button class="tabsContainer_headerBar_btn" data-ctrl-type="tabsContainer_headerBar_btn" data-tab-name="tab3"&gt;标签3&lt;/button&gt;
   &lt;/div&gt;
   &lt;div class="tabsContainer_contentWrapper"&gt;
-    &lt;div class="tabsContainer_contentWrapper_panel active" data-tab-name="tab1"&gt;内容1&lt;/div&gt;
-    &lt;div class="tabsContainer_contentWrapper_panel" data-tab-name="tab2"&gt;内容2&lt;/div&gt;
+    &lt;div class="tabsContainer_contentWrapper_panel active" data-tab-name="tab1" data-parent="tabsContainer_1" data-tab="0"&gt;内容1&lt;/div&gt;
+    &lt;div class="tabsContainer_contentWrapper_panel" data-tab-name="tab2" data-parent="tabsContainer_1" data-tab="1"&gt;内容2&lt;/div&gt;
+    &lt;div class="tabsContainer_contentWrapper_panel" data-tab-name="tab3" data-parent="tabsContainer_1" data-tab="2"&gt;内容3&lt;/div&gt;
   &lt;/div&gt;
 &lt;/div&gt;</code></pre>
   </div>
 
-  <h4>4.6 卡片框（CardBox） — 需 data-collapsible 和 data-collapsed</h4>
+  <h4>3.5 卡片框（CardBox）</h4>
+  <ul>
+    <li><strong>关键属性：</strong><code>data-collapsible="true"</code> + <code>data-collapsed="false"</code>。</li>
+    <li><strong>关键结构：</strong>头部 <code>.cardBox_header</code> → 标题 <code>.cardBox_header_title</code> + 折叠按钮 <code>.cardBox_collapse_btn</code>（含 SVG），内容区 <code>.cardBox_body</code> 需设 <code>data-ctrl-type="cardBox_body"</code>。</li>
+  </ul>
   <div class="code-block">
     <div class="code-block-header">
       <span class="lang-label">HTML</span>
       <button class="copy-btn" onclick="copyCodeFromBlock(this)">复制</button>
     </div>
-    <pre><code>&lt;div id="card_xxx" class="cardBox" data-ctrl-type="cardBox" data-drag-type="cardBox" data-name="卡片名"
+    <pre><code>&lt;div id="cardBox_1" data-type="cardBox" data-ctrl-type="cardBox" data-drag-type="cardBox" data-ctrl-id="cardBox_1" data-name="卡片框"
      data-collapsible="true" data-collapsed="false"
-     style="width:260px;height:180px;"&gt;
+     class="cardBox" style="width:260px;height:180px;"&gt;
   &lt;div class="cardBox_header"&gt;
     &lt;span class="cardBox_header_title"&gt;卡片标题&lt;/span&gt;
-    &lt;span class="cardBox_collapse_btn" data-ctrl-type="cardBox_collapse_btn"&gt;
-      &lt;svg width="12" height="12" viewBox="0 0 12 12"&gt;&lt;path d="M3 4.5L6 7.5L9 4.5" fill="none" stroke="currentColor" stroke-width="1.5"/&gt;&lt;/svg&gt;
+    &lt;span class="cardBox_collapse_btn"&gt;
+      &lt;svg width="12" height="12" viewBox="0 0 12 12"&gt;&lt;path d="M3 4.5L6 7.5L9 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/&gt;&lt;/svg&gt;
     &lt;/span&gt;
   &lt;/div&gt;
   &lt;div class="cardBox_body" data-ctrl-type="cardBox_body"&gt;卡片内容&lt;/div&gt;
 &lt;/div&gt;</code></pre>
   </div>
 
-  <h4>4.7 日志框（LogOutput） — 使用 logOutput_container 类</h4>
+  <h4>3.6 日志框（LogOutput）</h4>
+  <ul>
+    <li><strong>关键结构：</strong>容器 <code>.logOutput_container</code> → 日志行 <code>.logOutput_line</code>（每条需设 <code>data-ctrl-type="logOutput_item"</code>）。</li>
+  </ul>
   <div class="code-block">
     <div class="code-block-header">
       <span class="lang-label">HTML</span>
       <button class="copy-btn" onclick="copyCodeFromBlock(this)">复制</button>
     </div>
-    <pre><code>&lt;div id="log_xxx" class="logOutput_container" data-ctrl-type="logOutput" data-drag-type="logOutput" data-name="日志名"
-     style="width:300px;height:150px;"&gt;
-  &lt;div class="logOutput_line" data-ctrl-type="logOutput_item" style="color:#333;"&gt;[INFO] 日志已就绪&lt;/div&gt;
+    <pre><code>&lt;div id="logOutput_1" data-type="logOutput" data-ctrl-type="logOutput" data-drag-type="logOutput" data-ctrl-id="logOutput_1" data-name="日志框"
+     class="logOutput_container" style="width:300px;height:150px;"&gt;
+  &lt;div class="logOutput_line" data-ctrl-type="logOutput_item" style="color:#333"&gt;[INFO] 日志已就绪&lt;/div&gt;
 &lt;/div&gt;</code></pre>
   </div>
 
-  <h4>4.8 单选框组（RadioGroup） — 需要特定类名</h4>
+  <h4>3.7 单选框组（RadioGroup）</h4>
+  <ul>
+    <li><strong>关键结构：</strong>容器 <code>.radioGroup_container</code> → <code>&lt;label class="radioGroup_item"&gt;</code>（内含 <code>&lt;input type="radio"&gt;</code>）。每个 radio 的 <code>name</code> 必须一致（用于单选分组），且需设 <code>data-ctrl-type="radio"</code>。</li>
+  </ul>
   <div class="code-block">
     <div class="code-block-header">
       <span class="lang-label">HTML</span>
       <button class="copy-btn" onclick="copyCodeFromBlock(this)">复制</button>
     </div>
-    <pre><code>&lt;div id="radioGroup_xxx" class="radioGroup_container" data-ctrl-type="radioGroup" data-drag-type="radioGroup" data-name="单选框组"
-     style="width:120px;height:40px;"&gt;
+    <pre><code>&lt;div id="radioGroup_1" data-type="radioGroup" data-ctrl-type="radioGroup" data-drag-type="radioGroup" data-ctrl-id="radioGroup_1" data-name="单选框组"
+     class="radioGroup_container" style="width:120px;height:60px;"&gt;
   &lt;label class="radioGroup_item"&gt;
-    &lt;input type="radio" data-ctrl-type="radio" name="groupName" value="选项1" checked /&gt;选项1
+    &lt;input type="radio" data-ctrl-type="radio" name="radioGroup_1" value="选项1" checked /&gt;选项1
   &lt;/label&gt;
   &lt;label class="radioGroup_item"&gt;
-    &lt;input type="radio" data-ctrl-type="radio" name="groupName" value="选项2" /&gt;选项2
+    &lt;input type="radio" data-ctrl-type="radio" name="radioGroup_1" value="选项2" /&gt;选项2
   &lt;/label&gt;
 &lt;/div&gt;</code></pre>
   </div>
 
-  <h4>4.9 进度条（高级样式） — 使用 progressBar_container 类</h4>
+  <h4>3.8 进度条（高级样式，非原生 range）</h4>
+  <ul>
+    <li><strong>关键结构：</strong>容器 <code>.progressBar_container</code> → 轨道 <code>.progressBar_track</code> + 填充 <code>.progressBar_fill</code> + 文本 <code>.progressBar_text</code>。<code>data-editable="true"</code> 时允许点击跳转进度。</li>
+  </ul>
   <div class="code-block">
     <div class="code-block-header">
       <span class="lang-label">HTML</span>
       <button class="copy-btn" onclick="copyCodeFromBlock(this)">复制</button>
     </div>
-    <pre><code>&lt;div id="progress_xxx" class="progressBar_container" data-ctrl-type="progressBar" data-drag-type="progressBar" data-name="进度条"
-     data-editable="true" data-draggable="false"
+    <pre><code>&lt;div id="progressBar_1" data-type="progressBar" data-ctrl-type="progressBar" data-drag-type="progressBar" data-ctrl-id="progressBar_1" data-name="进度条"
+     data-editable="true" class="progressBar_container"
      style="width:250px;height:10px;overflow:visible;"&gt;
   &lt;div class="progressBar_track"&gt;&lt;/div&gt;
   &lt;div class="progressBar_fill" style="width:60%;height:100%;background:#0078D4;border-radius:inherit;transition:width 0.15s;"&gt;&lt;/div&gt;
-  &lt;span class="progressBar_text" style="transform:translate(-50%,-50%);font-size:inherit;pointer-events:none;white-space:nowrap;"&gt;60%&lt;/span&gt;
+  &lt;span class="progressBar_text" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:inherit;pointer-events:none;white-space:nowrap;"&gt;60%&lt;/span&gt;
 &lt;/div&gt;</code></pre>
   </div>
 </div>
 
-<!-- ==================== 5. 属性速查表（完整版） ==================== -->
+<!-- ==================== 4. 属性速查表（完整版） ==================== -->
 <div class="dev-step">
-  <h3><span class="step-num">5</span> 属性速查表（完整版）</h3>
+  <h3><span class="step-num">4</span> 属性速查表（完整版）</h3>
 
   <table>
     <thead>
@@ -512,10 +563,10 @@ window.__devGuideHTML = `
   </div>
 </div>
 
-<!-- ==================== 6. 完整页面模板（复制即用） ==================== -->
+<!-- ==================== 5. 完整页面模板（复制即用） ==================== -->
 <div class="dev-step">
-  <h3><span class="step-num">6</span> 完整页面模板（复制即用）</h3>
-  <p>以下模板包含标题栏 + 所有基础控件，可直接运行测试。所有属性均已完整配置，与设计器导出风格一致。</p>
+  <h3><span class="step-num">5</span> 完整页面模板（复制即用）</h3>
+  <p>以下模板严格遵循本文档规范（第 1 步页面容器/标题栏 + 第 2 步基础控件 + 第 3 步复杂控件 <strong>DataGrid</strong> / <strong>ListBox</strong>），可直接复制运行。</p>
 
   <div class="code-block">
     <div class="code-block-header">
@@ -530,43 +581,60 @@ window.__devGuideHTML = `
   &lt;title&gt;我的应用&lt;/title&gt;
   &lt;style&gt;
     * { margin:0; padding:0; box-sizing:border-box; }
+    html, body { width:100%; height:100%; overflow:hidden; }
+
+    /* 页面容器 — padding-top 留出标题栏高度，防止内容被遮挡 */
     .pageContainer {
-      app-region: drag; -webkit-app-region: drag;
       position: relative;
-      width: 100vw; height: 100vh;
+      width: 100%; height: 100%;
+      padding-top: 40px; /* 留出标题栏高度，防止内容被遮挡。 */
       background: #f0f2f5;
-      font-family: sans-serif;
-      display: flex;
-      flex-direction: column;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex; flex-direction: column;
       overflow: hidden;
+      app-region: drag; -webkit-app-region: drag;  /* 使整个窗口可拖拽 */
     }
-    .pageContainer.glass-effect {
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-    }
-    /* ⚠️ 只有【可交互控件】才需要 data-drag-type */
-    /* 纯布局容器（侧边栏、内容区等）【不需要】添加 data-drag-type */
+
+    /* 可交互控件 — 统一 no-drag，防止拖拽穿透到窗口 */
     [data-drag-type] { app-region: no-drag; -webkit-app-region: no-drag; }
+
+    /* 最大化按钮内部 span — 设回 drag，支持 Windows 11 Snap Layout */
     [data-ctrl-type="titlebar_max"] span { app-region: drag; -webkit-app-region: drag; }
 
-    /* 标题栏 */
-    .titlebar {
-      position: absolute; top:0; left:0; right:0;
-      height: 40px; background: #2d3a4b;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 12px; flex-shrink: 0;
+    /* ===== 标题栏（与第 1 步规范一致） ===== */
+    .titlebar_left { display:flex; align-items:center; padding-left:12px; }
+    .titlebar_center { flex:1; display:flex; justify-content:center; }
+    .titlebar_right { display:flex; align-items:center; padding-right:4px; }
+    .titlebar_rightBtn {
+      width:35px; height:32px; border:none; background:transparent;
+      cursor:default; border-radius:4px; display:flex; align-items:center; justify-content:center;
     }
-    .titlebar_title { font-size: 14px; font-weight: 500; color: #fff; }
-    .titlebar_btn {
-      width: 36px; height: 28px; border: none; background: transparent;
-      color: #fff; cursor: pointer; border-radius: 4px;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .titlebar_btn:hover { background: rgba(255,255,255,0.15); }
-    .titlebar_btn_close:hover { background: #e74c3c; }
+    .titlebar_rightBtn:hover { background:rgba(0,0,0,0.06); }
+    .titlebar_rightBtn_close:hover { background:#e81123; color:#fff; }
 
-    /* 内容区 */
+    /* 侧边栏 + 内容区布局 */
+    .main-layout { flex:1; display:flex; overflow:hidden; }
+    .sidebar {
+      width: 240px; background: #fff;
+      border-right: 1px solid #e0e0e0;
+      display: flex; flex-direction: column; flex-shrink: 0;
+    }
+    .sidebar-header {
+      padding: 14px 16px; border-bottom: 1px solid #f0f0f0;
+      font-size: 14px; font-weight: 600; color: #1a1a2e;
+    }
+    .sidebar-nav { flex:1; overflow-y:auto; padding: 8px 0; }
+    .nav-item {
+      padding: 10px 20px; cursor: pointer; font-size: 13px; color: #555;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .nav-item:hover { background: #f5f7fa; }
+    .nav-item.active { background: #e8f0fe; color: #409EFF; font-weight: 600; }
+
+    /* 内容区（布局容器，不需要 data-drag-type） */
     .content { flex:1; padding:20px; overflow-y:auto; }
+
+    /* 工具栏 */
     .toolbar { display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
     .toolbar input, .toolbar select { padding:6px 12px; border:1px solid #dadce0; border-radius:4px; font-size:13px; outline:none; }
     .toolbar input:focus, .toolbar select:focus { border-color:#409EFF; }
@@ -574,108 +642,318 @@ window.__devGuideHTML = `
     .toolbar button:hover { background:#f1f3f4; }
     .toolbar button.primary { background:#409EFF; border-color:#409EFF; color:#fff; }
     .toolbar button.primary:hover { background:#3a8ee6; }
+    .toolbar button.danger { background:#f56c6c; border-color:#f56c6c; color:#fff; }
+    .toolbar button.danger:hover { background:#f89898; }
 
+    /* 表单区域 */
     .form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
-    .form-group label { display:block; font-size:13px; font-weight:500; margin-bottom:4px; }
+    .form-group label { display:block; font-size:13px; font-weight:500; margin-bottom:4px; color:#333; }
     .form-group input, .form-group select, .form-group textarea {
       width:100%; padding:8px 12px; border:1px solid #dadce0; border-radius:4px; font-size:13px; outline:none;
     }
     .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color:#409EFF; }
     .form-check { display:flex; align-items:center; gap:8px; margin:4px 0; }
     .form-check input[type="checkbox"], .form-check input[type="radio"] { width:16px; height:16px; }
+
+    /* 列表控件区 */
+    .widget-section {
+      background: #fff; border: 1px solid #e8eaed; border-radius: 8px;
+      padding: 16px; margin-bottom: 16px;
+    }
+    .widget-section h4 { margin-bottom: 10px; font-size: 14px; color: #1a1a2e; }
+
+    /* ===== DataGrid（与第 3.2 节规范一致） ===== */
+    .dataGrid {
+      display:flex; flex-direction:column;
+      border:1px solid #e0e0e0; border-radius:4px; overflow:hidden; background:#fff;
+    }
+    .dataGrid_header {
+      display:flex; background:#f5f7fa;
+      border-bottom:2px solid #e0e0e0; flex-shrink:0;
+    }
+    .dataGrid_header_cell {
+      padding:8px 12px; font-size:13px; font-weight:600; color:#333;
+      display:flex; align-items:center;
+    }
+    .dataGrid_body { flex:1; overflow-y:auto; }
+    .dataGrid_row {
+      display:flex; border-bottom:1px solid #f0f0f0;
+    }
+    .dataGrid_row:hover { background:#f9fafb; }
+    .dataGrid_cell {
+      padding:8px 12px; font-size:13px; color:#333;
+      display:flex; align-items:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    }
+    .dataGrid_checkbox {
+      display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    }
+    .dataGrid_checkbox input { width:14px; height:14px; cursor:pointer; }
+
+    /* 统计卡片 */
+    .stat-cards { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:16px; }
+    .stat-card {
+      background: #fff; border: 1px solid #e8eaed; border-radius: 8px;
+      padding: 16px; text-align: center;
+    }
+    .stat-card .number { font-size: 28px; font-weight: 700; color: #1a1a2e; }
+    .stat-card .label { font-size: 13px; color: #888; margin-top: 4px; }
   &lt;/style&gt;
 &lt;/head&gt;
 &lt;body&gt;
 
-&lt;div class="pageContainer glass-effect" id="pageContainer"
+&lt;!-- ===== 页面容器 ===== --&gt;
+&lt;div class="pageContainer" id="pageContainer"
      data-ctrl-type="pageContainer" data-name="canvas"
-     data-original-width="900" data-original-height="600"&gt;
+     data-original-width="1065" data-original-height="695"&gt;
 
-  &lt;!-- ===== 标题栏 ===== --&gt;
-  &lt;div class="titlebar" id="titlebar"&gt;
+  &lt;!-- ===== 标题栏（与第 1 步规范完全一致） ===== --&gt;
+  &lt;div class="titlebar" id="titlebar" data-name="标题栏"
+       style="position:absolute;top:0;left:0;right:0;height:40px;background:#F8F8F8;border-bottom:1px solid rgba(0,0,0,0.08);app-region:drag;-webkit-app-region:drag;display:flex;align-items:center;"&gt;
     &lt;div class="titlebar_left"&gt;
-      &lt;span id="titlebar_left_icon" data-ctrl-type="titlebar_left_icon" data-drag-type="titlebar_left_icon"&gt;⚙️&lt;/span&gt;
-      &lt;span class="titlebar_title" id="titlebar_title" data-ctrl-type="titlebar_title" data-name="窗口标题" data-drag-type="titlebar_title"&gt;我的应用&lt;/span&gt;
+      &lt;span class="titlebar_left_icon" id="titlebar_left_icon"
+            data-ctrl-type="titlebar_left_icon" data-drag-type="titlebar_left_icon" data-name="图标" style="color:#333;"&gt;
+        &lt;i class="fas fa-star"&gt;&lt;/i&gt;
+      &lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class="titlebar_center" style="justify-content:flex-start;"&gt;
+      &lt;span class="titlebar_center_title" id="titlebar_title"
+            data-ctrl-type="titlebar_title" data-drag-type="titlebar_title" data-name="标题" style="color:#333;font-weight:600;"&gt;我的应用&lt;/span&gt;
     &lt;/div&gt;
     &lt;div class="titlebar_right"&gt;
-      &lt;button id="titlebar_min" data-ctrl-type="titlebar_min" data-drag-type="titlebar_min" class="titlebar_btn"&gt;─&lt;/button&gt;
-      &lt;button id="titlebar_max" data-ctrl-type="titlebar_max" data-drag-type="titlebar_max" class="titlebar_btn"&gt;
-        &lt;span style="width:18px;height:18px;display:flex;align-items:center;justify-content:center;"&gt;☐&lt;/span&gt;
+      &lt;button id="titlebar_min" data-ctrl-type="titlebar_min" data-drag-type="titlebar_min" data-name="最小化"
+              style="color:#333;" class="titlebar_rightBtn" title="最小化"&gt;
+        &lt;svg width="12" height="1" viewBox="0 0 10 1"&gt;&lt;rect width="10" height="1" fill="currentColor"/&gt;&lt;/svg&gt;
       &lt;/button&gt;
-      &lt;button id="titlebar_close" data-ctrl-type="titlebar_close" data-drag-type="titlebar_close" class="titlebar_btn titlebar_btn_close"&gt;✕&lt;/button&gt;
+      &lt;button id="titlebar_max" data-ctrl-type="titlebar_max" data-drag-type="titlebar_max" data-name="最大化"
+              style="color:#333;" class="titlebar_rightBtn" title="最大化"&gt;
+        &lt;span style="width:18px;height:18px;display:flex;align-items:center;justify-content:center;app-region:drag;-webkit-app-region:drag;"&gt;
+          &lt;svg width="12" height="12" viewBox="0 0 10 10" shape-rendering="crispEdges"&gt;
+            &lt;rect x="1" y="1" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1"/&gt;
+          &lt;/svg&gt;
+        &lt;/span&gt;
+      &lt;/button&gt;
+      &lt;button id="titlebar_close" data-ctrl-type="titlebar_close" data-drag-type="titlebar_close" data-name="关闭"
+              style="color:#333;" class="titlebar_rightBtn titlebar_rightBtn_close" title="关闭"&gt;
+        &lt;svg width="12" height="12" viewBox="0 0 10 10"&gt;
+          &lt;line x1="1" y1="1" x2="9" y2="9" stroke="currentColor" stroke-width="1"/&gt;
+          &lt;line x1="9" y1="1" x2="1" y2="9" stroke="currentColor" stroke-width="1"/&gt;
+        &lt;/svg&gt;
+      &lt;/button&gt;
     &lt;/div&gt;
   &lt;/div&gt;
 
-  &lt;!-- ===== 内容区（布局容器，不需要 data-drag-type） ===== --&gt;
-  &lt;div class="content" id="contentArea"&gt;
+  &lt;!-- ===== 主体（侧边栏 + 内容区，均为布局容器，不需要 data-drag-type） ===== --&gt;
+  &lt;div class="main-layout"&gt;
 
-    &lt;!-- 工具栏 --&gt;
-    &lt;div class="toolbar"&gt;
-      &lt;input id="inp_search" data-ctrl-type="inputText" data-name="搜索框" data-drag-type="inputText" placeholder="🔍 搜索..."&gt;
-      &lt;button id="btn_search" data-ctrl-type="button" data-name="搜索按钮" data-drag-type="button" class="primary"&gt;搜索&lt;/button&gt;
-      &lt;button id="btn_add" data-ctrl-type="button" data-name="添加按钮" data-drag-type="button" class="primary"&gt;➕ 添加&lt;/button&gt;
+    &lt;!-- 侧边栏 --&gt;
+    &lt;div class="sidebar" id="sidebar"&gt;
+      &lt;div class="sidebar-header"&gt;📋 导航菜单&lt;/div&gt;
+      &lt;div class="sidebar-nav"&gt;
+        &lt;div id="nav_dashboard" class="nav-item active"
+             data-ctrl-type="button" data-drag-type="button" data-name="仪表盘"&gt;📊 仪表盘&lt;/div&gt;
+        &lt;div id="nav_users" class="nav-item"
+             data-ctrl-type="button" data-drag-type="button" data-name="用户管理"&gt;👥 用户管理&lt;/div&gt;
+        &lt;div id="nav_settings" class="nav-item"
+             data-ctrl-type="button" data-drag-type="button" data-name="系统设置"&gt;⚙️ 系统设置&lt;/div&gt;
+        &lt;div id="nav_logs" class="nav-item"
+             data-ctrl-type="button" data-drag-type="button" data-name="运行日志"&gt;📝 运行日志&lt;/div&gt;
+      &lt;/div&gt;
     &lt;/div&gt;
 
-    &lt;!-- 表单区域 --&gt;
-    &lt;div class="form-row"&gt;
-      &lt;div class="form-group"&gt;
-        &lt;label&gt;用户名&lt;/label&gt;
-        &lt;input id="inp_username" data-ctrl-type="inputText" data-name="用户名" data-drag-type="inputText" placeholder="请输入用户名"&gt;
+    &lt;!-- 内容区 --&gt;
+    &lt;div class="content" id="contentArea"&gt;
+
+      &lt;!-- 统计卡片 --&gt;
+      &lt;div class="stat-cards"&gt;
+        &lt;div class="stat-card"&gt;
+          &lt;div class="number"&gt;1,286&lt;/div&gt;
+          &lt;div class="label"&gt;用户总数&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="stat-card"&gt;
+          &lt;div class="number"&gt;96.8%&lt;/div&gt;
+          &lt;div class="label"&gt;在线率&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="stat-card"&gt;
+          &lt;div class="number"&gt;42&lt;/div&gt;
+          &lt;div class="label"&gt;待处理任务&lt;/div&gt;
+        &lt;/div&gt;
       &lt;/div&gt;
-      &lt;div class="form-group"&gt;
-        &lt;label&gt;城市&lt;/label&gt;
-        &lt;select id="sel_city" data-ctrl-type="comboBox" data-name="城市下拉" data-drag-type="comboBox"&gt;
-          &lt;option value="bj"&gt;北京&lt;/option&gt;
-          &lt;option value="sh"&gt;上海&lt;/option&gt;
-          &lt;option value="gz"&gt;广州&lt;/option&gt;
+
+      &lt;!-- 工具栏 --&gt;
+      &lt;div class="toolbar"&gt;
+        &lt;input id="inp_search" data-ctrl-type="inputText" data-name="搜索框" data-drag-type="inputText" placeholder="🔍 搜索用户名或邮箱..."&gt;
+        &lt;select id="sel_role" data-ctrl-type="comboBox" data-name="角色筛选" data-drag-type="comboBox"&gt;
+          &lt;option value=""&gt;全部角色&lt;/option&gt;
+          &lt;option value="admin"&gt;管理员&lt;/option&gt;
+          &lt;option value="editor"&gt;编辑&lt;/option&gt;
+          &lt;option value="viewer"&gt;访客&lt;/option&gt;
         &lt;/select&gt;
+        &lt;button id="btn_search" data-ctrl-type="button" data-name="搜索按钮" data-drag-type="button" class="primary"&gt;搜索&lt;/button&gt;
+        &lt;button id="btn_add" data-ctrl-type="button" data-name="添加用户" data-drag-type="button"&gt;➕ 新增&lt;/button&gt;
+        &lt;button id="btn_delete" data-ctrl-type="button" data-name="批量删除" data-drag-type="button" class="danger"&gt;🗑️ 批量删除&lt;/button&gt;
+        &lt;span style="flex:1"&gt;&lt;/span&gt;
+        &lt;label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#666;cursor:pointer;"&gt;
+          &lt;input id="sw_autorefresh" type="checkbox" data-ctrl-type="switchToggle" data-name="自动刷新" data-drag-type="switchToggle" checked&gt;
+          自动刷新
+        &lt;/label&gt;
+        &lt;a id="link_help" data-ctrl-type="hyperLink" data-name="帮助链接" data-drag-type="hyperLink" data-href="#"&gt;❓ 帮助&lt;/a&gt;
       &lt;/div&gt;
-    &lt;/div&gt;
 
-    &lt;div class="form-row"&gt;
-      &lt;div class="form-group"&gt;
-        &lt;label&gt;选项&lt;/label&gt;
-        &lt;div class="form-check"&gt;
-          &lt;input id="chk_agree" type="checkbox" data-ctrl-type="checkbox" data-name="同意条款" data-drag-type="checkbox"&gt;
-          &lt;label&gt;我已阅读并同意协议&lt;/label&gt;
-        &lt;/div&gt;
-        &lt;div class="form-check"&gt;
-          &lt;input id="sw_notify" type="checkbox" data-ctrl-type="switchToggle" data-name="通知开关" data-drag-type="switchToggle" checked&gt;
-          &lt;label&gt;启用通知&lt;/label&gt;
+      &lt;!-- ===== DataGrid 多项表格（与第 3.2 节规范完全一致） ===== --&gt;
+      &lt;div class="widget-section"&gt;
+        &lt;h4&gt;👥 用户列表 — DataGrid&lt;/h4&gt;
+        &lt;div id="grid_users" class="dataGrid" data-ctrl-type="dataGrid" data-drag-type="dataGrid" data-name="用户表格"
+             data-columns='[{"field":"username","header":"用户名"},{"field":"role","header":"角色"},{"field":"status","header":"状态"}]'
+             data-rows='[{"id":"row1","cells":{"username":"张三","role":"管理员","status":"在线"}},{"id":"row2","cells":{"username":"李四","role":"编辑","status":"在线"}},{"id":"row3","cells":{"username":"王五","role":"访客","status":"离线"}}]'
+             data-show-checkbox="true" data-editable="false" data-always-show-selection="false"
+             style="width:100%;height:300px;"&gt;
+          &lt;div class="dataGrid_header"&gt;
+            &lt;div class="dataGrid_header_cell dataGrid_checkbox" style="width:36px;min-width:36px;flex-shrink:0"&gt;
+              &lt;input type="checkbox" class="dataGrid_select_all"&gt;
+            &lt;/div&gt;
+            &lt;div class="dataGrid_header_cell" data-col-key="username" data-col-name="用户名" style="flex:1;min-width:100px;"&gt;用户名&lt;/div&gt;
+            &lt;div class="dataGrid_header_cell" data-col-key="role" data-col-name="角色" style="width:100px;min-width:100px;flex-shrink:0"&gt;角色&lt;/div&gt;
+            &lt;div class="dataGrid_header_cell" data-col-key="status" data-col-name="状态" style="width:80px;min-width:80px;flex-shrink:0"&gt;状态&lt;/div&gt;
+            &lt;div class="dataGrid_header_cell" style="width:80px;min-width:80px;flex-shrink:0"&gt;操作&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class="dataGrid_body"&gt;
+            &lt;div class="dataGrid_row" data-row-index="0" data-row-id="row1"&gt;
+              &lt;div class="dataGrid_cell dataGrid_checkbox" style="width:36px;min-width:36px;flex-shrink:0"&gt;
+                &lt;input type="checkbox" class="dataGrid_row_check" data-ctrl-type="dataGrid_row_checkbox"&gt;
+              &lt;/div&gt;
+              &lt;div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="username" data-col-name="用户名" style="flex:1;min-width:100px;" title="张三"&gt;张三&lt;/div&gt;
+              &lt;div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="role" data-col-name="角色" style="width:100px;min-width:100px;flex-shrink:0" title="管理员"&gt;管理员&lt;/div&gt;
+              &lt;div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="status" data-col-name="状态" style="width:80px;min-width:80px;flex-shrink:0;color:#67c23a;" title="在线"&gt;在线&lt;/div&gt;
+              &lt;div class="dataGrid_cell" style="width:80px;min-width:80px;flex-shrink:0"&gt;
+                &lt;button id="btn_edit_1" data-ctrl-type="button" data-name="编辑张三" data-drag-type="button" style="padding:2px 10px;font-size:12px;border:1px solid #dadce0;border-radius:3px;background:#fff;cursor:pointer;"&gt;编辑&lt;/button&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+            &lt;div class="dataGrid_row" data-row-index="1" data-row-id="row2"&gt;
+              &lt;div class="dataGrid_cell dataGrid_checkbox" style="width:36px;min-width:36px;flex-shrink:0"&gt;
+                &lt;input type="checkbox" class="dataGrid_row_check" data-ctrl-type="dataGrid_row_checkbox"&gt;
+              &lt;/div&gt;
+              &lt;div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="username" data-col-name="用户名" style="flex:1;min-width:100px;" title="李四"&gt;李四&lt;/div&gt;
+              &lt;div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="role" data-col-name="角色" style="width:100px;min-width:100px;flex-shrink:0" title="编辑"&gt;编辑&lt;/div&gt;
+              &lt;div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="status" data-col-name="状态" style="width:80px;min-width:80px;flex-shrink:0;color:#67c23a;" title="在线"&gt;在线&lt;/div&gt;
+              &lt;div class="dataGrid_cell" style="width:80px;min-width:80px;flex-shrink:0"&gt;
+                &lt;button id="btn_edit_2" data-ctrl-type="button" data-name="编辑李四" data-drag-type="button" style="padding:2px 10px;font-size:12px;border:1px solid #dadce0;border-radius:3px;background:#fff;cursor:pointer;"&gt;编辑&lt;/button&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+            &lt;div class="dataGrid_row" data-row-index="2" data-row-id="row3"&gt;
+              &lt;div class="dataGrid_cell dataGrid_checkbox" style="width:36px;min-width:36px;flex-shrink:0"&gt;
+                &lt;input type="checkbox" class="dataGrid_row_check" data-ctrl-type="dataGrid_row_checkbox"&gt;
+              &lt;/div&gt;
+              &lt;div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="username" data-col-name="用户名" style="flex:1;min-width:100px;" title="王五"&gt;王五&lt;/div&gt;
+              &lt;div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="role" data-col-name="角色" style="width:100px;min-width:100px;flex-shrink:0" title="访客"&gt;访客&lt;/div&gt;
+              &lt;div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="status" data-col-name="状态" style="width:80px;min-width:80px;flex-shrink:0;color:#f56c6c;" title="离线"&gt;离线&lt;/div&gt;
+              &lt;div class="dataGrid_cell" style="width:80px;min-width:80px;flex-shrink:0"&gt;
+                &lt;button id="btn_edit_3" data-ctrl-type="button" data-name="编辑王五" data-drag-type="button" style="padding:2px 10px;font-size:12px;border:1px solid #dadce0;border-radius:3px;background:#fff;cursor:pointer;"&gt;编辑&lt;/button&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
         &lt;/div&gt;
       &lt;/div&gt;
-      &lt;div class="form-group"&gt;
-        &lt;label&gt;性别&lt;/label&gt;
-        &lt;div class="form-check"&gt;
-          &lt;input id="rdo_male" type="radio" name="gender" data-ctrl-type="radio" data-name="男" data-drag-type="radio" value="male" checked&gt;
-          &lt;label&gt;男&lt;/label&gt;
-        &lt;/div&gt;
-        &lt;div class="form-check"&gt;
-          &lt;input id="rdo_female" type="radio" name="gender" data-ctrl-type="radio" data-name="女" data-drag-type="radio" value="female"&gt;
-          &lt;label&gt;女&lt;/label&gt;
-        &lt;/div&gt;
-      &lt;/div&gt;
-    &lt;/div&gt;
 
-    &lt;div class="form-row"&gt;
-      &lt;div class="form-group"&gt;
-        &lt;label&gt;进度条&lt;/label&gt;
-        &lt;input id="prg_load" type="range" min="0" max="100" value="60" data-ctrl-type="progressBar" data-name="加载进度" data-drag-type="progressBar" data-editable="true"&gt;
+      &lt;!-- 表单区域 --&gt;
+      &lt;div class="widget-section"&gt;
+        &lt;h4&gt;✏️ 编辑用户信息&lt;/h4&gt;
+        &lt;div class="form-row"&gt;
+          &lt;div class="form-group"&gt;
+            &lt;label&gt;用户名&lt;/label&gt;
+            &lt;input id="inp_username" data-ctrl-type="inputText" data-name="用户名" data-drag-type="inputText" placeholder="请输入用户名"&gt;
+          &lt;/div&gt;
+          &lt;div class="form-group"&gt;
+            &lt;label&gt;邮箱&lt;/label&gt;
+            &lt;input id="inp_email" type="email" data-ctrl-type="inputText" data-name="邮箱" data-drag-type="inputText" placeholder="请输入邮箱"&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="form-row"&gt;
+          &lt;div class="form-group"&gt;
+            &lt;label&gt;密码&lt;/label&gt;
+            &lt;input id="inp_password" type="password" data-ctrl-type="inputText" data-name="密码" data-drag-type="inputText" placeholder="请输入密码"&gt;
+          &lt;/div&gt;
+          &lt;div class="form-group"&gt;
+            &lt;label&gt;角色&lt;/label&gt;
+            &lt;select id="sel_userrole" data-ctrl-type="comboBox" data-name="用户角色" data-drag-type="comboBox"&gt;
+              &lt;option value="viewer"&gt;访客&lt;/option&gt;
+              &lt;option value="editor"&gt;编辑&lt;/option&gt;
+              &lt;option value="admin"&gt;管理员&lt;/option&gt;
+            &lt;/select&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="form-row"&gt;
+          &lt;div class="form-group"&gt;
+            &lt;label&gt;性别&lt;/label&gt;
+            &lt;div class="form-check"&gt;
+              &lt;input id="rdo_male" type="radio" name="gender" data-ctrl-type="radio" data-name="男" data-drag-type="radio" value="male" checked&gt;
+              &lt;label&gt;男&lt;/label&gt;
+            &lt;/div&gt;
+            &lt;div class="form-check"&gt;
+              &lt;input id="rdo_female" type="radio" name="gender" data-ctrl-type="radio" data-name="女" data-drag-type="radio" value="female"&gt;
+              &lt;label&gt;女&lt;/label&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class="form-group"&gt;
+            &lt;label&gt;状态&lt;/label&gt;
+            &lt;div class="form-check"&gt;
+              &lt;input id="chk_active" type="checkbox" data-ctrl-type="checkbox" data-name="启用账户" data-drag-type="checkbox" checked&gt;
+              &lt;label&gt;启用账户&lt;/label&gt;
+            &lt;/div&gt;
+            &lt;div class="form-check"&gt;
+              &lt;input id="sw_vip" type="checkbox" data-ctrl-type="switchToggle" data-name="VIP会员" data-drag-type="switchToggle"&gt;
+              &lt;label&gt;VIP 会员&lt;/label&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="form-row"&gt;
+          &lt;div class="form-group"&gt;
+            &lt;label&gt;备注&lt;/label&gt;
+            &lt;textarea id="txt_remark" data-ctrl-type="textarea" data-name="备注" data-drag-type="textarea" rows="3" placeholder="请输入备注信息"&gt;&lt;/textarea&gt;
+          &lt;/div&gt;
+          &lt;div class="form-group"&gt;
+            &lt;label&gt;进度&lt;/label&gt;
+            &lt;input id="prg_complete" type="range" min="0" max="100" value="75" data-ctrl-type="progressBar" data-name="完成进度" data-drag-type="progressBar" data-editable="true" style="width:100%;"&gt;
+            &lt;div style="display:flex;justify-content:space-between;font-size:12px;color:#999;margin-top:4px;"&gt;
+              &lt;span&gt;0%&lt;/span&gt;&lt;span id="lbl_progress" data-ctrl-type="label" data-name="进度文本" data-drag-type="label"&gt;75%&lt;/span&gt;&lt;span&gt;100%&lt;/span&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="form-row"&gt;
+          &lt;div class="form-group"&gt;
+            &lt;label&gt;入职日期&lt;/label&gt;
+            &lt;input id="dt_join" type="date" data-ctrl-type="datetimePicker" data-name="入职日期" data-drag-type="datetimePicker"&gt;
+          &lt;/div&gt;
+          &lt;div class="form-group" style="display:flex;align-items:flex-end;gap:12px;padding-bottom:2px;"&gt;
+            &lt;button id="btn_save" data-ctrl-type="button" data-name="保存按钮" data-drag-type="button" class="primary"&gt;💾 保存&lt;/button&gt;
+            &lt;button id="btn_reset" data-ctrl-type="button" data-name="重置按钮" data-drag-type="button"&gt;↩️ 重置&lt;/button&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
       &lt;/div&gt;
-      &lt;div class="form-group"&gt;
-        &lt;label&gt;日期&lt;/label&gt;
-        &lt;input id="dt_birth" type="date" data-ctrl-type="datetimePicker" data-name="出生日期" data-drag-type="datetimePicker"&gt;
+
+      &lt;!-- 列表框演示 --&gt;
+      &lt;div class="widget-section"&gt;
+        &lt;h4&gt;📋 最近操作日志&lt;/h4&gt;
+        &lt;div id="list_log" class="listBox" data-ctrl-type="listBox" data-name="操作日志" data-drag-type="listBox"
+             data-listBox-items='[{"id":"1","text":"管理员登录系统","selected":false},{"id":"2","text":"新增用户 张三","selected":false},{"id":"3","text":"修改系统设置","selected":false}]'
+             data-always-show-selection="false" data-editable="false"
+             style="width:100%;height:160px;border:1px solid #e8eaed;border-radius:4px;"&gt;
+          &lt;div class="listBox_scroll"&gt;
+            &lt;div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="0"&gt;
+              &lt;span class="listBox_item_text"&gt;管理员登录系统&lt;/span&gt;
+            &lt;/div&gt;
+            &lt;div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="1"&gt;
+              &lt;span class="listBox_item_text"&gt;新增用户 张三&lt;/span&gt;
+            &lt;/div&gt;
+            &lt;div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="2"&gt;
+              &lt;span class="listBox_item_text"&gt;修改系统设置&lt;/span&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
       &lt;/div&gt;
-    &lt;/div&gt;
 
-    &lt;div style="display:flex; gap:12px; margin-top:12px;"&gt;
-      &lt;button id="btn_submit" data-ctrl-type="button" data-name="提交按钮" data-drag-type="button" class="primary"&gt;✅ 提交&lt;/button&gt;
-      &lt;button id="btn_reset" data-ctrl-type="button" data-name="重置按钮" data-drag-type="button"&gt;↩️ 重置&lt;/button&gt;
-      &lt;span id="lbl_status" data-ctrl-type="label" data-name="状态标签" data-drag-type="label" style="font-size:13px;color:#5f6368;align-self:center;"&gt;就绪&lt;/span&gt;
-    &lt;/div&gt;
-
-  &lt;/div&gt;
-&lt;/div&gt;
+    &lt;/div&gt;&lt;!-- .content --&gt;
+  &lt;/div&gt;&lt;!-- .main-layout --&gt;
+&lt;/div&gt;&lt;!-- .pageContainer --&gt;
 
 &lt;script src="webviewBridge.js"&gt;&lt;/script&gt;
 &lt;/body&gt;
@@ -683,8 +961,26 @@ window.__devGuideHTML = `
   </div>
 
   <div class="tip-box">
-    <strong>💡 使用说明：</strong>复制此模板后，修改 <code>id</code> 和 <code>data-name</code> 为实际业务名称，删除不需要的控件即可。所有控件均已配置完整属性，无需额外调试。<br/>
-    <strong>⚠️ 特别注意：</strong>模板中的 <code>&lt;div class="content"&gt;</code> 是布局容器，<strong>不需要</strong> <code>data-drag-type</code>，以保持窗口拖拽能力。
+    <strong>💡 使用说明：</strong><br/>
+    1. 复制此模板到新 <code>.html</code> 文件，同目录放置 <code>webviewBridge.js</code> 即可运行<br/>
+    2. 修改 <code>id</code> 和 <code>data-name</code> 为实际业务名称，删除不需要的控件<br/>
+    3. <strong>DataGrid 必须使用 <code>div+flex</code> 布局</strong>（非 <code>&lt;table&gt;</code> 标签），严格遵循第 3.2 节的类名结构<br/>
+    4. <strong>侧边栏、内容区、主布局均为布局容器，<span style="color:#c62828;">不需要</span> <code>data-drag-type</code></strong>，保持窗口拖拽能力<br/>
+    5. <strong>导航菜单项 <code>.nav-item</code> 和表格内操作按钮均为自定义元素，<span style="color:#c62828;">必须显式设置</span> <code>data-ctrl-type</code></strong>
+  </div>
+</div>
+
+
+<!-- ==================== 6. 图标占位符处理 ==================== -->
+<div class="dev-step">
+  <h3><span class="step-num">6</span> 图标占位符处理（IconManager）</h3>
+  <p>桥接脚本内置了 <strong>图标管理器（IconManager）</strong>，支持将 <code>[OK]</code>、<code>{ERROR}</code> 等占位符自动转换为对应的 Emoji 图标。</p>
+  <ul>
+    <li><strong>解析（页面显示）</strong>：<code>IconManager.parse(text)</code> 将占位符转为图标，通常无需手动调用，脚本会自动处理。</li>
+    <li><strong>转义（上报数据）</strong>：<code>IconManager.toText(html)</code> 将图标转为占位符或 <code>[U+XXXX]</code>，所有事件上报和 API 返回值均会自动执行此操作。</li>
+  </ul>
+  <div class="tip-box">
+    <strong>💡 开发建议：</strong>在控件文本中直接使用占位符，如 <code>&lt;button&gt;[OK] 确定&lt;/button&gt;</code>，即可显示为“✅ 确定”。无需额外处理，桥接脚本会自动完成双向转换。
   </div>
 </div>
 
@@ -739,93 +1035,234 @@ var config = JSON.parse(webviewBridge.api.tooltip.getConfig('tip1'));</code></pr
   </div>
 </div>
 
-<!-- ==================== 8. AI 提示词模板（已更新，含完整结构） ==================== -->
+<!-- ==================== 8. AI 提示词模板（基于最新文档规范） ==================== -->
 <div class="dev-step">
-  <h3><span class="step-num">8</span> AI 提示词模板（已更新）</h3>
-  <p>将以下提示词发给 AI（如 ChatGPT、Claude、DeepSeek），即可快速生成符合规范的完整页面。</p>
+  <h3><span class="step-num">8</span> AI 提示词模板</h3>
+  <p>将以下提示词发给 AI（ChatGPT、Claude、DeepSeek 等），即可生成符合本文档全部规范的完整页面。</p>
 
-  <h4>模板 ：通用万能提示词</h4>
+  <h4>通用万能提示词</h4>
   <div class="prompt-box" id="prompt-a">
 你是 webviewBridge.js 前端开发专家，请生成一个可在 WebView2 中运行的完整 HTML 页面。
 
 【身份定位】
-你是精通 webviewBridge.js 桥接机制的前端开发专家，擅长用最标准的 HTML 结构实现与宿主程序的完整交互。
+你精通 webviewBridge.js 桥接机制，擅长用最标准的 HTML 结构实现与宿主程序的完整交互。
 
 【核心规则 — 必须100%严格遵守】
 
-1. 页面通过 webviewBridge.js 【改成实际路径】与宿主程序通信，脚本已存在，只需引入。
+一、页面骨架
+1. 在 &lt;body&gt; 末尾引入 &lt;script src="webviewBridge.js"&gt;&lt;/script&gt;（脚本已存在，只需引入）
+2. 页面容器：
+   &lt;div class="pageContainer" id="pageContainer"
+        data-ctrl-type="pageContainer" data-name="canvas"
+        data-original-width="1065" data-original-height="695"
+        style="position:relative;width:100%;height:100%;padding-top:40px;display:flex;flex-direction:column;overflow:hidden;app-region:drag;-webkit-app-region:drag;"&gt;
+   注意：如标题栏使用绝对定位，padding-top 建议 ≥ 标题栏高度（默认40px），防止内容被遮挡。
 
-2. 基础控件属性规则（每个控件缺一不可）：
-   - id（唯一标识，英文小写+下划线，如 btn_submit）
-   - data-ctrl-type（控件类型，见下表）
-   - data-drag-type（拖拽标记，值任意，如 button）—— 【仅可交互控件需要】
-   - data-name（中文名称，推荐）
-   - data-type（基础控件类型，与 data-ctrl-type 不同，只记录原生控件最基础的标签类型，如 select）
+二、标题栏（与页面容器同级，放在容器内最顶部）
+&lt;div class="titlebar" id="titlebar" data-name="标题栏"
+     style="position:absolute;top:0;left:0;right:0;height:40px;background:#F8F8F8;border-bottom:1px solid rgba(0,0,0,0.08);app-region:drag;-webkit-app-region:drag;display:flex;align-items:center;"&gt;
+  &lt;div class="titlebar_left"&gt;
+    &lt;span class="titlebar_left_icon" id="titlebar_left_icon"
+          data-ctrl-type="titlebar_left_icon" data-drag-type="titlebar_left_icon" data-name="图标" style="color:#333;"&gt;
+      &lt;i class="fas fa-star"&gt;&lt;/i&gt;
+    &lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div class="titlebar_center"&gt;
+    &lt;span class="titlebar_center_title" id="titlebar_title"
+          data-ctrl-type="titlebar_title" data-drag-type="titlebar_title" data-name="标题" style="color:#333;font-weight:600;"&gt;应用标题&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div class="titlebar_right"&gt;
+    &lt;button id="titlebar_min" data-ctrl-type="titlebar_min" data-drag-type="titlebar_min"
+            class="titlebar_rightBtn" title="最小化"&gt;
+      &lt;svg width="12" height="1" viewBox="0 0 10 1"&gt;&lt;rect width="10" height="1" fill="currentColor"/&gt;&lt;/svg&gt;
+    &lt;/button&gt;
+    &lt;button id="titlebar_max" data-ctrl-type="titlebar_max" data-drag-type="titlebar_max"
+            class="titlebar_rightBtn" title="最大化"&gt;
+      &lt;span style="width:18px;height:18px;display:flex;align-items:center;justify-content:center;app-region:drag;-webkit-app-region:drag;"&gt;
+        &lt;svg width="12" height="12" viewBox="0 0 10 10" shape-rendering="crispEdges"&gt;
+          &lt;rect x="1" y="1" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1"/&gt;
+        &lt;/svg&gt;
+      &lt;/span&gt;
+    &lt;/button&gt;
+    &lt;button id="titlebar_close" data-ctrl-type="titlebar_close" data-drag-type="titlebar_close"
+            class="titlebar_rightBtn titlebar_rightBtn_close" title="关闭"&gt;
+      &lt;svg width="12" height="12" viewBox="0 0 10 10"&gt;
+        &lt;line x1="1" y1="1" x2="9" y2="9" stroke="currentColor" stroke-width="1"/&gt;
+        &lt;line x1="9" y1="1" x2="1" y2="9" stroke="currentColor" stroke-width="1"/&gt;
+      &lt;/svg&gt;
+    &lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+关键：最大化按钮内部的 &lt;span&gt; 必须设置 app-region:drag（支持 Windows 11 Snap Layout），固定宽高18px。
 
-   控件类型对应关系：
-   按钮: button       输入框: inputText     复选框: checkbox
-   单选框: radio      开关: switchToggle    下拉框: comboBox
-   文本域: textarea   超链接: hyperLink     标签: label
-   图片: imageBox     进度条: progressBar   日期: datetimePicker
-   列表: listBox      表格: dataGrid        树形: treeView
-   标签页: tabsContainer  卡片: cardBox     日志: logOutput
+三、基础控件属性规则
+每个控件缺一不可的属性：
+  id（唯一标识，英文小写+下划线，如 btn_submit）
+  data-ctrl-type（控件类型，见下表）
+  data-drag-type（防拖拽标记）—— 【仅可交互控件需要】，纯布局容器（侧边栏、内容区）不需要
+  data-name（中文名称，推荐）
 
-3. 复杂控件必须包含完整子结构 + 初始化数据属性（这是重点！）：
-   ▸ 列表框（ListBox）：
-     容器必须设置 data-listBox-items='[{"id":"1","text":"项1","selected":false}]'
-     内部必须有 .listBox_scroll → .listBox_item → .listBox_item_text
-     &lt;div id="list_xxx" class="listBox" data-ctrl-type="listBox" data-listBox-items='[{"text":"示例"}]'&gt;
-       &lt;div class="listBox_scroll"&gt;
-         &lt;div class="listBox_item" data-item-index="0"&gt;
-           &lt;span class="listBox_item_text"&gt;示例&lt;/span&gt;
-         &lt;/div&gt;
-       &lt;/div&gt;
-     &lt;/div&gt;
+控件类型速查：
+  按钮: button       输入框: inputText     密码框: inputText（type="password"）
+  文本域: textarea    复选框: checkbox       开关: switchToggle（必须用此值！）
+  单选框: radio       下拉框: comboBox       超链接: hyperLink
+  标签: label         图片框: imageBox       进度条(原生range): progressBar
+  日期: datetimePicker  分割线: divider
+  列表: listBox        表格: dataGrid        树形: treeView
+  标签页: tabsContainer  卡片: cardBox       日志: logOutput
+  单选框组: radioGroup  进度条(高级): progressBar
 
-   ▸ 数据表格（DataGrid）：
-     容器使用 class="dataGrid_container"，必须设置 data-columns 和 data-rows JSON
-     内部必须有 .dataGrid_header（含 .dataGrid_header_cell）和 .dataGrid_body（含 .dataGrid_row → .dataGrid_cell）
-     如需复选框，添加 .dataGrid_checkbox 和 input.dataGrid_row_check
+⚠️ 开关必须使用 data-ctrl-type="switchToggle"，不能用 checkbox，否则脚本无法区分。
+⚠️ 自定义元素（如 &lt;div class="nav-item"&gt; 导航菜单项）必须显式添加 data-ctrl-type="button" 和 data-drag-type="button"，否则事件会被父容器捕获。
 
-   ▸ 树形框（TreeView）：
-     容器必须设置 data-tree-id="tree_xxx"
-     节点必须用 .treeView_node（含 data-node-id）→ .treeView_node_content → .treeView_label
-     展开按钮用 .treeView_toggle（expanded/collapsed/empty 类）
-     子容器用 .treeView_children
+四、复杂控件 — 必须包含完整子结构 + 初始化数据属性
 
-   ▸ 进度条（高级样式）：
-     容器使用 class="progressBar_container"，设置 data-editable="true" 和 data-draggable="false"
-     内部必须包含 .progressBar_fill（控制宽度）和 .progressBar_text（显示百分比）
+▸ 列表框（ListBox）：
+  &lt;div id="list_1" class="listBox" data-ctrl-type="listBox" data-drag-type="listBox" data-name="列表"
+       data-listBox-items='[{"id":"1","text":"项1","selected":false},{"id":"2","text":"项2","selected":false}]'
+       data-editable="false" data-always-show-selection="false" style="width:200px;height:200px;"&gt;
+    &lt;div class="listBox_scroll"&gt;
+      &lt;div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="0"&gt;
+        &lt;span class="listBox_item_text"&gt;项1&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="1"&gt;
+        &lt;span class="listBox_item_text"&gt;项2&lt;/span&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  JSON 使用单引号包裹，内部属性用双引号。
 
-   ▸ 日志框（LogOutput）：
-     容器使用 class="logOutput_container"
-     每一行使用 .logOutput_line
+▸ 多项表格（DataGrid）：
+  &lt;div id="grid_1" class="dataGrid_container" data-ctrl-type="dataGrid" data-drag-type="dataGrid" data-name="表格"
+       data-columns='[{"field":"col1","header":"列A"},{"field":"col2","header":"列B"}]'
+       data-rows='[{"id":"row1","cells":{"col1":"值A","col2":"值B"}}]'
+       data-show-checkbox="true" data-editable="false" data-always-show-selection="false"
+       style="width:500px;height:300px;"&gt;
+    &lt;div class="dataGrid_header"&gt;
+      &lt;div class="dataGrid_header_cell dataGrid_checkbox" style="width:36px;min-width:36px;flex-shrink:0"&gt;
+        &lt;input type="checkbox" class="dataGrid_select_all"&gt;
+      &lt;/div&gt;
+      &lt;div class="dataGrid_header_cell" data-ctrl-type="dataGrid_cell" data-col-key="col1" data-col-name="列A" style="width:100px;min-width:100px;flex-shrink:0"&gt;列A&lt;/div&gt;
+      &lt;div class="dataGrid_header_cell" data-ctrl-type="dataGrid_cell" data-col-key="col2" data-col-name="列B" style="width:100px;min-width:100px;flex-shrink:0"&gt;列B&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="dataGrid_body"&gt;
+      &lt;div class="dataGrid_row" data-row-index="0" data-row-id="row1"&gt;
+        &lt;div class="dataGrid_cell dataGrid_checkbox" style="width:36px;min-width:36px;flex-shrink:0"&gt;
+          &lt;input type="checkbox" class="dataGrid_row_check" data-ctrl-type="dataGrid_row_checkbox"&gt;
+        &lt;/div&gt;
+        &lt;div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="col1" data-col-name="列A" style="width:100px;min-width:100px;flex-shrink:0" title="值A"&gt;值A&lt;/div&gt;
+        &lt;div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="col2" data-col-name="列B" style="width:100px;min-width:100px;flex-shrink:0" title="值B"&gt;值B&lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  头部和数据单元格都必须设置 data-ctrl-type="dataGrid_cell"。表格使用 div+flex 布局，不是 &lt;table&gt; 标签。
 
-   ▸ 单选框组（RadioGroup）：
-     容器使用 class="radioGroup_container"
-     每个选项使用 class="radioGroup_item"
+▸ 树形框（TreeView）：
+  &lt;div id="tree_1" class="treeView" data-ctrl-type="treeView" data-drag-type="treeView" data-name="树形"
+       data-tree-id="tree_1" data-editable="false" data-show-icon="true" data-always-show-selection="true"
+       style="width:220px;height:320px;"&gt;
+    &lt;div class="treeView_node" data-node-id="node_1" data-level="0"&gt;
+      &lt;div class="treeView_node_content"&gt;
+        &lt;span class="treeView_toggle expanded" data-ctrl-type="treeview_node_toggle"&gt;▶&lt;/span&gt;
+        &lt;span class="treeView_icon folder"&gt;📁&lt;/span&gt;
+        &lt;span class="treeView_label" data-ctrl-type="treeview_node_text"&gt;根节点&lt;/span&gt;
+        &lt;span class="tree-edit-input" style="display:none"&gt;&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;div class="treeView_children"&gt;
+        &lt;div class="treeView_node" data-node-id="node_2" data-level="1"&gt;
+          &lt;div class="treeView_node_content"&gt;
+            &lt;span class="treeView_toggle empty" data-ctrl-type="treeview_node_toggle"&gt;▶&lt;/span&gt;
+            &lt;span class="treeView_icon file"&gt;📄&lt;/span&gt;
+            &lt;span class="treeView_label" data-ctrl-type="treeview_node_text"&gt;子节点&lt;/span&gt;
+            &lt;span class="tree-edit-input" style="display:none"&gt;&lt;/span&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  三角状态：expanded=已展开、collapsed=有子节点已折叠、empty=叶子节点无子节点。
+  每个节点都必须包含 .tree-edit-input（初始 display:none）。
 
-   ▸ 卡片框（CardBox）：
-     容器必须设置 data-collapsible="true" 和 data-collapsed="false"
+▸ 标签页（TabContainer）：
+  &lt;div id="tabs_1" class="tabsContainer" data-ctrl-type="tabsContainer" data-drag-type="tabsContainer" data-name="标签页"
+       style="width:300px;height:200px;"&gt;
+    &lt;div class="tabsContainer_headerBar"&gt;
+      &lt;button class="tabsContainer_headerBar_btn active" data-ctrl-type="tabsContainer_headerBar_btn" data-tab-name="tab1"&gt;标签1&lt;/button&gt;
+      &lt;button class="tabsContainer_headerBar_btn" data-ctrl-type="tabsContainer_headerBar_btn" data-tab-name="tab2"&gt;标签2&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;div class="tabsContainer_contentWrapper"&gt;
+      &lt;div class="tabsContainer_contentWrapper_panel active" data-tab-name="tab1" data-parent="tabs_1" data-tab="0"&gt;内容1&lt;/div&gt;
+      &lt;div class="tabsContainer_contentWrapper_panel" data-tab-name="tab2" data-parent="tabs_1" data-tab="1"&gt;内容2&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  面板需设置 data-parent（指向容器ID）和 data-tab（索引）。
 
-4. 页面结构：
-   - 最外层用 &lt;div class="pageContainer glass-effect" id="pageContainer" data-ctrl-type="pageContainer" data-name="canvas" style="app-region: drag;"&gt;
-   - 标题栏 id="titlebar"，包含最小化/最大化/关闭按钮（最大化按钮内部必须有一个 &lt;span&gt; 包含图标，并设为 drag，固定高宽18px）
-   - 所有交互控件放在内容区
+▸ 卡片框（CardBox）：
+  &lt;div id="card_1" class="cardBox" data-ctrl-type="cardBox" data-drag-type="cardBox" data-name="卡片"
+       data-collapsible="true" data-collapsed="false" style="width:260px;height:180px;"&gt;
+    &lt;div class="cardBox_header"&gt;
+      &lt;span class="cardBox_header_title"&gt;卡片标题&lt;/span&gt;
+      &lt;span class="cardBox_collapse_btn"&gt;
+        &lt;svg width="12" height="12" viewBox="0 0 12 12"&gt;
+          &lt;path d="M3 4.5L6 7.5L9 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/&gt;
+        &lt;/svg&gt;
+      &lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class="cardBox_body" data-ctrl-type="cardBox_body"&gt;卡片内容&lt;/div&gt;
+  &lt;/div&gt;
 
-5. 样式要求：
-   - .pageContainer { app-region: drag; }
-   - 【仅可交互控件】需要 [data-drag-type] { app-region: no-drag; }
-   - 纯布局容器（侧边栏、内容区）【不要】添加 data-drag-type，记住：能点能输入就需要，纯放东西不需要。
-   - [data-ctrl-type="titlebar_max"] span { app-region: drag; }
+▸ 日志框（LogOutput）：
+  &lt;div id="log_1" class="logOutput_container" data-ctrl-type="logOutput" data-drag-type="logOutput" data-name="日志"
+       style="width:300px;height:150px;"&gt;
+    &lt;div class="logOutput_line" data-ctrl-type="logOutput_item" style="color:#333"&gt;日志已就绪&lt;/div&gt;
+  &lt;/div&gt;
 
-6. 所有控件交互事件会自动上报给宿主，无需手动写事件监听。
+▸ 单选框组（RadioGroup）：
+  &lt;div id="rg_1" class="radioGroup_container" data-ctrl-type="radioGroup" data-drag-type="radioGroup" data-name="单选框组"
+       style="width:120px;height:60px;"&gt;
+    &lt;label class="radioGroup_item"&gt;
+      &lt;input type="radio" data-ctrl-type="radio" name="rg_1" value="选项1" checked /&gt;选项1
+    &lt;/label&gt;
+    &lt;label class="radioGroup_item"&gt;
+      &lt;input type="radio" data-ctrl-type="radio" name="rg_1" value="选项2" /&gt;选项2
+    &lt;/label&gt;
+  &lt;/div&gt;
+
+▸ 进度条（高级样式，非原生 range）：
+  &lt;div id="prg_1" class="progressBar_container" data-ctrl-type="progressBar" data-drag-type="progressBar" data-name="进度条"
+       data-editable="true" style="width:250px;height:10px;overflow:visible;"&gt;
+    &lt;div class="progressBar_track"&gt;&lt;/div&gt;
+    &lt;div class="progressBar_fill" style="width:60%;height:100%;background:#0078D4;border-radius:inherit;transition:width 0.15s;"&gt;&lt;/div&gt;
+    &lt;span class="progressBar_text" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:inherit;pointer-events:none;white-space:nowrap;"&gt;60%&lt;/span&gt;
+  &lt;/div&gt;
+
+五、CSS 必须包含的规则
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:100%; height:100%; overflow:hidden; }
+  [data-drag-type] { app-region: no-drag; -webkit-app-region: no-drag; }
+  [data-ctrl-type="titlebar_max"] span { app-region: drag; -webkit-app-region: drag; }
+  .titlebar_rightBtn { width:35px; height:32px; border:none; background:transparent; cursor:default; border-radius:4px; display:flex; align-items:center; justify-content:center; }
+  .titlebar_rightBtn:hover { background:rgba(0,0,0,0.06); }
+  .titlebar_rightBtn_close:hover { background:#e81123; color:#fff; }
+  .titlebar_left { display:flex; align-items:center; padding-left:12px; }
+  .titlebar_center { flex:1; display:flex; justify-content:center; }
+  .titlebar_right { display:flex; align-items:center; padding-right:4px; }
+
+六、拖拽规则（重要！）
+  ✅ 可交互控件（按钮、输入框、下拉框、复选框、菜单项、列表项等）→ 必须设置 data-drag-type
+  ❌ 纯布局容器（侧边栏、内容区、卡片面板、主布局等）→ 不设置 data-drag-type
+  记忆：能点能输入就需要，纯放东西不需要。
+
+七、其他
+  - 所有控件交互事件会自动上报给宿主，无需手动写事件监听
+  - 如使用 Font Awesome 图标，引入 &lt;link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" /&gt;
 
 【输出要求】
-- 完整可运行的 HTML 文件
-- 样式使用内联 &lt;style&gt; 标签，界面美观
+- 完整可运行的 HTML 文件（包含 &lt;!DOCTYPE html&gt; 到 &lt;/html&gt;）
+- 样式使用内联 &lt;style&gt; 标签，界面美观现代
 - 所有文字使用中文
 - 代码结构清晰，缩进规范
+- 所有控件属性完整，不可省略
 
 请根据用户需求生成页面。
 <button class="copy-prompt" onclick="copyPrompt('prompt-a',this)">复制提示词</button>
