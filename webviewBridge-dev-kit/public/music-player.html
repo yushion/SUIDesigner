@@ -6,260 +6,825 @@
 <title>音乐播放器</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
+/* ===== 全局重置 ===== */
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:transparent}
 
-.pageContainer{position:relative;overflow:hidden;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
-[data-drag-type]{app-region:no-drag;-webkit-app-region:no-drag}
+/* ===== CSS 变量 - 浅色主题（默认） ===== */
+:root{
+  --bg-primary:#F3F3F3;
+  --bg-secondary:#FFFFFF;
+  --bg-sidebar:#FAFAFA;
+  --bg-card:#FFFFFF;
+  --bg-titlebar:#F8F8F8;
+  --bg-hover:rgba(0,0,0,0.04);
+  --bg-active:#E8F4FD;
+  --bg-progress-track:#E0E0E0;
+  --bg-progress-fill:#0078D4;
+  --bg-statusbar:#F3F3F3;
+  --bg-btn-hover:rgba(0,0,0,0.06);
+  --bg-btn-active:rgba(0,0,0,0.1);
+  --text-primary:#1A1A1A;
+  --text-secondary:#5A5A5A;
+  --text-tertiary:#999999;
+  --text-inverse:#FFFFFF;
+  --border-color:rgba(0,0,0,0.06);
+  --border-card:#E5E5E5;
+  --shadow-card:0 1px 3px rgba(0,0,0,0.08);
+  --accent:#0078D4;
+  --accent-hover:#106EBE;
+  --mode-active-bg:#E8F4FD;
+  --mode-active-color:#0078D4;
+  --scrollbar-thumb:#C1C1C1;
+  --scrollbar-track:transparent;
+}
 
-.titlebar{position:absolute;top:0;left:0;right:0;height:40px;display:flex;align-items:center;app-region:drag;-webkit-app-region:drag}
-.titlebar_rightBtn{width:35px;height:32px;border:none;background:transparent;cursor:default;border-radius:4px;display:flex;align-items:center;justify-content:center}
-.titlebar_rightBtn:hover{background:rgba(0,0,0,0.06)}
-.titlebar_rightBtn_close:hover{background:#e81123;color:#fff}
+/* ===== 深色主题 ===== */
+.dark-theme{
+  --bg-primary:#1E1E1E;
+  --bg-secondary:#2D2D2D;
+  --bg-sidebar:#252525;
+  --bg-card:#2D2D2D;
+  --bg-titlebar:#2D2D2D;
+  --bg-hover:rgba(255,255,255,0.06);
+  --bg-active:#1E3A5F;
+  --bg-progress-track:#3D3D3D;
+  --bg-progress-fill:#60CDFF;
+  --bg-statusbar:#252525;
+  --bg-btn-hover:rgba(255,255,255,0.08);
+  --bg-btn-active:rgba(255,255,255,0.14);
+  --text-primary:#E0E0E0;
+  --text-secondary:#A0A0A0;
+  --text-tertiary:#707070;
+  --text-inverse:#1A1A1A;
+  --border-color:rgba(255,255,255,0.06);
+  --border-card:#3D3D3D;
+  --shadow-card:0 1px 3px rgba(0,0,0,0.3);
+  --accent:#60CDFF;
+  --accent-hover:#7CD6FF;
+  --mode-active-bg:#1E3A5F;
+  --mode-active-color:#60CDFF;
+  --scrollbar-thumb:#555555;
+  --scrollbar-track:transparent;
+}
 
-/* button 子元素覆盖浏览器 UA */
-.tabsContainer_headerBar_btn,.cardBox_collapse_btn,.ctrl-btn{color:inherit;font-size:inherit;font-family:inherit;border:none;background:none;cursor:pointer}
+/* ===== 页面容器 ===== */
+.pageContainer{
+  position:relative;
+  overflow:hidden;
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  background-color:var(--bg-primary);
+  transition:background-color 0.3s;
+}
 
-/* 全局 button inherit 策略 */
-button{color:inherit;font-size:inherit;font-family:inherit}
-button i{color:inherit;font-size:inherit}
+/* ===== 排除控件的拖拽区域 ===== */
+[data-drag-type]{
+  app-region:no-drag;
+  -webkit-app-region:no-drag;
+}
 
-/* 布局 */
-.main-layout{display:flex;flex:1;overflow:hidden}
+/* ===== 标题栏 ===== */
+.titlebar{
+  position:absolute;top:0;left:0;right:0;
+  height:40px;display:flex;align-items:center;
+  background:var(--bg-titlebar);
+  border-bottom:1px solid var(--border-color);
+  app-region:drag;-webkit-app-region:drag;
+  user-select:none;z-index:10;
+  transition:background-color 0.3s,border-color 0.3s;
+}
+.titlebar_left{
+  display:flex;align-items:center;padding-left:14px;gap:8px;
+}
+.titlebar_left_icon{
+  width:22px;height:22px;display:flex;align-items:center;justify-content:center;
+  font-size:15px;color:var(--accent);
+}
+.titlebar_center{
+  flex:1;display:flex;align-items:center;padding-left:6px;
+}
+.titlebar_center_title{
+  font-size:13px;font-weight:600;color:var(--text-primary);
+  transition:color 0.3s;
+}
+.titlebar_right{
+  display:flex;align-items:center;padding-right:4px;flex-shrink:0;
+}
+.titlebar_rightBtn{
+  width:35px;height:32px;border:none;background:transparent;
+  cursor:default;border-radius:4px;display:flex;
+  align-items:center;justify-content:center;
+  color:var(--text-primary);font-size:12px;
+  transition:background-color 0.15s,color 0.3s;
+}
+.titlebar_rightBtn:hover{background:var(--bg-btn-hover)}
+.titlebar_rightBtn_close:hover{background:#e81123;color:#fff !important}
 
-/* 侧边栏 */
-.sidebar{width:240px;min-width:240px;display:flex;flex-direction:column;border-right:1px solid rgba(0,0,0,0.08);overflow:hidden}
+/* button 子元素覆盖浏览器 UA 样式（规则15：所有button子元素必须inherit） */
+button i, button span{
+  color:inherit;font-size:inherit;font-family:inherit;
+}
+.titlebar_rightBtn i,
+.titlebar_rightBtn span{
+  color:inherit;font-size:inherit;font-family:inherit;
+}
 
-/* 内容区 */
-.content{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
+#titlebar_theme i {
+  font-family: "Font Awesome 6 Free" !important;
+  font-weight: 900; /* Font Awesome 实心图标需要这个 */
+}
 
-/* 播放列表 */
-.playlist-header{height:40px;display:flex;align-items:center;padding:0 16px;font-weight:600;font-size:14px;border-bottom:1px solid rgba(0,0,0,0.06);flex-shrink:0}
+/* ===== 主内容区域 ===== */
+.main-content{
+  display:flex;flex:1;overflow:hidden;
+}
 
-/* listBox 样式 */
-.listBox_scroll{flex:1;overflow-y:auto}
-.listBox_item{display:flex;align-items:center;height:40px;padding:0 16px;cursor:pointer;transition:background 0.15s}
-.listBox_item:hover{background:rgba(0,0,0,0.04)}
-.listBox_item.active{background:rgba(0,120,212,0.1)}
-.listBox_item_icon{margin-right:10px;font-size:14px;width:20px;text-align:center;flex-shrink:0}
-.listBox_item_text{flex:1;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.listBox_item_artist{font-size:11px;opacity:0.5;margin-left:8px;flex-shrink:0}
+/* ===== 侧边栏（播放列表）- 布局容器，不设 data-drag-type ===== */
+.sidebar{
+  width:280px;min-width:220px;display:flex;flex-direction:column;
+  background:var(--bg-sidebar);
+  border-right:1px solid var(--border-color);
+  transition:background-color 0.3s,border-color 0.3s;
+}
+.sidebar_header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px 8px;
+}
+.sidebar_title{
+  font-size:13px;font-weight:600;color:var(--text-primary);
+  transition:color 0.3s;
+}
+.sidebar_count{
+  font-size:11px;color:var(--text-tertiary);
+  transition:color 0.3s;
+}
 
-/* 歌曲信息 */
-.song-info{text-align:center;margin-bottom:20px}
-.song-title{font-size:20px;font-weight:700;margin-bottom:4px;display:block}
-.song-artist{font-size:14px;display:block}
+/* ===== 滚动条 ===== */
+.listBox_scroll::-webkit-scrollbar{width:4px}
+.listBox_scroll::-webkit-scrollbar-track{background:var(--scrollbar-track)}
+.listBox_scroll::-webkit-scrollbar-thumb{
+  background:var(--scrollbar-thumb);border-radius:2px;
+}
+.listBox_scroll::-webkit-scrollbar-thumb:hover{background:var(--text-tertiary)}
 
-/* 进度条 */
-.progress-area{width:100%;max-width:480px;display:flex;align-items:center;gap:10px;margin-bottom:16px}
-.progress-time{font-size:11px;min-width:36px}
-.progress-time:last-child{text-align:right}
+/* ===== 列表项样式 ===== */
+.listBox_item{
+  display:flex;align-items:center;height:56px;padding:0 16px;
+  cursor:pointer;gap:10px;border-left:3px solid transparent;
+  transition:background-color 0.15s,border-color 0.15s;
+}
+.listBox_item:hover{background:var(--bg-hover)}
+.listBox_item.active{
+  background:var(--bg-active);border-left-color:var(--accent);
+}
+.listBox_item_index{
+  width:24px;font-size:12px;color:var(--text-tertiary);
+  text-align:center;flex-shrink:0;
+}
+.listBox_item_info{
+  flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;
+}
+.listBox_item_title{
+  font-size:13px;font-weight:500;color:var(--text-primary);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  transition:color 0.3s;
+}
+.listBox_item_artist{
+  font-size:11px;color:var(--text-tertiary);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  transition:color 0.3s;
+}
+.listBox_item_duration{
+  font-size:12px;color:var(--text-tertiary);flex-shrink:0;
+  transition:color 0.3s;
+}
 
-/* 播放控制 */
-.play-controls{display:flex;align-items:center;gap:12px;margin-bottom:24px}
-.ctrl-btn{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px}
-.ctrl-btn:hover{background:rgba(0,0,0,0.06)}
-.ctrl-btn.play-btn{width:52px;height:52px;font-size:22px;background:#0078D4;border-radius:50%}
-.ctrl-btn.play-btn:hover{background:#106ebe}
-.ctrl-btn.play-btn i,.ctrl-btn.play-btn span,.ctrl-btn.play-btn *{color:#fff}
+/* ===== 播放控制区域 ===== */
+.player-area{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:20px 40px;gap:16px;
+  background:var(--bg-primary);
+  transition:background-color 0.3s;
+}
 
-/* 底部控制 */
-.bottom-controls{display:flex;align-items:center;gap:16px}
-.extra-controls{display:flex;align-items:center;gap:8px}
+/* ===== 专辑封面卡片 ===== */
+.cover-wrapper{
+  width:220px;height:220px;border-radius:12px;
+  box-shadow:var(--shadow-card),0 8px 24px rgba(0,0,0,0.12);
+  overflow:hidden;position:relative;flex-shrink:0;
+}
+.cover-wrapper .album-cover{
+  width:100%;height:100%;display:flex;align-items:center;
+  justify-content:center;font-size:80px;
+  background:linear-gradient(135deg,var(--accent),#8B5CF6);
+  color:rgba(255,255,255,0.85);
+  transition:background 0.3s;
+}
 
-/* 滚动条 */
-::-webkit-scrollbar{width:6px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.15);border-radius:3px}
-::-webkit-scrollbar-thumb:hover{background:rgba(0,0,0,0.25)}
+/* ===== 歌曲信息 ===== */
+.song-info{
+  text-align:center;display:flex;flex-direction:column;gap:2px;
+}
+.song-name{
+  font-size:18px;font-weight:600;color:var(--text-primary);
+  transition:color 0.3s;
+}
+.song-artist{
+  font-size:13px;color:var(--text-secondary);
+  transition:color 0.3s;
+}
+
+/* ===== 播放进度条容器 ===== */
+.progress-row{
+  display:flex;align-items:center;gap:10px;width:100%;max-width:480px;
+}
+.progress-time{
+  font-size:11px;color:var(--text-tertiary);min-width:36px;
+  text-align:center;transition:color 0.3s;
+}
+.progress-bar-wrap{
+  flex:1;
+}
+
+/* ===== 进度条覆盖样式 ===== */
+.progressBar_container{
+  cursor:pointer;
+}
+.progressBar_container .progressBar_track{
+  transition:background-color 0.3s;
+}
+.progressBar_container .progressBar_fill{
+  transition:width 0.1s linear,background-color 0.3s;
+}
+.progressBar_container:hover .progressBar_track{
+  filter:brightness(0.95);
+}
+.progressBar_container .progressBar_thumb{
+  position:absolute;top:50%;width:14px;height:14px;
+  background:var(--bg-progress-fill);border-radius:50%;
+  transform:translate(-50%,-50%);display:none;
+  box-shadow:0 1px 3px rgba(0,0,0,0.2);
+  transition:background-color 0.3s;
+}
+.progressBar_container:hover .progressBar_thumb{display:block}
+
+/* ===== 控制按钮组 ===== */
+.control-buttons{
+  display:flex;align-items:center;gap:6px;
+}
+.ctrl-btn{
+  width:40px;height:40px;border:none;background:transparent;
+  cursor:default;border-radius:50%;display:flex;
+  align-items:center;justify-content:center;
+  color:var(--text-primary);font-size:16px;
+  transition:background-color 0.15s,color 0.3s,transform 0.1s;
+}
+.ctrl-btn:hover{background:var(--bg-btn-hover)}
+.ctrl-btn:active{transform:scale(0.94);background:var(--bg-btn-active)}
+.play-btn{
+  width:52px;height:52px;font-size:20px;
+  background:var(--accent);color:#FFFFFF;border-radius:50%;
+}
+.play-btn:hover{background:var(--accent-hover);color:#FFFFFF}
+.play-btn:active{transform:scale(0.94)}
+
+/* ===== 播放模式按钮 ===== */
+.mode-buttons{
+  display:flex;align-items:center;gap:2px;
+}
+.mode-btn{
+  width:34px;height:34px;border:none;background:transparent;
+  cursor:default;border-radius:6px;display:flex;
+  align-items:center;justify-content:center;position:relative;
+  color:var(--text-tertiary);font-size:15px;
+  transition:background-color 0.15s,color 0.3s;
+}
+.mode-btn:hover{background:var(--bg-btn-hover);color:var(--text-primary)}
+.mode-btn.active{
+  background:var(--mode-active-bg);color:var(--mode-active-color);
+}
+/* 单曲循环"1"标记 - 使用CSS而非内联样式，遵循规则15 */
+.mode-single-mark{
+  position:absolute;font-size:8px;font-weight:700;margin-top:1px;
+}
+
+/* ===== 音量控制区域 ===== */
+.volume-row{
+  display:flex;align-items:center;gap:8px;width:100%;max-width:280px;
+  margin-top:4px;
+}
+.volume-btn{
+  width:32px;height:32px;border:none;background:transparent;
+  cursor:default;border-radius:6px;display:flex;
+  align-items:center;justify-content:center;flex-shrink:0;
+  color:var(--text-tertiary);font-size:14px;
+  transition:background-color 0.15s,color 0.3s;
+}
+.volume-btn:hover{background:var(--bg-btn-hover);color:var(--text-primary)}
+.volume-bar-wrap{flex:1}
+.volume-bar-wrap .progressBar_container{cursor:pointer}
+.volume-percent{
+  font-size:11px;color:var(--text-tertiary);min-width:30px;
+  text-align:right;transition:color 0.3s;
+}
+
+/* ===== 底部状态栏 ===== */
+.statusbar{
+  height:28px;display:flex;align-items:center;
+  justify-content:space-between;padding:0 16px;
+  background:var(--bg-statusbar);
+  border-top:1px solid var(--border-color);
+  transition:background-color 0.3s,border-color 0.3s;
+}
+.statusbar_left{
+  display:flex;align-items:center;gap:6px;
+}
+.statusbar_right{
+  display:flex;align-items:center;gap:6px;
+}
+.status-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:#4CAF50;flex-shrink:0;
+}
+.status-text{
+  font-size:11px;color:var(--text-tertiary);
+  transition:color 0.3s;
+}
 </style>
 </head>
 <body>
+
+<!-- ★ 页面容器：根元素，class/id 必须 -->
 <div class="pageContainer" id="pageContainer" data-ctrl-type="pageContainer" data-name="canvas"
-     data-original-width="980" data-original-height="620"
+     data-original-width="900" data-original-height="600"
      style="position:relative;width:100%;height:100%;padding-top:40px;display:flex;flex-direction:column;app-region:drag;-webkit-app-region:drag;">
 
-  <!-- ========== 标题栏 ========== -->
-  <div class="titlebar" id="titlebar" data-name="标题栏"
-       style="background:#F8F8F8;border-bottom:1px solid rgba(0,0,0,0.08);">
-    <div class="titlebar_left" style="display:flex;align-items:center;padding-left:12px;">
-      <span id="titlebar_icon" data-ctrl-type="titlebar_left_icon" data-drag-type="titlebar_left_icon" data-name="图标">
-        <i class="fas fa-music" style="font-size:14px;color:#0078D4;"></i>
+  <!-- ★ 标题栏 -->
+  <div class="titlebar" id="titlebar" data-name="标题栏">
+
+    <!-- 左侧：应用图标 + 标题 -->
+    <div class="titlebar_left">
+      <span id="titlebar_icon" data-ctrl-type="titlebar_left_icon" data-drag-type="titlebar_left_icon" data-name="图标" class="titlebar_left_icon">
+        <i class="fas fa-headphones"></i>
       </span>
     </div>
-    <div class="titlebar_center" style="flex:1;display:flex;align-items:center;">
-      <span id="titlebar_title" data-ctrl-type="titlebar_title" data-drag-type="titlebar_title" data-name="标题"
-            style="font-size:13px;font-weight:600;">音乐播放器</span>
+
+    <!-- 中间：标题 -->
+    <div class="titlebar_center">
+      <span id="titlebar_title" data-ctrl-type="titlebar_title" data-drag-type="titlebar_title" data-name="标题" class="titlebar_center_title">音乐播放器</span>
     </div>
-    <div class="titlebar_right" style="display:flex;align-items:center;padding-right:4px;">
+
+    <!-- 右侧：主题切换 + 三按钮 -->
+    <div class="titlebar_right">
+      <!-- 切换主题按钮（位于最小化按钮左侧） -->
+      <button id="titlebar_theme" data-ctrl-type="button" data-drag-type="button" data-type="button" data-name="切换主题"
+              class="titlebar_rightBtn" style="font-size:14px;" onclick="toggleTheme()">
+        <i class="fas fa-moon" id="theme_icon"></i>
+      </button>
+
+      <!-- 标准三按钮 -->
       <button id="titlebar_min" data-ctrl-type="titlebar_min" data-drag-type="titlebar_min" data-name="最小化" class="titlebar_rightBtn">─</button>
       <button id="titlebar_max" data-ctrl-type="titlebar_max" data-drag-type="titlebar_max" data-name="最大化" class="titlebar_rightBtn">
-        <span style="app-region:drag;-webkit-app-region:drag;width:18px;height:18px;display:flex;align-items:center;justify-content:center;">□</span>
+        <span style="app-region:drag;-webkit-app-region:drag;width:12px;height:12px;display:flex;align-items:center;justify-content:center;">□</span>
       </button>
       <button id="titlebar_close" data-ctrl-type="titlebar_close" data-drag-type="titlebar_close" data-name="关闭" class="titlebar_rightBtn titlebar_rightBtn_close">✕</button>
     </div>
   </div>
 
-  <!-- ========== 主布局 ========== -->
-  <div class="main-layout" style="flex:1;overflow:hidden;">
+  <!-- ★ 主内容区域（布局容器，不设 data-drag-type） -->
+  <div class="main-content" style="flex:1;overflow:hidden;">
 
-    <!-- ===== 左侧：播放列表 ===== -->
-    <div class="sidebar" style="background:rgba(0,0,0,0.02);">
-      <div class="playlist-header">
-        <i class="fas fa-list-ul" style="margin-right:8px;font-size:13px;"></i>
-        <span>播放列表</span>
+    <!-- ★ 左侧：播放列表 -->
+    <div class="sidebar">
+      <div class="sidebar_header">
+        <span id="sidebar_title" data-ctrl-type="label" data-type="label" data-name="播放列表标题" class="sidebar_title">播放列表</span>
+        <span id="sidebar_count" data-ctrl-type="label" data-type="label" data-name="歌曲数量" class="sidebar_count" style="display:block;">8 首</span>
       </div>
 
-      <div id="playlist_1" data-ctrl-type="listBox" data-drag-type="listBox" data-type="listBox" data-name="播放列表"
-           data-listBox-items='[{"id":"1","text":"晴天","selected":true},{"id":"2","text":"夜曲","selected":false},{"id":"3","text":"稻香","selected":false},{"id":"4","text":"七里香","selected":false},{"id":"5","text":"青花瓷","selected":false},{"id":"6","text":"简单爱","selected":false},{"id":"7","text":"东风破","selected":false},{"id":"8","text":"发如雪","selected":false}]'
-           data-editable="false" data-always-show-selection="true"
-           style="flex:1;overflow:hidden;display:flex;flex-direction:column;">
+      <!-- ListBox 控件 -->
+      <div id="playlist" data-ctrl-type="listBox" data-drag-type="listBox" data-type="listBox" data-name="播放列表"
+           data-listBox-items='[{"id":"song_1","text":"晴天 — 周杰伦","selected":true},{"id":"song_2","text":"七里香 — 周杰伦","selected":false},{"id":"song_3","text":"夜曲 — 周杰伦","selected":false},{"id":"song_4","text":"稻香 — 周杰伦","selected":false},{"id":"song_5","text":"起风了 — 买辣椒也用券","selected":false},{"id":"song_6","text":"平凡之路 — 朴树","selected":false},{"id":"song_7","text":"十年 — 陈奕迅","selected":false},{"id":"song_8","text":"青花瓷 — 周杰伦","selected":false}]'
+           data-editable="false" data-always-show-selection="false"
+           style="flex:1;overflow:hidden;border-radius:0;">
         <div class="listBox_scroll" style="flex:1;overflow-y:auto;">
-          <div class="listBox_item active" data-ctrl-type="listBox_item" data-item-index="0"
-               style="display:flex;align-items:center;height:40px;padding:0 16px;cursor:pointer;">
-            <span class="listBox_item_icon" style="margin-right:10px;font-size:14px;width:20px;text-align:center;flex-shrink:0;">
-              <i class="fas fa-play" style="color:#0078D4;font-size:10px;"></i>
-            </span>
-            <span class="listBox_item_text" style="flex:1;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">晴天</span>
-            <span class="listBox_item_artist" style="font-size:11px;opacity:0.5;margin-left:8px;flex-shrink:0;">周杰伦</span>
+
+          <!-- 歌曲列表项（由 JS 动态生成，此处为静态占位） -->
+          <div class="listBox_item active" data-ctrl-type="listBox_item" data-item-index="0" onclick="selectSong(0)">
+            <span class="listBox_item_index">01</span>
+            <div class="listBox_item_info">
+              <span class="listBox_item_text listBox_item_title">晴天</span>
+              <span class="listBox_item_artist">周杰伦</span>
+            </div>
+            <span class="listBox_item_duration">04:29</span>
           </div>
-          <div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="1"
-               style="display:flex;align-items:center;height:40px;padding:0 16px;cursor:pointer;">
-            <span class="listBox_item_icon" style="margin-right:10px;font-size:14px;width:20px;text-align:center;flex-shrink:0;">
-              <i class="fas fa-music" style="font-size:12px;"></i>
-            </span>
-            <span class="listBox_item_text" style="flex:1;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">夜曲</span>
-            <span class="listBox_item_artist" style="font-size:11px;opacity:0.5;margin-left:8px;flex-shrink:0;">周杰伦</span>
+          <div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="1" onclick="selectSong(1)">
+            <span class="listBox_item_index">02</span>
+            <div class="listBox_item_info">
+              <span class="listBox_item_text listBox_item_title">七里香</span>
+              <span class="listBox_item_artist">周杰伦</span>
+            </div>
+            <span class="listBox_item_duration">04:57</span>
           </div>
-          <div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="2"
-               style="display:flex;align-items:center;height:40px;padding:0 16px;cursor:pointer;">
-            <span class="listBox_item_icon" style="margin-right:10px;font-size:14px;width:20px;text-align:center;flex-shrink:0;">
-              <i class="fas fa-music" style="font-size:12px;"></i>
-            </span>
-            <span class="listBox_item_text" style="flex:1;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">稻香</span>
-            <span class="listBox_item_artist" style="font-size:11px;opacity:0.5;margin-left:8px;flex-shrink:0;">周杰伦</span>
+          <div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="2" onclick="selectSong(2)">
+            <span class="listBox_item_index">03</span>
+            <div class="listBox_item_info">
+              <span class="listBox_item_text listBox_item_title">夜曲</span>
+              <span class="listBox_item_artist">周杰伦</span>
+            </div>
+            <span class="listBox_item_duration">03:46</span>
           </div>
-          <div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="3"
-               style="display:flex;align-items:center;height:40px;padding:0 16px;cursor:pointer;">
-            <span class="listBox_item_icon" style="margin-right:10px;font-size:14px;width:20px;text-align:center;flex-shrink:0;">
-              <i class="fas fa-music" style="font-size:12px;"></i>
-            </span>
-            <span class="listBox_item_text" style="flex:1;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">七里香</span>
-            <span class="listBox_item_artist" style="font-size:11px;opacity:0.5;margin-left:8px;flex-shrink:0;">周杰伦</span>
+          <div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="3" onclick="selectSong(3)">
+            <span class="listBox_item_index">04</span>
+            <div class="listBox_item_info">
+              <span class="listBox_item_text listBox_item_title">稻香</span>
+              <span class="listBox_item_artist">周杰伦</span>
+            </div>
+            <span class="listBox_item_duration">03:43</span>
           </div>
-          <div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="4"
-               style="display:flex;align-items:center;height:40px;padding:0 16px;cursor:pointer;">
-            <span class="listBox_item_icon" style="margin-right:10px;font-size:14px;width:20px;text-align:center;flex-shrink:0;">
-              <i class="fas fa-music" style="font-size:12px;"></i>
-            </span>
-            <span class="listBox_item_text" style="flex:1;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">青花瓷</span>
-            <span class="listBox_item_artist" style="font-size:11px;opacity:0.5;margin-left:8px;flex-shrink:0;">周杰伦</span>
+          <div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="4" onclick="selectSong(4)">
+            <span class="listBox_item_index">05</span>
+            <div class="listBox_item_info">
+              <span class="listBox_item_text listBox_item_title">起风了</span>
+              <span class="listBox_item_artist">买辣椒也用券</span>
+            </div>
+            <span class="listBox_item_duration">05:13</span>
           </div>
-          <div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="5"
-               style="display:flex;align-items:center;height:40px;padding:0 16px;cursor:pointer;">
-            <span class="listBox_item_icon" style="margin-right:10px;font-size:14px;width:20px;text-align:center;flex-shrink:0;">
-              <i class="fas fa-music" style="font-size:12px;"></i>
-            </span>
-            <span class="listBox_item_text" style="flex:1;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">简单爱</span>
-            <span class="listBox_item_artist" style="font-size:11px;opacity:0.5;margin-left:8px;flex-shrink:0;">周杰伦</span>
+          <div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="5" onclick="selectSong(5)">
+            <span class="listBox_item_index">06</span>
+            <div class="listBox_item_info">
+              <span class="listBox_item_text listBox_item_title">平凡之路</span>
+              <span class="listBox_item_artist">朴树</span>
+            </div>
+            <span class="listBox_item_duration">05:02</span>
           </div>
-          <div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="6"
-               style="display:flex;align-items:center;height:40px;padding:0 16px;cursor:pointer;">
-            <span class="listBox_item_icon" style="margin-right:10px;font-size:14px;width:20px;text-align:center;flex-shrink:0;">
-              <i class="fas fa-music" style="font-size:12px;"></i>
-            </span>
-            <span class="listBox_item_text" style="flex:1;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">东风破</span>
-            <span class="listBox_item_artist" style="font-size:11px;opacity:0.5;margin-left:8px;flex-shrink:0;">周杰伦</span>
+          <div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="6" onclick="selectSong(6)">
+            <span class="listBox_item_index">07</span>
+            <div class="listBox_item_info">
+              <span class="listBox_item_text listBox_item_title">十年</span>
+              <span class="listBox_item_artist">陈奕迅</span>
+            </div>
+            <span class="listBox_item_duration">03:25</span>
           </div>
-          <div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="7"
-               style="display:flex;align-items:center;height:40px;padding:0 16px;cursor:pointer;">
-            <span class="listBox_item_icon" style="margin-right:10px;font-size:14px;width:20px;text-align:center;flex-shrink:0;">
-              <i class="fas fa-music" style="font-size:12px;"></i>
-            </span>
-            <span class="listBox_item_text" style="flex:1;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">发如雪</span>
-            <span class="listBox_item_artist" style="font-size:11px;opacity:0.5;margin-left:8px;flex-shrink:0;">周杰伦</span>
+          <div class="listBox_item" data-ctrl-type="listBox_item" data-item-index="7" onclick="selectSong(7)">
+            <span class="listBox_item_index">08</span>
+            <div class="listBox_item_info">
+              <span class="listBox_item_text listBox_item_title">青花瓷</span>
+              <span class="listBox_item_artist">周杰伦</span>
+            </div>
+            <span class="listBox_item_duration">03:57</span>
           </div>
+
         </div>
       </div>
     </div>
 
-    <!-- ===== 右侧：播放主界面 ===== -->
-    <div class="content" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;padding:20px;">
+    <!-- ★ 右侧：播放控制区 -->
+    <div class="player-area">
 
-      <!-- 专辑封面 -->
-      <div id="album_art" data-ctrl-type="imageBox" data-drag-type="imageBox" data-type="imageBox" data-name="专辑封面"
-           class="imageBox"
-           style="width:200px;height:200px;border-radius:12px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.15);margin-bottom:24px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);flex-shrink:0;">
-        <i class="fas fa-compact-disc" style="font-size:72px;color:rgba(255,255,255,0.5);"></i>
-      </div>
-
-      <!-- 歌曲信息（纯展示 label，不加 data-drag-type） -->
-      <div class="song-info" style="text-align:center;margin-bottom:20px;">
-        <span id="song_name" data-ctrl-type="label" data-name="歌曲名"
-              class="song-title" style="font-size:20px;font-weight:700;display:block;margin-bottom:4px;">晴天</span>
-        <span id="song_artist" data-ctrl-type="label" data-name="歌手"
-              class="song-artist" style="font-size:14px;display:block;">周杰伦</span>
-      </div>
-
-      <!-- 进度条 -->
-      <div class="progress-area" style="width:100%;max-width:480px;display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-        <span class="progress-time" style="font-size:11px;min-width:36px;">1:24</span>
-        <div id="progress_1" data-ctrl-type="progressBar" data-drag-type="progressBar" data-type="progressBar" data-name="播放进度"
-             data-editable="true" class="progressBar_container"
-             style="flex:1;height:6px;position:relative;overflow:visible;border-radius:6px;">
-          <div class="progressBar_track" style="width:100%;height:100%;background:#E0E0E0;border-radius:inherit;"></div>
-          <div class="progressBar_fill" style="position:absolute;top:0;left:0;width:32%;height:100%;background:#0078D4;border-radius:inherit;"></div>
-          <span class="progressBar_text" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:10px;color:#fff;display:none;">32%</span>
+      <!-- 专辑封面（imageBox） -->
+      <div class="cover-wrapper">
+        <div id="album_cover" data-ctrl-type="imageBox" data-drag-type="imageBox" data-type="imageBox" data-name="专辑封面"
+             class="album-cover" style="width:100%;height:100%;">
+          <i class="fas fa-compact-disc"></i>
         </div>
-        <span class="progress-time" style="font-size:11px;min-width:36px;text-align:right;">4:23</span>
       </div>
 
-      <!-- 播放控制按钮 -->
-      <div class="play-controls" style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
-        <button id="btn_shuffle" data-ctrl-type="button" data-drag-type="button" data-type="button" data-name="随机播放"
-                class="ctrl-btn" style="color:inherit;font-size:inherit;font-family:inherit;width:40px;height:40px;border:none;background:transparent;cursor:pointer;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;">
-          <i class="fas fa-random" style="color:inherit;font-size:inherit;"></i>
-        </button>
-        <button id="btn_prev" data-ctrl-type="button" data-drag-type="button" data-type="button" data-name="上一首"
-                class="ctrl-btn" style="color:inherit;font-size:inherit;font-family:inherit;width:40px;height:40px;border:none;background:transparent;cursor:pointer;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;">
-          <i class="fas fa-step-backward" style="color:inherit;font-size:inherit;"></i>
-        </button>
-        <button id="btn_play" data-ctrl-type="button" data-drag-type="button" data-type="button" data-name="播放"
-                class="ctrl-btn play-btn" style="color:inherit;font-size:inherit;font-family:inherit;width:52px;height:52px;border:none;cursor:pointer;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;background:#0078D4;">
-          <i class="fas fa-play" style="color:#fff;font-size:inherit;"></i>
-        </button>
-        <button id="btn_next" data-ctrl-type="button" data-drag-type="button" data-type="button" data-name="下一首"
-                class="ctrl-btn" style="color:inherit;font-size:inherit;font-family:inherit;width:40px;height:40px;border:none;background:transparent;cursor:pointer;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;">
-          <i class="fas fa-step-forward" style="color:inherit;font-size:inherit;"></i>
-        </button>
-        <button id="btn_repeat" data-ctrl-type="button" data-drag-type="button" data-type="button" data-name="循环播放"
-                class="ctrl-btn" style="color:inherit;font-size:inherit;font-family:inherit;width:40px;height:40px;border:none;background:transparent;cursor:pointer;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;">
-          <i class="fas fa-redo" style="color:inherit;font-size:inherit;"></i>
-        </button>
+      <!-- 歌曲名 -->
+      <div class="song-info">
+        <span id="song_name" data-ctrl-type="label" data-type="label" data-name="歌曲名" class="song-name">晴天</span>
+        <span id="song_artist" data-ctrl-type="label" data-type="label" data-name="歌手名" class="song-artist">周杰伦</span>
       </div>
 
-      <!-- 底部控件：收藏 + 音量 -->
-      <div class="bottom-controls" style="display:flex;align-items:center;gap:16px;">
-        <button id="btn_like" data-ctrl-type="button" data-drag-type="button" data-type="button" data-name="收藏"
-                style="color:inherit;font-size:inherit;font-family:inherit;width:36px;height:36px;border:none;background:transparent;cursor:pointer;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;">
-          <i class="far fa-heart" style="color:inherit;font-size:inherit;"></i>
-        </button>
-        <div class="extra-controls" style="display:flex;align-items:center;gap:8px;">
-          <i class="fas fa-volume-up" style="font-size:14px;width:16px;color:inherit;"></i>
-          <div id="volume_bar" data-ctrl-type="progressBar" data-drag-type="progressBar" data-type="progressBar" data-name="音量"
+      <!-- 播放进度条（progressBar, editable） -->
+      <div class="progress-row">
+        <span id="time_current" data-ctrl-type="label" data-type="label" data-name="当前时间" class="progress-time">00:00</span>
+        <div class="progress-bar-wrap">
+          <div id="play_progress" data-ctrl-type="progressBar" data-drag-type="progressBar" data-type="progressBar" data-name="播放进度"
                data-editable="true" class="progressBar_container"
-               style="width:100px;height:4px;position:relative;overflow:visible;border-radius:4px;">
-            <div class="progressBar_track" style="width:100%;height:100%;background:#E0E0E0;border-radius:inherit;"></div>
-            <div class="progressBar_fill" style="position:absolute;top:0;left:0;width:70%;height:100%;background:#0078D4;border-radius:inherit;"></div>
-            <span class="progressBar_text" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:10px;color:#fff;display:none;">70%</span>
+               style="width:100%;height:6px;position:relative;overflow:visible;border-radius:3px;"
+               onclick="seekProgress(event)">
+            <div class="progressBar_track" style="width:100%;height:100%;background:var(--bg-progress-track);border-radius:inherit;"></div>
+            <div class="progressBar_fill" id="play_fill" style="position:absolute;top:0;left:0;width:0%;height:100%;background:var(--bg-progress-fill);border-radius:inherit;"></div>
+            <div class="progressBar_thumb" id="play_thumb" style="position:absolute;top:50%;left:0%;width:14px;height:14px;background:var(--bg-progress-fill);border-radius:50%;transform:translate(-50%,-50%);display:none;box-shadow:0 1px 3px rgba(0,0,0,0.2);"></div>
+            <span class="progressBar_text" style="display:none;"></span>
           </div>
         </div>
+        <span id="time_total" data-ctrl-type="label" data-type="label" data-name="总时长" class="progress-time">04:29</span>
+      </div>
+
+      <!-- 控制按钮组 -->
+      <div class="control-buttons">
+        <!-- 上一曲 -->
+        <button id="btn_prev" data-ctrl-type="iconButton" data-drag-type="iconButton" data-type="iconButton" data-name="上一曲"
+                class="ctrl-btn" onclick="prevSong()">
+          <i class="fas fa-step-backward"></i>
+        </button>
+        <!-- 播放/暂停 -->
+        <button id="btn_play" data-ctrl-type="iconButton" data-drag-type="iconButton" data-type="iconButton" data-name="播放暂停"
+                class="ctrl-btn play-btn" onclick="togglePlay()">
+          <i class="fas fa-play" id="play_icon"></i>
+        </button>
+        <!-- 下一曲 -->
+        <button id="btn_next" data-ctrl-type="iconButton" data-drag-type="iconButton" data-type="iconButton" data-name="下一曲"
+                class="ctrl-btn" onclick="nextSong()">
+          <i class="fas fa-step-forward"></i>
+        </button>
+      </div>
+
+      <!-- 播放模式切换 -->
+      <div class="mode-buttons">
+        <button id="mode_loop" data-ctrl-type="button" data-drag-type="button" data-type="button" data-name="列表循环"
+                class="mode-btn active" onclick="setPlayMode(0)" title="列表循环">
+          <i class="fas fa-repeat"></i>
+        </button>
+        <button id="mode_single" data-ctrl-type="button" data-drag-type="button" data-type="button" data-name="单曲循环"
+                class="mode-btn" onclick="setPlayMode(1)" title="单曲循环">
+          <i class="fas fa-repeat"></i><span class="mode-single-mark">1</span>
+        </button>
+        <button id="mode_shuffle" data-ctrl-type="button" data-drag-type="button" data-type="button" data-name="随机播放"
+                class="mode-btn" onclick="setPlayMode(2)" title="随机播放">
+          <i class="fas fa-shuffle"></i>
+        </button>
+      </div>
+
+      <!-- 音量控制 -->
+      <div class="volume-row">
+        <!-- 静音按钮 -->
+        <button id="btn_mute" data-ctrl-type="iconButton" data-drag-type="iconButton" data-type="iconButton" data-name="静音"
+                class="volume-btn" onclick="toggleMute()">
+          <i class="fas fa-volume-high" id="mute_icon"></i>
+        </button>
+        <!-- 音量滑块（progressBar, editable） -->
+        <div class="volume-bar-wrap">
+          <div id="volume_bar" data-ctrl-type="progressBar" data-drag-type="progressBar" data-type="progressBar" data-name="音量"
+               data-editable="true" class="progressBar_container"
+               style="width:100%;height:4px;position:relative;overflow:visible;border-radius:2px;"
+               onclick="setVolume(event)">
+            <div class="progressBar_track" style="width:100%;height:100%;background:var(--bg-progress-track);border-radius:inherit;"></div>
+            <div class="progressBar_fill" id="volume_fill" style="position:absolute;top:0;left:0;width:80%;height:100%;background:var(--bg-progress-fill);border-radius:inherit;"></div>
+            <span class="progressBar_text" style="display:none;"></span>
+          </div>
+        </div>
+        <span id="volume_label" data-ctrl-type="label" data-type="label" data-name="音量数值" class="volume-percent">80</span>
       </div>
 
     </div>
   </div>
 
+  <!-- ★ 底部状态栏 -->
+  <div class="statusbar">
+    <div class="statusbar_left">
+      <span class="status-dot"></span>
+      <span id="status_text" data-ctrl-type="label" data-type="label" data-name="状态文字" class="status-text">正在播放</span>
+    </div>
+    <div class="statusbar_right">
+      <span id="status_time" data-ctrl-type="label" data-type="label" data-name="已播放时间" class="status-text">00:00 / 04:29</span>
+    </div>
+  </div>
+
 </div>
+
 <script src="webviewBridge.js"></script>
+<script>
+/* ===== 播放器数据 ===== */
+const playlist = [
+  { title:'晴天', artist:'周杰伦', duration:269, color:'#FF9A56' },
+  { title:'七里香', artist:'周杰伦', duration:297, color:'#6EC6FF' },
+  { title:'夜曲', artist:'周杰伦', duration:226, color:'#C084FC' },
+  { title:'稻香', artist:'周杰伦', duration:223, color:'#FBBF24' },
+  { title:'起风了', artist:'买辣椒也用券', duration:313, color:'#34D399' },
+  { title:'平凡之路', artist:'朴树', duration:302, color:'#FB7185' },
+  { title:'十年', artist:'陈奕迅', duration:205, color:'#A78BFA' },
+  { title:'青花瓷', artist:'周杰伦', duration:237, color:'#38BDF8' }
+];
+
+let currentIndex = 0;
+let isPlaying = false;
+let isMuted = false;
+let volume = 80;
+let prevVolume = 80;
+let playMode = 0; /* 0=列表循环, 1=单曲循环, 2=随机 */
+let currentTime = 0;
+let playTimer = null;
+
+/* ===== 主题切换 ===== */
+function toggleTheme(){
+  const isDark = document.documentElement.classList.contains('dark-theme');
+  const icon = document.getElementById('theme_icon');
+  if(isDark){
+    document.documentElement.classList.remove('dark-theme');
+    icon.className = 'fas fa-moon';
+  }else{
+    document.documentElement.classList.add('dark-theme');
+    icon.className = 'fas fa-sun';
+  }
+}
+
+/* ===== 格式化时间 ===== */
+function formatTime(seconds){
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+}
+
+/* ===== 选择歌曲 ===== */
+function selectSong(index){
+  if(index === currentIndex && isPlaying) return;
+  currentIndex = index;
+  currentTime = 0;
+  loadSong();
+  play();
+}
+
+/* ===== 加载歌曲信息 ===== */
+function loadSong(){
+  const song = playlist[currentIndex];
+  document.getElementById('song_name').textContent = song.title;
+  document.getElementById('song_artist').textContent = song.artist;
+  document.getElementById('time_total').textContent = formatTime(song.duration);
+  document.getElementById('time_current').textContent = '00:00';
+  document.getElementById('status_time').textContent = '00:00 / ' + formatTime(song.duration);
+
+  /* 更新封面背景色 */
+  const cover = document.getElementById('album_cover');
+  cover.style.background = 'linear-gradient(135deg,' + song.color + ',#8B5CF6)';
+
+  /* 更新列表选中态 */
+  document.querySelectorAll('.listBox_item').forEach(function(el,i){
+    el.classList.toggle('active', i === index);
+  });
+
+  /* 重置进度 */
+  updateProgress(0);
+}
+
+/* ===== 播放 ===== */
+function play(){
+  isPlaying = true;
+  document.getElementById('play_icon').className = 'fas fa-pause';
+  document.getElementById('status_text').textContent = '正在播放';
+  startTimer();
+}
+
+/* ===== 暂停 ===== */
+function pause(){
+  isPlaying = false;
+  document.getElementById('play_icon').className = 'fas fa-play';
+  document.getElementById('status_text').textContent = '已暂停';
+  stopTimer();
+}
+
+/* ===== 播放/暂停切换 ===== */
+function togglePlay(){
+  if(isPlaying){ pause(); }else{ play(); }
+}
+
+/* ===== 上一曲 ===== */
+function prevSong(){
+  stopTimer();
+  currentIndex = currentIndex > 0 ? currentIndex - 1 : playlist.length - 1;
+  currentTime = 0;
+  loadSong();
+  play();
+}
+
+/* ===== 下一曲 ===== */
+function nextSong(){
+  stopTimer();
+  if(playMode === 2){
+    /* 随机播放 */
+    let next;
+    do{ next = Math.floor(Math.random() * playlist.length); }
+    while(next === currentIndex && playlist.length > 1);
+    currentIndex = next;
+  }else{
+    currentIndex = currentIndex < playlist.length - 1 ? currentIndex + 1 : 0;
+  }
+  currentTime = 0;
+  loadSong();
+  play();
+}
+
+/* ===== 进度更新 ===== */
+function updateProgress(percent){
+  const fill = document.getElementById('play_fill');
+  const thumb = document.getElementById('play_thumb');
+  fill.style.width = percent + '%';
+  thumb.style.left = percent + '%';
+  document.getElementById('time_current').textContent = formatTime(currentTime);
+  document.getElementById('status_time').textContent = formatTime(currentTime) + ' / ' + formatTime(playlist[currentIndex].duration);
+}
+
+/* ===== 开始计时 ===== */
+function startTimer(){
+  stopTimer();
+  playTimer = setInterval(function(){
+    const song = playlist[currentIndex];
+    currentTime += 0.2;
+    if(currentTime >= song.duration){
+      currentTime = 0;
+      if(playMode === 1){
+        /* 单曲循环：从头播 */
+        updateProgress(0);
+        currentTime = 0;
+      }else{
+        /* 列表循环或随机：下一曲 */
+        stopTimer();
+        if(playMode === 2){
+          let next;
+          do{ next = Math.floor(Math.random() * playlist.length); }
+          while(next === currentIndex && playlist.length > 1);
+          currentIndex = next;
+        }else{
+          currentIndex = currentIndex < playlist.length - 1 ? currentIndex + 1 : 0;
+        }
+        currentTime = 0;
+        loadSong();
+        play();
+        return;
+      }
+    }
+    const percent = (currentTime / song.duration) * 100;
+    updateProgress(percent);
+  }, 200);
+}
+
+/* ===== 停止计时 ===== */
+function stopTimer(){
+  if(playTimer){ clearInterval(playTimer); playTimer = null; }
+}
+
+/* ===== 点击进度条跳转 ===== */
+function seekProgress(event){
+  const bar = event.currentTarget;
+  const rect = bar.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const percent = Math.max(0, Math.min(100, (x / rect.width) * 100));
+  const song = playlist[currentIndex];
+  currentTime = (percent / 100) * song.duration;
+  updateProgress(percent);
+}
+
+/* ===== 播放模式切换 ===== */
+function setPlayMode(mode){
+  playMode = mode;
+  document.getElementById('mode_loop').classList.toggle('active', mode === 0);
+  document.getElementById('mode_single').classList.toggle('active', mode === 1);
+  document.getElementById('mode_shuffle').classList.toggle('active', mode === 2);
+}
+
+/* ===== 音量设置 ===== */
+function setVolume(event){
+  const bar = event.currentTarget;
+  const rect = bar.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const percent = Math.round(Math.max(0, Math.min(100, (x / rect.width) * 100)));
+  applyVolume(percent);
+}
+
+function applyVolume(vol){
+  volume = vol;
+  if(vol > 0){ isMuted = false; prevVolume = vol; }
+  document.getElementById('volume_fill').style.width = vol + '%';
+  document.getElementById('volume_label').textContent = vol;
+  updateMuteIcon();
+}
+
+/* ===== 静音切换 ===== */
+function toggleMute(){
+  if(isMuted){
+    isMuted = false;
+    applyVolume(prevVolume > 0 ? prevVolume : 80);
+  }else{
+    isMuted = true;
+    prevVolume = volume;
+    volume = 0;
+    document.getElementById('volume_fill').style.width = '0%';
+    document.getElementById('volume_label').textContent = '0';
+  }
+  updateMuteIcon();
+}
+
+/* ===== 更新静音图标 ===== */
+function updateMuteIcon(){
+  const icon = document.getElementById('mute_icon');
+  if(volume === 0 || isMuted){
+    icon.className = 'fas fa-volume-xmark';
+  }else if(volume < 50){
+    icon.className = 'fas fa-volume-low';
+  }else{
+    icon.className = 'fas fa-volume-high';
+  }
+}
+
+/* ===== 初始化 ===== */
+(function init(){
+  loadSong();
+  updateProgress(0);
+  updateMuteIcon();
+})();
+</script>
 </body>
 </html>

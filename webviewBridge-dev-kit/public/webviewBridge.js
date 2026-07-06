@@ -1,7 +1,7 @@
 /**
  * webviewBridge.js — WebView2 运行时桥接脚本
  * 负责监控所有控件事件并与 WebView2 宿主通信
- * 纯原生 JavaScript，不依赖任何第三方库
+ * 独立于 UI 设计器，纯原生 JavaScript，不依赖任何第三方库
  */
 (function() {
   'use strict';
