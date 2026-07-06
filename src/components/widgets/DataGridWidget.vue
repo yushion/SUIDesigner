@@ -110,7 +110,7 @@ const containerStyle = computed(() => {
     ...base,
     color: s.color || undefined,
     fontFamily: s.fontFamily || undefined,
-    '--grid-header-bg': s.gridHeaderBg || '#f0f0f0',
+    '--grid-header-bg': s.gridHeaderBg || s.headerBg || '#f0f0f0',
     '--grid-header-border-bottom': s.gridHeaderBorderBottom || '1px solid #d9d9d9',
     '--grid-header-cell-border-right': s.gridHeaderCellBorderRight || '1px solid #d9d9d9',
     '--grid-row-border-bottom': s.gridRowBorderBottom || '1px solid #e8e8e8',

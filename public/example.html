@@ -732,7 +732,7 @@ body { display:flex }
   width: 100%;
   height: 100%;
   background-color: transparent;
-  border: 1px solid #D6D6D6;
+  border: 1px solid rgba(200, 200, 200, 1);
   border-radius: 8px;
   app-region: drag;-webkit-app-region: drag;
   
@@ -740,15 +740,13 @@ body { display:flex }
 }
 
 /* === 画布自定义样式 === */
-/* ===== 画布自定义样式 ===== */
-
-/* 页面容器（border/border-radius 由画布配置动态生成，此处不写死） */
 .pageContainer {
   position: relative;
   overflow: hidden;
   --canvas-bg-color: #ffffff;
   --canvas-opacity: 1;
 }
+
 .pageContainer::before {
   content: '';
   position: absolute;
@@ -760,13 +758,11 @@ body { display:flex }
   border-radius: inherit;
 }
 
-/* 毛玻璃效果 */
 .pageContainer.glass-effect {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
 
-/* 标题栏容器 */
 .titlebar {
   position: absolute;
   top: 0;
@@ -781,6 +777,7 @@ body { display:flex }
   z-index: 10;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
+
 .titlebar .titlebar_left {
   width: 40px;
   display: flex;
@@ -789,12 +786,14 @@ body { display:flex }
   flex-shrink: 0;
   margin-left: 2px;
 }
+
 .titlebar .titlebar_center {
   flex: 1;
   display: flex;
   align-items: center;
   min-width: 0;
 }
+
 .titlebar .titlebar_right {
   display: flex;
   align-items: center;
@@ -802,6 +801,7 @@ body { display:flex }
   padding-right: 4px;
   flex-shrink: 0;
 }
+
 .titlebar .titlebar_left_icon {
   width: 22px;
   height: 22px;
@@ -810,6 +810,7 @@ body { display:flex }
   justify-content: center;
   font-size: 18px;
 }
+
 .titlebar .titlebar_center_title {
   font-size: 13px;
   font-weight: 600;
@@ -817,6 +818,7 @@ body { display:flex }
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
 .titlebar .titlebar_rightBtn {
   width: 35px;
   height: 32px;
@@ -829,23 +831,30 @@ body { display:flex }
   border-radius: 4px;
   flex-shrink: 0;
 }
+
 .titlebar .titlebar_rightBtn:hover { background: rgba(0, 0, 0, 0.06); }
+
 .titlebar .titlebar_rightBtn:active { background: rgba(0, 0, 0, 0.1); }
+
 .titlebar .titlebar_rightBtn_close:hover { background: #e81123; color: #fff; }
+
 .titlebar .titlebar_rightBtn_close:active { background: #bf0a1a; color: #fff; }
 
+.page-container {
+  --canvas-opacity: 0;
+}
 
 /* === 页面容器 CSS 变量（放在 customCSS 之后，确保不被覆盖） === */
 .pageContainer {
-  --canvas-bg-color: #ffffff;
-  --canvas-opacity: 1;
+  --canvas-bg-color: rgba(255, 255, 255, 1);
+  --canvas-opacity: 0;
 }
 
 /* === 控件独立样式（每控件完整 #id { ... }，互不干扰） === */
 /* 按钮_1 - 基础样式 */
 #button_1 {
   position: absolute;
-  left: 19px;
+  left: 26px;
   top: 53px;
   width: 80px;
   height: 30px;
@@ -889,8 +898,8 @@ body { display:flex }
 /* 编辑框_1 - 基础样式 */
 #input_1 {
   position: absolute;
-  left: 109px;
-  top: 56px;
+  left: 124px;
+  top: 52px;
   width: 150px;
   height: 30px;
   z-index: 3;
@@ -936,8 +945,8 @@ body { display:flex }
 /* 选择框_1 - 基础样式 */
 #checkbox_1 {
   position: absolute;
-  left: 275px;
-  top: 60px;
+  left: 309px;
+  top: 56px;
   width: 50px;
   height: 20px;
   z-index: 4;
@@ -983,11 +992,11 @@ body { display:flex }
 /* 开关按钮_1 - 基础样式 */
 #toggle_1 {
   position: absolute;
-  left: 339px;
-  top: 58px;
+  left: 376px;
+  top: 53px;
   width: 50px;
   height: 24px;
-  z-index: 5;
+  z-index: 6;
   box-sizing: border-box;
   background-color: #cccccc;
   display: inline-block;
@@ -1064,11 +1073,11 @@ body { display:flex }
 /* 组合框_1 - 基础样式 */
 #comboBox_1 {
   position: absolute;
-  left: 408px;
-  top: 54px;
+  left: 443px;
+  top: 50px;
   width: 120px;
   height: 28px;
-  z-index: 6;
+  z-index: 7;
   box-sizing: border-box;
   background-color: #ffffff;
   color: #1E1F22;
@@ -1106,11 +1115,11 @@ body { display:flex }
 /* 文本标签_1 - 基础样式 */
 #label_1 {
   position: absolute;
-  left: 543px;
-  top: 59px;
+  left: 586px;
+  top: 54px;
   width: 30px;
   height: 20px;
-  z-index: 7;
+  z-index: 8;
   box-sizing: border-box;
   color: #1E1F22;
   font-size: 13px;
@@ -1123,11 +1132,11 @@ body { display:flex }
 /* 分割线_1 - 基础样式 */
 #divider_1 {
   position: absolute;
-  left: 49px;
-  top: 96px;
+  left: 28px;
+  top: 109px;
   width: 200px;
   height: 1px;
-  z-index: 8;
+  z-index: 9;
   box-sizing: border-box;
   border-color: #D0D0D0;
   background-color: #fff;
@@ -1139,11 +1148,11 @@ body { display:flex }
 /* 超链接_1 - 基础样式 */
 #hyperLink_1 {
   position: absolute;
-  left: 603px;
-  top: 57px;
+  left: 637px;
+  top: 54px;
   width: 45px;
   height: 20px;
-  z-index: 9;
+  z-index: 10;
   box-sizing: border-box;
   color: #0078d4;
   font-size: 13px;
@@ -1170,11 +1179,11 @@ body { display:flex }
 /* 单选框组_1 - 基础样式 */
 #radioGroup_1 {
   position: absolute;
-  left: 664px;
-  top: 52px;
+  left: 691px;
+  top: 45px;
   width: 120px;
   height: 40px;
-  z-index: 10;
+  z-index: 11;
   box-sizing: border-box;
   color: #333333;
   font-size: 14px;
@@ -1225,11 +1234,11 @@ body { display:flex }
 /* 进度条_1 - 基础样式 */
 #progressBar_1 {
   position: absolute;
-  left: 30px;
-  top: 120px;
+  left: 254px;
+  top: 104px;
   width: 250px;
   height: 10px;
-  z-index: 11;
+  z-index: 12;
   box-sizing: border-box;
   font-size: 10px;
   border-radius: 12px;
@@ -1288,11 +1297,11 @@ body { display:flex }
 /* 时间框_1 - 基础样式 */
 #datetimePicker_1 {
   position: absolute;
-  left: 299px;
-  top: 107px;
+  left: 528px;
+  top: 90px;
   width: 140px;
   height: 32px;
-  z-index: 12;
+  z-index: 13;
   box-sizing: border-box;
   background-color: #ffffff;
   color: #333333;
@@ -1323,11 +1332,11 @@ body { display:flex }
 /* 图标按钮_1 - 基础样式 */
 #iconButton_1 {
   position: absolute;
-  left: 477px;
-  top: 106px;
+  left: 680px;
+  top: 93px;
   width: 80px;
   height: 30px;
-  z-index: 13;
+  z-index: 14;
   box-sizing: border-box;
   line-height: 30px;
   background-color: #0078d4;
@@ -1382,11 +1391,11 @@ body { display:flex }
 /* 图片框_1 - 基础样式 */
 #imageBox_1 {
   position: absolute;
-  left: 597px;
-  top: 119px;
+  left: 33px;
+  top: 237px;
   width: 150px;
   height: 150px;
-  z-index: 14;
+  z-index: 15;
   box-sizing: border-box;
   background-color: #f0f0f0;
   overflow: hidden;
@@ -1434,11 +1443,11 @@ body { display:flex }
 /* 文本域_1 - 基础样式 */
 #textarea_1 {
   position: absolute;
-  left: 37px;
-  top: 156px;
+  left: 29px;
+  top: 138px;
   width: 200px;
   height: 80px;
-  z-index: 15;
+  z-index: 16;
   box-sizing: border-box;
   background-color: #ffffff;
   color: #333333;
@@ -1476,11 +1485,11 @@ body { display:flex }
 /* 日志框_1 - 基础样式 */
 #logOutput_1 {
   position: absolute;
-  left: 263px;
-  top: 160px;
+  left: 772px;
+  top: 47px;
   width: 300px;
   height: 150px;
-  z-index: 16;
+  z-index: 17;
   box-sizing: border-box;
   border-color: #dddddd;
   border-width: 1px;
@@ -1515,11 +1524,11 @@ body { display:flex }
 /* 列表框_1 - 基础样式 */
 #listBox_1 {
   position: absolute;
-  left: 785px;
-  top: 55px;
+  left: 23px;
+  top: 421px;
   width: 200px;
   height: 200px;
-  z-index: 17;
+  z-index: 18;
   box-sizing: border-box;
   background-color: #ffffff;
   border-color: #d9d9d9;
@@ -1714,11 +1723,11 @@ body { display:flex }
 /* 树形框_1 - 基础样式 */
 #treeView_1 {
   position: absolute;
-  left: 17px;
-  top: 302px;
+  left: 263px;
+  top: 133px;
   width: 220px;
   height: 280px;
-  z-index: 18;
+  z-index: 19;
   box-sizing: border-box;
   background-color: #ffffff;
   border-color: #d9d9d9;
@@ -1946,11 +1955,11 @@ body { display:flex }
 /* 多项表格_1 - 基础样式 */
 #dataGrid_1 {
   position: absolute;
-  left: 260px;
-  top: 322px;
+  left: 247px;
+  top: 428px;
   width: 400px;
   height: 250px;
-  z-index: 19;
+  z-index: 20;
   box-sizing: border-box;
   background-color: #ffffff;
   color: #333333;
@@ -2118,11 +2127,11 @@ body { display:flex }
 /* 标签页容器_1 - 基础样式 */
 #tabsContainer_1 {
   position: absolute;
-  left: 709px;
-  top: 279px;
+  left: 495px;
+  top: 204px;
   width: 300px;
   height: 200px;
-  z-index: 20;
+  z-index: 21;
   box-sizing: border-box;
   background-color: #ffffff;
   border-color: #d9d9d9;
@@ -2163,6 +2172,7 @@ body { display:flex }
   position: relative;
   white-space: nowrap;
   font-size: inherit;
+  color: inherit;
   flex-shrink: 0;
   border-right: none;
 }
@@ -2218,8 +2228,6 @@ body { display:flex }
 /* 标签页容器_1 - .tabsContainer_headerBar_btn */
 #tabsContainer_1 .tabsContainer_headerBar_btn {
   background-color: #f5f5f5;
-  color: #333333;
-  font-size: 13px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2267,11 +2275,11 @@ body { display:flex }
 /* 卡片框_1 - 基础样式 */
 #cardBox_1 {
   position: absolute;
-  left: 722px;
-  top: 492px;
+  left: 774px;
+  top: 409px;
   width: 260px;
   height: 180px;
-  z-index: 21;
+  z-index: 22;
   box-sizing: border-box;
   background-color: #ffffff;
   border-color: #e0e0e0;
@@ -2458,14 +2466,14 @@ body { display:flex }
 </style>
 </head>
 <body>
-<div class="pageContainer glass-effect" id="pageContainer" data-ctrl-type="pageContainer" data-name="canvas" data-original-width="1065" data-original-height="695">
+<div class="pageContainer glass-effect" id="pageContainer" data-ctrl-type="pageContainer" data-name="canvas" data-original-width="1090" data-original-height="695">
 
-<div class="titlebar" id="titlebar" data-name="标题栏" style="position:absolute;top:0;left:0;right:0;height:40px;background-color:#F8F8F8;opacity:1;border-bottom:1px solid rgba(0,0,0,0.08);app-region: drag;-webkit-app-region: drag;">
+<div class="titlebar" id="titlebar" data-name="标题栏" style="position:absolute;top:0;left:0;right:0;height:40px;background-color:rgba(255, 255, 255, 1);opacity:1;border-bottom:1px solid rgba(0,0,0,0.08);app-region: drag;-webkit-app-region: drag;">
   <div class="titlebar_left"  data-ctrl-type="titlebar_left_icon">
-    <span class="titlebar_left_icon" id="titlebar_left_icon" data-name="图标" style="color:#333333;"><i class="fas fa-star"></i></span>
+    <span class="titlebar_left_icon" id="titlebar_left_icon" data-name="图标" style="color:#1e1e1e;"><i class="fas fa-star"></i></span>
   </div>
   <div class="titlebar_center" style="justify-content:flex-start;">
-    <span class="titlebar_center_title" id="titlebar_title" data-name="标题" data-ctrl-type="titlebar_title" style="color:#333333;font-weight:600">我的应用</span>
+    <span class="titlebar_center_title" id="titlebar_title" data-name="标题" data-ctrl-type="titlebar_title" style="color:#1e1e1e;font-weight:600">我的应用</span>
   </div>
   <div class="titlebar_right">
     <button class="titlebar_rightBtn titlebar_rightBtn_min" id="titlebar_min" data-ctrl-type="titlebar_min" data-name="最小化" style="color:#333333;margin-left: auto;" title="最小化"><svg width="12" height="1" viewBox="0 0 10 1"><rect width="10" height="1" fill="currentColor"/></svg></button><button class="titlebar_rightBtn titlebar_rightBtn_max" id="titlebar_max" data-ctrl-type="titlebar_max" data-name="最大化" style="color:#333333;margin-left: auto;" title="最大化"><span style="width: 18px;height: 18px;display: flex;align-items: center;justify-content: center;"><svg width="12" height="12" viewBox="0 0 10 10" shape-rendering="crispEdges"><rect x="1" y="1" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1" /></svg></span></button>
@@ -2484,7 +2492,7 @@ body { display:flex }
 <a id="hyperLink_1" data-type="hyperLink" data-ctrl-type="hyperLink" data-drag-type="hyperLink" data-ctrl-id="hyperLink_1" data-name="超链接_1" href="javascript:void(0)" data-href="#">超链接</a>
 <div id="radioGroup_1" data-type="radioGroup" data-ctrl-type="radioGroup" data-drag-type="radioGroup" data-ctrl-id="radioGroup_1" data-name="单选框组_1" class="radioGroup_container"><label class="radioGroup_item"><input type="radio" data-ctrl-type="radio" name="单选框组_1" value="选项1" checked />选项1</label><label class="radioGroup_item"><input type="radio" data-ctrl-type="radio" name="单选框组_1" value="选项2" />选项2</label></div>
 <div id="progressBar_1" data-type="progressBar" data-ctrl-type="progressBar" data-drag-type="progressBar" data-ctrl-id="progressBar_1" data-name="进度条_1" data-editable="false" class="progressBar_container" style="overflow:visible;"><div class="progressBar_track"></div><div class="progressBar_fill" style="width:60%;height:100%;background:#0078D4;border-radius:inherit;transition:width 0.15s;"></div><span class="progressBar_text" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:inherit;pointer-events:none;white-space:nowrap;">60%</span></div>
-<input type="datetime-local" id="datetimePicker_1" data-type="datetimePicker" data-ctrl-type="datetimePicker" data-drag-type="datetimePicker" data-ctrl-id="datetimePicker_1" data-name="时间框_1" value="2026-06-24T00:00" />
+<input type="datetime-local" id="datetimePicker_1" data-type="datetimePicker" data-ctrl-type="datetimePicker" data-drag-type="datetimePicker" data-ctrl-id="datetimePicker_1" data-name="时间框_1" value="2026-07-06T00:00" />
 <button id="iconButton_1" data-type="iconButton" data-ctrl-type="iconButton" data-drag-type="iconButton" data-ctrl-id="iconButton_1" data-name="图标按钮_1"><i class="fas fa-star"></i><span>按钮</span></button>
 <div id="imageBox_1" data-type="imageBox" data-ctrl-type="imageBox" data-drag-type="imageBox" data-ctrl-id="imageBox_1" data-name="图片框_1" class="imageBox"></div>
 <textarea id="textarea_1" data-type="textarea" data-ctrl-type="textarea" data-drag-type="textarea" data-ctrl-id="textarea_1" data-name="文本域_1" data-rows='4' placeholder="请输入..." rows="4"></textarea>

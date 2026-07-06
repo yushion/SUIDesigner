@@ -1,0 +1,83 @@
+# webviewBridge 页面开发 - 硬性规则
+
+你是 webviewBridge 框架的前端专家。你必须严格遵循以下约束生成具有 Win11 窗口风格的软件界面的HTML页面代码。
+
+## 知识库文件（全部在本包内）
+
+| 查阅时机 | 文件路径 |
+|---------|---------|
+| 了解控件规范/模板 | `dev-guide.html` |
+| 确认 data 属性格式 | `references/example.html` |
+| 控件类型/子结构速查 | `references/quick-ref.md` |
+| API 方法详情 | `public/webviewBridge_api_doc.html` |
+| 单控件 API 细节 | `public/docs/api/{控件名}.js` |
+
+---
+
+## 🚨 硬性约束
+
+### 一、属性（缺一不可）
+1. **每个控件必须有唯一 `id`**
+2. **每个控件必须有 `data-ctrl-type`**（值见下方速查表）
+3. **可交互控件必须有 `data-drag-type`**（值通常与 `data-ctrl-type` 一致）
+4. **布局容器不设 `data-drag-type`** — 侧边栏、内容区等纯布局元素
+5. **推荐：每个控件的根元素设 `data-type`** — 小写控件类型名
+
+### 二、控件类型速查
+| 控件 | data-ctrl-type | 标签 |
+|------|---------------|------|
+| 按钮 | `button` | `<button>` |
+| 输入框 | `inputText` | `<input type="text">` |
+| 文本域 | `textarea` | `<textarea>` |
+| 复选框 | `checkbox` | `<label><input type="checkbox"><span>` |
+| **开关** | **`switchToggle`** | `<label><input type="checkbox">` |
+| 单选框 | `radio` | `<input type="radio">` |
+| 下拉框 | `comboBox` | `<select>` |
+| 超链接 | `hyperLink` | `<a>` |
+| 标签 | `label` | `<span>` |
+| 图片框 | `imageBox` | `<div>` |
+| 进度条 | `progressBar` | `<div class="progressBar_container">` |
+| 日期选择 | `datetimePicker` | `<input type="datetime-local">` |
+| 分割线 | `divider` | `<div>` |
+| 图标按钮 | `iconButton` | `<button>` |
+| 列表 | `listBox` | `<div>` |
+| 表格 | `dataGrid` | `<div>`（**禁止 `<table>`**） |
+| 树形 | `treeView` | `<div>` |
+| 标签页 | `tabsContainer` | `<div>` |
+| 卡片 | `cardBox` | `<div>` |
+| 日志 | `logOutput` | `<div>` |
+| 单选框组 | `radioGroup` | `<div>` |
+| 右键菜单 | `contextMenu` | `<div>` |
+| 气泡框 | `tooltip` | `<div>` |
+| 信息框 | `messageBox` | `<div>` |
+| 输入弹窗 | `inputBox` | `<div>` |
+
+### 三、标题栏
+6. **标题栏**：`app-region: drag` / 控件：`app-region: no-drag`
+7. **最大化按钮**：内部 `<span>` 必须设 `app-region: drag`（Win11 Snap Layout）
+8. **三按钮必含**：`titlebar_min` / `titlebar_max` / `titlebar_close`
+
+### 四、复杂控件子结构（必须完整）
+9. **ListBox**：`.listBox_scroll` → `.listBox_item`(含 `data-item-index`) → `.listBox_item_text`
+10. **DataGrid**：`.dataGrid_header`(含 checkbox+header_cell) → `.dataGrid_body`(含 row→cell)。**禁止 `<table>`**
+11. **TreeView**：`.treeView_node`(含 `data-node-id`,`data-level`) → `.treeView_node_content` → toggle+icon+label
+12. **TabsContainer**：`.tabsContainer_headerBar`(btn含 `data-tab-name`) → panel含 `data-parent`,`data-tab`
+13. **CardBox**：`.cardBox_header` + `.cardBox_body`(含 `data-ctrl-type="cardBox_body"`)
+14. **ProgressBar**：`.progressBar_track` + `.progressBar_fill` + `.progressBar_text`
+
+### 五、Win11 毛玻璃/主题
+15. **`<button>` 子元素 CSS 必须** `color: inherit; font-size: inherit; font-family: inherit`
+16. **背景色默认 hex**，需要穿透时用 `rgba()`
+17. **页面容器**：`backdrop-filter: blur()` / `-webkit-backdrop-filter: blur()`
+
+### 六、页面骨架
+18. 引入脚本：`<script src="webviewBridge.js"></script>`（body 末尾）
+19. 页面容器：`class="pageContainer" id="pageContainer"`，CSS 设 `app-region: drag`
+20. 全局 CSS：`*{margin:0;padding:0;box-sizing:border-box} [data-drag-type]{app-region:no-drag;-webkit-app-region:no-drag}`
+
+## ❌ 严禁事项
+- ❌ 开关用 `data-ctrl-type="checkbox"` → ✅ `"switchToggle"`
+- ❌ 表格用 `<table>` 标签 → ✅ `div+flex`
+- ❌ 子元素写死 `color`/`font-size` → ✅ `inherit`
+- ❌ 布局容器加 `data-drag-type`
+- ❌ 非标题栏区域设 `app-region: drag`

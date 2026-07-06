@@ -181,6 +181,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useWidgetStore } from '@/stores/widgetStore'
 import { useThemeStore } from '@/stores/themeStore'
+import { getDefaultTheme } from '@/config/themes'
 import { generateCompleteHTML, downloadHTML, previewHTML, downloadRuntimeJS, fetchBridgeContent } from '@/utils/htmlExporter'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import WidgetLibrary from './components/WidgetLibrary.vue'
@@ -270,6 +271,12 @@ function saveToLocalStorage(force: boolean = false) {
       widgets: store.serializeWidgets(),
       messageBoxConfig: { ...store.messageBoxConfig },
       inputBoxConfig: { ...store.inputBoxConfig }
+    }
+    // 空设计不缓存（避免 initTheme 修改画布颜色后产生假缓存）
+    if (data.widgets.length === 0 && isCanvasDefault(data.canvas)) {
+      localStorage.removeItem(cacheKey)
+      lastSavedFingerprint = ''
+      return
     }
     localStorage.setItem(cacheKey, JSON.stringify(data))
     lastSavedFingerprint = fingerprint
@@ -454,17 +461,29 @@ const DEFAULT_CANVAS = {
 
 /**
  * 判断缓存的画布配置是否与默认一致
- * 仅检测 "设计特有" 属性（宽高、颜色、标题），
+ * 仅检测 "设计特有" 属性（宽高、标题）。
+ * backgroundColor / borderColor 受主题影响（theme.global.canvasBackgroundColor 等），
+ * 不作为缓存恢复判断依据，避免空设计反复弹窗。
  * 全局持久化属性（borderWidth/borderRadius/canvasFixedSize/showTitleBar/titleBarAlign）
  * 由 loadGlobalConfigs 统一管理，不在这里触发弹窗。
  */
 function isCanvasDefault(cachedCanvas: Record<string, any>): boolean {
-  const keys: (keyof typeof DEFAULT_CANVAS)[] = ['width', 'height', 'backgroundColor', 'borderColor', 'title']
-  for (const k of keys) {
-    if (cachedCanvas[k] !== DEFAULT_CANVAS[k]) {
-      return false
-    }
-  }
+  const defaultTheme = getDefaultTheme()
+  const themeBg = defaultTheme.global.canvasBackgroundColor
+  const themeBorder = defaultTheme.global.canvasBorderColor
+
+  if (cachedCanvas.width !== DEFAULT_CANVAS.width) return false
+  if (cachedCanvas.height !== DEFAULT_CANVAS.height) return false
+  if (cachedCanvas.title !== DEFAULT_CANVAS.title) return false
+
+  // 背景色：接受原始默认值 或 默认主题值（主题 initTheme 会覆盖）
+  const bg = cachedCanvas.backgroundColor
+  if (bg !== DEFAULT_CANVAS.backgroundColor && bg !== themeBg) return false
+
+  // 边框色：同上
+  const bc = cachedCanvas.borderColor
+  if (bc !== DEFAULT_CANVAS.borderColor && bc !== themeBorder) return false
+
   return true
 }
 
@@ -498,6 +517,7 @@ onMounted(() => {
   }
   cacheLoaded = true
   store.initHistory()
+  themeStore.initTheme()
 })
 
 // 监听历史变化，自动保存到 localStorage（去重）

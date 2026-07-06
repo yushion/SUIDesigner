@@ -1301,6 +1301,11 @@ const VALID_CSS_PROPS = new Set([
     if (!canvas.customCSS) {
       canvas.customCSS = DEFAULT_CANVAS_CSS
     }
+    // 清除缓存的主题背景图（主题始终初始化为默认风格，不持久化主题属性）
+    if (canvas.bodyBackground) {
+      canvas.bodyBackground.enabled = false
+      canvas.bodyBackground.imageUrl = ''
+    }
     widgets.length = 0
     if (state.widgets) {
       state.widgets.forEach((wData: any) => {

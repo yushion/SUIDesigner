@@ -1,4 +1,13 @@
-window.__devGuideHTML = `<div class="section-header">
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>webviewBridge 开发文档</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+</head>
+<body>
+<div class="section-header">
   <h2>🚀 快速开发指南(生成具有 Win11 窗口风格的软件界面)</h2>
   <div class="h2-meta">
     <span class="ctrl-badge">必读</span>
@@ -288,7 +297,7 @@ window.__devGuideHTML = `<div class="section-header">
   </div>
 </div>
 
-<!-- ==================== 3. 复杂控件完整模板（与设计器导出完全一致） ==================== -->
+<!-- ==================== 3. 复杂控件完整模板 ==================== -->
 <div class="dev-step">
   <h3><span class="step-num">3</span> 复杂控件完整模板</h3>
   <p>以下模板严格匹配桥接脚本 <code>webviewBridge.js</code> 的 <strong>完整 DOM 结构</strong>和必需的数据属性。每个控件的类名、层级、data 属性均不可省略或变更。</p>
@@ -1539,4 +1548,7 @@ var config = JSON.parse(webviewBridge.api.tooltip.getConfig('tip1'));</code></pr
   <p>本指南提供了强制属性规范 + 完整模板，确保您的控件能 100% 正确上报数据。</p>
   <p style="margin-top:14px;">请从左侧导航选择控件查看详细 API 文档。</p>
 </div>
-`;
+
+<script>hljs.highlightAll()</script>
+</body>
+</html>

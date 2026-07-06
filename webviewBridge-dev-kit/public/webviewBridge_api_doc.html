@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>webviewBridge API 文档</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+<link rel="stylesheet" href="docs/styles.css">
+</head>
+<body>
+
+<header class="header">
+  <h1>webviewBridge API 文档</h1>
+  <p>WebView2 运行时桥接脚本 — 完整 API 参考手册</p>
+  <div class="stats">
+    <div class="stat-item"><span>命名空间</span><strong>27</strong></div>
+    <div class="stat-item"><span> API 方法</span><strong>220</strong></div>
+    <div class="stat-item"><span>图标映射</span><strong>208</strong></div>
+    <div class="stat-item"><span>命令处理器</span><strong>20</strong></div>
+  </div>
+</header>
+
+<button class="mobile-toggle" onclick="toggleSidebar()" aria-label="菜单">☰</button>
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<div class="container">
+<nav class="sidebar" id="sidebar">
+  <input type="text" class="search-box" placeholder="搜索 API..." oninput="filterNav(this.value)" aria-label="搜索">
+
+  <div class="nav-group">
+    <div class="nav-group-title" onclick="this.classList.toggle('collapsed');this.nextElementSibling.classList.toggle('collapsed')" style="color:#272727">🚀 开发流程</div>
+    <ul class="nav-group-items">
+      <li class="nav-item"><a href="javascript:void(0)" onclick="showSection('dev-guide',this);return false;" style="font-weight:600;color:#e65100">快速开发指南 ⭐</a></li>
+    </ul>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-title" onclick="this.classList.toggle('collapsed');this.nextElementSibling.classList.toggle('collapsed')">📋 通用 API</div>
+    <ul class="nav-group-items">
+      <li class="nav-item"><a href="javascript:void(0)" onclick="showSection('public',this);return false;">通用控件操作<span class="badge">31</span></a></li>
+      <li class="nav-item"><a href="javascript:void(0)" onclick="showSection('icon-helpers',this);return false;">图标辅助<span class="badge">2</span></a></li>
+      <li class="nav-item"><a href="javascript:void(0)" onclick="showSection('messages',this);return false;">消息与通知<span class="badge">6</span></a></li>
+    </ul>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-title" onclick="this.classList.toggle('collapsed');this.nextElementSibling.classList.toggle('collapsed')">🔷 基础控件</div>
+    <ul class="nav-group-items">
+	  <li class="nav-item"><a href="javascript:void(0)" onclick="showSection('canvas',this);return false;">画布操作<span class="badge">3</span></a></li>
+      <li class="nav-item"><a href="javascript:void(0)" onclick="showSection('button',this);return false;">按钮 Button<span class="badge">2</span></a></li>
+      <li class="nav-item"><a href="javascript:void(0)" onclick="showSection('input',this);return false;">输入框 Input<span class="badge">5</span></a></li>
+      <li class="nav-item"><a href="javascript:void(0)" onclick="showSection('textarea',this);return false;">文本域 Textarea<span class="badge">5</span></a></li>
+      <li class="nav-item"><a href="javascript:void(0)" onclick="showSection('checkbox',this);return false;">复选框 CheckBox<span class="badge">4</span></a></li>
+      <li class="nav-item"><a href="javascript:void(0)" onclick="showSection('toggle-ctrl',this);return false;">开关 Toggle<span class="badge">2</span></a></li>
+      <li class="nav-item"><a href="javascript:void(0)" onclick="showSection('comboBox',this);return false;">组合框 ComboBox<span class="badge">9</span></a></li>
+      <li class="nav-item"><a href="javascript:void(0)" onclick="showSection('label',this);return false;">文本标签 Label<span class="badge">2</span></a></li>
+      <li class="nav-item"><a href="javascript:void(0)" onclick="showSection('hyperLink',this);return false;">超链接 Hyperlink<span class="badge">4</span></a></li>
+      <li class="nav-item"><a href="javascript:void(0)" onclick="showSection('radiogroup',this);return false;">单选框 RadioGroup<span class="badge">6</span></a></li>
+    </ul>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-title" onclick="this.classList.toggle('collapsed');this.nextElementSibling.classList.toggle('collapsed')">🔶 进阶控件</div>
+    <ul class="nav-group-items">
+      <li class="nav-item"><a href="#progressbar" onclick="showSection('progressbar',this)">进度条 ProgressBar<span class="badge">7</span></a></li>
+      <li class="nav-item"><a href="#datetimepicker" onclick="showSection('datetimepicker',this)">时间框 DateTimePicker<span class="badge">2</span></a></li>
+      <li class="nav-item"><a href="#iconbutton" onclick="showSection('iconbutton',this)">图标按钮 IconButton<span class="badge">4</span></a></li>
+      <li class="nav-item"><a href="#imagebox" onclick="showSection('imagebox',this)">图片框 ImageBox<span class="badge">4</span></a></li>
+      <li class="nav-item"><a href="#logOutput" onclick="showSection('logOutput',this)">日志框 logOutput<span class="badge">3</span></a></li>
+    </ul>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-title" onclick="this.classList.toggle('collapsed');this.nextElementSibling.classList.toggle('collapsed')">📦 容器控件</div>
+    <ul class="nav-group-items">
+      <li class="nav-item"><a href="javascript:void(0)" onclick="showSection('listBox',this);return false;">列表框 listBox<span class="badge">20</span></a></li>
+      <li class="nav-item"><a href="javascript:void(0)" onclick="showSection('treeView',this);return false;">树形框 TreeView<span class="badge">17</span></a></li>
+      <li class="nav-item"><a href="javascript:void(0)" onclick="showSection('dataGrid',this);return false;">多项表格 DataGrid<span class="badge">26</span></a></li>
+      <li class="nav-item"><a href="javascript:void(0)" onclick="showSection('cardBox',this);return false;">卡片框 CardBox<span class="badge">10</span></a></li>
+      <li class="nav-item"><a href="javascript:void(0)" onclick="showSection('tabcontainer',this);return false;">标签页 TabContainer<span class="badge">7</span></a></li>
+      <li class="nav-item"><a href="javascript:void(0)" onclick="showSection('contextmenu',this);return false;">右键菜单 ContextMenu<span class="badge">5</span></a></li>
+      <li class="nav-item"><a href="javascript:void(0)" onclick="showSection('tooltip',this);return false;">气泡提示框 Tooltip<span class="badge">5</span></a></li>
+      <li class="nav-item"><a href="javascript:void(0)" onclick="showSection('messageBox',this);return false;">信息提示框 MessageBox<span class="badge">4</span></a></li>
+      <li class="nav-item"><a href="javascript:void(0)" onclick="showSection('inputBox',this);return false;">输入对话框 InputBox<span class="badge">4</span></a></li>
+    </ul>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-title" onclick="this.classList.toggle('collapsed');this.nextElementSibling.classList.toggle('collapsed')">🛠 辅助功能</div>
+    <ul class="nav-group-items">
+      <li class="nav-item"><a href="javascript:void(0)" onclick="showSection('commands',this);return false;">命令分发处理<span class="badge">15</span></a></li>
+      <li class="nav-item"><a href="javascript:void(0)" onclick="showSection('iconmap',this);return false;">图标占位符映射表<span class="badge">208</span></a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="main-content" id="mainContent">
+  <div class="section" id="section-dev-guide">
+  </div>
+
+  <div id="sections"></div>
+</main>
+</div>
+
+<script src="docs/data/dev-guide.js"></script>
+<script src="docs/data/icon-map.js"></script>
+<script src="docs/data/commands.js"></script>
+<script src="docs/api/public.js"></script>
+<script src="docs/api/canvas.js"></script>
+<script src="docs/api/icon-helpers.js"></script>
+<script src="docs/api/messages.js"></script>
+<script src="docs/api/button.js"></script>
+<script src="docs/api/input.js"></script>
+<script src="docs/api/textarea.js"></script>
+<script src="docs/api/checkbox.js"></script>
+<script src="docs/api/toggle-ctrl.js"></script>
+<script src="docs/api/comboBox.js"></script>
+<script src="docs/api/label.js"></script>
+<script src="docs/api/hyperLink.js"></script>
+<script src="docs/api/radiogroup.js"></script>
+<script src="docs/api/progressbar.js"></script>
+<script src="docs/api/datetimepicker.js"></script>
+<script src="docs/api/iconbutton.js"></script>
+<script src="docs/api/imagebox.js"></script>
+<script src="docs/api/logOutput.js"></script>
+<script src="docs/api/listBox.js"></script>
+<script src="docs/api/treeView.js"></script>
+<script src="docs/api/dataGrid.js"></script>
+<script src="docs/api/cardBox.js"></script>
+<script src="docs/api/tabcontainer.js"></script>
+<script src="docs/api/contextmenu.js"></script>
+<script src="docs/api/tooltip.js"></script>
+<script src="docs/api/messageBox.js"></script>
+<script src="docs/api/inputBox.js"></script>
+<button id="backToTopBtn" class="back-to-top" onclick="scrollToTop()" title="返回顶部">
+  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="18 15 12 9 6 15"></polyline>
+  </svg>
+</button>
+
+<style>
+.back-to-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  color: #409EFF;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 9999;
+}
+
+.back-to-top:hover {
+  background: #409EFF;
+  color: #ffffff;
+  border-color: #409EFF;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(64, 158, 255, 0.4);
+}
+
+.back-to-top:active {
+  transform: translateY(0);
+}
+
+.back-to-top.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+</style>
+
+<script>
+function scrollToTop() {
+  var scrollStep = -window.scrollY / 20;
+  var scrollInterval = setInterval(function() {
+    if (window.scrollY !== 0) {
+      window.scrollBy(0, scrollStep);
+    } else {
+      clearInterval(scrollInterval);
+    }
+  }, 15);
+}
+
+function toggleBackToTopButton() {
+  var btn = document.getElementById('backToTopBtn');
+  if (!btn) return;
+  if (window.scrollY > 300) {
+    btn.classList.add('show');
+  } else {
+    btn.classList.remove('show');
+  }
+}
+
+window.addEventListener('scroll', toggleBackToTopButton);
+</script>
+
+<script src="docs/data/dev-guide.js"></script>
+<script src="docs/app.js"></script>
+</body>
+</html>

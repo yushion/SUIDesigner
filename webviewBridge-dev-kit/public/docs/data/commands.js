@@ -1,0 +1,22 @@
+window.__commandsData = [
+  {cmd:'setValue',desc:'设置控件值',maps:'targetId → targetId, value → value',ex:'{"command":"setValue","targetId":"input_1","value":"Hello"}'},
+  {cmd:'setChecked',desc:'设置勾选状态',maps:'targetId → targetId, checked → checked',ex:'{"command":"setChecked","targetId":"checkbox_1","checked":true}'},
+  {cmd:'setDisabled',desc:'禁用控件',maps:'targetId → api.setEnabled(targetId, false)',ex:'{"command":"setDisabled","targetId":"button_1"}'},
+  {cmd:'setEnabled',desc:'启用控件',maps:'targetId → api.setEnabled(targetId, true)',ex:'{"command":"setEnabled","targetId":"button_1"}'},
+  {cmd:'show',desc:'显示控件',maps:'targetId → targetId',ex:'{"command":"show","targetId":"panel_1"}'},
+  {cmd:'hide',desc:'隐藏控件',maps:'targetId → targetId',ex:'{"command":"hide","targetId":"panel_1"}'},
+  {cmd:'toggle',desc:'切换可见性',maps:'targetId → targetId',ex:'{"command":"toggle","targetId":"panel_1"}'},
+  {cmd:'focus',desc:'使控件获得焦点',maps:'targetId → targetId',ex:'{"command":"focus","targetId":"input_1"}'},
+  {cmd:'setStyle',desc:'批量设置样式',maps:'targetId, style/css → targetId, 样式对象',ex:'{"command":"setStyle","targetId":"label_1","style":{"color":"red"}}'},
+  {cmd:'setBlockContextMenu',desc:'阻止/允许右键菜单',maps:'block → block',ex:'{"command":"setBlockContextMenu","block":true}'},
+  {cmd:'showNotification',desc:'显示系统通知',maps:'title,text,text2,image,button1,button2 → options对象',ex:'{"command":"showNotification","title":"提示","text":"操作完成"}'},
+  {cmd:'iconParse',desc:'图标占位符转 emoji',maps:'targetId + text → 对元素 innerHTML 调用 parse',ex:'{"command":"iconParse","targetId":"label_1","text":"[OK] 成功"}'},
+  {cmd:'iconToText',desc:'emoji 转图标占位符',maps:'targetId + html → 对元素 innerHTML 调用 toText',ex:'{"command":"iconToText","targetId":"label_1","html":"✅ 成功"}'},
+  {cmd:'showMessageBox',desc:'显示全局信息提示框',maps:'overrides + requestId → api.messageBox.show(overrides, requestId)',ex:'{"command":"showMessageBox","overrides":{"title":"提示","message":"这是一条消息"},"requestId":"req_123"}'},
+  {cmd:'showInputBox',desc:'显示全局输入对话框',maps:'overrides + requestId → api.inputBox.show(overrides, requestId)',ex:'{"command":"showInputBox","overrides":{"title":"输入","prompt":"请输入内容"},"requestId":"req_123"}'},
+  {cmd:'setFixedCanvasSize',desc:'固定/取消固定画布宽高',maps:'isFixed, width, height → api.canvas.setFixedCanvasSize(isFixed, width, height)',ex:'{"command":"setFixedCanvasSize","isFixed":true,"width":800,"height":600}'},
+  {cmd:'getTitleBarTitle',desc:'获取画布标题栏文字',maps:'无参数 → api.canvas.getTitleBarTitle()，同步返回标题文字',ex:'{"command":"getTitleBarTitle"}'},
+  {cmd:'setTitleBarTitle',desc:'设置画布标题栏文字',maps:'title → api.canvas.setTitleBarTitle(title)',ex:'{"command":"setTitleBarTitle","title":"数据监控面板"}'},
+  {cmd:'getIdByName',desc:'通过 data-name 查找元素 id',maps:'dataName → api.getIdByName(dataName)，异步返回 getIdByNameResult',ex:'{"command":"getIdByName","dataName":"按钮_1"}'},
+  {cmd:'getInfoById',desc:'通过 id 获取元素元信息',maps:'id → api.getInfoById(id)，异步返回 getInfoByIdResult',ex:'{"command":"getInfoById","id":"button_1"}'}
+];

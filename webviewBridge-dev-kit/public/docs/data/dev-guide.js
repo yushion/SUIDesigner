@@ -288,7 +288,7 @@ window.__devGuideHTML = `<div class="section-header">
   </div>
 </div>
 
-<!-- ==================== 3. 复杂控件完整模板（与设计器导出完全一致） ==================== -->
+<!-- ==================== 3. 复杂控件完整模板 ==================== -->
 <div class="dev-step">
   <h3><span class="step-num">3</span> 复杂控件完整模板</h3>
   <p>以下模板严格匹配桥接脚本 <code>webviewBridge.js</code> 的 <strong>完整 DOM 结构</strong>和必需的数据属性。每个控件的类名、层级、data 属性均不可省略或变更。</p>

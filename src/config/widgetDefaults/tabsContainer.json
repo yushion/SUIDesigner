@@ -47,11 +47,9 @@
         "border": "none",
         "position": "relative",
         "white-space": "nowrap",
-        "font-size": "13px",
         "flex-shrink": "0",
         "border-right": "1px solid #d9d9d9",
         "background-color": "#f5f5f5",
-        "color": "#333333",
         "font-weight": 500
       },
       ".tabsContainer_headerBar_btn.active": {
@@ -135,6 +133,7 @@
       "position: relative",
       "white-space: nowrap",
       "font-size: inherit",
+      "color: inherit",
       "flex-shrink: 0",
       "border-right: none"
     ],
@@ -175,9 +174,7 @@
     {
       "selector": ".tabsContainer_headerBar_btn",
       "base": {
-        "backgroundColor": "#f5f5f5",
-        "color": "#333333",
-        "fontSize": 13
+        "backgroundColor": "#f5f5f5"
       },
       "pseudo": {
         ":hover": {
