@@ -95,18 +95,27 @@ window.__devGuideHTML = `<div class="section-header">
     <li>标题栏<code>titlebar</code>需设置 <code>app-region:drag;-webkit-app-region:drag;</code> 确保使整个标题栏可拖拽。</li>
     <li>三分布局：左侧图标区 <code>titlebar_left</code> ，中间标题文本区 <code>titlebar_center</code> ，右侧控制按钮区 <code>titlebar_right</code> </li>
     <li>-- 控制按钮区 <code>titlebar_right</code> 三分布局：最小化 <code>titlebar_min</code> ，最大化 <code>titlebar_max</code> ，关闭 <code>titlebar_close</code> </li>
+	  <li>-- 所有标题栏控制按钮都必须设有<code>app-region:no-drag</code>（保证点击响应）。<strong style="color: rgb(240, 0, 0);">为适配下方最大化按钮的Windows 11 贴靠布局，不要用 <code>data-drag-type</code>，改用 CSS 选择器 <code>[data-ctrl-type^="titlebar_"]</code> 控制 no-drag。</strong></li>
     <li>-- 最大化按钮 <code>titlebar_max</code> 实现 Windows 11 贴靠布局（Snap Layout）兼容说明：
       <div class="info-box">
-    在 Windows 11 中，鼠标悬停最大化按钮时会弹出贴靠布局菜单。要触发此功能，<strong>最大化按钮所在的区域必须被系统识别为“标题栏可拖拽区域”</strong>。
+    在 Windows 11 中，鼠标悬停最大化按钮时会弹出贴靠布局菜单。要触发此功能，<strong>最大化按钮所在的区域必须被系统识别为“标题栏可拖拽区域”，因此需在内部添加<code>&lt;span&gt;</code>( 或<code>&lt;div&gt;</code>)。</strong>。
     <ul style="margin:8px 0 0 20px;line-height:1.8;">
-      <li>按钮自身：必须设为<code>app-region:no-drag</code>（保证点击响应），可交互控件的<code>[data-drag-type]</code>已实现。</li>
-      <li>按钮内部的 <code>&lt;span&gt;</code>（或 <code>&lt;div&gt;</code>）：必须设为 <code>app-region:drag</code>，让系统认为该区域属于标题栏，从而激活悬停时的贴靠布局。</li>
-      <li>固定宽高 18px</li>
+      <li>按钮自身：须有<code>app-region:no-drag</code>（保证点击响应），不要用 <code>data-drag-type</code>，改用 CSS 选择器 <code>[data-ctrl-type^="titlebar_"]</code> 控制 no-drag。</li>
+      <li>按钮内部的 <code>&lt;span&gt;</code>( 或<code>&lt;div&gt;</code>)：必须设为 <code>app-region:drag</code>，让系统认为该区域属于标题栏，从而激活悬停时的贴靠布局。</li>
+      <li>按钮内部的 <code>&lt;span&gt;</code>( 或<code>&lt;div&gt;</code>)：固定宽高 = <strong style="color: rgb(240, 0, 0);font-size: 13px;">18px</strong></li>
     </ul>
     <div style="margin-top:8px;padding:8px;background:#f5f5f5;border-radius:4px;font-size:12px;color:#333;">
       <strong>正确示例：</strong><br/>
-      <code>&lt;button id="titlebar_max" data-ctrl-type="titlebar_max" data-drag-type="titlebar_max" title="最大化"&gt;<br/>
-      &nbsp;&nbsp;&lt;span style="width:18px;height:18px;display:flex;align-items:center;justify-content:center;app-region:drag;-webkit-app-region:drag;"&gt;☐&lt;/span&gt;<br/>
+      <code><br/>
+	    &lt;style&gt;<br/>
+      &nbsp;&nbsp;/* 标题栏按钮 no-drag（用 ctrl-type 选，不用 data-drag-type，避免 WebView2 子元素句柄失效） */<br/>
+      &nbsp;&nbsp;.pageContainer [data-ctrl-type^="titlebar_"] { app-region: no-drag; -webkit-app-region: no-drag; }<br/>
+      &nbsp;&nbsp;/* 最大化按钮内部 span — 设回 drag，支持 Windows 11 Snap Layout */<br/>
+      &nbsp;&nbsp;.pageContainer [data-ctrl-type="titlebar_max"] span { app-region: drag; -webkit-app-region: drag; }<br/>
+	    &lt;/style&gt;<br/>
+
+	    &lt;button id="titlebar_max" data-ctrl-type="titlebar_max" title="最大化"&gt;<br/>
+      &nbsp;&nbsp;&lt;span style="width:18px;height:18px;display:flex;align-items:center;justify-content:center;"&gt;☐&lt;/span&gt;<br/>
       &lt;/button&gt;</code><br/>
     </div>
     <p style="margin-top:6px;"><strong>⚠️ 如果缺少此设置</strong>，最大化按钮在 Windows 11 中悬停时将不会弹出贴靠布局菜单，影响用户体验。</p>
@@ -126,17 +135,17 @@ window.__devGuideHTML = `<div class="section-header">
     &lt;span class="titlebar_center_title" id="titlebar_title" data-ctrl-type="titlebar_title" data-drag-type="titlebar_title" data-name="标题" style="color:#333;font-weight:600;"&gt;我的应用&lt;/span&gt;
   &lt;/div&gt;
   &lt;div class="titlebar_right"&gt;
-    &lt;button id="titlebar_min" data-ctrl-type="titlebar_min" data-drag-type="titlebar_min" style="color:#333;" class="titlebar_rightBtn" title="最小化"&gt;
+    &lt;button id="titlebar_min" data-ctrl-type="titlebar_min" style="color:#333;" class="titlebar_rightBtn" title="最小化"&gt;
       &lt;svg width="12" height="1" viewBox="0 0 10 1"&gt;&lt;rect width="10" height="1" fill="currentColor"/&gt;&lt;/svg&gt;
     &lt;/button&gt;
-    &lt;button id="titlebar_max" data-ctrl-type="titlebar_max" data-drag-type="titlebar_max" style="color:#333;" class="titlebar_rightBtn" title="最大化"&gt;
-      &lt;span style="width:18px;height:18px;display:flex;align-items:center;justify-content:center;app-region:drag;-webkit-app-region:drag;"&gt;
+    &lt;button id="titlebar_max" data-ctrl-type="titlebar_max" style="color:#333;" class="titlebar_rightBtn" title="最大化"&gt;
+      &lt;span style="width:18px;height:18px;display:flex;align-items:center;justify-content:center;"&gt;
         &lt;svg width="12" height="12" viewBox="0 0 10 10" shape-rendering="crispEdges"&gt;
           &lt;rect x="1" y="1" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1"/&gt;
         &lt;/svg&gt;
       &lt;/span&gt;
     &lt;/button&gt;
-    &lt;button id="titlebar_close" data-ctrl-type="titlebar_close" data-drag-type="titlebar_close" style="color:#333;" class="titlebar_rightBtn titlebar_rightBtn_close" title="关闭"&gt;
+    &lt;button id="titlebar_close" data-ctrl-type="titlebar_close" style="color:#333;" class="titlebar_rightBtn titlebar_rightBtn_close" title="关闭"&gt;
       &lt;svg width="12" height="12" viewBox="0 0 10 10"&gt;
         &lt;line x1="1" y1="1" x2="9" y2="9" stroke="currentColor" stroke-width="1"/&gt;
         &lt;line x1="9" y1="1" x2="1" y2="9" stroke="currentColor" stroke-width="1"/&gt;
@@ -695,8 +704,10 @@ window.__devGuideHTML = `<div class="section-header">
     /* 可交互控件 — 统一 no-drag，防止拖拽穿透到窗口 */
     [data-drag-type] { app-region: no-drag; -webkit-app-region: no-drag; }
 
+    /* 标题栏按钮 no-drag（用 ctrl-type 选，不用 data-drag-type，避免 WebView2 子元素句柄失效） */
+    .pageContainer [data-ctrl-type^="titlebar_"] { app-region: no-drag; -webkit-app-region: no-drag; }
     /* 最大化按钮内部 span — 设回 drag，支持 Windows 11 Snap Layout */
-    [data-ctrl-type="titlebar_max"] span { app-region: drag; -webkit-app-region: drag; }
+    .pageContainer [data-ctrl-type="titlebar_max"] span { app-region: drag; -webkit-app-region: drag; }
 
     /* ===== 标题栏（与第 1 步规范一致） ===== */
     .titlebar_left { display:flex; align-items:center; padding-left:12px; }
@@ -817,19 +828,19 @@ window.__devGuideHTML = `<div class="section-header">
             data-ctrl-type="titlebar_title" data-drag-type="titlebar_title" data-name="标题" style="color:#333;font-weight:600;"&gt;我的应用&lt;/span&gt;
     &lt;/div&gt;
     &lt;div class="titlebar_right"&gt;
-      &lt;button id="titlebar_min" data-ctrl-type="titlebar_min" data-drag-type="titlebar_min" data-name="最小化"
+      &lt;button id="titlebar_min" data-ctrl-type="titlebar_min" data-name="最小化"
               style="color:#333;" class="titlebar_rightBtn" title="最小化"&gt;
         &lt;svg width="12" height="1" viewBox="0 0 10 1"&gt;&lt;rect width="10" height="1" fill="currentColor"/&gt;&lt;/svg&gt;
       &lt;/button&gt;
-      &lt;button id="titlebar_max" data-ctrl-type="titlebar_max" data-drag-type="titlebar_max" data-name="最大化"
+      &lt;button id="titlebar_max" data-ctrl-type="titlebar_max" data-name="最大化"
               style="color:#333;" class="titlebar_rightBtn" title="最大化"&gt;
-        &lt;span style="width:18px;height:18px;display:flex;align-items:center;justify-content:center;app-region:drag;-webkit-app-region:drag;"&gt;
+        &lt;span style="width:18px;height:18px;display:flex;align-items:center;justify-content:center;"&gt;
           &lt;svg width="12" height="12" viewBox="0 0 10 10" shape-rendering="crispEdges"&gt;
             &lt;rect x="1" y="1" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1"/&gt;
           &lt;/svg&gt;
         &lt;/span&gt;
       &lt;/button&gt;
-      &lt;button id="titlebar_close" data-ctrl-type="titlebar_close" data-drag-type="titlebar_close" data-name="关闭"
+      &lt;button id="titlebar_close" data-ctrl-type="titlebar_close" data-name="关闭"
               style="color:#333;" class="titlebar_rightBtn titlebar_rightBtn_close" title="关闭"&gt;
         &lt;svg width="12" height="12" viewBox="0 0 10 10"&gt;
           &lt;line x1="1" y1="1" x2="9" y2="9" stroke="currentColor" stroke-width="1"/&gt;
@@ -1165,7 +1176,15 @@ var config = JSON.parse(webviewBridge.api.tooltip.getConfig('tip1'));</code></pr
   border: none;
   background: none;
   cursor: pointer;
+}
+/* 必须追加！保护 Font Awesome 图标不受 font-family:inherit 影响 */
+.pageContainer i[class*="fa-"] {
+  font-family: "Font Awesome 6 Free" !important;
+  font-weight: 900;
 }</code></pre>
+  </div>
+  <div class="warn-box">
+    <strong>⚠️ 重要：</strong><code>font-family: inherit</code> 会导致 <code>&lt;i class="fas fa-moon"&gt;</code> 等 Font Awesome 图标消失。必须追加图标保护规则。
   </div>
 
   <h4>规则 3：背景色默认用 hex，需要毛玻璃时用 rgba</h4>
@@ -1248,19 +1267,19 @@ var config = JSON.parse(webviewBridge.api.tooltip.getConfig('tip1'));</code></pr
           data-ctrl-type="titlebar_title" data-drag-type="titlebar_title" data-name="标题" style="color:#333;font-weight:600;"&gt;应用标题&lt;/span&gt;
   &lt;/div&gt;
   &lt;div class="titlebar_right"&gt;
-    &lt;button id="titlebar_min" data-ctrl-type="titlebar_min" data-drag-type="titlebar_min"
+    &lt;button id="titlebar_min" data-ctrl-type="titlebar_min"
             class="titlebar_rightBtn" title="最小化"&gt;
       &lt;svg width="12" height="1" viewBox="0 0 10 1"&gt;&lt;rect width="10" height="1" fill="currentColor"/&gt;&lt;/svg&gt;
     &lt;/button&gt;
-    &lt;button id="titlebar_max" data-ctrl-type="titlebar_max" data-drag-type="titlebar_max"
+    &lt;button id="titlebar_max" data-ctrl-type="titlebar_max"
             class="titlebar_rightBtn" title="最大化"&gt;
-      &lt;span style="width:18px;height:18px;display:flex;align-items:center;justify-content:center;app-region:drag;-webkit-app-region:drag;"&gt;
+      &lt;span style="width:18px;height:18px;display:flex;align-items:center;justify-content:center;"&gt;
         &lt;svg width="12" height="12" viewBox="0 0 10 10" shape-rendering="crispEdges"&gt;
           &lt;rect x="1" y="1" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1"/&gt;
         &lt;/svg&gt;
       &lt;/span&gt;
     &lt;/button&gt;
-    &lt;button id="titlebar_close" data-ctrl-type="titlebar_close" data-drag-type="titlebar_close"
+    &lt;button id="titlebar_close" data-ctrl-type="titlebar_close"
             class="titlebar_rightBtn titlebar_rightBtn_close" title="关闭"&gt;
       &lt;svg width="12" height="12" viewBox="0 0 10 10"&gt;
         &lt;line x1="1" y1="1" x2="9" y2="9" stroke="currentColor" stroke-width="1"/&gt;
@@ -1456,7 +1475,8 @@ var config = JSON.parse(webviewBridge.api.tooltip.getConfig('tip1'));</code></pr
   * { margin:0; padding:0; box-sizing:border-box; }
   html, body { width:100%; height:100%; overflow:hidden; }
   [data-drag-type] { app-region: no-drag; -webkit-app-region: no-drag; }
-  [data-ctrl-type="titlebar_max"] span { app-region: drag; -webkit-app-region: drag; }
+  .pageContainer [data-ctrl-type^="titlebar_"] { app-region: no-drag; -webkit-app-region: no-drag; }
+  .pageContainer [data-ctrl-type="titlebar_max"] span { app-region: drag; -webkit-app-region: drag; }
   .titlebar_rightBtn { width:35px; height:32px; border:none; background:transparent; cursor:default; border-radius:4px; display:flex; align-items:center; justify-content:center; }
   .titlebar_rightBtn:hover { background:rgba(0,0,0,0.06); }
   .titlebar_rightBtn_close:hover { background:#e81123; color:#fff; }
@@ -1465,6 +1485,8 @@ var config = JSON.parse(webviewBridge.api.tooltip.getConfig('tip1'));</code></pr
   .titlebar_right { display:flex; align-items:center; padding-right:4px; }
   /* 按钮子元素必须显式 inherit 覆盖浏览器 UA 样式（button{color:buttontext}） */
   .tabsContainer_headerBar_btn, .cardBox_collapse_btn { color: inherit; font-size: inherit; font-family: inherit; border: none; background: none; cursor: pointer; }
+  /* 保护 Font Awesome 图标字体不被 inherit 覆盖 */
+  .pageContainer i[class*="fa-"] { font-family: "Font Awesome 6 Free" !important; font-weight: 900; }
   /* 毛玻璃效果 */
   .pageContainer { backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
 

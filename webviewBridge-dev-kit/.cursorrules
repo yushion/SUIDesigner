@@ -52,10 +52,16 @@
 | 信息框 | `messageBox` | `<div>` |
 | 输入弹窗 | `inputBox` | `<div>` |
 
-### 三、标题栏
-6. **标题栏**：`app-region: drag` / 控件：`app-region: no-drag`
-7. **最大化按钮**：内部 `<span>` 必须设 `app-region: drag`（Win11 Snap Layout）
-8. **三按钮必含**：`titlebar_min` / `titlebar_max` / `titlebar_close`
+### 三、标题栏（特殊规则）
+6. **标题栏**：`app-region: drag`
+7. **标题栏按钮不设 `data-drag-type`** — ⚠️ 例外！用 CSS 选择器控制拖拽：
+   ```css
+   .pageContainer [data-ctrl-type^="titlebar_"] { app-region: no-drag; -webkit-app-region: no-drag; }
+   .pageContainer [data-ctrl-type="titlebar_max"] span { app-region: drag; -webkit-app-region: drag; }
+   ```
+   原因：`data-drag-type` 会使 WebView2 把整个按钮标记为 no-drag，子元素 span 无法再获得拖拽句柄。
+8. **最大化按钮**：内部 `<span>` 通过 CSS 获得 `app-region: drag`（Win11 Snap Layout），不要在 span 上写内联 `app-region:drag`
+9. **三按钮必含**：`titlebar_min` / `titlebar_max` / `titlebar_close`
 
 ### 四、复杂控件子结构（必须完整）
 9. **ListBox**：`.listBox_scroll` → `.listBox_item`(含 `data-item-index`) → `.listBox_item_text`
@@ -67,13 +73,44 @@
 
 ### 五、Win11 毛玻璃/主题
 15. **`<button>` 子元素 CSS 必须** `color: inherit; font-size: inherit; font-family: inherit`
-16. **背景色默认 hex**，需要穿透时用 `rgba()`
-17. **页面容器**：`backdrop-filter: blur()` / `-webkit-backdrop-filter: blur()`
+16. **Font Awesome 图标保护**：`font-family: inherit` 会覆盖图标字体，必须追加规则：
+    ```css
+    .pageContainer i[class*="fa-"] { font-family: "Font Awesome 6 Free" !important; font-weight: 900; }
+    ```
+17. **背景色默认 hex**，需要穿透时用 `rgba()`
+18. **页面容器**：`backdrop-filter: blur()` / `-webkit-backdrop-filter: blur()`
 
 ### 六、页面骨架
-18. 引入脚本：`<script src="webviewBridge.js"></script>`（body 末尾）
-19. 页面容器：`class="pageContainer" id="pageContainer"`，CSS 设 `app-region: drag`
-20. 全局 CSS：`*{margin:0;padding:0;box-sizing:border-box} [data-drag-type]{app-region:no-drag;-webkit-app-region:no-drag}`
+18. **所有页面文件必须放在 `output/` 目录下**（如 `output/myapp.html`），output 不存在则自行创建
+19. **将 `webviewBridge.js` 复制到 `output/` 目录中**（与页面同级），引入 `<script src="webviewBridge.js"></script>`
+20. 页面容器：`class="pageContainer" id="pageContainer"`，CSS 设 `app-region: drag`
+21. 全局 CSS：`*{margin:0;padding:0;box-sizing:border-box} [data-drag-type]{app-region:no-drag;-webkit-app-region:no-drag}`
+
+### 七、打包部署（fv2_packer.exe）
+项目目录下包含 `fv2_packer.exe`，用于将开发好的页面打包为 `.fv2` 应用包。
+基本用法：
+```sh
+# 最简：入口文件全路径 → 自动输出 入口名.app.fv2 -> myapp.app.fv2
+fv2_packer.exe D:\output\myapp.html
+
+# 目录+入口文件名 → 输出 入口名.app.fv2 -> myapp.app.fv2
+fv2_packer.exe D:\output myapp.html
+
+# 指定输出文件名  → 输出  myapp → myapp.fv2
+fv2_packer.exe D:\output myapp.html myapp
+
+# 指定输出文件名  → 输出  myapp.fv2 → myapp.fv2
+fv2_packer.exe D:\output myapp.html myapp.fv2
+
+
+# 不加密打包（默认加密）
+fv2_packer.exe D:\output\myapp.html --no-encrypt
+
+# 指定 token（不指定则自动随机生成）
+fv2_packer.exe D:\output\myapp.html --token=X4FE85
+fv2_packer.exe D:\output\myapp.html --token=A1B2C3 --no-encrypt
+```
+⚠️ `--no-encrypt` 和 `--token=` 不遵守参数排序，可放在任意位置。
 
 ## ❌ 严禁事项
 - ❌ 开关用 `data-ctrl-type="checkbox"` → ✅ `"switchToggle"`
@@ -81,3 +118,4 @@
 - ❌ 子元素写死 `color`/`font-size` → ✅ `inherit`
 - ❌ 布局容器加 `data-drag-type`
 - ❌ 非标题栏区域设 `app-region: drag`
+- ❌ 标题栏按钮加 `data-drag-type` → ✅ 用 CSS `[data-ctrl-type^="titlebar_"]` 选择器控制

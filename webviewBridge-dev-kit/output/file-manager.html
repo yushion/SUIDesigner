@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>文件管理器</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+<style>
+/* ================================================================
+ * 全局重置 + 基础样式
+ * ================================================================ */
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:transparent}
+body{display:flex}
+
+/* ================================================================
+ * CSS 变量：浅色主题（默认）
+ * ================================================================ */
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f5;
+  --bg-tertiary: #e8e8e8;
+  --bg-panel: #fafafa;
+  --text-primary: #1a1a1a;
+  --text-secondary: #555555;
+  --text-muted: #888888;
+  --accent: #0078d4;
+  --accent-hover: #106ebe;
+  --accent-light: rgba(0,120,212,0.06);
+  --border: rgba(0,0,0,0.07);
+  --border-strong: rgba(0,0,0,0.12);
+  --card-bg: rgba(255,255,255,0.75);
+  --tree-hover: rgba(0,0,0,0.04);
+  --tree-active: rgba(0,120,212,0.08);
+  --row-hover: rgba(0,0,0,0.03);
+  --row-selected: rgba(0,120,212,0.06);
+  --shadow: 0 1px 3px rgba(0,0,0,0.06);
+  --titlebar-bg: #f8f8f8;
+  --toolbar-bg: #fcfcfc;
+  --statusbar-bg: rgba(245,245,245,0.9);
+  --progress-track: #e0e0e0;
+  --progress-fill: #0078d4;
+  --input-bg: #ffffff;
+  --input-border: rgba(0,0,0,0.12);
+  --input-focus-border: #0078d4;
+}
+
+/* 深色主题 */
+.pageContainer.dark-theme {
+  --bg-primary: #1e1e2e;
+  --bg-secondary: #252536;
+  --bg-tertiary: #2d2d44;
+  --bg-panel: #222233;
+  --text-primary: #e0e0e0;
+  --text-secondary: #a0a0b0;
+  --text-muted: #6a6a7a;
+  --accent: #9b6dff;
+  --accent-hover: #b088ff;
+  --accent-light: rgba(155,109,255,0.08);
+  --border: rgba(255,255,255,0.05);
+  --border-strong: rgba(255,255,255,0.08);
+  --card-bg: rgba(30,30,46,0.75);
+  --tree-hover: rgba(255,255,255,0.03);
+  --tree-active: rgba(155,109,255,0.12);
+  --row-hover: rgba(255,255,255,0.02);
+  --row-selected: rgba(155,109,255,0.08);
+  --shadow: 0 1px 3px rgba(0,0,0,0.25);
+  --titlebar-bg: #1a1a2e;
+  --toolbar-bg: #1e1e30;
+  --statusbar-bg: rgba(30,30,46,0.9);
+  --progress-track: #3a3a55;
+  --progress-fill: #9b6dff;
+  --input-bg: #2d2d40;
+  --input-border: rgba(255,255,255,0.08);
+  --input-focus-border: #9b6dff;
+}
+
+.pageContainer,.pageContainer *{transition:background-color 0.3s ease,color 0.3s ease,border-color 0.3s ease}
+
+/* ================================================================
+ * 页面容器 + 毛玻璃
+ * ================================================================ */
+.pageContainer{position:relative;overflow:hidden;width:100%;height:100%;display:flex;flex-direction:column;background-color:var(--bg-primary);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+[data-drag-type]{app-region:no-drag;-webkit-app-region:no-drag}
+.pageContainer button{color:inherit;font-size:inherit;font-family:inherit}
+.pageContainer i[class*="fa-"]{font-family:"Font Awesome 6 Free"!important;font-weight:900}
+
+/* ================================================================
+ * 标题栏
+ * ================================================================ */
+.titlebar{position:relative;height:40px;display:flex;align-items:center;flex-shrink:0;background-color:var(--titlebar-bg);border-bottom:1px solid var(--border);user-select:none;z-index:10}
+.titlebar .titlebar_left{width:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.titlebar .titlebar_left_icon{width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--accent)}
+.titlebar .titlebar_center{flex:1;display:flex;align-items:center;min-width:0;gap:8px}
+.titlebar .titlebar_center_title{font-size:13px;font-weight:600;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.titlebar .titlebar_right{display:flex;align-items:center;height:100%;padding-right:4px;flex-shrink:0;gap:2px}
+.titlebar_rightBtn{width:35px;height:32px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:default;border-radius:4px;flex-shrink:0;color:var(--text-primary);font-size:12px}
+.titlebar_rightBtn:hover{background:var(--tree-hover)}
+.titlebar_rightBtn_close:hover{background:#e81123;color:#fff!important}
+.titlebar_themeBtn{width:35px;height:32px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:pointer;border-radius:4px;flex-shrink:0;color:var(--text-primary);font-size:14px}
+.titlebar_themeBtn:hover{background:var(--tree-hover)}
+
+/* 标题栏拖拽 */
+.pageContainer [data-ctrl-type^="titlebar_"]{app-region:no-drag;-webkit-app-region:no-drag}
+.pageContainer [data-ctrl-type="titlebar_max"] span{app-region:drag;-webkit-app-region:drag}
+
+/* ================================================================
+ * 工具栏
+ * ================================================================ */
+.toolbar{position:relative;height:44px;display:flex;align-items:center;flex-shrink:0;padding:0 8px;gap:4px;background-color:var(--toolbar-bg);border-bottom:1px solid var(--border)}
+.toolbar-nav-btn{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;border-radius:6px;cursor:pointer;color:var(--text-secondary);font-size:13px;transition:all 0.12s ease}
+.toolbar-nav-btn:hover{background:var(--tree-hover);color:var(--text-primary)}
+.toolbar-nav-btn:disabled{color:var(--text-muted);cursor:default;pointer-events:none}
+.toolbar-sep{width:1px;height:20px;background:var(--border-strong);margin:0 4px;flex-shrink:0}
+.toolbar-addr-wrap{flex:1;position:relative;display:flex;align-items:center;min-width:0}
+.toolbar-addr-wrap input{width:100%;height:30px;padding:0 10px;border:1px solid var(--input-border);border-radius:6px;background:var(--input-bg);color:var(--text-primary);font-size:12px;outline:none;transition:border-color 0.15s ease}
+.toolbar-addr-wrap input:focus{border-color:var(--input-focus-border);box-shadow:0 0 0 1px var(--input-focus-border)}
+.toolbar-search-wrap{position:relative;width:180px;flex-shrink:0}
+.toolbar-search-wrap input{width:100%;height:30px;padding:0 10px 0 28px;border:1px solid var(--input-border);border-radius:6px;background:var(--input-bg);color:var(--text-primary);font-size:12px;outline:none;transition:border-color 0.15s ease}
+.toolbar-search-wrap input:focus{border-color:var(--input-focus-border);box-shadow:0 0 0 1px var(--input-focus-border)}
+.toolbar-search-wrap .search-icon{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:12px;pointer-events:none}
+
+/* ================================================================
+ * 主区域
+ * ================================================================ */
+.main-area{flex:1;display:flex;overflow:hidden;min-height:0}
+
+/* 左侧树形目录 */
+.tree-sidebar{width:240px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid var(--border);background-color:var(--bg-panel);overflow:hidden}
+.tree-header{padding:10px 14px;font-size:12px;font-weight:600;color:var(--text-secondary);border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;gap:6px}
+.tree-header i{color:var(--accent)}
+
+/* treeView */
+#tree_dir{flex:1;overflow:auto;border:none!important;border-radius:0!important;padding:4px 0}
+.treeView_node_content{padding:4px 8px 4px 4px;cursor:pointer;border-radius:4px;margin:1px 4px;display:flex;align-items:center;gap:2px;min-height:28px;transition:background 0.1s ease;white-space:nowrap}
+.treeView_node_content:hover{background:var(--tree-hover)}
+.treeView_node.active>.treeView_node_content{background:var(--tree-active);color:var(--accent)}
+.treeView_node_content .treeView_toggle{width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text-muted);flex-shrink:0;border-radius:3px;transition:transform 0.15s ease}
+.treeView_node_content .treeView_toggle:hover{background:var(--tree-hover);color:var(--text-primary)}
+.treeView_node_content .treeView_toggle.expanded{transform:rotate(90deg)}
+.treeView_node_content .treeView_toggle.empty{visibility:hidden}
+.treeView_node_content .treeView_icon{font-size:14px;width:18px;text-align:center;flex-shrink:0}
+.treeView_node_content .treeView_icon.folder{color:#e6a23c}
+.pageContainer.dark-theme .treeView_node_content .treeView_icon.folder{color:#f0c05a}
+.treeView_node_content .treeView_icon.drive{color:var(--accent)}
+.treeView_node_content .treeView_label{font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* 拖拽分割线 */
+.split-bar{width:3px;flex-shrink:0;cursor:col-resize;background:transparent;position:relative;z-index:5;transition:background 0.15s ease}
+.split-bar:hover,.split-bar:active{background:var(--accent)}
+
+/* 右侧内容区 */
+.content-area{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.content-area .content-header{height:36px;display:flex;align-items:center;padding:0 12px;border-bottom:1px solid var(--border);background:var(--toolbar-bg);flex-shrink:0;gap:2px}
+.content-header .breadcrumb-btn{padding:4px 8px;border:none;background:transparent;cursor:pointer;border-radius:4px;font-size:12px;color:var(--text-secondary);transition:all 0.12s ease;white-space:nowrap}
+.content-header .breadcrumb-btn:hover{background:var(--tree-hover);color:var(--accent)}
+.content-header .breadcrumb-arrow{color:var(--text-muted);font-size:10px;margin:0 1px;flex-shrink:0}
+
+/* 文件列表 dataGrid */
+#grid_files{flex:1;overflow:hidden;border:none!important;border-radius:0!important}
+#grid_files .dataGrid_header{display:flex;height:32px;border-bottom:1px solid var(--border);background:var(--toolbar-bg);flex-shrink:0}
+#grid_files .dataGrid_header_cell{display:flex;align-items:center;padding:0 12px;font-size:12px;font-weight:600;color:var(--text-secondary);white-space:nowrap;user-select:none;cursor:pointer;transition:color 0.12s ease;gap:4px}
+#grid_files .dataGrid_header_cell:hover{color:var(--accent)}
+#grid_files .dataGrid_header_cell .sort-arrow{font-size:10px;opacity:0.4}
+#grid_files .dataGrid_header_cell.sorted .sort-arrow{opacity:1;color:var(--accent)}
+#grid_files .dataGrid_body{flex:1;overflow-y:auto}
+#grid_files .dataGrid_row{display:flex;height:32px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.08s ease}
+#grid_files .dataGrid_row:hover{background:var(--row-hover)}
+#grid_files .dataGrid_row.selected{background:var(--row-selected)}
+#grid_files .dataGrid_cell{display:flex;align-items:center;padding:0 12px;font-size:12px;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#grid_files .dataGrid_cell.file-icon-cell{width:40px;min-width:40px;max-width:40px;justify-content:center;padding:0}
+#grid_files .dataGrid_cell.file-icon{font-size:16px}
+
+/* ================================================================
+ * 右侧详情面板 cardBox
+ * ================================================================ */
+.detail-panel{width:240px;flex-shrink:0;border-left:1px solid var(--border);background:var(--bg-panel);display:flex;flex-direction:column;overflow:hidden}
+.detail-panel .cardBox_header{padding:10px 14px;font-size:12px;font-weight:600;color:var(--text-secondary);border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;gap:6px}
+.detail-panel .cardBox_header i{color:var(--accent)}
+.detail-panel .cardBox_body{flex:1;padding:12px 14px;overflow-y:auto}
+.detail-panel .detail-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text-muted);gap:8px}
+.detail-panel .detail-empty i{font-size:36px;opacity:0.3}
+.detail-panel .detail-empty span{font-size:12px}
+.detail-panel .detail-preview{display:flex;flex-direction:column;align-items:center;gap:12px}
+.detail-panel .detail-preview-icon{font-size:48px;color:var(--accent)}
+.detail-panel .detail-preview-icon.folder-icon{color:#e6a23c}
+.pageContainer.dark-theme .detail-panel .detail-preview-icon.folder-icon{color:#f0c05a}
+.detail-panel .detail-preview-name{font-size:13px;font-weight:600;color:var(--text-primary);text-align:center;word-break:break-all}
+.detail-panel .detail-table{width:100%;font-size:11px}
+.detail-panel .detail-row{display:flex;padding:4px 0;border-bottom:1px solid var(--border)}
+.detail-panel .detail-row .detail-label{width:60px;color:var(--text-muted);flex-shrink:0}
+.detail-panel .detail-row .detail-value{flex:1;color:var(--text-primary);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ================================================================
+ * 底部状态栏
+ * ================================================================ */
+.status-bar{height:28px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 12px;background:var(--statusbar-bg);border-top:1px solid var(--border);font-size:11px;color:var(--text-muted);gap:12px}
+.status-bar .status-left,.status-bar .status-right{display:flex;align-items:center;gap:8px}
+.status-bar .status-sep{width:1px;height:12px;background:var(--border-strong)}
+
+/* 磁盘用量进度条 */
+#prg_disk{width:100px;height:4px;border-radius:2px;overflow:visible}
+#prg_disk .progressBar_track{width:100%;height:100%;background:var(--progress-track);border-radius:inherit}
+#prg_disk .progressBar_fill{position:absolute;top:0;left:0;height:100%;background:var(--progress-fill);border-radius:inherit}
+#prg_disk .progressBar_text{position:absolute;left:100%;top:50%;transform:translateY(-50%);font-size:9px;color:var(--text-muted);margin-left:6px;white-space:nowrap}
+
+/* ================================================================
+ * 滚动条
+ * ================================================================ */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(128,128,128,0.2);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(128,128,128,0.35)}
+</style>
+</head>
+<body>
+<!-- ================================================================
+     页面容器
+     ================================================================ -->
+<div class="pageContainer" id="pageContainer" data-ctrl-type="pageContainer" data-name="canvas"
+     data-original-width="1060" data-original-height="680"
+     style="app-region:drag;-webkit-app-region:drag">
+
+  <!-- ================================================================
+       标题栏
+       ================================================================ -->
+  <div class="titlebar" id="titlebar" data-name="标题栏" style="app-region:drag;-webkit-app-region:drag">
+    <div class="titlebar_left">
+      <span id="titlebar_icon" data-ctrl-type="titlebar_left_icon" data-drag-type="titlebar_left_icon" data-name="图标" class="titlebar_left_icon">
+        <i class="fas fa-folder-open"></i>
+      </span>
+    </div>
+    <div class="titlebar_center">
+      <span id="titlebar_title" data-ctrl-type="titlebar_title" data-drag-type="titlebar_title" data-name="标题" class="titlebar_center_title">文件管理器</span>
+    </div>
+    <div class="titlebar_right">
+      <button id="btn_theme" data-ctrl-type="button" data-drag-type="button" data-type="button" data-name="切换主题"
+              class="titlebar_themeBtn" title="切换主题">
+        <i class="fas fa-moon" id="ico_theme"></i>
+      </button>
+      <button id="titlebar_min" data-ctrl-type="titlebar_min" data-name="最小化" class="titlebar_rightBtn" title="最小化">─</button>
+      <button id="titlebar_max" data-ctrl-type="titlebar_max" data-name="最大化" class="titlebar_rightBtn" title="最大化">
+        <span style="width:18px;height:18px;display:flex;align-items:center;justify-content:center">□</span>
+      </button>
+      <button id="titlebar_close" data-ctrl-type="titlebar_close" data-name="关闭" class="titlebar_rightBtn titlebar_rightBtn_close" title="关闭">✕</button>
+    </div>
+  </div>
+
+  <!-- ================================================================
+       工具栏
+       ================================================================ -->
+  <div class="toolbar">
+    <button id="btn_back" data-ctrl-type="iconButton" data-drag-type="iconButton" data-type="iconButton" data-name="后退"
+            class="toolbar-nav-btn" title="后退" disabled>
+      <i class="fas fa-arrow-left"></i>
+    </button>
+    <button id="btn_forward" data-ctrl-type="iconButton" data-drag-type="iconButton" data-type="iconButton" data-name="前进"
+            class="toolbar-nav-btn" title="前进" disabled>
+      <i class="fas fa-arrow-right"></i>
+    </button>
+    <button id="btn_up" data-ctrl-type="iconButton" data-drag-type="iconButton" data-type="iconButton" data-name="向上"
+            class="toolbar-nav-btn" title="向上一级">
+      <i class="fas fa-arrow-up"></i>
+    </button>
+    <button id="btn_refresh" data-ctrl-type="iconButton" data-drag-type="iconButton" data-type="iconButton" data-name="刷新"
+            class="toolbar-nav-btn" title="刷新">
+      <i class="fas fa-sync-alt"></i>
+    </button>
+    <div class="toolbar-sep"></div>
+    <div class="toolbar-addr-wrap">
+      <input id="inp_address" data-ctrl-type="inputText" data-drag-type="inputText" data-type="input" data-name="地址栏"
+             type="text" value="C:\Users\Administrator" placeholder="输入路径后按回车跳转" />
+    </div>
+    <div class="toolbar-sep"></div>
+    <div class="toolbar-search-wrap">
+      <i class="fas fa-search search-icon"></i>
+      <input id="inp_search" data-ctrl-type="inputText" data-drag-type="inputText" data-type="input" data-name="搜索"
+             type="text" placeholder="搜索文件..." />
+    </div>
+  </div>
+
+  <!-- ================================================================
+       分割线
+       ================================================================ -->
+  <div id="div_toolbar" data-ctrl-type="divider" data-drag-type="divider" data-type="divider" data-name="工具分隔"
+       style="width:100%;height:1px;background:var(--border-strong);flex-shrink:0"></div>
+
+  <!-- ================================================================
+       主内容区域
+       ================================================================ -->
+  <div class="main-area">
+    <!-- ==========================================================
+         左侧目录树
+         ========================================================== -->
+    <div class="tree-sidebar" id="sidebar_tree">
+      <div class="tree-header">
+        <i class="fas fa-hdd"></i> 目录树
+      </div>
+      <div id="tree_dir" data-ctrl-type="treeView" data-drag-type="treeView" data-type="treeView" data-name="目录树"
+           data-tree-id="tree_dir" data-editable="false" data-show-icon="true" data-always-show-selection="true"
+           style="flex:1;overflow:auto;background:transparent">
+      </div>
+    </div>
+
+    <!-- 拖拽分割条 -->
+    <div class="split-bar" id="split_bar"></div>
+
+    <!-- ==========================================================
+         右侧内容区
+         ========================================================== -->
+    <div class="content-area" id="content_area">
+      <!-- 面包屑导航 -->
+      <div class="content-header" id="breadcrumb_bar">
+      </div>
+      <!-- 文件列表 dataGrid -->
+      <div id="grid_files" data-ctrl-type="dataGrid" data-drag-type="dataGrid" data-type="dataGrid" data-name="文件列表"
+           data-show-checkbox="false" data-editable="false" data-always-show-selection="true"
+           style="flex:1;display:flex;flex-direction:column;overflow:hidden;background:transparent">
+        <div class="dataGrid_header" style="display:flex;height:32px;border-bottom:1px solid var(--border);background:var(--toolbar-bg);flex-shrink:0">
+          <div class="dataGrid_header_cell dataGrid_checkbox" style="width:36px;min-width:36px;flex-shrink:0;display:flex;align-items:center;justify-content:center">
+            <input type="checkbox" class="dataGrid_select_all" style="display:none">
+          </div>
+          <div class="dataGrid_header_cell" data-col-key="name" data-col-name="名称" data-ctrl-type="dataGrid_cell"
+               style="flex:1;min-width:120px;padding:0 12px;cursor:pointer" id="hdr_name">
+            名称 <span class="sort-arrow">▲</span>
+          </div>
+          <div class="dataGrid_header_cell" data-col-key="date" data-col-name="修改日期" data-ctrl-type="dataGrid_cell"
+               style="width:140px;min-width:100px;padding:0 12px;cursor:pointer" id="hdr_date">
+            修改日期 <span class="sort-arrow">▲</span>
+          </div>
+          <div class="dataGrid_header_cell" data-col-key="type" data-col-name="类型" data-ctrl-type="dataGrid_cell"
+               style="width:100px;min-width:80px;padding:0 12px;cursor:pointer" id="hdr_type">
+            类型 <span class="sort-arrow">▲</span>
+          </div>
+          <div class="dataGrid_header_cell" data-col-key="size" data-col-name="大小" data-ctrl-type="dataGrid_cell"
+               style="width:100px;min-width:80px;padding:0 12px;cursor:pointer" id="hdr_size">
+            大小 <span class="sort-arrow">▲</span>
+          </div>
+        </div>
+        <div class="dataGrid_body" style="flex:1;overflow-y:auto">
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================================
+         右侧详情面板 cardBox
+         ========================================================== -->
+    <div class="detail-panel" id="panel_detail">
+      <div class="cardBox_header" id="detail_header" data-ctrl-type="cardBox_header" data-name="详情标题">
+        <i class="fas fa-info-circle"></i> 属性
+      </div>
+      <div class="cardBox_body" id="detail_body" data-ctrl-type="cardBox_body" data-name="详情内容"
+           style="padding:12px 14px;overflow-y:auto">
+        <div class="detail-empty" id="detail_empty">
+          <i class="fas fa-mouse-pointer"></i>
+          <span>选择文件查看详情</span>
+        </div>
+        <div class="detail-preview" id="detail_preview" style="display:none">
+          <div id="detail_icon"></div>
+          <div id="detail_name" class="detail-preview-name"></div>
+          <div class="detail-table" id="detail_table">
+            <div class="detail-row"><span class="detail-label">类型</span><span class="detail-value" id="d_type">--</span></div>
+            <div class="detail-row"><span class="detail-label">大小</span><span class="detail-value" id="d_size">--</span></div>
+            <div class="detail-row"><span class="detail-label">修改日期</span><span class="detail-value" id="d_date">--</span></div>
+            <div class="detail-row"><span class="detail-label">路径</span><span class="detail-value" id="d_path">--</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================
+       底部状态栏
+       ================================================================ -->
+  <div class="status-bar">
+    <div class="status-left">
+      <span id="lbl_itemCount" data-ctrl-type="label" data-drag-type="label" data-type="label" data-name="项目数"
+            style="color:var(--text-secondary)">0 个项目</span>
+      <span class="status-sep"></span>
+      <span id="lbl_currentPath" data-ctrl-type="label" data-drag-type="label" data-type="label" data-name="当前路径"
+            style="color:var(--text-muted)">C:\Users\Administrator</span>
+    </div>
+    <div class="status-right">
+      <div id="prg_disk" data-ctrl-type="progressBar" data-drag-type="progressBar" data-type="progressBar" data-name="磁盘用量"
+           data-editable="false" class="progressBar_container"
+           style="width:100px;height:4px;position:relative;overflow:visible;border-radius:2px">
+        <div class="progressBar_track" style="width:100%;height:100%;background:var(--progress-track);border-radius:inherit"></div>
+        <div class="progressBar_fill" style="position:absolute;top:0;left:0;width:45%;height:100%;background:var(--progress-fill);border-radius:inherit"></div>
+        <span class="progressBar_text" style="position:absolute;left:100%;top:50%;transform:translateY(-50%);font-size:9px;color:var(--text-muted);margin-left:6px;white-space:nowrap">已用 112GB / 256GB</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     webviewBridge.js
+     ================================================================ -->
+<script src="webviewBridge.js"></script>
+
+<!-- ================================================================
+     文件管理器业务逻辑
+     ================================================================ -->
+<script>
+(function() {
+  'use strict';
+
+  // ============================================================
+  // 模拟文件系统数据
+  // ============================================================
+  var fsData = {
+    'C:\\': {
+      type: 'folder', name: '本地磁盘 (C:)', icon: 'drive',
+      children: {
+        'Windows': { type: 'folder',
+          children: {
+            'System32': { type: 'folder',
+              children: { 'drivers': { type: 'folder', children: {} }, 'config': { type: 'folder', children: {} } }
+            },
+            'Fonts': { type: 'folder', children: {} },
+            'explorer.exe': { type: 'file', size: '4.5 MB', date: '2025-11-15' },
+            'notepad.exe': { type: 'file', size: '256 KB', date: '2025-10-20' }
+          }
+        },
+        'Program Files': { type: 'folder',
+          children: {
+            'Common Files': { type: 'folder', children: {} },
+            'Internet Explorer': { type: 'folder', children: { 'iexplore.exe': { type: 'file', size: '812 KB', date: '2024-06-01' } } }
+          }
+        },
+        'Program Files (x86)': { type: 'folder', children: {} },
+        'Users': { type: 'folder',
+          children: {
+            'Administrator': { type: 'folder',
+              children: {
+                'Documents': { type: 'folder',
+                  children: {
+                    '项目源码': { type: 'folder',
+                      children: {
+                        'README.md': { type: 'file', size: '4.2 KB', date: '2026-07-01' },
+                        'index.html': { type: 'file', size: '18.5 KB', date: '2026-07-05' },
+                        'app.js': { type: 'file', size: '32.8 KB', date: '2026-07-06' },
+                        'style.css': { type: 'file', size: '12.1 KB', date: '2026-07-04' }
+                      }
+                    },
+                    '工作周报.docx': { type: 'file', size: '520 KB', date: '2026-06-20' },
+                    '数据报表.xlsx': { type: 'file', size: '1.8 MB', date: '2026-06-18' },
+                    '会议纪要.txt': { type: 'file', size: '8 KB', date: '2026-06-15' }
+                  }
+                },
+                'Downloads': { type: 'folder',
+                  children: {
+                    'VSCodeSetup.exe': { type: 'file', size: '78.5 MB', date: '2026-06-28' },
+                    'music-player.app.fv2': { type: 'file', size: '275 KB', date: '2026-07-07' },
+                    'photo_collection.zip': { type: 'file', size: '156.3 MB', date: '2026-05-10' }
+                  }
+                },
+                'Music': { type: 'folder',
+                  children: {
+                    '晴天 - 周杰伦.mp3': { type: 'file', size: '8.5 MB', date: '2025-12-01' },
+                    '夜曲 - 周杰伦.flac': { type: 'file', size: '28.3 MB', date: '2026-01-20' },
+                    '稻香 - 周杰伦.mp3': { type: 'file', size: '7.2 MB', date: '2025-11-15' },
+                    '起风了 - 买辣椒也用券.mp3': { type: 'file', size: '9.1 MB', date: '2026-03-08' }
+                  }
+                },
+                'Pictures': { type: 'folder',
+                  children: {
+                    'Screenshots': { type: 'folder',
+                      children: {
+                        'screenshot_0601.png': { type: 'file', size: '1.5 MB', date: '2026-06-01' },
+                        'screenshot_0615.png': { type: 'file', size: '2.1 MB', date: '2026-06-15' }
+                      }
+                    },
+                    'avatar.jpg': { type: 'file', size: '256 KB', date: '2026-01-01' },
+                    'wallpaper.png': { type: 'file', size: '3.2 MB', date: '2026-04-12' }
+                  }
+                },
+                'Desktop': { type: 'folder',
+                  children: {
+                    '项目快捷方式.lnk': { type: 'file', size: '1.2 KB', date: '2026-07-01' },
+                    '待办事项.txt': { type: 'file', size: '2 KB', date: '2026-07-03' }
+                  }
+                },
+                'AppData': { type: 'folder', children: { 'Local': { type: 'folder', children: {} }, 'Roaming': { type: 'folder', children: {} } } }
+              }
+            },
+            'Public': { type: 'folder', children: {} }
+          }
+        },
+        'Temp': { type: 'folder',
+          children: {
+            'debug.log': { type: 'file', size: '12 KB', date: '2026-07-07' },
+            'cache_data.tmp': { type: 'file', size: '4 KB', date: '2026-07-06' }
+          }
+        },
+        'autoexec.bat': { type: 'file', size: '1 KB', date: '2024-01-01' }
+      }
+    }
+  };
+
+  // ============================================================
+  // 工具函数
+  // ============================================================
+  var $ = function(s) { return document.querySelector(s); };
+  var $$ = function(s) { return document.querySelectorAll(s); };
+
+  /**
+   * 按路径获取文件系统节点
+   * @param {string} path 路径（如 C:\Users\Administrator）
+   * @returns {object|null} 节点对象
+   */
+  function getNodeByPath(path) {
+    if (!path) return null;
+    var parts = path.replace(/\\+$/, '').split('\\');
+    if (parts[0] !== 'C:' && parts[1] !== '') parts = ['C:',''].concat(parts);
+    if (parts[0] !== 'C:') parts = ['C:',''].concat(parts);
+    var node = fsData['C:\\'];
+    if (!node) return null;
+    for (var i = 2; i < parts.length; i++) {
+      if (!parts[i]) continue;
+      if (!node.children || !node.children[parts[i]]) return null;
+      node = node.children[parts[i]];
+    }
+    return node;
+  }
+
+  /**
+   * 解析路径为数组
+   */
+  function parsePath(path) {
+    if (!path) return [];
+    var parts = path.replace(/\\+$/, '').split('\\');
+    if (parts[0] !== 'C:') parts = ['C:'];
+    if (parts.length > 1 && parts[1] === '') parts.splice(1, 1);
+    return parts;
+  }
+
+  /**
+   * 格式化文件大小
+   */
+  function formatSize(sizeStr) {
+    return sizeStr || '--';
+  }
+
+  // ============================================================
+  // 应用状态
+  // ============================================================
+  var state = {
+    currentPath: 'C:\\Users\\Administrator',
+    historyStack: ['C:\\'],
+    historyIndex: 0,
+    selectedFile: null,
+    isDark: false,
+    sortKey: 'name',
+    sortAsc: true,
+    searchFilter: ''
+  };
+
+  // ============================================================
+  // DOM 缓存
+  // ============================================================
+  var dom = {
+    pageContainer: $('#pageContainer'),
+    treeDir: $('#tree_dir'),
+    gridBody: $('#grid_files .dataGrid_body'),
+    inpAddress: $('#inp_address'),
+    inpSearch: $('#inp_search'),
+    btnBack: $('#btn_back'),
+    btnForward: $('#btn_forward'),
+    btnUp: $('#btn_up'),
+    btnRefresh: $('#btn_refresh'),
+    btnTheme: $('#btn_theme'),
+    icoTheme: $('#ico_theme'),
+    breadcrumb: $('#breadcrumb_bar'),
+    lblItemCount: $('#lbl_itemCount'),
+    lblCurrentPath: $('#lbl_currentPath'),
+    detailEmpty: $('#detail_empty'),
+    detailPreview: $('#detail_preview'),
+    detailIcon: $('#detail_icon'),
+    detailName: $('#detail_name'),
+    dType: $('#d_type'),
+    dSize: $('#d_size'),
+    dDate: $('#d_date'),
+    dPath: $('#d_path'),
+    diskFill: $('#prg_disk .progressBar_fill'),
+    diskText: $('#prg_disk .progressBar_text')
+  };
+
+  // ============================================================
+  // 构建目录树
+  // ============================================================
+  function buildTreeHTML(node, nodeId, pathParts, level) {
+    if (!node || node.type !== 'folder') return '';
+    var hasChildren = node.children && Object.keys(node.children).length > 0;
+    var toggleClass = level === 0 ? 'expanded' : (hasChildren ? 'expanded' : 'empty');
+    var iconClass = node.icon || 'folder';
+    var label = level === 0 ? '本地磁盘 (C:)' : pathParts[pathParts.length - 1] || '本地磁盘 (C:)';
+    var nodeClass = '';
+    // 检查是否当前路径
+    var fullPath = pathParts.join('\\') + (level > 0 ? '' : '\\');
+    if (state.currentPath === fullPath || (level === 0 && state.currentPath.indexOf('C:') === 0)) {
+      nodeClass = ' active';
+    }
+
+    var html = '<div class="treeView_node' + nodeClass + '" data-node-id="' + nodeId + '" data-level="' + level + '" data-path="' + fullPath + '">';
+    html += '<div class="treeView_node_content" style="padding-left:' + (4 + level * 16) + 'px">';
+    html += '<span class="treeView_toggle ' + toggleClass + '" data-ctrl-type="treeview_node_toggle">▶</span>';
+    html += '<span class="treeView_icon ' + iconClass + '">';
+    if (iconClass === 'drive') html += '<i class="fas fa-hdd"></i>';
+    else if (level <= 2) html += '<i class="fas fa-folder"></i>';
+    else html += '📁';
+    html += '</span>';
+    html += '<span class="treeView_label" data-ctrl-type="treeview_node_text">' + label + '</span>';
+    html += '</div>';
+
+    if (hasChildren) {
+      html += '<div class="treeView_children">';
+      var keys = Object.keys(node.children).sort(function(a, b) {
+        var aIsFolder = node.children[a].type === 'folder';
+        var bIsFolder = node.children[b].type === 'folder';
+        if (aIsFolder && !bIsFolder) return -1;
+        if (!aIsFolder && bIsFolder) return 1;
+        return a.localeCompare(b, 'zh');
+      });
+      keys.forEach(function(key, i) {
+        var childNode = node.children[key];
+        if (childNode.type === 'folder') {
+          html += buildTreeHTML(childNode, nodeId + '_' + i, pathParts.concat([key]), level + 1);
+        }
+      });
+      html += '</div>';
+    }
+
+    html += '</div>';
+    return html;
+  }
+
+  function renderTree() {
+    dom.treeDir.innerHTML = buildTreeHTML(fsData['C:\\'], 'root', ['C:'], 0);
+    bindTreeEvents();
+  }
+
+  // ============================================================
+  // 绑定树形事件
+  // ============================================================
+  function bindTreeEvents() {
+    dom.treeDir.addEventListener('click', function(e) {
+      var toggle = e.target.closest('.treeView_toggle');
+      var content = e.target.closest('.treeView_node_content');
+      if (!content) return;
+
+      var node = content.closest('.treeView_node');
+      if (!node) return;
+
+      var path = node.getAttribute('data-path');
+
+      // 处理展开/折叠
+      if (toggle && !toggle.classList.contains('empty')) {
+        var isExpanded = toggle.classList.contains('expanded');
+        if (isExpanded) {
+          toggle.classList.remove('expanded');
+          toggle.classList.add('collapsed');
+        } else {
+          toggle.classList.remove('collapsed');
+          toggle.classList.add('expanded');
+        }
+        var children = node.querySelector(':scope > .treeView_children');
+        if (children) {
+          children.style.display = isExpanded ? 'none' : 'block';
+        }
+      }
+
+      // 点击节点 → 导航
+      if (path) {
+        navigateTo(path);
+      }
+    });
+  }
+
+  // ============================================================
+  // 导航
+  // ============================================================
+  function navigateTo(path) {
+    if (path === state.currentPath) return;
+
+    // 更新历史
+    if (state.historyIndex < state.historyStack.length - 1) {
+      state.historyStack = state.historyStack.slice(0, state.historyIndex + 1);
+    }
+    state.historyStack.push(path);
+    state.historyIndex = state.historyStack.length - 1;
+
+    state.currentPath = path;
+    state.selectedFile = null;
+    refreshAll();
+  }
+
+  function goBack() {
+    if (state.historyIndex > 0) {
+      state.historyIndex--;
+      state.currentPath = state.historyStack[state.historyIndex];
+      state.selectedFile = null;
+      refreshAll();
+    }
+  }
+
+  function goForward() {
+    if (state.historyIndex < state.historyStack.length - 1) {
+      state.historyIndex++;
+      state.currentPath = state.historyStack[state.historyIndex];
+      state.selectedFile = null;
+      refreshAll();
+    }
+  }
+
+  function goUp() {
+    var parts = parsePath(state.currentPath);
+    if (parts.length > 2) {
+      parts.pop();
+      navigateTo(parts.join('\\'));
+    }
+  }
+
+  // ============================================================
+  // 面包屑
+  // ============================================================
+  function renderBreadcrumb() {
+    var parts = parsePath(state.currentPath);
+    if (parts.length === 0) return;
+    var html = '';
+    for (var i = 0; i < parts.length; i++) {
+      if (i > 0) html += '<span class="breadcrumb-arrow">▶</span>';
+      var path = parts.slice(0, i + 1).join('\\');
+      var label = parts[i];
+      html += '<button class="breadcrumb-btn" data-path="' + path + '">' + label + '</button>';
+    }
+    dom.breadcrumb.innerHTML = html;
+
+    dom.breadcrumb.querySelectorAll('.breadcrumb-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        navigateTo(this.getAttribute('data-path'));
+      });
+    });
+  }
+
+  // ============================================================
+  // 文件列表 dataGrid
+  // ============================================================
+  function getFileExt(name) {
+    var dot = name.lastIndexOf('.');
+    if (dot < 0) return '';
+    return name.substring(dot + 1).toLowerCase();
+  }
+
+  function getFileIcon(name, isFolder) {
+    if (isFolder) return '<i class="fas fa-folder" style="color:#e6a23c"></i>';
+    var ext = getFileExt(name);
+    var map = {
+      'exe': '<i class="fas fa-cog" style="color:#666"></i>',
+      'dll': '<i class="fas fa-puzzle-piece" style="color:#999"></i>',
+      'js': '<i class="fas fa-file-code" style="color:#f0c040"></i>',
+      'css': '<i class="fas fa-file-code" style="color:#42a5f5"></i>',
+      'html': '<i class="fas fa-file-code" style="color:#e44d26"></i>',
+      'json': '<i class="fas fa-file-code" style="color:#f0c040"></i>',
+      'py': '<i class="fas fa-file-code" style="color:#306998"></i>',
+      'cpp': '<i class="fas fa-file-code" style="color:#00599c"></i>',
+      'c': '<i class="fas fa-file-code" style="color:#555"></i>',
+      'md': '<i class="fas fa-file-alt" style="color:#42a5f5"></i>',
+      'txt': '<i class="fas fa-file-alt" style="color:#888"></i>',
+      'log': '<i class="fas fa-file-alt" style="color:#888"></i>',
+      'bat': '<i class="fas fa-terminal" style="color:#333"></i>',
+      'ps1': '<i class="fas fa-terminal" style="color:#0078d4"></i>',
+      'docx': '<i class="fas fa-file-word" style="color:#2b579a"></i>',
+      'xlsx': '<i class="fas fa-file-excel" style="color:#217346"></i>',
+      'pptx': '<i class="fas fa-file-powerpoint" style="color:#d24726"></i>',
+      'pdf': '<i class="fas fa-file-pdf" style="color:#e74c3c"></i>',
+      'zip': '<i class="fas fa-file-archive" style="color:#e6a23c"></i>',
+      'rar': '<i class="fas fa-file-archive" style="color:#e6a23c"></i>',
+      'mp3': '<i class="fas fa-file-audio" style="color:#9b59b6"></i>',
+      'flac': '<i class="fas fa-file-audio" style="color:#9b59b6"></i>',
+      'mp4': '<i class="fas fa-file-video" style="color:#e74c3c"></i>',
+      'jpg': '<i class="fas fa-file-image" style="color:#27ae60"></i>',
+      'jpeg': '<i class="fas fa-file-image" style="color:#27ae60"></i>',
+      'png': '<i class="fas fa-file-image" style="color:#27ae60"></i>',
+      'gif': '<i class="fas fa-file-image" style="color:#27ae60"></i>',
+      'ico': '<i class="fas fa-file-image" style="color:#27ae60"></i>',
+      'lnk': '<i class="fas fa-share-square" style="color:#666"></i>',
+      'tmp': '<i class="fas fa-file" style="color:#ccc"></i>',
+      'fv2': '<i class="fas fa-box" style="color:#9b6dff"></i>'
+    };
+    return map[ext] || '<i class="fas fa-file" style="color:#aaa"></i>';
+  }
+
+  function getFileType(name, isFolder) {
+    if (isFolder) return '文件夹';
+    var ext = getFileExt(name);
+    if (!ext) return '文件';
+    return ext.toUpperCase() + ' 文件';
+  }
+
+  function renderFileList() {
+    var node = getNodeByPath(state.currentPath);
+    if (!node || !node.children) {
+      dom.gridBody.innerHTML = '';
+      dom.lblItemCount.textContent = '0 个项目';
+      return;
+    }
+
+    var entries = [];
+    Object.keys(node.children).forEach(function(key) {
+      entries.push({ name: key, data: node.children[key] });
+    });
+
+    // 搜索过滤
+    if (state.searchFilter) {
+      var filter = state.searchFilter.toLowerCase();
+      entries = entries.filter(function(e) { return e.name.toLowerCase().indexOf(filter) >= 0; });
+    }
+
+    // 排序：文件夹优先
+    entries.sort(function(a, b) {
+      var aIsFolder = a.data.type === 'folder';
+      var bIsFolder = b.data.type === 'folder';
+      if (aIsFolder && !bIsFolder) return -1;
+      if (!aIsFolder && bIsFolder) return 1;
+
+      var aVal, bVal;
+      switch (state.sortKey) {
+        case 'name': aVal = a.name.toLowerCase(); bVal = b.name.toLowerCase(); break;
+        case 'date': aVal = a.data.date || ''; bVal = b.data.date || ''; break;
+        case 'type': aVal = getFileType(a.name, aIsFolder); bVal = getFileType(b.name, bIsFolder); break;
+        case 'size':
+          aVal = aIsFolder ? 0 : (parseFloat(a.data.size) || 0);
+          bVal = bIsFolder ? 0 : (parseFloat(b.data.size) || 0);
+          return state.sortAsc ? aVal - bVal : bVal - aVal;
+        default: aVal = a.name; bVal = b.name;
+      }
+      var cmp = (aVal < bVal ? -1 : (aVal > bVal ? 1 : 0));
+      return state.sortAsc ? cmp : -cmp;
+    });
+
+    var html = '';
+    entries.forEach(function(entry, index) {
+      var isFolder = entry.data.type === 'folder';
+      var icon = getFileIcon(entry.name, isFolder);
+      var type = getFileType(entry.name, isFolder);
+      var size = isFolder ? '' : formatSize(entry.data.size);
+      var date = entry.data.date || '--';
+      var selClass = '';
+      if (state.selectedFile && state.selectedFile === state.currentPath + '\\' + entry.name) {
+        selClass = ' selected';
+      }
+
+      html += '<div class="dataGrid_row' + selClass + '" data-row-index="' + index + '" data-row-id="row_' + index + '" data-name="' + entry.name + '" data-is-folder="' + isFolder + '" style="display:flex;height:32px;border-bottom:1px solid var(--border);cursor:pointer">';
+      html += '<div class="dataGrid_cell dataGrid_checkbox" style="width:36px;min-width:36px;flex-shrink:0;display:none;align-items:center;justify-content:center"><input type="checkbox" class="dataGrid_row_check" data-ctrl-type="dataGrid_row_checkbox"></div>';
+      html += '<div class="dataGrid_cell file-icon-cell" style="width:40px;min-width:40px;max-width:40px;display:flex;align-items:center;justify-content:center;padding:0"><span class="file-icon">' + icon + '</span></div>';
+      html += '<div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="name" style="flex:1;min-width:120px;padding:0 12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + entry.name + '">' + entry.name + '</div>';
+      html += '<div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="date" style="width:140px;min-width:100px;padding:0 12px" title="' + date + '">' + date + '</div>';
+      html += '<div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="type" style="width:100px;min-width:80px;padding:0 12px">' + type + '</div>';
+      html += '<div class="dataGrid_cell" data-ctrl-type="dataGrid_cell" data-col-key="size" style="width:100px;min-width:80px;padding:0 12px;text-align:right" title="' + size + '">' + size + '</div>';
+      html += '</div>';
+    });
+
+    dom.gridBody.innerHTML = html;
+    dom.lblItemCount.textContent = entries.length + ' 个项目';
+    bindGridEvents();
+
+    // 去除表头排序标记
+    $$('#grid_files .dataGrid_header_cell').forEach(function(h) { h.classList.remove('sorted'); });
+    var hdr = $('#hdr_' + state.sortKey);
+    if (hdr) hdr.classList.add('sorted');
+  }
+
+  // ============================================================
+  // 绑定文件列表事件
+  // ============================================================
+  function bindGridEvents() {
+    dom.gridBody.querySelectorAll('.dataGrid_row').forEach(function(row) {
+      // 单击选中
+      row.addEventListener('click', function(e) {
+        dom.gridBody.querySelectorAll('.dataGrid_row.selected').forEach(function(r) { r.classList.remove('selected'); });
+        this.classList.add('selected');
+        var name = this.getAttribute('data-name');
+        var path = state.currentPath + '\\' + name;
+        state.selectedFile = path;
+        showDetail(name, this.getAttribute('data-is-folder') === 'true');
+
+        // 如果点击的是表头checkbox列则忽略
+        if (e.target.type === 'checkbox') return;
+      });
+
+      // 双击进入文件夹
+      row.addEventListener('dblclick', function() {
+        var isFolder = this.getAttribute('data-is-folder') === 'true';
+        var name = this.getAttribute('data-name');
+        if (isFolder) {
+          navigateTo(state.currentPath + '\\' + name);
+        }
+      });
+    });
+  }
+
+  // 表头排序
+  function bindHeaderSort() {
+    ['name','date','type','size'].forEach(function(key) {
+      var hdr = $('#hdr_' + key);
+      if (!hdr) return;
+      hdr.addEventListener('click', function() {
+        if (state.sortKey === key) {
+          state.sortAsc = !state.sortAsc;
+        } else {
+          state.sortKey = key;
+          state.sortAsc = (key === 'name');
+        }
+        renderFileList();
+      });
+    });
+  }
+
+  // ============================================================
+  // 详情面板
+  // ============================================================
+  function showDetail(name, isFolder) {
+    var node = getNodeByPath(state.currentPath);
+    if (!node || !node.children) return;
+    var entry = node.children[name];
+    if (!entry) return;
+
+    dom.detailEmpty.style.display = 'none';
+    dom.detailPreview.style.display = 'flex';
+
+    var iconHtml = isFolder
+      ? '<i class="fas fa-folder detail-preview-icon folder-icon"></i>'
+      : getFileIcon(name, false).replace('class="', 'class="detail-preview-icon ');
+    dom.detailIcon.innerHTML = iconHtml;
+    dom.detailName.textContent = name;
+    dom.dType.textContent = getFileType(name, isFolder);
+    dom.dSize.textContent = isFolder ? '--' : formatSize(entry.size);
+    dom.dDate.textContent = entry.date || '--';
+    dom.dPath.textContent = state.currentPath;
+  }
+
+  function clearDetail() {
+    dom.detailEmpty.style.display = 'flex';
+    dom.detailPreview.style.display = 'none';
+  }
+
+  // ============================================================
+  // 拖拽分割线
+  // ============================================================
+  function bindSplitBar() {
+    var splitBar = $('#split_bar');
+    var sidebar = $('#sidebar_tree');
+    var detailPanel = $('#panel_detail');
+    var isDragging = false;
+    var startX, startWidth;
+
+    // 调整左边栏
+    splitBar.addEventListener('mousedown', function(e) {
+      isDragging = true;
+      startX = e.clientX;
+      startWidth = sidebar.offsetWidth;
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+      e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', function(e) {
+      if (!isDragging) return;
+      var dx = e.clientX - startX;
+      var newWidth = Math.max(160, Math.min(500, startWidth + dx));
+      sidebar.style.width = newWidth + 'px';
+    });
+
+    document.addEventListener('mouseup', function() {
+      if (isDragging) {
+        isDragging = false;
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+      }
+    });
+  }
+
+  // ============================================================
+  // 主题切换
+  // ============================================================
+  function toggleTheme() {
+    state.isDark = !state.isDark;
+    if (state.isDark) {
+      dom.pageContainer.classList.add('dark-theme');
+      dom.icoTheme.className = 'fas fa-sun';
+      dom.btnTheme.title = '切换浅色主题';
+    } else {
+      dom.pageContainer.classList.remove('dark-theme');
+      dom.icoTheme.className = 'fas fa-moon';
+      dom.btnTheme.title = '切换深色主题';
+    }
+  }
+
+  // ============================================================
+  // 刷新全部
+  // ============================================================
+  function refreshAll() {
+    dom.inpAddress.value = state.currentPath;
+    dom.lblCurrentPath.textContent = state.currentPath;
+    renderTree();
+    renderFileList();
+    renderBreadcrumb();
+    clearDetail();
+
+    // 导航按钮状态
+    dom.btnBack.disabled = state.historyIndex <= 0;
+    dom.btnForward.disabled = state.historyIndex >= state.historyStack.length - 1;
+  }
+
+  // ============================================================
+  // 事件绑定
+  // ============================================================
+  function bindEvents() {
+    dom.btnBack.addEventListener('click', goBack);
+    dom.btnForward.addEventListener('click', goForward);
+    dom.btnUp.addEventListener('click', goUp);
+    dom.btnRefresh.addEventListener('click', refreshAll);
+    dom.btnTheme.addEventListener('click', toggleTheme);
+
+    // 地址栏回车跳转
+    dom.inpAddress.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        var newPath = this.value.trim();
+        var node = getNodeByPath(newPath);
+        if (node) {
+          navigateTo(newPath);
+        } else {
+          this.value = state.currentPath;
+        }
+      }
+    });
+
+    // 搜索实时过滤
+    var searchTimer = null;
+    dom.inpSearch.addEventListener('input', function() {
+      clearTimeout(searchTimer);
+      var self = this;
+      searchTimer = setTimeout(function() {
+        state.searchFilter = self.value.trim();
+        renderFileList();
+      }, 200);
+    });
+
+    bindHeaderSort();
+    bindSplitBar();
+
+    // 键盘快捷键
+    document.addEventListener('keydown', function(e) {
+      if (e.altKey && e.key === 'ArrowLeft') { e.preventDefault(); goBack(); }
+      if (e.altKey && e.key === 'ArrowRight') { e.preventDefault(); goForward(); }
+      if (e.altKey && e.key === 'ArrowUp') { e.preventDefault(); goUp(); }
+      if (e.key === 'F5') { e.preventDefault(); refreshAll(); }
+    });
+  }
+
+  // ============================================================
+  // 初始化
+  // ============================================================
+  function init() {
+    renderTree();
+    bindEvents();
+    refreshAll();
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>

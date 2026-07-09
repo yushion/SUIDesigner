@@ -56,9 +56,14 @@
 html,body{width:100%;height:100%;overflow:hidden}
 .pageContainer{position:relative;overflow:hidden;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 [data-drag-type]{app-region:no-drag;-webkit-app-region:no-drag}
+/* 标题栏按钮拖拽：不用 data-drag-type，用 data-ctrl-type 选择器 */
+.pageContainer [data-ctrl-type^="titlebar_"]{app-region:no-drag;-webkit-app-region:no-drag}
+.pageContainer [data-ctrl-type="titlebar_max"] span{app-region:drag;-webkit-app-region:drag}
 .titlebar_rightBtn{width:35px;height:32px;border:none;background:transparent;cursor:default;display:flex;align-items:center;justify-content:center}
 .titlebar_rightBtn:hover{background:rgba(0,0,0,0.06)}
 .titlebar_rightBtn_close:hover{background:#e81123;color:#fff}
+/* 保护 Font Awesome 图标字体 */
+.pageContainer i[class*="fa-"]{font-family:"Font Awesome 6 Free"!important;font-weight:900}
 </style>
 </head>
 <body>
@@ -71,11 +76,11 @@ html,body{width:100%;height:100%;overflow:hidden}
     <div class="titlebar_left">...</div>
     <div class="titlebar_center">...</div>
     <div class="titlebar_right">
-      <button id="titlebar_min" data-ctrl-type="titlebar_min" data-drag-type="titlebar_min" class="titlebar_rightBtn">─</button>
-      <button id="titlebar_max" data-ctrl-type="titlebar_max" data-drag-type="titlebar_max" class="titlebar_rightBtn">
-        <span style="app-region:drag;-webkit-app-region:drag;display:flex;">□</span>
+      <button id="titlebar_min" data-ctrl-type="titlebar_min" class="titlebar_rightBtn">─</button>
+      <button id="titlebar_max" data-ctrl-type="titlebar_max" class="titlebar_rightBtn">
+        <span style="display:flex;">□</span>
       </button>
-      <button id="titlebar_close" data-ctrl-type="titlebar_close" data-drag-type="titlebar_close" class="titlebar_rightBtn titlebar_rightBtn_close">✕</button>
+      <button id="titlebar_close" data-ctrl-type="titlebar_close" class="titlebar_rightBtn titlebar_rightBtn_close">✕</button>
     </div>
   </div>
 
@@ -86,3 +91,20 @@ html,body{width:100%;height:100%;overflow:hidden}
 </body>
 </html>
 ```
+⚠️ 先将 `webviewBridge.js` 复制到 `output/` 目录，再在此目录中创建页面文件。
+
+## fv2_packer 打包速查
+
+```sh
+# 自动命名（入口名.app.fv2）
+fv2_packer.exe D:\output\myapp.html
+fv2_packer.exe D:\output myapp.html
+
+# 指定输出名
+fv2_packer.exe D:\output myapp.html myapp   # → myapp.fv2
+
+# 不加密 / 指定 token
+fv2_packer.exe D:\output\myapp.html --no-encrypt
+fv2_packer.exe D:\output\myapp.html --token=X4FE85
+```
+

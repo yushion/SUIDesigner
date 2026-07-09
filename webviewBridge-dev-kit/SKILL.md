@@ -36,13 +36,14 @@ description: >
 ### 第二步：生成页面（按此顺序）
 
 ```
-1. <!DOCTYPE html> → <head>（meta + Font Awesome + <style>）
-2. CSS：全局 reset + [data-drag-type] no-drag + 标题栏 + 毛玻璃
-3. <body> → .pageContainer#pageContainer
-4. 标题栏 .titlebar（含三按钮：min/max/close）
-5. 布局：侧边栏 + 内容区
-6. 逐个添加控件（每个对照下方检查清单）
-7. <script src="webviewBridge.js"></script>
+1. 如 output/ 不存在则创建该目录，并将 webviewBridge.js 复制到 output/ 中
+2. <!DOCTYPE html> → <head>（meta + Font Awesome + <style>）
+3. CSS：全局 reset + 标题栏拖拽规则 + 毛玻璃 + button inherit
+4. <body> → .pageContainer#pageContainer
+5. 标题栏 .titlebar（含三按钮：min/max/close）
+6. 布局：侧边栏 + 内容区
+7. 逐个添加控件（每个对照下方检查清单）
+8. 文件保存到 output/xxx.html，引入 <script src="webviewBridge.js"></script>
 ```
 
 **每个控件生成检查清单**：
@@ -260,6 +261,11 @@ description: >
   background: none;
   cursor: pointer;
 }
+/* 保护 Font Awesome 图标字体不被 inherit 覆盖 */
+.pageContainer i[class*="fa-"] {
+  font-family: "Font Awesome 6 Free" !important;
+  font-weight: 900;
+}
 ```
 
 ### 规则 2：背景色策略
@@ -318,8 +324,14 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',Tahoma,G
 .titlebar_rightBtn:hover{background:rgba(0,0,0,0.06)}
 .titlebar_rightBtn_close:hover{background:#e81123;color:#fff}
 
+/* 标题栏按钮拖拽：不用 data-drag-type，用 data-ctrl-type 选择器控制（避免 WebView2 子元素拖拽句柄失效） */
+.pageContainer [data-ctrl-type^="titlebar_"]{app-region:no-drag;-webkit-app-region:no-drag}
+.pageContainer [data-ctrl-type="titlebar_max"] span{app-region:drag;-webkit-app-region:drag}
+
 /* button 子元素覆盖浏览器 UA */
 .tabsContainer_headerBar_btn,.cardBox_collapse_btn{color:inherit;font-size:inherit;font-family:inherit;border:none;background:none;cursor:pointer}
+/* 保护 Font Awesome 图标字体不被 inherit 覆盖 */
+.pageContainer i[class*="fa-"]{font-family:"Font Awesome 6 Free"!important;font-weight:900}
 </style>
 </head>
 <body>
@@ -339,11 +351,11 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',Tahoma,G
             style="font-size:13px;font-weight:600;">我的应用</span>
     </div>
     <div class="titlebar_right" style="display:flex;align-items:center;padding-right:4px;">
-      <button id="titlebar_min" data-ctrl-type="titlebar_min" data-drag-type="titlebar_min" data-name="最小化" class="titlebar_rightBtn">─</button>
-      <button id="titlebar_max" data-ctrl-type="titlebar_max" data-drag-type="titlebar_max" data-name="最大化" class="titlebar_rightBtn">
-        <span style="app-region:drag;-webkit-app-region:drag;width:18px;height:18px;display:flex;align-items:center;justify-content:center;">□</span>
+      <button id="titlebar_min" data-ctrl-type="titlebar_min" data-name="最小化" class="titlebar_rightBtn">─</button>
+      <button id="titlebar_max" data-ctrl-type="titlebar_max" data-name="最大化" class="titlebar_rightBtn">
+        <span style="width:18px;height:18px;display:flex;align-items:center;justify-content:center;">□</span>
       </button>
-      <button id="titlebar_close" data-ctrl-type="titlebar_close" data-drag-type="titlebar_close" data-name="关闭" class="titlebar_rightBtn titlebar_rightBtn_close">✕</button>
+      <button id="titlebar_close" data-ctrl-type="titlebar_close" data-name="关闭" class="titlebar_rightBtn titlebar_rightBtn_close">✕</button>
     </div>
   </div>
 
@@ -354,6 +366,47 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',Tahoma,G
 </body>
 </html>
 ```
+
+⚠️ 开发前先将 `webviewBridge.js` 复制一份到 `output/` 目录中。
+
+---
+
+## 打包部署（fv2_packer.exe）
+
+本包根目录下的 `fv2_packer.exe` 用于将开发好的页面打包为 `.fv2` 应用包。
+
+**基本用法**：
+```sh
+# 入口文件全路径 → 自动输出 入口名.app.fv2 -> myapp.app.fv2
+fv2_packer.exe D:\output\myapp.html
+
+# 目录 + 入口文件名 → 输出 入口名.app.fv2 -> myapp.app.fv2
+fv2_packer.exe D:\output myapp.html
+
+# 指定输出文件名  → 输出  myapp → myapp.fv2
+fv2_packer.exe D:\output myapp.html myapp
+
+# 指定输出文件名  → 输出  myapp.fv2 → myapp.fv2
+fv2_packer.exe D:\output myapp.html myapp.fv2
+```
+
+**加密 / Token**：
+```sh
+# 默认加密打包
+fv2_packer.exe D:\output\myapp.html
+
+# 不加密
+fv2_packer.exe D:\output\myapp.html --no-encrypt
+
+# 指定 token（不指定则自动随机生成 6 位）
+fv2_packer.exe D:\output\myapp.html --token=X4FE85
+fv2_packer.exe D:\output\myapp.html --token=A1B2C3 --no-encrypt
+```
+
+⚠️ `--no-encrypt` 和 `--token=` 可放在任意参数位置，不要求排序。
+⚠️ 打包时会把整个目录（含 `webviewBridge.js`、CSS、图片等）一并打包。
+
+当用户说"打包"或"发布"时，指导用户使用上述命令。
 
 ---
 

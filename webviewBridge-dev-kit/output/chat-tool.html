@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>聊天工具</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:transparent}
+body{display:flex}
+:root{
+  --bg-primary:#ffffff;--bg-secondary:#f5f5f5;--bg-tertiary:#e8e8e8;
+  --text-primary:#1a1a1a;--text-secondary:#555;--text-muted:#999;
+  --accent:#0078d4;--accent-hover:#106ebe;--accent-light:rgba(0,120,212,0.06);
+  --border:rgba(0,0,0,0.07);--border-strong:rgba(0,0,0,0.12);
+  --card-bg:rgba(255,255,255,0.75);--hover:rgba(0,0,0,0.04);
+  --titlebar-bg:#f8f8f8;--panel-bg:#fafafa;
+  --msg-sent:#0078d4;--msg-sent-text:#fff;
+  --msg-received:#f0f0f0;--msg-received-text:#333;
+  --input-bg:#fff;--input-border:rgba(0,0,0,0.12);
+  --online:#4caf50;--offline:#bbb;
+  --avatar-bg:linear-gradient(135deg,#667eea,#764ba2);
+}
+.pageContainer.dark-theme{
+  --bg-primary:#1e1e2e;--bg-secondary:#252536;--bg-tertiary:#2d2d44;
+  --text-primary:#e0e0e0;--text-secondary:#a0a0b0;--text-muted:#6a6a7a;
+  --accent:#9b6dff;--accent-hover:#b088ff;--accent-light:rgba(155,109,255,0.08);
+  --border:rgba(255,255,255,0.05);--border-strong:rgba(255,255,255,0.08);
+  --card-bg:rgba(30,30,46,0.75);--hover:rgba(255,255,255,0.03);
+  --titlebar-bg:#1a1a2e;--panel-bg:#222233;
+  --msg-sent:#9b6dff;--msg-sent-text:#fff;
+  --msg-received:#2d2d44;--msg-received-text:#e0e0e0;
+  --input-bg:#2d2d40;--input-border:rgba(255,255,255,0.08);
+}
+.pageContainer,.pageContainer *{transition:background-color 0.3s ease,color 0.3s ease,border-color 0.3s ease}
+.pageContainer{position:relative;overflow:hidden;width:100%;height:100%;display:flex;flex-direction:column;background:var(--bg-primary);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+[data-drag-type]{app-region:no-drag;-webkit-app-region:no-drag}
+.pageContainer button{color:inherit;font-size:inherit;font-family:inherit}
+.pageContainer i[class*="fa-"]{font-family:"Font Awesome 6 Free"!important;font-weight:900}
+
+/* 标题栏 */
+.titlebar{height:40px;display:flex;align-items:center;flex-shrink:0;background:var(--titlebar-bg);border-bottom:1px solid var(--border);user-select:none;z-index:10}
+.titlebar .tl_l{width:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.titlebar .tl_l_icon{width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--accent)}
+.titlebar .tl_c{flex:1;display:flex;align-items:center;min-width:0;gap:8px}
+.titlebar .tl_c_t{font-size:13px;font-weight:600;color:var(--text-primary)}
+.titlebar .tl_r{display:flex;align-items:center;height:100%;padding-right:4px;flex-shrink:0;gap:2px}
+.titlebar .tb{width:35px;height:32px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:default;border-radius:4px;flex-shrink:0;color:var(--text-primary);font-size:12px}
+.titlebar .tb:hover{background:var(--hover)}
+.titlebar .tb_close:hover{background:#e81123;color:#fff!important}
+.titlebar .theme_btn{width:35px;height:32px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:pointer;border-radius:4px;flex-shrink:0;color:var(--text-primary);font-size:14px}
+.titlebar .theme_btn:hover{background:var(--hover)}
+.pageContainer [data-ctrl-type^="titlebar_"]{app-region:no-drag;-webkit-app-region:no-drag}
+.pageContainer [data-ctrl-type="titlebar_max"] span{app-region:drag;-webkit-app-region:drag}
+
+/* 主区域 */
+.main-area{flex:1;display:flex;overflow:hidden;min-height:0}
+
+/* 联系人侧边栏 */
+.contact-sidebar{width:260px;flex-shrink:0;border-right:1px solid var(--border);background:var(--panel-bg);display:flex;flex-direction:column;overflow:hidden}
+.contact-search{padding:10px;border-bottom:1px solid var(--border);flex-shrink:0}
+.contact-search input{width:100%;height:32px;padding:0 12px;border:1px solid var(--input-border);border-radius:8px;background:var(--input-bg);color:var(--text-primary);font-size:12px;outline:none}
+.contact-search input:focus{border-color:var(--accent)}
+.contact-list{flex:1;overflow-y:auto}
+.contact-item{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--border);transition:background 0.1s ease}
+.contact-item:hover{background:var(--hover)}
+.contact-item.active{background:var(--accent-light)}
+.contact-item .avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;font-weight:600;flex-shrink:0;position:relative}
+.contact-item .avatar .status-dot{position:absolute;width:10px;height:10px;border-radius:50%;bottom:0;right:0;border:2px solid var(--panel-bg)}
+.contact-item .avatar .status-dot.online{background:var(--online)}
+.contact-item .avatar .status-dot.offline{background:var(--offline)}
+.contact-item .info{flex:1;min-width:0}
+.contact-item .info .name{font-size:13px;font-weight:500;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.contact-item .info .preview{font-size:11px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.contact-item .meta{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0}
+.contact-item .meta .time{font-size:10px;color:var(--text-muted)}
+.contact-item .meta .badge{background:var(--accent);color:#fff;font-size:10px;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 5px}
+
+/* 聊天区域 */
+.chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+/* 聊天头部 */
+.chat-header{height:50px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid var(--border);background:var(--card-bg);flex-shrink:0;gap:10px}
+.chat-header .ch_avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:600;flex-shrink:0}
+.chat-header .ch_info{flex:1}
+.chat-header .ch_name{font-size:13px;font-weight:600;color:var(--text-primary)}
+.chat-header .ch_status{font-size:11px;color:var(--text-muted)}
+.chat-header .ch_actions{display:flex;gap:4px}
+.chat-header .ch_btn{width:30px;height:30px;border:none;background:transparent;border-radius:6px;cursor:pointer;color:var(--text-secondary);font-size:13px;display:flex;align-items:center;justify-content:center}
+.chat-header .ch_btn:hover{background:var(--hover);color:var(--accent)}
+
+/* 消息列表 */
+.msg-list{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:var(--bg-primary)}
+.msg-date-divider{text-align:center;font-size:11px;color:var(--text-muted);margin:8px 0}
+.msg-bubble{max-width:70%;padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.5;word-break:break-word;position:relative}
+.msg-bubble.sent{align-self:flex-end;background:var(--msg-sent);color:var(--msg-sent-text);border-bottom-right-radius:4px}
+.msg-bubble.received{align-self:flex-start;background:var(--msg-received);color:var(--msg-received-text);border-bottom-left-radius:4px}
+.msg-bubble .msg-time{font-size:10px;opacity:0.7;margin-top:4px;text-align:right}
+.msg-bubble.received .msg-time{text-align:left}
+
+/* 输入区域 */
+.input-area{padding:12px 16px;border-top:1px solid var(--border);background:var(--card-bg);flex-shrink:0;display:flex;gap:8px;align-items:flex-end}
+.input-area textarea{flex:1;height:40px;max-height:120px;padding:8px 12px;border:1px solid var(--input-border);border-radius:8px;background:var(--input-bg);color:var(--text-primary);font-size:13px;outline:none;resize:none;font-family:inherit;line-height:1.4}
+.input-area textarea:focus{border-color:var(--accent)}
+.input-area .send-btn{width:40px;height:40px;border-radius:8px;border:none;background:var(--accent);color:#fff;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all 0.12s ease;flex-shrink:0}
+.input-area .send-btn:hover{background:var(--accent-hover);transform:scale(1.05)}
+.input-area .send-btn:active{transform:scale(0.95)}
+
+/* 滚动条 */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(128,128,128,0.2);border-radius:3px}
+</style>
+</head>
+<body>
+<div class="pageContainer" id="pageContainer" data-ctrl-type="pageContainer" data-name="canvas"
+     data-original-width="880" data-original-height="600"
+     style="app-region:drag;-webkit-app-region:drag">
+
+  <!-- ================================================================
+       标题栏
+       ================================================================ -->
+  <div class="titlebar" id="titlebar" data-name="标题栏" style="app-region:drag;-webkit-app-region:drag">
+    <div class="tl_l">
+      <span id="titlebar_icon" data-ctrl-type="titlebar_left_icon" data-drag-type="titlebar_left_icon" data-name="图标" class="tl_l_icon">
+        <i class="fas fa-comments"></i>
+      </span>
+    </div>
+    <div class="tl_c">
+      <span id="titlebar_title" data-ctrl-type="titlebar_title" data-drag-type="titlebar_title" data-name="标题" class="tl_c_t">聊天工具</span>
+    </div>
+    <div class="tl_r">
+      <button id="btn_theme" data-ctrl-type="button" data-drag-type="button" data-type="button" data-name="切换主题"
+              class="theme_btn" title="切换主题"><i class="fas fa-moon" id="ico_theme"></i></button>
+      <button id="titlebar_min" data-ctrl-type="titlebar_min" data-name="最小化" class="tb" title="最小化">─</button>
+      <button id="titlebar_max" data-ctrl-type="titlebar_max" data-name="最大化" class="tb" title="最大化">
+        <span style="width:18px;height:18px;display:flex;align-items:center;justify-content:center">□</span>
+      </button>
+      <button id="titlebar_close" data-ctrl-type="titlebar_close" data-name="关闭" class="tb tb_close" title="关闭">✕</button>
+    </div>
+  </div>
+
+  <!-- ================================================================
+       主区域
+       ================================================================ -->
+  <div class="main-area">
+    <!-- 联系人列表 -->
+    <div class="contact-sidebar">
+      <div class="contact-search">
+        <input id="inp_search" data-ctrl-type="inputText" data-drag-type="inputText" data-type="input" data-name="搜索联系人"
+               type="text" placeholder="搜索联系人..." />
+      </div>
+      <div class="contact-list" id="contact_list">
+      </div>
+    </div>
+
+    <!-- 聊天区域 -->
+    <div class="chat-area">
+      <!-- 聊天头部 -->
+      <div class="chat-header" id="chat_header">
+        <div class="ch_avatar" id="ch_avatar" style="background:var(--avatar-bg)">李</div>
+        <div class="ch_info">
+          <span id="lbl_chatName" data-ctrl-type="label" data-drag-type="label" data-type="label" data-name="聊天对象"
+                class="ch_name" style="font-size:13px;font-weight:600;color:var(--text-primary)">李思雨</span>
+          <span id="lbl_chatStatus" data-ctrl-type="label" data-drag-type="label" data-type="label" data-name="在线状态"
+                class="ch_status" style="font-size:11px;color:var(--text-muted)">在线</span>
+        </div>
+        <div class="ch_actions">
+          <button id="btn_phone" data-ctrl-type="iconButton" data-drag-type="iconButton" data-type="iconButton" data-name="语音"
+                  class="ch_btn" title="语音通话"><i class="fas fa-phone"></i></button>
+          <button id="btn_video" data-ctrl-type="iconButton" data-drag-type="iconButton" data-type="iconButton" data-name="视频"
+                  class="ch_btn" title="视频通话"><i class="fas fa-video"></i></button>
+          <button id="btn_more" data-ctrl-type="iconButton" data-drag-type="iconButton" data-type="iconButton" data-name="更多"
+                  class="ch_btn" title="更多"><i class="fas fa-ellipsis-h"></i></button>
+        </div>
+      </div>
+
+      <!-- 消息列表 -->
+      <div class="msg-list" id="msg_list">
+      </div>
+
+      <!-- 输入区域 -->
+      <div class="input-area">
+        <textarea id="inp_msg" data-ctrl-type="textarea" data-drag-type="textarea" data-type="textarea" data-name="消息输入"
+                  placeholder="输入消息... (Enter 发送)" rows="1"></textarea>
+        <button id="btn_send" data-ctrl-type="iconButton" data-drag-type="iconButton" data-type="iconButton" data-name="发送"
+                class="send-btn" title="发送">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="webviewBridge.js"></script>
+<script>
+(function(){
+  'use strict';
+  var $=function(s){return document.querySelector(s)};
+  var $$=function(s){return document.querySelectorAll(s)};
+
+  // 联系人数据
+  var contacts=[
+    {id:'c1',name:'李思雨',avatar:'李',color:'linear-gradient(135deg,#667eea,#764ba2)',online:true,preview:'好的，明天见面聊',time:'12:30',badge:3},
+    {id:'c2',name:'王明哲',avatar:'王',color:'linear-gradient(135deg,#f093fb,#f5576c)',online:true,preview:'文件我已经发你了',time:'11:15',badge:0},
+    {id:'c3',name:'张伟',avatar:'张',color:'linear-gradient(135deg,#4facfe,#00f2fe)',online:false,preview:'谢谢！',time:'昨天',badge:0},
+    {id:'c4',name:'陈晓红',avatar:'陈',color:'linear-gradient(135deg,#43e97b,#38f9d7)',online:true,preview:'会议纪要整理好了吗',time:'昨天',badge:1},
+    {id:'c5',name:'刘洋',avatar:'刘',color:'linear-gradient(135deg,#fa709a,#fee140)',online:false,preview:'收到，辛苦了',time:'周一',badge:0},
+    {id:'c6',name:'赵敏',avatar:'赵',color:'linear-gradient(135deg,#a18cd1,#fbc2eb)',online:true,preview:'周末一起吃饭吧',time:'周日',badge:0},
+    {id:'c7',name:'产品讨论组',avatar:'产',color:'linear-gradient(135deg,#ff9a9e,#fecfef)',online:true,preview:'周鹏：新需求已提交',time:'10:05',badge:12}
+  ];
+
+  // 模拟对话数据
+  var conversations={
+    'c1':[
+      {type:'received',text:'你好，明天的会议几点开始？',time:'10:20'},
+      {type:'sent',text:'上午10点，在三楼会议室',time:'10:22'},
+      {type:'received',text:'好的，我会提前准备好演示文稿',time:'10:25'},
+      {type:'sent',text:'辛苦了，有什么需要我配合的吗？',time:'10:26'},
+      {type:'received',text:'能把上次的项目数据发我一份吗？我需要在演示中引用',time:'10:28'},
+      {type:'sent',text:'没问题，我这就发给你',time:'10:30'},
+      {type:'received',text:'好的，明天见面聊',time:'12:30'}
+    ],
+    'c2':[
+      {type:'sent',text:'设计稿已经更新了，你看一下',time:'09:30'},
+      {type:'received',text:'看到了，色彩方案调整得不错',time:'09:45'},
+      {type:'sent',text:'那我按这个方案继续开发了',time:'09:50'},
+      {type:'received',text:'文件我已经发你了',time:'11:15'}
+    ],
+    'c3':[
+      {type:'sent',text:'张伟，那个bug修复了吗？',time:'15:00'},
+      {type:'received',text:'修复了，已经提交到dev分支',time:'15:30'},
+      {type:'sent',text:'好的我来review一下',time:'15:35'},
+      {type:'received',text:'谢谢！',time:'16:00'}
+    ],
+    'c4':[
+      {type:'received',text:'会议纪要整理好了吗',time:'14:00'},
+      {type:'sent',text:'正在整理，稍等',time:'14:05'},
+      {type:'received',text:'记得发到群里',time:'14:06'}
+    ],
+    'c5':[
+      {type:'sent',text:'项目报告我写完了，你看看',time:'周一'},
+      {type:'received',text:'收到，辛苦了',time:'周一'}
+    ],
+    'c6':[
+      {type:'received',text:'周末一起吃饭吧',time:'周日'},
+      {type:'sent',text:'好啊，去哪里？',time:'周日'},
+      {type:'received',text:'新开的那家日料怎么样？',time:'周日'}
+    ],
+    'c7':[
+      {type:'received',text:'周鹏：新需求已提交',time:'10:05'},
+      {type:'sent',text:'收到了，我来分配任务',time:'10:08'},
+      {type:'received',text:'李思雨：我这周比较忙，下周一可以开始',time:'10:10'},
+      {type:'received',text:'王明哲：我可以接手前端部分',time:'10:12'}
+    ]
+  };
+
+  var state={isDark:false,activeChat:'c1'};
+  var dom={
+    pageContainer:$('#pageContainer'),
+    btnTheme:$('#btn_theme'),icoTheme:$('#ico_theme'),
+    contactList:$('#contact_list'),
+    msgList:$('#msg_list'),
+    inpMsg:$('#inp_msg'),
+    btnSend:$('#btn_send'),
+    chAvatar:$('#ch_avatar'),
+    inpSearch:$('#inp_search')
+  };
+
+  /** 构建联系人列表 */
+  function renderContacts(filter){
+    filter=(filter||'').toLowerCase();
+    var html='';
+    contacts.forEach(function(c){
+      if(filter && c.name.toLowerCase().indexOf(filter)<0) return;
+      var activeClass=c.id===state.activeChat?' active':'';
+      var badgeHtml=c.badge>0?'<span class="badge">'+(c.badge>99?'99+':c.badge)+'</span>':'';
+      html+='<div class="contact-item'+activeClass+'" data-contact-id="'+c.id+'">'
+        +'<div class="avatar" style="background:'+c.color+'">'+c.avatar
+        +'<span class="status-dot '+(c.online?'online':'offline')+'"></span></div>'
+        +'<div class="info"><div class="name">'+c.name+'</div><div class="preview">'+c.preview+'</div></div>'
+        +'<div class="meta"><span class="time">'+c.time+'</span>'+badgeHtml+'</div>'
+        +'</div>';
+    });
+    dom.contactList.innerHTML=html;
+
+    dom.contactList.querySelectorAll('.contact-item').forEach(function(item){
+      item.addEventListener('click',function(){
+        var cid=this.getAttribute('data-contact-id');
+        switchChat(cid);
+      });
+    });
+  }
+
+  /** 切换聊天对象 */
+  function switchChat(cid){
+    state.activeChat=cid;
+    var contact=contacts.find(function(c){return c.id===cid});
+    if(!contact) return;
+    dom.chAvatar.style.background=contact.color;
+    dom.chAvatar.textContent=contact.avatar;
+    $('#lbl_chatName').textContent=contact.name;
+    $('#lbl_chatStatus').textContent=contact.online?'在线':'离线';
+    renderContacts(dom.inpSearch.value);
+    renderMessages();
+    dom.msgList.scrollTop=dom.msgList.scrollHeight;
+  }
+
+  /** 渲染消息 */
+  function renderMessages(){
+    var msgs=conversations[state.activeChat]||[];
+    var html='';
+    msgs.forEach(function(m){
+      html+='<div class="msg-bubble '+m.type+'"><div>'+m.text+'</div><div class="msg-time">'+m.time+'</div></div>';
+    });
+    dom.msgList.innerHTML=html;
+  }
+
+  /** 发送消息 */
+  function sendMessage(){
+    var text=dom.inpMsg.value.trim();
+    if(!text) return;
+    var now=new Date();
+    var time=('0'+now.getHours()).slice(-2)+':'+('0'+now.getMinutes()).slice(-2);
+    if(!conversations[state.activeChat]) conversations[state.activeChat]=[];
+    conversations[state.activeChat].push({type:'sent',text:text,time:time});
+    dom.inpMsg.value='';
+    renderMessages();
+    dom.msgList.scrollTop=dom.msgList.scrollHeight;
+    renderContacts(dom.inpSearch.value);
+
+    // 模拟自动回复
+    setTimeout(function(){
+      var replies=['收到！','好的，明白了👍','嗯嗯，稍等我看一下','哈哈，说得对','这个想法不错，我们讨论一下','我马上处理'];
+      var reply=replies[Math.floor(Math.random()*replies.length)];
+      var t2=new Date();var t2Str=('0'+t2.getHours()).slice(-2)+':'+('0'+t2.getMinutes()).slice(-2);
+      conversations[state.activeChat].push({type:'received',text:reply,time:t2Str});
+      renderMessages();
+      dom.msgList.scrollTop=dom.msgList.scrollHeight;
+      renderContacts(dom.inpSearch.value);
+    },800+Math.random()*1500);
+  }
+
+  /** 主题切换 */
+  function toggleTheme(force){
+    var dark=typeof force==='boolean'?force:!state.isDark;
+    state.isDark=dark;
+    if(dark){dom.pageContainer.classList.add('dark-theme');dom.icoTheme.className='fas fa-sun'}
+    else{dom.pageContainer.classList.remove('dark-theme');dom.icoTheme.className='fas fa-moon'}
+  }
+
+  /** 绑定事件 */
+  function bindEvents(){
+    dom.btnTheme.addEventListener('click',function(){toggleTheme()});
+    dom.btnSend.addEventListener('click',sendMessage);
+    dom.inpMsg.addEventListener('keydown',function(e){
+      if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}
+    });
+    dom.inpSearch.addEventListener('input',function(){renderContacts(this.value)});
+  }
+
+  function init(){
+    renderContacts();
+    switchChat('c1');
+    bindEvents();
+  }
+  init();
+})();
+</script>
+</body>
+</html>

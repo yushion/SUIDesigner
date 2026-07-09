@@ -32,6 +32,7 @@ webviewBridge-dev-kit/
 ├── .cursorrules                     AI 规则：20 条硬性约束 + 控件速查表
 ├── SKILL.md                         AI 技能：工作流 + 6 种复杂控件完整模板 + 踩坑表
 ├── dev-guide.html                   完整开发文档（浏览器打开）
+├── fv2_packer.exe                   项目打包程序：将所有文件打包为 .fv2 压缩包
 │
 ├── public/
 │   ├── webviewBridge.js             ★ 桥接脚本（页面必须引入）
@@ -60,6 +61,7 @@ webviewBridge-dev-kit/
 | `references/example.html` | 完整可运行的实际页面（对照 HTML/CSS 写法） | 推荐 |
 | `public/webviewBridge.js` | 桥接脚本（页面 `<script src="webviewBridge.js">` 引入） | 运行时 |
 | `public/webviewBridge_api_doc.html` | 所有 API 方法文档 | 按需 |
+| `fv2_packer.exe` | 将所有文件打包为 .fv2 压缩包（SKILL.md 详细介绍了使用命令） | 按需 |
 
 ---
 

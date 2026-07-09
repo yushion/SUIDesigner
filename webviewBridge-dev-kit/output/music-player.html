@@ -352,6 +352,8 @@ button i, button span{
   font-size:11px;color:var(--text-tertiary);
   transition:color 0.3s;
 }
+.pageContainer [data-ctrl-type^="titlebar_"] { app-region: no-drag; -webkit-app-region: no-drag;}
+.pageContainer [data-ctrl-type="titlebar_max"] span { app-region: drag; -webkit-app-region: drag;}
 </style>
 </head>
 <body>
@@ -385,11 +387,15 @@ button i, button span{
       </button>
 
       <!-- 标准三按钮 -->
-      <button id="titlebar_min" data-ctrl-type="titlebar_min" data-drag-type="titlebar_min" data-name="最小化" class="titlebar_rightBtn">─</button>
-      <button id="titlebar_max" data-ctrl-type="titlebar_max" data-drag-type="titlebar_max" data-name="最大化" class="titlebar_rightBtn">
-        <span style="app-region:drag;-webkit-app-region:drag;width:12px;height:12px;display:flex;align-items:center;justify-content:center;">□</span>
+      <button id="titlebar_min" data-ctrl-type="titlebar_min" data-name="最小化" class="titlebar_rightBtn">─</button>
+      <button id="titlebar_max" data-ctrl-type="titlebar_max" data-name="最大化" class="titlebar_rightBtn">
+        <span style="width:18px;height:18px;display:flex;align-items:center;justify-content:center;">
+		<svg width="12" height="12" viewBox="0 0 10 10" shape-rendering="crispEdges">
+			<rect x="1" y="1" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1"/>
+		</svg>
+	</span>
       </button>
-      <button id="titlebar_close" data-ctrl-type="titlebar_close" data-drag-type="titlebar_close" data-name="关闭" class="titlebar_rightBtn titlebar_rightBtn_close">✕</button>
+      <button id="titlebar_close" data-ctrl-type="titlebar_close" data-name="关闭" class="titlebar_rightBtn titlebar_rightBtn_close">✕</button>
     </div>
   </div>
 

@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>设置面板</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:transparent}
+body{display:flex}
+:root{
+  --bg-primary:#ffffff;--bg-secondary:#f5f5f5;--bg-tertiary:#e8e8e8;
+  --text-primary:#1a1a1a;--text-secondary:#555;--text-muted:#888;
+  --accent:#0078d4;--accent-hover:#106ebe;--accent-light:rgba(0,120,212,0.06);
+  --border:rgba(0,0,0,0.07);--border-strong:rgba(0,0,0,0.12);
+  --card-bg:rgba(255,255,255,0.8);--hover:rgba(0,0,0,0.04);
+  --titlebar-bg:#f8f8f8;--panel-bg:#fafafa;
+  --switch-bg:#ccc;--switch-active:#0078d4;
+  --input-bg:#fff;--input-border:rgba(0,0,0,0.12);
+  --divider-color:rgba(0,0,0,0.06);
+}
+.pageContainer.dark-theme{
+  --bg-primary:#1e1e2e;--bg-secondary:#252536;--bg-tertiary:#2d2d44;
+  --text-primary:#e0e0e0;--text-secondary:#a0a0b0;--text-muted:#6a6a7a;
+  --accent:#9b6dff;--accent-hover:#b088ff;--accent-light:rgba(155,109,255,0.08);
+  --border:rgba(255,255,255,0.05);--border-strong:rgba(255,255,255,0.08);
+  --card-bg:rgba(30,30,46,0.8);--hover:rgba(255,255,255,0.03);
+  --titlebar-bg:#1a1a2e;--panel-bg:#222233;
+  --switch-bg:#444;--switch-active:#9b6dff;
+  --input-bg:#2d2d40;--input-border:rgba(255,255,255,0.08);
+  --divider-color:rgba(255,255,255,0.05);
+}
+.pageContainer,.pageContainer *{transition:background-color 0.3s ease,color 0.3s ease,border-color 0.3s ease}
+.pageContainer{position:relative;overflow:hidden;width:100%;height:100%;display:flex;flex-direction:column;background:var(--bg-primary);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+[data-drag-type]{app-region:no-drag;-webkit-app-region:no-drag}
+.pageContainer button{color:inherit;font-size:inherit;font-family:inherit}
+.pageContainer i[class*="fa-"]{font-family:"Font Awesome 6 Free"!important;font-weight:900}
+
+/* 标题栏 */
+.titlebar{position:relative;height:40px;display:flex;align-items:center;flex-shrink:0;background:var(--titlebar-bg);border-bottom:1px solid var(--border);user-select:none;z-index:10}
+.titlebar .tl_l{width:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.titlebar .tl_l_icon{width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--accent)}
+.titlebar .tl_c{flex:1;display:flex;align-items:center;min-width:0}
+.titlebar .tl_c_t{font-size:13px;font-weight:600;color:var(--text-primary)}
+.titlebar .tl_r{display:flex;align-items:center;height:100%;padding-right:4px;flex-shrink:0;gap:2px}
+.titlebar .tb_btn{width:35px;height:32px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:default;border-radius:4px;flex-shrink:0;color:var(--text-primary);font-size:12px}
+.titlebar .tb_btn:hover{background:var(--hover)}
+.titlebar .tb_close:hover{background:#e81123;color:#fff!important}
+.titlebar .theme_btn{width:35px;height:32px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:pointer;border-radius:4px;flex-shrink:0;color:var(--text-primary);font-size:14px}
+.titlebar .theme_btn:hover{background:var(--hover)}
+.pageContainer [data-ctrl-type^="titlebar_"]{app-region:no-drag;-webkit-app-region:no-drag}
+.pageContainer [data-ctrl-type="titlebar_max"] span{app-region:drag;-webkit-app-region:drag}
+
+/* 主区域 */
+.main-area{flex:1;display:flex;overflow:hidden;min-height:0}
+
+/* 左侧导航 */
+.nav-sidebar{width:200px;flex-shrink:0;border-right:1px solid var(--border);background:var(--panel-bg);display:flex;flex-direction:column;overflow:hidden}
+.nav-sidebar .nav-item{padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:var(--text-secondary);border-left:3px solid transparent;transition:all 0.12s ease}
+.nav-sidebar .nav-item:hover{background:var(--hover);color:var(--text-primary)}
+.nav-sidebar .nav-item.active{background:var(--accent-light);color:var(--accent);border-left-color:var(--accent);font-weight:500}
+.nav-sidebar .nav-item i{width:18px;text-align:center;font-size:14px}
+
+/* 右侧内容 */
+.content-panel{flex:1;overflow-y:auto;padding:24px 32px;background:var(--bg-primary)}
+.content-panel .section{display:none}
+.content-panel .section.active{display:block}
+.content-panel .section-title{font-size:18px;font-weight:600;color:var(--text-primary);margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--divider-color)}
+
+/* 设置项 */
+.setting-group{margin-bottom:24px}
+.setting-group-title{font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-radius:8px;background:var(--card-bg);border:1px solid var(--border);margin-bottom:8px}
+.setting-row .row-label{display:flex;flex-direction:column;gap:2px}
+.setting-row .row-label .title{font-size:13px;font-weight:500;color:var(--text-primary)}
+.setting-row .row-label .desc{font-size:11px;color:var(--text-muted)}
+.setting-row .row-control{flex-shrink:0}
+
+/* switchToggle 样式 */
+.switch {position:relative;display:inline-block;width:40px;height:22px}
+.switch input{opacity:0;width:0;height:0}
+.switch .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:var(--switch-bg);border-radius:11px;transition:0.25s}
+.switch .slider:before{position:absolute;content:"";height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:0.25s}
+.switch input:checked+.slider{background:var(--switch-active)}
+.switch input:checked+.slider:before{transform:translateX(18px)}
+
+/* 下拉框 */
+.setting-select{padding:6px 12px;border:1px solid var(--input-border);border-radius:6px;background:var(--input-bg);color:var(--text-primary);font-size:12px;outline:none;cursor:pointer;min-width:120px}
+.setting-select:focus{border-color:var(--accent)}
+
+/* 输入框 */
+.setting-input{padding:6px 12px;border:1px solid var(--input-border);border-radius:6px;background:var(--input-bg);color:var(--text-primary);font-size:12px;outline:none;width:120px;text-align:center}
+.setting-input:focus{border-color:var(--accent)}
+
+/* 按钮 */
+.setting-btn{padding:8px 20px;border:1px solid var(--accent);border-radius:6px;background:var(--accent);color:#fff;font-size:12px;cursor:pointer;transition:all 0.15s ease}
+.setting-btn:hover{background:var(--accent-hover)}
+.setting-btn.outline{background:transparent;color:var(--accent)}
+.setting-btn.outline:hover{background:var(--accent-light)}
+.setting-btn.danger{border-color:#e81123;background:transparent;color:#e81123}
+.setting-btn.danger:hover{background:rgba(232,17,35,0.08)}
+
+/* 关于信息 */
+.about-info{display:flex;flex-direction:column;align-items:center;gap:16px;padding:32px}
+.about-info .app-icon{font-size:48px;color:var(--accent)}
+.about-info .app-version{font-size:13px;color:var(--text-muted)}
+.about-info .app-desc{font-size:12px;color:var(--text-secondary);text-align:center;max-width:300px;line-height:1.6}
+.about-info .detail-table{width:100%;max-width:360px;font-size:12px}
+.about-info .detail-row{display:flex;padding:6px 0;border-bottom:1px solid var(--divider-color)}
+.about-info .detail-row .d-lbl{width:100px;color:var(--text-muted);flex-shrink:0}
+.about-info .detail-row .d-val{flex:1;color:var(--text-primary);text-align:right}
+
+/* 颜色选择器组 */
+.color-presets{display:flex;gap:8px;flex-wrap:wrap}
+.color-dot{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all 0.12s ease}
+.color-dot:hover{transform:scale(1.15);border-color:var(--accent)}
+.color-dot.active{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-light)}
+
+/* 滚动条 */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(128,128,128,0.2);border-radius:3px}
+</style>
+</head>
+<body>
+<div class="pageContainer" id="pageContainer" data-ctrl-type="pageContainer" data-name="canvas"
+     data-original-width="780" data-original-height="560"
+     style="app-region:drag;-webkit-app-region:drag">
+
+  <!-- ================================================================
+       标题栏
+       ================================================================ -->
+  <div class="titlebar" id="titlebar" data-name="标题栏" style="app-region:drag;-webkit-app-region:drag">
+    <div class="tl_l">
+      <span id="titlebar_icon" data-ctrl-type="titlebar_left_icon" data-drag-type="titlebar_left_icon" data-name="图标" class="tl_l_icon">
+        <i class="fas fa-cog"></i>
+      </span>
+    </div>
+    <div class="tl_c">
+      <span id="titlebar_title" data-ctrl-type="titlebar_title" data-drag-type="titlebar_title" data-name="标题" class="tl_c_t">设置</span>
+    </div>
+    <div class="tl_r">
+      <button id="btn_theme" data-ctrl-type="button" data-drag-type="button" data-type="button" data-name="切换主题"
+              class="theme_btn" title="切换主题"><i class="fas fa-moon" id="ico_theme"></i></button>
+      <button id="titlebar_min" data-ctrl-type="titlebar_min" data-name="最小化" class="tb_btn" title="最小化">─</button>
+      <button id="titlebar_max" data-ctrl-type="titlebar_max" data-name="最大化" class="tb_btn" title="最大化">
+        <span style="width:18px;height:18px;display:flex;align-items:center;justify-content:center">□</span>
+      </button>
+      <button id="titlebar_close" data-ctrl-type="titlebar_close" data-name="关闭" class="tb_btn tb_close" title="关闭">✕</button>
+    </div>
+  </div>
+
+  <!-- ================================================================
+       主区域
+       ================================================================ -->
+  <div class="main-area">
+    <!-- 左侧导航 -->
+    <div class="nav-sidebar">
+      <div class="nav-item active" data-tab="appearance">
+        <i class="fas fa-paint-brush"></i><span>外观</span>
+      </div>
+      <div class="nav-item" data-tab="system">
+        <i class="fas fa-desktop"></i><span>系统</span>
+      </div>
+      <div class="nav-item" data-tab="notification">
+        <i class="fas fa-bell"></i><span>通知</span>
+      </div>
+      <div class="nav-item" data-tab="privacy">
+        <i class="fas fa-shield-alt"></i><span>隐私</span>
+      </div>
+      <div class="nav-item" data-tab="about">
+        <i class="fas fa-info-circle"></i><span>关于</span>
+      </div>
+    </div>
+
+    <!-- 右侧内容面板 -->
+    <div class="content-panel" id="panel_content">
+
+      <!-- 外观设置 -->
+      <div class="section active" id="sec_appearance">
+        <div class="section-title">外观设置</div>
+        <div class="setting-group">
+          <div class="setting-group-title">主题</div>
+          <div class="setting-row">
+            <div class="row-label">
+              <span class="title">深色模式</span>
+              <span class="desc">切换应用程序的明暗主题</span>
+            </div>
+            <div class="row-control">
+              <label id="sw_darkmode" data-ctrl-type="switchToggle" data-drag-type="switchToggle" data-type="toggle" data-name="深色模式" class="switch">
+                <input type="checkbox" id="chk_darkmode"><span class="slider"></span>
+              </label>
+            </div>
+          </div>
+          <div class="setting-row">
+            <div class="row-label">
+              <span class="title">强调色</span>
+              <span class="desc">选择界面的主题色</span>
+            </div>
+            <div class="row-control">
+              <div class="color-presets">
+                <div class="color-dot active" data-color="#0078d4" style="background:#0078d4"></div>
+                <div class="color-dot" data-color="#9b6dff" style="background:#9b6dff"></div>
+                <div class="color-dot" data-color="#e91e63" style="background:#e91e63"></div>
+                <div class="color-dot" data-color="#4caf50" style="background:#4caf50"></div>
+                <div class="color-dot" data-color="#ff9800" style="background:#ff9800"></div>
+                <div class="color-dot" data-color="#00bcd4" style="background:#00bcd4"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="setting-group">
+          <div class="setting-group-title">字体与语言</div>
+          <div class="setting-row">
+            <div class="row-label">
+              <span class="title">界面语言</span>
+              <span class="desc">更改应用程序显示语言</span>
+            </div>
+            <div class="row-control">
+              <select id="sel_lang" data-ctrl-type="comboBox" data-drag-type="comboBox" data-type="comboBox" data-name="语言" class="setting-select">
+                <option value="zh-CN" selected>简体中文</option>
+                <option value="en-US">English</option>
+                <option value="ja-JP">日本語</option>
+                <option value="ko-KR">한국어</option>
+              </select>
+            </div>
+          </div>
+          <div class="setting-row">
+            <div class="row-label">
+              <span class="title">字体大小</span>
+              <span class="desc">调整应用程序文字大小</span>
+            </div>
+            <div class="row-control">
+              <select id="sel_fontSize" data-ctrl-type="comboBox" data-drag-type="comboBox" data-type="comboBox" data-name="字体大小" class="setting-select">
+                <option value="small">小</option>
+                <option value="normal" selected>标准</option>
+                <option value="large">大</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 系统设置 -->
+      <div class="section" id="sec_system">
+        <div class="section-title">系统设置</div>
+        <div class="setting-group">
+          <div class="setting-group-title">启动与行为</div>
+          <div class="setting-row">
+            <div class="row-label">
+              <span class="title">开机自启动</span>
+              <span class="desc">系统启动时自动运行本程序</span>
+            </div>
+            <div class="row-control">
+              <label id="sw_autostart" data-ctrl-type="switchToggle" data-drag-type="switchToggle" data-type="toggle" data-name="开机自启动" class="switch">
+                <input type="checkbox"><span class="slider"></span>
+              </label>
+            </div>
+          </div>
+          <div class="setting-row">
+            <div class="row-label">
+              <span class="title">最小化到托盘</span>
+              <span class="desc">关闭窗口时最小化到系统托盘</span>
+            </div>
+            <div class="row-control">
+              <label id="sw_tray" data-ctrl-type="switchToggle" data-drag-type="switchToggle" data-type="toggle" data-name="托盘" class="switch">
+                <input type="checkbox" checked><span class="slider"></span>
+              </label>
+            </div>
+          </div>
+          <div class="setting-row">
+            <div class="row-label">
+              <span class="title">硬件加速</span>
+              <span class="desc">使用 GPU 加速渲染界面</span>
+            </div>
+            <div class="row-control">
+              <label id="sw_gpu" data-ctrl-type="switchToggle" data-drag-type="switchToggle" data-type="toggle" data-name="硬件加速" class="switch">
+                <input type="checkbox" checked><span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="setting-group">
+          <div class="setting-group-title">缓存与存储</div>
+          <div class="setting-row">
+            <div class="row-label">
+              <span class="title">缓存大小</span>
+              <span class="desc">当前缓存占用 128 MB</span>
+            </div>
+            <div class="row-control">
+              <button id="btn_clearCache" data-ctrl-type="button" data-drag-type="button" data-type="button" data-name="清除缓存"
+                      class="setting-btn outline">清除缓存</button>
+            </div>
+          </div>
+          <div class="setting-row">
+            <div class="row-label">
+              <span class="title">数据目录</span>
+              <span class="desc">C:\Users\Administrator\AppData</span>
+            </div>
+            <div class="row-control">
+              <button id="btn_openDir" data-ctrl-type="button" data-drag-type="button" data-type="button" data-name="打开目录"
+                      class="setting-btn outline">打开</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 通知设置 -->
+      <div class="section" id="sec_notification">
+        <div class="section-title">通知设置</div>
+        <div class="setting-group">
+          <div class="setting-group-title">通知</div>
+          <div class="setting-row">
+            <div class="row-label">
+              <span class="title">启用通知</span>
+              <span class="desc">接收系统消息和应用通知</span>
+            </div>
+            <div class="row-control">
+              <label id="sw_notify" data-ctrl-type="switchToggle" data-drag-type="switchToggle" data-type="toggle" data-name="通知开关" class="switch">
+                <input type="checkbox" checked><span class="slider"></span>
+              </label>
+            </div>
+          </div>
+          <div class="setting-row">
+            <div class="row-label">
+              <span class="title">声音提示</span>
+              <span class="desc">收到通知时播放提示音</span>
+            </div>
+            <div class="row-control">
+              <label id="sw_sound" data-ctrl-type="switchToggle" data-drag-type="switchToggle" data-type="toggle" data-name="声音" class="switch">
+                <input type="checkbox"><span class="slider"></span>
+              </label>
+            </div>
+          </div>
+          <div class="setting-row">
+            <div class="row-label">
+              <span class="title">桌面通知</span>
+              <span class="desc">在桌面右下角弹出通知横幅</span>
+            </div>
+            <div class="row-control">
+              <label id="sw_toast" data-ctrl-type="switchToggle" data-drag-type="switchToggle" data-type="toggle" data-name="桌面通知" class="switch">
+                <input type="checkbox" checked><span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="setting-group">
+          <div class="setting-group-title">提醒频率</div>
+          <div class="setting-row">
+            <div class="row-label">
+              <span class="title">更新提醒间隔</span>
+              <span class="desc">软件更新检查的频率</span>
+            </div>
+            <div class="row-control">
+              <select id="sel_updateFreq" data-ctrl-type="comboBox" data-drag-type="comboBox" data-type="comboBox" data-name="更新频率" class="setting-select">
+                <option value="daily">每天</option>
+                <option value="weekly" selected>每周</option>
+                <option value="monthly">每月</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 隐私设置 -->
+      <div class="section" id="sec_privacy">
+        <div class="section-title">隐私与安全</div>
+        <div class="setting-group">
+          <div class="setting-group-title">数据收集</div>
+          <div class="setting-row">
+            <div class="row-label">
+              <span class="title">发送使用统计</span>
+              <span class="desc">匿名发送使用数据以改进产品</span>
+            </div>
+            <div class="row-control">
+              <label id="sw_analytics" data-ctrl-type="switchToggle" data-drag-type="switchToggle" data-type="toggle" data-name="使用统计" class="switch">
+                <input type="checkbox"><span class="slider"></span>
+              </label>
+            </div>
+          </div>
+          <div class="setting-row">
+            <div class="row-label">
+              <span class="title">错误报告</span>
+              <span class="desc">自动发送崩溃报告以帮助修复问题</span>
+            </div>
+            <div class="row-control">
+              <label id="sw_crash" data-ctrl-type="switchToggle" data-drag-type="switchToggle" data-type="toggle" data-name="错误报告" class="switch">
+                <input type="checkbox" checked><span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="setting-group">
+          <div class="setting-group-title">安全</div>
+          <div class="setting-row">
+            <div class="row-label">
+              <span class="title">记住登录状态</span>
+              <span class="desc">下次启动时自动登录</span>
+            </div>
+            <div class="row-control">
+              <label id="sw_remember" data-ctrl-type="switchToggle" data-drag-type="switchToggle" data-type="toggle" data-name="记住登录" class="switch">
+                <input type="checkbox" checked><span class="slider"></span>
+              </label>
+            </div>
+          </div>
+          <div class="setting-row">
+            <div class="row-label">
+              <span class="title">重置所有设置</span>
+              <span class="desc">将所有设置恢复为默认值</span>
+            </div>
+            <div class="row-control">
+              <button id="btn_reset" data-ctrl-type="button" data-drag-type="button" data-type="button" data-name="重置设置"
+                      class="setting-btn danger">重置</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 关于 -->
+      <div class="section" id="sec_about">
+        <div class="section-title">关于</div>
+        <div class="about-info">
+          <div class="app-icon"><i class="fas fa-cubes"></i></div>
+          <span id="lbl_appName" data-ctrl-type="label" data-drag-type="label" data-type="label" data-name="应用名"
+                style="font-size:18px;font-weight:700;color:var(--text-primary)">WebViewBridge 工具套件</span>
+          <span id="lbl_version" data-ctrl-type="label" data-drag-type="label" data-type="label" data-name="版本"
+                style="font-size:13px;color:var(--text-muted)">版本 1.0.0</span>
+          <div class="detail-table">
+            <div class="detail-row"><span class="d-lbl">构建版本</span><span class="d-val">2026.07.08.001</span></div>
+            <div class="detail-row"><span class="d-lbl">运行环境</span><span class="d-val">WebView2 Runtime</span></div>
+            <div class="detail-row"><span class="d-lbl">框架版本</span><span class="d-val">webviewBridge 2.0</span></div>
+            <div class="detail-row"><span class="d-lbl">许可证</span><span class="d-val">MIT License</span></div>
+          </div>
+          <button id="btn_checkUpdate" data-ctrl-type="button" data-drag-type="button" data-type="button" data-name="检查更新"
+                  class="setting-btn" style="margin-top:12px">检查更新</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="webviewBridge.js"></script>
+<script>
+(function(){
+  'use strict';
+  var $=function(s){return document.querySelector(s)};
+  var $$=function(s){return document.querySelectorAll(s)};
+
+  var state={isDark:false};
+
+  var dom={
+    pageContainer:$('#pageContainer'),
+    btnTheme:$('#btn_theme'),icoTheme:$('#ico_theme'),
+    chkDarkmode:$('#chk_darkmode'),
+    navItems:$$('.nav-sidebar .nav-item'),
+    sections:$$('.content-panel .section'),
+    colorDots:$$('.color-dot')
+  };
+
+  /** 切换标签页 */
+  function switchTab(tabName) {
+    dom.navItems.forEach(function(n){ n.classList.toggle('active', n.getAttribute('data-tab')===tabName); });
+    dom.sections.forEach(function(s){ s.classList.toggle('active', s.id==='sec_'+tabName); });
+  }
+
+  /** 切换主题 */
+  function toggleTheme(forceDark) {
+    var isDark = typeof forceDark === 'boolean' ? forceDark : !state.isDark;
+    state.isDark = isDark;
+    if (isDark) {
+      dom.pageContainer.classList.add('dark-theme');
+      dom.icoTheme.className = 'fas fa-sun';
+      dom.chkDarkmode.checked = true;
+    } else {
+      dom.pageContainer.classList.remove('dark-theme');
+      dom.icoTheme.className = 'fas fa-moon';
+      dom.chkDarkmode.checked = false;
+    }
+  }
+
+  /** 绑定事件 */
+  function bindEvents(){
+    dom.btnTheme.addEventListener('click', function(){ toggleTheme(); });
+    dom.chkDarkmode.addEventListener('change', function(){ toggleTheme(this.checked); });
+
+    dom.navItems.forEach(function(item){
+      item.addEventListener('click', function(){ switchTab(this.getAttribute('data-tab')); });
+    });
+
+    dom.colorDots.forEach(function(dot){
+      dot.addEventListener('click', function(){
+        dom.colorDots.forEach(function(d){ d.classList.remove('active'); });
+        this.classList.add('active');
+        var color = this.getAttribute('data-color');
+        document.documentElement.style.setProperty('--accent', color);
+      });
+    });
+
+    // 清除缓存
+    var btnClear = $('#btn_clearCache');
+    if (btnClear) btnClear.addEventListener('click', function(){ alert('缓存已清除'); });
+    // 重置
+    var btnReset = $('#btn_reset');
+    if (btnReset) btnReset.addEventListener('click', function(){ if(confirm('确认重置所有设置？')) alert('已重置'); });
+    // 检查更新
+    var btnUpdate = $('#btn_checkUpdate');
+    if (btnUpdate) btnUpdate.addEventListener('click', function(){ alert('当前已是最新版本'); });
+  }
+
+  bindEvents();
+})();
+</script>
+</body>
+</html>
